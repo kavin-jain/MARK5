@@ -203,3 +203,4 @@ site/
 dmypy.json
 .pyre/
 .pytype/
+.env
