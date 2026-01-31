@@ -1,0 +1,205 @@
+# ============================================
+# 🔒 CRITICAL SECURITY - NEVER COMMIT THESE
+# ============================================
+.env
+.env.local
+.env.*.local
+.env.BACKUP_DO_NOT_COMMIT
+*.key
+*.pem
+*.p12
+*credentials*
+*secrets*
+api_keys.txt
+tokens.txt
+
+# ============================================
+# 🐍 Python
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# ============================================
+# 📊 Data & Models (Large Files)
+# ============================================
+# Raw data
+data/raw/
+data/processed/
+data/backups/
+data/temp/
+*.csv
+*.parquet
+*.feather
+*.hdf5
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Trained models (604MB - too large for Git)
+model_artifacts/
+models/*/
+*.h5
+*.pkl
+*.pickle
+*.joblib
+*.model
+*.cbm
+*.bin
+*.onnx
+*.tflite
+*.pt
+*.pth
+
+# Scalers and weights
+scalers/
+weights/
+checkpoints/
+
+# ============================================
+# 📝 Logs
+# ============================================
+logs/
+*.log
+log_*.txt
+*.log.*
+*.out
+
+# ============================================
+# 💻 IDE & Editors
+# ============================================
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ============================================
+# 🖥️ Operating System
+# ============================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ============================================
+# 🐳 Docker
+# ============================================
+*.env.docker
+docker-compose.override.yml
+
+# ============================================
+# 📦 Archives & Backups
+# ============================================
+_ARCHIVE*/
+_archive*/
+_backup*/
+_old*/
+*.zip
+*.tar.gz
+*.tar
+*.rar
+*.7z
+*.bak
+*.backup
+*.tmp
+*.temp
+
+# Legacy archive (11GB - don't commit this!)
+_ARCHIVE_LEGACY_*/
+
+# ============================================
+# 🧪 Testing
+# ============================================
+.tox/
+.coverage
+.pytest_cache/
+
+# ============================================
+# 📚 Documentation Build
+# ============================================
+docs/_build/
+site/
+
+# ============================================
+# 🔧 Other
+# ============================================
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/

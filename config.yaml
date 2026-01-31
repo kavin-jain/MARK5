@@ -1,0 +1,436 @@
+# MARK5 System Configuration v5.0.0
+# Centralized configuration for all system components
+# ENVIRONMENT: Use config_dev.yaml, config_staging.yaml, config_prod.yaml for env-specific settings
+
+# =============================================================================
+# SECURITY BEST PRACTICES (READ THIS FIRST!)
+# =============================================================================
+security:
+  guidelines:
+    - "NEVER store credentials (API keys, passwords) in config files. Use environment variables."
+    - "Validate all required environment variables are set before deployment (see validation checklist)"
+    - "Required ENV variables: MARK5_EMAIL_SENDER, MARK5_EMAIL_PASSWORD, MARK5_API_KEY (if applicable)"
+    - "Rotate credentials regularly and use secrets management (e.g., AWS Secrets Manager, HashiCorp Vault)"
+    - "Restrict file permissions on config files (chmod 600) to prevent unauthorized access"
+    - "Never commit credentials to version control - use .gitignore for sensitive files"
+
+# Data Collection Settings
+data_collector:
+  min_request_interval: 2.0  # Seconds between API requests
+  max_retries: 5
+  retry_delay: 2.0  # Base delay; code implements exponential backoff (delay * 2^attempt)
+  cache_ttl: 60  # Default cache TTL in seconds (override with dynamic TTL from MarketStatusChecker)
+  
+  # Data quality thresholds
+  data_quality:
+    min_data_points: 50  # Default for daily data
+    max_price_change: 0.50  # 50% max change (filters obvious data errors)
+    min_volume: 100
+    
+    # Interval-specific minimum data points (align with model requirements)
+    interval_specific_min_points:
+      "1m": 100   # 1-minute bars need more data
+      "5m": 80    # 5-minute bars
+      "15m": 60   # 15-minute bars
+      "1h": 50    # Hourly bars
+      "1d": 50    # Daily bars (default)
+
+# Trading Utilities
+trading:
+  # Transaction costs for NSE/BSE (India)
+  # NOTE: Keep in sync with backtesting.commission and backtesting.slippage
+  transaction_costs:
+    brokerage_pct: 0.0003  # 0.03%
+    brokerage_flat: 20.0   # ₹20 max
+    stt_buy_pct: 0.0001    # 0.01% on buy
+    stt_sell_pct: 0.00025  # 0.025% on sell
+    exchange_charges_nse: 0.0000325  # NSE charges
+    exchange_charges_bse: 0.000037   # BSE charges (if trading on BSE)
+    gst_pct: 0.18  # 18% GST
+    sebi_charges: 0.00001  # SEBI charges
+    slippage_pct: 0.001  # 0.1% base slippage (adjust dynamically: slippage_pct * volatility_pct)
+    # Code should multiply slippage by volatility for realistic modeling
+  
+  # Data freshness validation
+  data_freshness:
+    max_age_trading: 15  # Minutes during trading hours
+    max_age_closed: 1440  # Minutes when market closed (24 hours)
+    # Interval-specific max age (in minutes) - adjusted for real-world latency
+    # NOTE: Ensure interval-specific values do NOT exceed max_age_trading (validation in code)
+    interval_specific:
+      "1m": 5      # Allow 5 min for 1-min data (3-5 min latency is realistic)
+      "5m": 10     # 10 minutes for 5-minute data
+      "15m": 15    # 15 minutes for 15-minute data (≤ max_age_trading)
+      "1h": 70     # 70 minutes for hourly data
+      "1d": 1440   # 24 hours for daily data
+
+# Model Registry Settings
+model_registry:
+  registry_path: "core/models/registry.json"
+  enable_hot_reload: true
+  hot_reload_interval: 60  # Seconds between hot-reload checks
+  confirm_before_reload: false  # Set true to require manual confirmation before reloading models
+  keep_versions: 5  # Number of model versions to retain (excludes deployed models)
+  cleanup_interval: 86400  # Daily cleanup (seconds)
+  # NOTE: Cleanup skips models marked as 'deployed' to avoid removing production models
+
+# Feature Engineering
+feature_engineering:
+  cache_max_size: 100
+  cache_default_ttl: 300  # 5 minutes (override with dynamic TTL from MarketStatusChecker)
+  # NOTE: Cache TTL should adapt to market volatility - use shorter TTL during high volatility
+  
+  # Feature selection defaults (overridden by model_type_configs)
+  correlation_threshold: 0.8  # Remove features with >80% correlation
+  vif_threshold: 10.0  # Remove features with VIF >10 (multicollinearity)
+  
+  # Technical indicators
+  sma_periods: [10, 20, 50, 200]
+  ema_periods: [12, 26]
+  rsi_period: 14
+  macd_periods: [12, 26, 9]
+  bollinger_period: 20
+  bollinger_std: 2.0
+
+# Model-Specific Parameter Overrides
+# Centralized location for model-type-specific configurations
+model_type_configs:
+  # TCN (Temporal Convolutional Network) - requires stricter feature selection
+  tcn:
+    correlation_threshold: 0.7  # Stricter than default (0.8)
+    vif_threshold: 5.0          # Stricter than default (10.0)
+    training_batch_size: 64     # Overrides training.tcn.batch_size if needed
+    sequence_length: 64
+    # NOTE: Code should check this section first, then fall back to defaults
+  
+  # XGBoost - uses defaults but can be customized here
+  xgboost:
+    correlation_threshold: 0.8  # Use defaults
+    vif_threshold: 10.0
+    # Add custom params if needed
+  
+  # LightGBM - uses defaults but can be customized here
+  lightgbm:
+    correlation_threshold: 0.8  # Use defaults
+    vif_threshold: 10.0
+    # Add custom params if needed
+
+# Model Training
+training:
+  test_size: 0.15  # Reduced from 0.2 to preserve more training data
+  validation_size: 0.1  # Reduced from 0.2 for long-term models
+  random_state: 42  # Fixed for reproducibility (allow randomization during hyperparameter tuning)
+  # NOTE: For exploration, set random_state to null in optimization phase
+  
+  # XGBoost defaults
+  xgboost:
+    n_estimators: 200
+    max_depth: 8
+    learning_rate: 0.05
+    min_child_weight: 5
+    
+  # LightGBM defaults
+  lightgbm:
+    n_estimators: 200
+    max_depth: 8
+    learning_rate: 0.05
+    num_leaves: 31
+    
+  # TCN defaults (🔥 REDUCED COMPLEXITY to fix overfitting)
+  tcn:
+    sequence_length: 64
+    filters: 32  # 🔥 REDUCED from 64 to 32 (Fix #3: reduce overfitting)
+    kernel_size: 3
+    dilations: [1, 2, 4, 8]  # 🔥 REDUCED from [1,2,4,8,16] (remove depth)
+    dropout: 0.3  # 🔥 INCREASED from 0.2 to 0.3 (more regularization)
+    epochs: 100
+    batch_size: 64  # Increased from 32 to 64 for faster training (adjust based on GPU memory)
+    # RATIONALE: Val Accuracy 86% → Test 48% indicates severe overfitting
+    # Reducing complexity forces model to learn generalizable patterns
+
+# Hyperparameter Optimization
+optimization:
+  n_trials: 100
+  timeout: 1800  # Default: 30 minutes (see model_timeouts for overrides)
+  n_jobs: -1  # Use all CPUs
+  
+  # Optuna settings
+  sampler: "TPE"  # Tree-structured Parzen Estimator
+  pruner: "MedianPruner"
+  
+  # Walk-forward validation
+  walk_forward:
+    n_splits: 5
+    train_size: 252  # Trading days (~1 year)
+    test_size: 63    # Trading days (~3 months)
+    buffer_days: 7   # 1 week buffer to prevent data leakage between train/test periods
+    
+    # Model-specific timeout overrides (in seconds)
+    model_timeouts:
+      tcn: 3600      # 1 hour for TCN (complex model)
+      lstm: 3600     # 1 hour for LSTM (if implemented)
+      xgboost: 1800  # 30 minutes for XGBoost (default)
+      lightgbm: 1800 # 30 minutes for LightGBM (default)
+      default: 1800  # Default for other models
+
+# Alert System
+alerts:
+  enabled: true
+  
+  # Email configuration (SECURITY: Load credentials from environment variables!)
+  email:
+    enabled: false
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    sender: ""  # Load from ENV: MARK5_EMAIL_SENDER
+    recipients: []  # Load from ENV: MARK5_EMAIL_RECIPIENTS (comma-separated)
+    password: ""  # Load from ENV: MARK5_EMAIL_PASSWORD (NEVER hardcode!)
+    
+  # Console alerts
+  console:
+    enabled: true
+    min_level: "MEDIUM"  # CRITICAL, HIGH, MEDIUM, LOW, INFO
+    
+  # Database storage
+  database:
+    enabled: true
+    retention_days: 30
+    
+  # Alert thresholds
+  thresholds:
+    # Model degradation (calculate relative to baseline accuracy)
+    model_degradation: 0.05  # 5% drop (e.g., 70% → 66.5% triggers alert)
+    model_degradation_relative: true  # If true, 5% means 5% of baseline (70% * 0.05 = 3.5% absolute drop)
+    
+    data_freshness_hours: 24
+    cpu_percent: 90
+    memory_percent: 85
+    disk_percent: 90
+    
+    # Risk score thresholds (multi-level)
+    risk_score_critical: 0.85  # Critical risk
+    risk_score_high: 0.7       # High risk
+    risk_score_medium: 0.5     # Medium risk
+    
+    confidence_threshold: 0.55  # Minimum confidence for trading signals
+    # NOTE: Consider optimizing confidence_threshold via backtesting per regime
+
+# Monitoring & Logging
+monitoring:
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  log_file: "logs/mark5.log"
+  log_max_bytes: 10485760  # 10 MB
+  log_backup_count: 5
+  log_context: true  # Include ticker/model context in logs (e.g., "[RELIANCE.NS] Data validation failed")
+  
+  # Performance tracking
+  track_performance: true
+  performance_db: "database/main/mark5.db"
+  
+  # System health checks (expanded scope with thresholds)
+  health_check_interval: 300  # 5 minutes
+  health_check_components:
+    model_registry:
+      enabled: true
+      check: "connectivity"  # Verify registry is accessible
+    
+    data_collector:
+      enabled: true
+      check: "cache_health"  # Verify cache is functioning
+      max_cache_age_minutes: 30  # Alert if cache hasn't updated in 30min
+    
+    trading_api:
+      enabled: true
+      check: "latency"
+      max_latency_ms: 500  # Alert if API response time > 500ms
+      timeout_seconds: 10
+    
+    database:
+      enabled: true
+      check: "connectivity"
+      timeout_seconds: 5
+    
+    disk_space:
+      enabled: true
+      check: "free_space"
+      min_free_gb: 10  # Alert if free disk space < 10GB
+      critical_free_gb: 5  # Critical alert if < 5GB
+    
+    memory:
+      enabled: true
+      check: "usage"
+      max_used_percent: 85  # Alert if memory usage > 85%
+      critical_used_percent: 95  # Critical if > 95%
+
+# Backtesting
+backtesting:
+  initial_capital: 100000  # ₹1,00,000
+  position_size_pct: 10  # Percentage of portfolio per position (10 = 10%)
+  max_positions: 5
+  
+  # Transaction costs (aligned with trading.transaction_costs)
+  # Total transaction cost from trading.transaction_costs:
+  #   Brokerage: 0.03% + STT: 0.025% + Exchange: 0.0000325% + GST: 18% of (brokerage+exchange)
+  #   Combined ≈ 0.055% per trade, rounded to 0.2% for safety margin
+  commission: 0.002  # 0.2% of trade value (combined costs)
+  slippage: 0.001  # 0.1% of trade value (base, multiply by volatility in code)
+  # NOTE: Keep commission/slippage in sync with trading.transaction_costs
+  # Verify alignment: 0.002 (commission) + 0.001 (slippage) = 0.3% total per trade
+  
+  # 🔥 CRITICAL FIXES - Risk Management (ENABLED)
+  use_atr_stop_loss: true  # Enable ATR-based stop-loss (prevents -10% to -18% losses)
+  atr_stop_multiplier: 2.0  # 2x ATR for stop distance
+  max_stop_loss_pct: 0.05   # Never lose more than 5% on a single trade
+  min_profit_threshold: 0.015  # Only take trades with >1.5% gross profit potential
+  max_hold_days: 10  # Exit positions after 10 days regardless
+  max_hold_days_losing: 5  # Exit losing positions faster (5 days)
+  
+  # Legacy risk management (for reference)
+  stop_loss: 0.05  # 5% stop loss
+  take_profit: 0.15  # 15% take profit
+  max_drawdown: 0.20  # 20% max drawdown limit
+  max_drawdown_enforcement: true  # Halt backtesting if max_drawdown is exceeded
+  
+  # Leverage (if applicable)
+  max_leverage: 1.0  # No leverage (set to 2.0 for 2x leverage, etc.)
+
+# Production Settings
+# CRITICAL: This base config assumes PRODUCTION environment
+# Override in config_dev.yaml or config_staging.yaml for non-production environments
+production:
+  # API settings (adjust based on data source)
+  api_timeout: 30  # Seconds (10s for intraday, 60s for historical)
+  max_concurrent_requests: 10
+  rate_limit_per_minute: 60  # Global rate limit
+  rate_limit_per_ticker: 3    # Max trades per ticker per day (prevents overtrading single asset)
+  
+  # Safety checks - PRODUCTION DEFAULTS
+  enable_paper_trading: false  # PRODUCTION: false (real trades). DEV/STAGING: Override to true!
+  require_confirmation: true   # Require manual confirmation before executing trades
+  confirmation_timeout: 300    # 5 minutes timeout for confirmation (prevents hanging trades)
+  # IMPORTANT: Only set enable_paper_trading=false after:
+  #   1. Thorough backtesting with realistic transaction costs
+  #   2. Extended paper trading period (30+ days)
+  #   3. Validation of all system components
+  #   4. Review and approval from risk management
+  
+  # Trade limits
+  max_daily_trades: 20        # Maximum total trades per day
+  max_position_value: 50000   # ₹50,000 max per position
+
+# System Paths
+# CRITICAL: Replace with ABSOLUTE paths in production config (config_prod.yaml)
+# Development: Relative paths (below) are acceptable
+# Production: MUST use absolute paths to prevent working directory issues
+paths:
+  data_dir: "data"                    # PROD: Replace with /var/mark5/data
+  models_dir: "models"          # PROD: Replace with /var/mark5/models
+  logs_dir: "logs"                    # PROD: Replace with /var/log/mark5
+  reports_dir: "reports"              # PROD: Replace with /var/mark5/reports
+  database_dir: "database/main"       # PROD: Replace with /var/mark5/database
+  backups_dir: "database/backups"     # PROD: Replace with /var/mark5/backups
+  # VALIDATION: Ensure all directories exist with proper permissions (755 for dirs, 644 for files)
+  # VALIDATION: Ensure backups_dir has sufficient storage (recommended: 50GB+)
+
+# Environment-Specific Overrides
+# Create separate config files for different environments:
+# - config_dev.yaml (development settings)
+# - config_staging.yaml (staging/testing)
+# - config_prod.yaml (production settings)
+#
+# Load priority: config_prod.yaml > config.yaml (base)
+#
+# Example differences:
+# Development:
+#   - enable_paper_trading: true
+#   - log_level: DEBUG
+#   - require_confirmation: false
+#
+# Production:
+#   - enable_paper_trading: false (ONLY after thorough testing!)
+#   - log_level: INFO
+#   - require_confirmation: true
+#   - Use absolute paths for all directories
+#   - Load credentials from environment variables
+
+# Configuration Best Practices:
+# 1. NEVER commit credentials to version control
+# 2. Use environment variables for secrets (EMAIL_PASSWORD, API_KEYS)
+# 3. Test configuration changes in staging before production
+# 4. Keep transaction_costs in sync across trading/backtesting
+# 5. Adjust thresholds (freshness, TTL) based on market conditions
+# 6. Monitor and tune parameters based on live performance
+# 7. Backup this file before making changes
+# 8. Document any custom overrides for your setup
+
+# ===============================================================================
+# VALIDATION CHECKLIST (Complete BEFORE deployment)
+# ===============================================================================
+# Run through this checklist before deploying to any environment:
+#
+# ENVIRONMENT & CONFIGURATION
+# [ ] Config file loaded is correct for environment (dev/staging/prod)
+# [ ] enable_paper_trading matches environment intent:
+#     - DEV/STAGING: true (paper trading)
+#     - PRODUCTION: false (real trades) - ONLY after thorough testing
+# [ ] All paths are ABSOLUTE in production config (not relative)
+# [ ] All directories exist with proper permissions (755 for dirs, 644 for files)
+#
+# SECURITY & CREDENTIALS
+# [ ] All environment variables are defined and correct:
+#     - MARK5_EMAIL_SENDER
+#     - MARK5_EMAIL_PASSWORD
+#     - MARK5_API_KEY (if applicable)
+# [ ] No credentials are hardcoded in config files
+# [ ] Config file permissions are restricted (chmod 600)
+# [ ] Credentials are rotated regularly (documented schedule)
+#
+# DATA & MODELS
+# [ ] Database is accessible and has sufficient space (50GB+ recommended)
+# [ ] Backup directory has sufficient storage (50GB+ recommended)
+# [ ] Model versions retention (keep_versions) is appropriate
+# [ ] Feature engineering correlation/VIF thresholds align with model types
+# [ ] Data freshness interval-specific values don't exceed max_age_trading
+#
+# TRANSACTION COSTS & TRADING
+# [ ] Transaction costs in trading.transaction_costs match broker's actual fees
+# [ ] Backtesting commission/slippage align with trading.transaction_costs
+# [ ] Total transaction cost verified: commission + slippage = expected %
+# [ ] Rate limits align with API provider's restrictions
+# [ ] Rate limit per ticker (3/day) is appropriate for strategy
+#
+# MONITORING & ALERTS
+# [ ] Health check thresholds are defined and realistic:
+#     - API latency < 500ms
+#     - Disk space > 10GB free
+#     - Memory usage < 85%
+# [ ] Alert thresholds are appropriate for your strategy
+# [ ] Email notification recipients are correct and tested
+# [ ] Log rotation is configured properly (10MB max, 5 backups)
+# [ ] Log file path is absolute in production
+#
+# MODEL TRAINING & OPTIMIZATION
+# [ ] Model training batch sizes are compatible with available GPU memory:
+#     - TCN batch_size: 64 (adjust if GPU memory limited)
+# [ ] Walk-forward buffer_days (7) is set to prevent data leakage
+# [ ] Model-specific timeouts in optimization.walk_forward.model_timeouts are set
+# [ ] test_size (0.15) and validation_size (0.1) are appropriate for dataset size
+#
+# BACKTESTING & RISK
+# [ ] max_drawdown (20%) and stop_loss (5%) align with risk tolerance
+# [ ] max_leverage (1.0) is set correctly (no leverage by default)
+# [ ] position_size_pct (10%) doesn't exceed risk management limits
+#
+# FINAL CHECKS
+# [ ] Configuration validated with test run in staging environment
+# [ ] All monitoring dashboards are set up and accessible
+# [ ] Backup and disaster recovery procedures are documented and tested
+# [ ] Team is trained on configuration changes and emergency procedures
+# [ ] Rollback plan is documented in case of issues
+#
+# Sign-off:
+# [ ] Developer: _______________  Date: __________
+# [ ] Risk Manager: ____________  Date: __________
+# [ ] Operations: ______________  Date: __________
+#
+# For more information, see: ENHANCEMENTS_COMPLETE.md

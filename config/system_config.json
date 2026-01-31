@@ -1,0 +1,286 @@
+{
+  "system_name": "MARK3 - Advanced AI Stock Prediction System",
+  "version": "3.0.0",
+  "debug_mode": false,
+  "log_level": "INFO",
+  "log_retention_days": 30,
+  "database": {
+    "path": "database/mark3.db",
+    "backup_path": "database/backups",
+    "connection_pool_size": 10,
+    "connection_timeout": 30,
+    "query_timeout": 60,
+    "wal_mode": true,
+    "cache_size": 10000,
+    "temp_store": "MEMORY",
+    "backup_interval_hours": 24,
+    "max_backup_files": 30,
+    "auto_vacuum": true
+  },
+  "redis": {
+    "host": "localhost",
+    "port": 6379,
+    "db": 0,
+    "password": null,
+    "socket_timeout": 5.0,
+    "retry_on_timeout": true,
+    "max_connections": 10,
+    "health_check_interval": 30
+  },
+  "timescale": {
+    "host": "localhost",
+    "port": 5432,
+    "user": "postgres",
+    "password": "password",
+    "database": "mark3_timescale",
+    "min_connections": 1,
+    "max_connections": 10,
+    "schema_name": "public",
+    "ssl_mode": "prefer"
+  },
+  "data_collection": {
+    "default_period": "2y",
+    "default_interval": "1d",
+    "max_retries": 3,
+    "request_timeout": 30,
+    "rate_limit_delay": 1.0,
+    "cache_ttl": 300,
+    "max_workers": 5,
+    "data_quality_checks": true,
+    "validate_on_fetch": true,
+    "news_sources_enabled": true,
+    "sentiment_analysis_enabled": true,
+    "index_instrument_tokens": {
+      "NIFTY50": 256265,
+      "NIFTY 50": 256265,
+      "NIFTY_50": 256265,
+      "NSEI": 256265,
+      "BANKNIFTY": 260105,
+      "NIFTY BANK": 260105,
+      "NSEBANK": 260105,
+      "NIFTYIT": 261641,
+      "CNXIT": 261641
+    },
+    "yahoo_download_timeout": 10,
+    "index_fetch_period": "1d",
+    "index_fetch_interval": "1d",
+    "beta_rolling_window": 20,
+    "outlier_z_score_threshold": 5.0
+  },
+  "ml_training": {
+    "sequence_length": 60,
+    "prediction_horizon": 1,
+    "validation_split": 0.2,
+    "test_split": 0.1,
+    "cv_folds": 5,
+    "max_epochs": 100,
+    "early_stopping_patience": 10,
+    "learning_rate_reduction_patience": 5,
+    "batch_size_options": [
+      16,
+      32,
+      64,
+      128
+    ],
+    "feature_selection_k": 20,
+    "gpu_memory_limit": 4096,
+    "enable_automl": true,
+    "automl_trials": 20,
+    "automl_timeout": 3600
+  },
+  "prediction": {
+    "confidence_threshold": 0.7,
+    "min_model_agreement": 0.6,
+    "enable_explainable_ai": true,
+    "enable_market_regime_detection": true,
+    "cache_ttl": 60,
+    "max_ensemble_models": 5,
+    "prediction_horizons": {
+      "intraday": {
+        "days": 0,
+        "hours": 4
+      },
+      "next_day": {
+        "days": 1,
+        "hours": 0
+      },
+      "short_term": {
+        "days": 3,
+        "hours": 0
+      },
+      "medium_term": {
+        "days": 7,
+        "hours": 0
+      },
+      "long_term": {
+        "days": 30,
+        "hours": 0
+      },
+      "quarterly": {
+        "days": 90,
+        "hours": 0
+      }
+    },
+    "risk_analysis_enabled": true,
+    "min_data_rows": 200,
+    "model_types": [
+      "xgboost",
+      "lightgbm",
+      "catboost",
+      "lstm",
+      "gru",
+      "tcn"
+    ],
+    "sma_short_window": 20,
+    "sma_long_window": 50,
+    "atr_period": 14,
+    "volatility_short_window": 10,
+    "volatility_long_window": 50,
+    "sma_trend_window": 200,
+    "momentum_short_window": 20,
+    "momentum_long_window": 60,
+    "volume_window": 50,
+    "max_lru_cache_size": 50,
+    "signal_thresholds": {
+      "bull_market": {
+        "strong_buy": 0.7,
+        "buy": 0.52,
+        "hold": 0.45,
+        "sell": 0.55,
+        "strong_sell": 0.7
+      },
+      "bear_market": {
+        "strong_buy": 0.75,
+        "buy": 0.6,
+        "hold": 0.4,
+        "sell": 0.48,
+        "strong_sell": 0.65
+      },
+      "sideways_market": {
+        "strong_buy": 0.72,
+        "buy": 0.56,
+        "hold": 0.48,
+        "sell": 0.56,
+        "strong_sell": 0.72
+      },
+      "volatile_market": {
+        "strong_buy": 0.7,
+        "buy": 0.52,
+        "hold": 0.45,
+        "sell": 0.55,
+        "strong_sell": 0.7
+      },
+      "normal_market": {
+        "strong_buy": 0.72,
+        "buy": 0.56,
+        "hold": 0.48,
+        "sell": 0.56,
+        "strong_sell": 0.72
+      }
+    }
+  },
+  "ui": {
+    "theme": "dark",
+    "refresh_interval": 5,
+    "max_display_items": 50,
+    "auto_refresh": true,
+    "show_detailed_logs": false,
+    "enable_alerts": true,
+    "default_watchlist": [
+      "RELIANCE.NS",
+      "TCS.NS",
+      "INFY.NS",
+      "HDFCBANK.NS"
+    ],
+    "charts_enabled": true,
+    "real_time_updates": true,
+    "dashboard_refresh_interval": 1,
+    "chart_refresh_interval": 30,
+    "max_watchlist_display": 10,
+    "max_news_display": 5,
+    "max_predictions_display": 15,
+    "max_history_display": 10,
+    "default_history_period": "2y",
+    "extended_history_period": "5y",
+    "max_history_period": "10y"
+  },
+  "risk_management": {
+    "max_position_size": 0.1,
+    "default_stop_loss": 0.05,
+    "default_take_profit": 0.15,
+    "max_daily_loss": 0.02,
+    "max_portfolio_correlation": 0.7,
+    "position_sizing_method": "kelly",
+    "risk_free_rate": 0.05,
+    "volatility_lookback": 20,
+    "enable_dynamic_stops": true,
+    "max_drawdown_threshold_pct": 10.0,
+    "max_var_threshold_pct": 5.0,
+    "max_ticker_limit": 0.1,
+    "max_sector_limit": 0.2,
+    "annualization_factor": 252,
+    "allow_fractional": false,
+    "max_position_risk_alert_pct": 5.0,
+    "max_position_pct_alert": 30.0,
+    "max_position_size_threshold_pct": 25.0,
+    "min_liquidity_volume": 100,
+    "initial_capital": 100000.0,
+    "max_risk_per_trade_pct": 2.0
+  },
+  "alerts": {
+    "enabled": false,
+    "email": {
+      "host": null,
+      "port": null,
+      "username": null,
+      "password": null,
+      "recipients": []
+    },
+    "slack": {
+      "webhook_url": null,
+      "channel": null
+    }
+  },
+  "execution": {
+    "paper_trading_slippage": 0.0005,
+    "default_product_type": "MIS",
+    "max_order_retries": 3,
+    "order_retry_delay": 1.0,
+    "market_open_time": "09:15",
+    "market_close_time": "15:30",
+    "symbol_config": {},
+    "transaction_costs": {
+      "brokerage_rate": 0.0003,
+      "brokerage_cap": 20.0,
+      "stt_rate_sell": 0.00025,
+      "exchange_txn_charge_rate": 3.25e-05,
+      "gst_rate": 0.18,
+      "stamp_duty_rate_buy": 3e-05,
+      "sebi_charges_rate": 1e-06
+    }
+  },
+  "paths": {
+    "base_dir": ".",
+    "logs_dir": "logs",
+    "data_dir": "data",
+    "models_dir": "models",
+    "config_dir": "config",
+    "database_dir": "database",
+    "temp_dir": "temp"
+  },
+  "market": {
+    "timezone": "Asia/Kolkata",
+    "market_open": "09:15",
+    "market_close": "15:30",
+    "pre_market_open": "09:00",
+    "post_market_close": "16:00",
+    "trading_days": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "holidays": []
+  }
+}

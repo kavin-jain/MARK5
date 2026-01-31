@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+service InferenceService {
+  rpc Predict (PredictionRequest) returns (PredictionResponse) {}
+  rpc BatchPredict (BatchPredictionRequest) returns (BatchPredictionResponse) {}
+}
+
+message PredictionRequest {
+  string model_name = 1;
+  repeated float features = 2;
+}
+
+message PredictionResponse {
+  string model_name = 1;
+  float prediction = 2;
+  float confidence = 3;
+  string timestamp = 4;
+}
+
+message BatchPredictionRequest {
+  string model_name = 1;
+  repeated PredictionRequest requests = 2;
+}
+
+message BatchPredictionResponse {
+  string model_name = 1;
+  repeated float predictions = 2;
+  repeated float confidences = 3;
+  repeated int64 timestamps = 4;
+}

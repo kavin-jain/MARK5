@@ -1,0 +1,11 @@
+{
+  "debug_mode": false,
+  "ui": {
+    "theme": "dark",
+    "auto_refresh": true
+  },
+  "ml_training": {
+    "enable_automl": true,
+    "gpu_memory_limit": 4096
+  }
+}
