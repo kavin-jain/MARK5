@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-03-17T08:50:02.004Z",
+  "projectRoot": "/home/lynx/Documents/MARK5",
+  "structure": {
+    "hasPackageJson": false,
+    "hasTsConfig": false,
+    "hasClaudeConfig": false,
+    "hasClaudeFlow": true
+  },
+  "scannedAt": 1773737402004
+}

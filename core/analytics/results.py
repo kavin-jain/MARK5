@@ -1,6 +1,17 @@
 """
-MARK5 HFT Results Analyzer
-Focuses on Drawdown Duration, Streak Analysis, and Profit Factors.
+MARK5 HFT Results Analyzer v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Production hardening & standardized header
+
+TRADING ROLE: Analyzes trade results for drawdown, streaks, profit factors
+SAFETY LEVEL: MEDIUM - Informs risk decisions
+
+FEATURES:
+✅ Win/Loss streak analysis (vectorized)
+✅ Drawdown duration tracking
+✅ Profit factor & expectancy calculation
 """
 
 import pandas as pd

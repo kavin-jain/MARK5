@@ -6,11 +6,27 @@ from core.api.websocket_manager import manager
 import random
 import json
 
+"""
+MARK5 API GATEWAY v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, production certification
+
+TRADING ROLE: External Interface (UI/Websocket)
+SAFETY LEVEL: MEDIUM - Read-only Strategy Data, Write-only Orders
+
+FEATURES:
+✅ FastAPI Async Architecture
+✅ WebSocket Real-time Feed
+✅ CORS & Middleware Security
+"""
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("mark5_api")
+logger = logging.getLogger("MARK5.API")
 
-app = FastAPI(title="MARK5 API", version="1.0.0")
+app = FastAPI(title="MARK5 API", version="8.0")
 
 # CORS
 app.add_middleware(
@@ -45,7 +61,7 @@ async def websocket_endpoint(websocket: WebSocket):
 # Mock Data Generator (Background Task)
 async def mock_market_data_stream():
     """Simulates real-time market data for UI development."""
-    tickers = ["RELIANCE", "TCS", "INFY", "HDFCBANK", "NIFTY_50"]
+    tickers = ["COFORGE", "PERSISTENT", "KPITTECH", "HAL", "POLYCAB"]
     while True:
         update = {
             "type": "market_update",

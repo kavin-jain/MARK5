@@ -487,8 +487,8 @@ class SystemAuditor:
                             with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
                                 if search_term.lower() in f.read().lower():
                                     return True
-                        except:
-                            pass
+                        except (IOError, OSError):
+                            pass  # File read error - skip this file
         return False
     
     def generate_report(self, audit_results: Dict) -> str:

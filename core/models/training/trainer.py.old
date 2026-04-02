@@ -1,0 +1,456 @@
+"""
+MARK5 Advanced ML Trainer v8.0 - HARDENED EDITION
+Revisions from v7.0:
+1. Fixed class weight data leakage - now computed per fold
+2. Fixed walk-forward look-ahead bias - disjoint windows
+3. Fixed geometric mean zero collapse - log-sum-exp with epsilon
+4. Separated calibration from early-stopping validation
+5. Added input validation with clear errors
+6. Added docstrings and type hints
+"""
+
+import numpy as np
+import pandas as pd
+import sys
+import os
+import gc
+import logging
+import joblib
+from datetime import datetime
+from typing import Dict, Tuple, Optional, List
+
+# TensorFlow / Keras
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+import tensorflow as tf
+
+# Sklearn & Boosting
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, precision_score, log_loss, brier_score_loss
+from sklearn.utils.class_weight import compute_class_weight
+from sklearn.isotonic import IsotonicRegression
+
+import xgboost as xgb
+import lightgbm as lgb
+
+# Import Core definitions
+try:
+    from core.utils.constants import FEATURE_EXCLUDE_COLUMNS
+    from core.models.training.financial_engineer import FinancialEngineer
+except ImportError:
+    FEATURE_EXCLUDE_COLUMNS = ['date', 'open', 'high', 'low', 'close', 'volume']
+    from core.models.training.financial_engineer import FinancialEngineer
+
+# LOGGING SETUP
+logger = logging.getLogger("MARK5_Trainer")
+if not logger.handlers:
+    logger.setLevel(logging.INFO)
+    handler = logging.StreamHandler(sys.stdout)
+    formatter = logging.Formatter('%(asctime)s - [TRAINER] - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+from core.models.model_versioning import ModelVersionManager
+
+# =============================================================================
+# CONSTANTS
+# =============================================================================
+EPSILON = 1e-6  # For numerical stability in geometric mean
+MIN_SAMPLES_TRAIN = 100
+MIN_SAMPLES_TEST = 20
+REQUIRED_COLUMNS = ['close']  # Minimum required columns
+
+
+class TrainerError(Exception):
+    """Base exception for trainer errors."""
+    pass
+
+
+class DataValidationError(TrainerError):
+    """Raised when input data fails validation."""
+    pass
+
+
+class TrainingFailedError(TrainerError):
+    """Raised when model training fails."""
+    pass
+
+
+class MARK5MLTrainer:
+    """
+    Production-ready ML trainer with multi-model ensemble.
+    
+    Features:
+    - XGBoost, LightGBM, RandomForest ensemble
+    - Isotonic probability calibration
+    - Geometric mean ensembling (log-sum-exp)
+    - Purged walk-forward validation (no look-ahead)
+    - Per-fold class weight computation (no leakage)
+    
+    Version: 8.0
+    """
+    
+    def __init__(self, config=None):
+        """
+        Initialize trainer with configuration.
+        
+        Args:
+            config: Configuration object with attributes:
+                - prediction_horizon: int (default 5)
+                - gpu_memory_limit: int (default 4096)
+                - models_dir: str (default "./models")
+                - transaction_cost: float (default 0.0012)
+        """
+        self.config = config if config else self._get_default_config()
+        self.use_gpu = self._setup_hardware()
+        self.models_base_dir = getattr(self.config, 'models_dir', 'models')
+        self.version_manager = ModelVersionManager(
+            self.config.__dict__ if hasattr(self.config, '__dict__') else self.config
+        )
+        os.makedirs(self.models_base_dir, exist_ok=True)
+
+    def _get_default_config(self):
+        """Create default configuration."""
+        class Config:
+            prediction_horizon = 5
+            gpu_memory_limit = 4096
+            models_dir = "./models"
+            transaction_cost = 0.0012  # 0.12% round trip
+            train_ratio = 0.50
+            test_ratio = 0.10
+            val_ratio = 0.10  # Separate from calibration
+            cal_ratio = 0.05  # For isotonic regression
+        return Config()
+
+    def _setup_hardware(self) -> bool:
+        """Configure GPU if available."""
+        try:
+            gpus = tf.config.list_physical_devices('GPU')
+            if gpus:
+                for gpu in gpus:
+                    tf.config.experimental.set_memory_growth(gpu, True)
+                logger.info(f"GPU enabled: {len(gpus)} device(s)")
+                return True
+            return False
+        except Exception as e:
+            logger.warning(f"GPU setup failed: {e}")
+            return False
+
+    def _validate_data(self, data: pd.DataFrame, ticker: str) -> None:
+        """
+        Validate input DataFrame.
+        
+        Raises:
+            DataValidationError: If data fails validation
+        """
+        if data is None:
+            raise DataValidationError(f"{ticker}: Data is None")
+        
+        if not isinstance(data, pd.DataFrame):
+            raise DataValidationError(f"{ticker}: Expected DataFrame, got {type(data).__name__}")
+        
+        if data.empty:
+            raise DataValidationError(f"{ticker}: DataFrame is empty")
+        
+        if len(data) < MIN_SAMPLES_TRAIN + MIN_SAMPLES_TEST:
+            raise DataValidationError(
+                f"{ticker}: Insufficient samples ({len(data)}), need at least "
+                f"{MIN_SAMPLES_TRAIN + MIN_SAMPLES_TEST}"
+            )
+        
+        missing_cols = [c for c in REQUIRED_COLUMNS if c not in data.columns]
+        if missing_cols:
+            raise DataValidationError(f"{ticker}: Missing required columns: {missing_cols}")
+        
+        # Check for NaN in critical columns
+        nan_counts = data[REQUIRED_COLUMNS].isna().sum()
+        if nan_counts.any():
+            logger.warning(f"{ticker}: NaN values in columns: {nan_counts[nan_counts > 0].to_dict()}")
+
+    def prepare_data_dynamic(
+        self, 
+        data: pd.DataFrame, 
+        ticker: str
+    ) -> Tuple[pd.DataFrame, np.ndarray]:
+        """
+        Prepare features and labels from raw data.
+        
+        NOTE: Class weights are NOT computed here to avoid data leakage.
+        They are computed per fold in train_advanced_ensemble.
+        
+        Args:
+            data: Raw OHLCV DataFrame
+            ticker: Stock ticker symbol
+            
+        Returns:
+            Tuple of (features_df, targets)
+        """
+        self._validate_data(data, ticker)
+        
+        fe = FinancialEngineer(
+            transaction_cost_pct=getattr(self.config, 'transaction_cost', 0.001)
+        )
+        
+        labels_df = fe.get_labels(
+            prices=data,
+            run_bars=self.config.prediction_horizon,
+            pt_sl=[2.0, 1.0]
+        )
+        
+        aligned_df = data.join(labels_df[['bin']], how='inner')
+        aligned_df.dropna(inplace=True)
+        
+        if aligned_df.empty:
+            raise DataValidationError(f"{ticker}: No samples after alignment")
+        
+        targets = aligned_df['bin'].values.astype(int)
+        
+        exclude = FEATURE_EXCLUDE_COLUMNS + ['bin', 'target', 'ret', 'out', 'sl', 'pt', 't1']
+        feature_cols = [c for c in aligned_df.columns if c not in exclude]
+        
+        if not feature_cols:
+            raise DataValidationError(f"{ticker}: No feature columns found")
+        
+        logger.info(f"[{ticker}] Samples: {len(aligned_df)} | Features: {len(feature_cols)}")
+        
+        return aligned_df[feature_cols], targets
+
+    def _compute_class_weights(self, y_train: np.ndarray) -> Dict[int, float]:
+        """
+        Compute class weights from training data ONLY.
+        
+        This prevents data leakage from test set class distribution.
+        """
+        classes = np.unique(y_train)
+        weights = compute_class_weight(class_weight='balanced', classes=classes, y=y_train)
+        return dict(zip(classes, weights))
+
+    def _geometric_mean_stable(self, probs: List[np.ndarray]) -> np.ndarray:
+        """
+        Compute geometric mean using log-sum-exp for numerical stability.
+        
+        Handles zeros gracefully with epsilon smoothing.
+        """
+        n = len(probs)
+        log_sum = np.zeros_like(probs[0])
+        for p in probs:
+            log_sum += np.log(np.clip(p, EPSILON, 1.0))
+        return np.exp(log_sum / n)
+
+    def train_advanced_ensemble(self, ticker: str, data: pd.DataFrame) -> Dict:
+        """
+        Train ensemble with purged walk-forward validation.
+        
+        Uses DISJOINT windows to prevent look-ahead bias:
+        - Training window: [0, train_end)
+        - Embargo gap: [train_end, train_end + embargo)  
+        - Test window: [train_end + embargo, test_end)
+        - Next iteration starts at test_end (NOT overlapping)
+        
+        Args:
+            ticker: Stock ticker symbol
+            data: Raw OHLCV DataFrame
+            
+        Returns:
+            Dict with 'status', 'brier_score', 'version'
+        """
+        logger.info(f"Training v8.0 for {ticker}")
+        
+        try:
+            features_df, y = self.prepare_data_dynamic(data, ticker)
+        except DataValidationError as e:
+            logger.error(str(e))
+            return {'status': 'failed', 'reason': str(e)}
+        
+        X = features_df.values
+        feature_names = features_df.columns.tolist()
+        
+        n_samples = len(X)
+        train_size = int(n_samples * getattr(self.config, 'train_ratio', 0.50))
+        test_size = int(n_samples * getattr(self.config, 'test_ratio', 0.10))
+        embargo = self.config.prediction_horizon * 2
+        
+        best_brier = 1.0
+        best_models = {}
+        best_calibrators = {}
+        best_scaler = None
+        
+        # DISJOINT walk-forward: window_start moves forward by full window each time
+        window_start = 0
+        fold = 0
+        
+        while True:
+            train_end = window_start + train_size
+            test_start = train_end + embargo
+            test_end = test_start + test_size
+            
+            if test_end > n_samples:
+                break
+            
+            fold += 1
+            logger.debug(f"Fold {fold}: train[{window_start}:{train_end}] test[{test_start}:{test_end}]")
+            
+            # Split data - DISJOINT windows
+            X_train_raw = X[window_start:train_end]
+            y_train = y[window_start:train_end]
+            X_test_raw = X[test_start:test_end]
+            y_test = y[test_start:test_end]
+            
+            if len(X_train_raw) < MIN_SAMPLES_TRAIN or len(X_test_raw) < MIN_SAMPLES_TEST:
+                logger.warning(f"Fold {fold}: insufficient samples, skipping")
+                window_start = test_end
+                continue
+            
+            # Compute class weights from TRAINING DATA ONLY (no leakage)
+            class_weights = self._compute_class_weights(y_train)
+            
+            # Scale
+            scaler = StandardScaler()
+            X_train = scaler.fit_transform(X_train_raw)
+            X_test = scaler.transform(X_test_raw)
+            
+            # Split training into: train_sub (training), val (early stopping), cal (calibration)
+            n_train = len(X_train)
+            val_size = int(n_train * getattr(self.config, 'val_ratio', 0.10))
+            cal_size = int(n_train * getattr(self.config, 'cal_ratio', 0.05))
+            train_sub_end = n_train - val_size - cal_size
+            
+            if train_sub_end < MIN_SAMPLES_TRAIN // 2:
+                logger.warning(f"Fold {fold}: training subset too small, skipping")
+                window_start = test_end
+                continue
+            
+            X_train_sub = X_train[:train_sub_end]
+            y_train_sub = y_train[:train_sub_end]
+            X_val = X_train[train_sub_end:train_sub_end + val_size]
+            y_val = y_train[train_sub_end:train_sub_end + val_size]
+            X_cal = X_train[train_sub_end + val_size:]
+            y_cal = y_train[train_sub_end + val_size:]
+            
+            # Train models
+            models = {}
+            calibrators = {}
+            preds_proba = {}
+            
+            try:
+                # XGBoost - uses X_val for early stopping
+                xgb_model = self._train_xgboost(X_train_sub, y_train_sub, X_val, y_val, class_weights)
+                models['xgb'] = xgb_model
+                # Calibrate on X_cal (separate from early stopping)
+                raw_cal = xgb_model.predict_proba(X_cal)[:, 1]
+                iso = IsotonicRegression(out_of_bounds='clip')
+                iso.fit(raw_cal, y_cal)
+                calibrators['xgb'] = iso
+                preds_proba['xgb'] = iso.transform(xgb_model.predict_proba(X_test)[:, 1])
+                
+                # LightGBM
+                lgb_model = self._train_lightgbm(X_train_sub, y_train_sub, X_val, y_val, class_weights)
+                models['lgb'] = lgb_model
+                raw_cal = lgb_model.predict_proba(X_cal)[:, 1]
+                iso = IsotonicRegression(out_of_bounds='clip')
+                iso.fit(raw_cal, y_cal)
+                calibrators['lgb'] = iso
+                preds_proba['lgb'] = iso.transform(lgb_model.predict_proba(X_test)[:, 1])
+                
+                # RandomForest
+                rf_model = RandomForestClassifier(
+                    n_estimators=100, max_depth=10, n_jobs=-1, 
+                    class_weight=class_weights, random_state=42
+                )
+                rf_model.fit(X_train_sub, y_train_sub)
+                models['rf'] = rf_model
+                raw_cal = rf_model.predict_proba(X_cal)[:, 1]
+                iso = IsotonicRegression(out_of_bounds='clip')
+                iso.fit(raw_cal, y_cal)
+                calibrators['rf'] = iso
+                preds_proba['rf'] = iso.transform(rf_model.predict_proba(X_test)[:, 1])
+                
+            except Exception as e:
+                logger.error(f"Fold {fold} training failed: {e}")
+                window_start = test_end
+                continue
+            
+            # Geometric mean ensemble (stable version)
+            ens_prob = self._geometric_mean_stable([
+                preds_proba['xgb'], preds_proba['lgb'], preds_proba['rf']
+            ])
+            ens_pred = (ens_prob > 0.5).astype(int)
+            
+            brier = brier_score_loss(y_test, ens_prob)
+            precision = precision_score(y_test, ens_pred, zero_division=0)
+            
+            logger.info(f"Fold {fold}: Brier={brier:.4f} | Precision={precision:.2%}")
+            
+            if brier < best_brier:
+                best_brier = brier
+                best_models = models.copy()
+                best_calibrators = calibrators.copy()
+                best_scaler = scaler
+            
+            # Move to NEXT disjoint window
+            window_start = test_end
+            gc.collect()
+        
+        if not best_models:
+            return {'status': 'failed', 'reason': 'No successful folds'}
+        
+        version = self.version_manager.increment_version(ticker)
+        self._save_artifacts(ticker, best_models, best_calibrators, best_scaler, feature_names, version)
+        
+        return {'status': 'success', 'brier_score': best_brier, 'version': version, 'folds': fold}
+
+    def _train_xgboost(self, X_t, y_t, X_v, y_v, weights: Dict) -> xgb.XGBClassifier:
+        """Train XGBoost with early stopping on validation set."""
+        sample_w = np.array([weights.get(y, 1.0) for y in y_t])
+        clf = xgb.XGBClassifier(
+            n_estimators=1000, learning_rate=0.05, max_depth=5,
+            subsample=0.8, colsample_bytree=0.8,
+            objective='binary:logistic', eval_metric='logloss',
+            tree_method='hist', device='cuda' if self.use_gpu else 'cpu',
+            early_stopping_rounds=50, random_state=42
+        )
+        clf.fit(X_t, y_t, sample_weight=sample_w, eval_set=[(X_v, y_v)], verbose=False)
+        return clf
+
+    def _train_lightgbm(self, X_t, y_t, X_v, y_v, weights: Dict) -> lgb.LGBMClassifier:
+        """Train LightGBM with early stopping on validation set."""
+        sample_w = np.array([weights.get(y, 1.0) for y in y_t])
+        callbacks = [lgb.early_stopping(50, verbose=False)]
+        clf = lgb.LGBMClassifier(
+            n_estimators=1000, learning_rate=0.05, num_leaves=31,
+            objective='binary', device='gpu' if self.use_gpu else 'cpu',
+            random_state=42, verbose=-1
+        )
+        clf.fit(X_t, y_t, sample_weight=sample_w, eval_set=[(X_v, y_v)], callbacks=callbacks)
+        return clf
+
+    def _save_artifacts(
+        self, 
+        ticker: str, 
+        models: Dict, 
+        calibrators: Dict, 
+        scaler: StandardScaler, 
+        features: List[str], 
+        version: int
+    ) -> None:
+        """Save trained models and artifacts."""
+        path = os.path.join(self.models_base_dir, ticker, f"v{version}")
+        os.makedirs(path, exist_ok=True)
+        
+        joblib.dump(scaler, os.path.join(path, 'scaler.pkl'))
+        joblib.dump(features, os.path.join(path, 'features.json'))
+        
+        for name, model in models.items():
+            joblib.dump(model, os.path.join(path, f'{name}_model.pkl'))
+            joblib.dump(calibrators[name], os.path.join(path, f'{name}_calibrator.pkl'))
+        
+        logger.info(f"Artifacts saved to {path}")
+    
+    def health_check(self) -> Dict:
+        """Return trainer health status."""
+        return {
+            'version': '8.0',
+            'gpu_enabled': self.use_gpu,
+            'models_dir': self.models_base_dir,
+            'models_dir_exists': os.path.isdir(self.models_base_dir)
+        }

@@ -1,8 +1,18 @@
 """
-MARK5 System Bootstrapper
--------------------------
-Initializes the ServiceContainer. 
-Ensures Infrastructure is ready before Business Logic starts.
+MARK5 SYSTEM BOOTSTRAPPER v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, production certification
+- [Previous] v6.0: Dependency Injection Wiring
+
+TRADING ROLE: Service Locator & Dependency Injection
+SAFETY LEVEL: CRITICAL - Initializes all core services
+
+FEATURES:
+✅ Centralized Service Registration (Container)
+✅ Infrastructure Wiring (Redis, DB, Alerts)
+✅ Environment-aware booting (Prod/Dev)
 """
 
 import logging

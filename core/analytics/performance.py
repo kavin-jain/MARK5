@@ -1,11 +1,22 @@
 """
-MARK5 PERFORMANCE TRACKER v6.0 (FINANCIAL GRADE)
-------------------------------------------------
-Architect: The Legendary Trader
-Improvements:
-1. Financial Metrics (Expectancy, SQN) over Academic Metrics (F1).
-2. Statistical Decay Detection (Z-Score) instead of fixed thresholds.
-3. Regime-Aware Tracking (Knows if model fails in Chop vs Trend).
+MARK5 PERFORMANCE TRACKER v8.0 - PRODUCTION GRADE (FINANCIAL GRADE)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Production hardening
+  • Standardized version/header format
+  • Added schema migration for new columns
+  • Z-Score based decay detection
+- [Previous] v6.0: Financial metrics (Expectancy, SQN)
+
+TRADING ROLE: Tracks model performance with financial metrics
+SAFETY LEVEL: HIGH - Detects decaying models before losses
+
+FEATURES:
+✅ Expectancy calculation (The "Edge")
+✅ System Quality Number (SQN)
+✅ Statistical decay detection via Z-Score
+✅ Regime-aware performance tracking
 """
 
 import numpy as np
@@ -346,6 +357,173 @@ class ModelPerformanceTracker:
             ticker, model_type, datetime.now().isoformat(),
             alert_type, severity, message, json.dumps(metrics), metrics.get('z_score', 0.0)
         ))
+
+    # =========================================================================
+    # PREDICTIVE HEALTH MONITOR (Leading Indicators)
+    # =========================================================================
+    
+    def _init_health_tables(self):
+        """Create tables for prediction quality tracking"""
+        self._execute_safe('''
+            CREATE TABLE IF NOT EXISTS prediction_quality_metrics (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                ticker TEXT NOT NULL,
+                timestamp TEXT NOT NULL,
+                entropy REAL,
+                confidence REAL,
+                feature_drift_psi REAL,
+                prediction_sharpness REAL,
+                model_version INTEGER,
+                data_staleness_ms REAL
+            )
+        ''')
+    
+    def record_prediction_quality(
+        self, 
+        ticker: str,
+        entropy: float,
+        confidence: float,
+        feature_drift_psi: Optional[float] = None,
+        prediction_sharpness: Optional[float] = None,
+        model_version: int = 0,
+        data_staleness_ms: float = 0.0
+    ):
+        """
+        Record prediction quality metrics for early degradation detection.
+        
+        Called after each prediction to track leading indicators.
+        """
+        # Ensure table exists
+        self._init_health_tables()
+        
+        self._execute_safe('''
+            INSERT INTO prediction_quality_metrics
+            (ticker, timestamp, entropy, confidence, feature_drift_psi, 
+             prediction_sharpness, model_version, data_staleness_ms)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            ticker,
+            datetime.now().isoformat(),
+            entropy,
+            confidence,
+            feature_drift_psi,
+            prediction_sharpness,
+            model_version,
+            data_staleness_ms
+        ))
+    
+    def detect_early_degradation(self, ticker: str, lookback_hours: int = 24) -> Dict:
+        """
+        Detect model degradation BEFORE traditional Z-score method triggers.
+        
+        Leading indicators:
+        1. Entropy trend (rising = model getting confused)
+        2. Confidence trend (falling = losing conviction)
+        3. Prediction sharpness (decreasing = wishy-washy)
+        
+        Returns:
+            Dict with health_score (0-100), warnings, confidence_multiplier
+        """
+        # Ensure table exists
+        self._init_health_tables()
+        
+        conn = sqlite3.connect(self.db_path)
+        try:
+            cutoff = (datetime.now() - timedelta(hours=lookback_hours)).isoformat()
+            
+            df = pd.read_sql_query('''
+                SELECT timestamp, entropy, confidence, prediction_sharpness
+                FROM prediction_quality_metrics
+                WHERE ticker = ? AND timestamp > ?
+                ORDER BY timestamp ASC
+            ''', conn, params=(ticker, cutoff))
+            
+            if len(df) < 10:
+                return {
+                    'health_score': 100,
+                    'confidence_multiplier': 1.0,
+                    'warnings': [],
+                    'status': 'INSUFFICIENT_DATA'
+                }
+            
+            warnings = []
+            health_score = 100
+            confidence_multiplier = 1.0
+            
+            # Split into baseline and recent
+            n = len(df)
+            split = max(5, n // 2)
+            baseline = df.iloc[:split]
+            recent = df.iloc[split:]
+            
+            # 1. Entropy Trend (higher = worse)
+            baseline_entropy = baseline['entropy'].mean()
+            recent_entropy = recent['entropy'].mean()
+            entropy_change = recent_entropy - baseline_entropy
+            
+            if entropy_change > 0.2:  # Significant increase
+                warnings.append(f"Entropy rising: {baseline_entropy:.2f} → {recent_entropy:.2f}")
+                health_score -= 20
+                confidence_multiplier *= 0.85
+            elif entropy_change > 0.1:
+                warnings.append(f"Entropy drift: +{entropy_change:.2f}")
+                health_score -= 10
+                confidence_multiplier *= 0.95
+            
+            # 2. Confidence Trend (lower = worse)
+            baseline_conf = baseline['confidence'].mean()
+            recent_conf = recent['confidence'].mean()
+            conf_change = recent_conf - baseline_conf
+            
+            if conf_change < -0.1:  # Significant drop
+                warnings.append(f"Confidence falling: {baseline_conf:.2f} → {recent_conf:.2f}")
+                health_score -= 25
+                confidence_multiplier *= 0.80
+            elif conf_change < -0.05:
+                warnings.append(f"Confidence drift: {conf_change:.2f}")
+                health_score -= 10
+                confidence_multiplier *= 0.90
+            
+            # 3. Overall entropy level (absolute check)
+            if recent_entropy > 0.9:  # High entropy = confusion
+                warnings.append(f"HIGH ENTROPY: {recent_entropy:.2f} (model confused)")
+                health_score -= 15
+                confidence_multiplier *= 0.75
+            
+            # Clamp values
+            health_score = max(0, min(100, health_score))
+            confidence_multiplier = max(0.5, min(1.0, confidence_multiplier))
+            
+            status = 'HEALTHY'
+            if health_score < 50:
+                status = 'CRITICAL'
+            elif health_score < 75:
+                status = 'DEGRADED'
+            elif warnings:
+                status = 'WARNING'
+            
+            # Record alert if degraded
+            if status in ['CRITICAL', 'DEGRADED']:
+                self._record_alert(
+                    ticker, 'ensemble', 'EARLY_DEGRADATION', 
+                    'HIGH' if status == 'CRITICAL' else 'MEDIUM',
+                    f"Health score: {health_score}. {'; '.join(warnings)}",
+                    {'health_score': health_score, 'entropy_trend': entropy_change}
+                )
+            
+            return {
+                'health_score': health_score,
+                'confidence_multiplier': round(confidence_multiplier, 2),
+                'warnings': warnings,
+                'status': status,
+                'entropy_baseline': round(baseline_entropy, 3),
+                'entropy_recent': round(recent_entropy, 3),
+                'confidence_baseline': round(baseline_conf, 3),
+                'confidence_recent': round(recent_conf, 3)
+            }
+            
+        finally:
+            conn.close()
 
 if __name__ == '__main__':
     tracker = ModelPerformanceTracker()

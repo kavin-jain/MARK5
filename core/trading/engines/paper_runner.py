@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 """
-🔥 MARK3 HEADLESS PAPER TRADING RUNNER
-=====================================
-Launches the autonomous trading system in PAPER TRADING mode.
-This script is designed to run in the background (headless).
+MARK5 HEADLESS PAPER TRADING RUNNER v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Usage:
-    python3 run_paper_trading.py
+CHANGELOG:
+- [2026-02-06] v8.0: Production hardening & standardized header
 
-Features:
-- Forces PAPER_TRADING=True
-- Initializes database
-- Starts Data Collector (Real-time)
-- Starts Autonomous Trader
-- Logs to console and file
+TRADING ROLE: Paper trading system launcher
+SAFETY LEVEL: LOW - Testing environment only
+
+FEATURES:
+✅ Forces PAPER_TRADING=True
+✅ Initializes database and data collector
+✅ Starts Autonomous Trader
+✅ Graceful signal handling (SIGINT/SIGTERM)
+✅ Test mode with forced market open
 """
 
 import os
@@ -29,8 +30,8 @@ import pandas as pd
 try:
     import core.models.trainer
     import core.data.collector
-    from core.models.trainer import MARK3MLTrainer
-    print(f"DEBUG: MARK3MLTrainer source: {MARK3MLTrainer.train_advanced_ensemble}")
+    from core.models.training.trainer import MARK5MLTrainer
+    print(f"DEBUG: MARK5MLTrainer source: {MARK5MLTrainer.train_advanced_ensemble}")
 except Exception as e:
     print(f"DEBUG: Failed to inspect trainer: {e}")
 
@@ -56,7 +57,7 @@ logging.basicConfig(
     ]
 )
 
-logger = logging.getLogger("MARK3.Runner")
+logger = logging.getLogger("MARK5.Runner")
 
 def signal_handler(sig, frame):
     logger.info("🛑 Interrupt received, shutting down...")
@@ -72,11 +73,11 @@ def main():
     
     # 0. Parse Arguments
     import argparse
-    parser = argparse.ArgumentParser(description='Run MARK3 Paper Trading')
+    parser = argparse.ArgumentParser(description='Run MARK5 Paper Trading')
     parser.add_argument('--test-mode', action='store_true', help='Force market open for testing')
     args = parser.parse_args()
     
-    logger.info("🚀 Starting MARK3 Paper Trading System...")
+    logger.info("🚀 Starting MARK5 Paper Trading System...")
     
     # 1. Load & Override Config
     config_manager = ConfigManager()
@@ -96,8 +97,7 @@ def main():
     # OR explicitly add .NS if we know we are using Yahoo fallback.
     # For paper trading without Kite, .NS is safer.
     config['watchlist'] = [
-        'RELIANCE.NS', 'TCS.NS', 'HDFCBANK.NS', 'INFY.NS', 'ICICIBANK.NS', 
-        'SBIN.NS', 'BHARTIARTL.NS', 'KOTAKBANK.NS', 'ITC.NS', 'HINDUNILVR.NS'
+        'COFORGE.NS', 'PERSISTENT.NS', 'KPITTECH.NS', 'HAL.NS', 'POLYCAB.NS'
     ]
     
     logger.info(f"📋 Watchlist: {config['watchlist']}")

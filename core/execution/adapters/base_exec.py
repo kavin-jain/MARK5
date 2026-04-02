@@ -1,3 +1,19 @@
+"""
+MARK5 BASE EXECUTOR v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Production hardening & standardized header
+
+TRADING ROLE: Abstract interface for broker adapters
+SAFETY LEVEL: CRITICAL - Defines execution contract
+
+INTERFACE:
+✅ place_order, cancel_order, modify_order
+✅ fetch_orders, fetch_positions (reconciliation)
+✅ NSE tick size quantization utility
+"""
+
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Optional
 from decimal import Decimal, ROUND_HALF_UP

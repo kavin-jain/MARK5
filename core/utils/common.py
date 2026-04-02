@@ -1,7 +1,17 @@
 """
-MARK5 Common Utilities
-======================
-Consolidated utilities for file system, logging, decorators, and caching.
+MARK5 COMMON UTILITIES v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, production certification
+
+TRADING ROLE: Shared Utilities (File I/O, Logging, Caching)
+SAFETY LEVEL: LOW - Core Utility Foundation
+
+FEATURES:
+✅ Safe JSON/Pickle I/O
+✅ Thread-safe Singleton & Logging
+✅ Decorators (Retry, Timing)
 """
 
 import json

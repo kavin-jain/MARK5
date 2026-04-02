@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
 """
-Zerodha Kite Connect - Access Token Generator
-Generate access token for MARK3 system using Kite Connect login flow
+MARK5 KITE TOKEN GENERATOR v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Usage:
-    python3 generate_kite_token.py
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, production certification
+
+TRADING ROLE: Authentication Utility
+SAFETY LEVEL: CRITICAL - Access Token Generation
+
+FEATURES:
+✅ Zerodha Login Flow Automation
+✅ Secure Token Extraction
+✅ Environment (.env) Auto-Update
 """
 
 import os
@@ -137,14 +145,14 @@ def generate_access_token():
         print("🎉 SETUP COMPLETE!")
         print("="*70)
         print()
-        print("✅ Your MARK3 system can now connect to Zerodha Kite!")
+        print("✅ Your MARK5 system can now connect to Zerodha Kite!")
         print()
         print("⚠️  IMPORTANT:")
         print("   - Access tokens expire after 24 hours")
         print("   - Run this script daily to get a fresh token")
         print("   - Or set up automatic token refresh in your code")
         print()
-        print("🚀 Start MARK3:")
+        print("🚀 Start MARK5:")
         print("   python3 core/system/launcher.py")
         print()
         

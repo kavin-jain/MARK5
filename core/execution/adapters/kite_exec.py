@@ -1,3 +1,20 @@
+"""
+MARK5 KITE EXECUTOR v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Production hardening & standardized header
+
+TRADING ROLE: Live execution via Zerodha Kite API
+SAFETY LEVEL: CRITICAL - Real money execution
+
+FEATURES:
+✅ Kite Connect integration (when SDK available)
+✅ Order type mapping (MARKET, LIMIT, SL, SL-M)
+✅ NSE tick size quantization
+✅ Order reconciliation from Kite order book
+"""
+
 import logging
 from typing import List, Dict, Any, Optional
 from decimal import Decimal

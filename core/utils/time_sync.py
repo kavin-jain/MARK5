@@ -1,7 +1,17 @@
 """
-MARK5 TIME SYNCHRONIZATION
---------------------------
-NTP-Correction for millisecond-accurate logging and trade execution.
+MARK5 TIME SYNC v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, production certification
+
+TRADING ROLE: Temporal Precision (NTP)
+SAFETY LEVEL: CRITICAL - Logs & Trade Timestamp Accuracy
+
+FEATURES:
+✅ NTP Offset Correction
+✅ Monotonic Time Source
+✅ Fallback to local time
 """
 
 import time

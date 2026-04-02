@@ -1,18 +1,27 @@
 import logging
 from typing import Optional, Any
 
+"""
+MARK5 SERVICE CONTAINER v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, production certification
+
+TRADING ROLE: Global State & Dependency Manager
+SAFETY LEVEL: CRITICAL - Central Nervous System
+
+FEATURES:
+✅ Zero-Overhead Slot-based access
+✅ Strict Type Enforcement
+✅ Singleton Pattern
+"""
+
 class ServiceContainer:
-    """
-    MARK5 Service Container (Architect's Edition)
-    ---------------------------------------------
-    Zero-Overhead Dependency Injection.
-    Uses __slots__ for faster attribute access and reduced memory footprint.
-    Replaces legacy dictionary-based lookup.
-    """
     __slots__ = (
         'config', 'redis', 'db', 'data', 'oms', 
         'feed_manager', 'time', 'alerts', 'logger',
-        'risk_manager'
+        'risk_manager', 'predictor'
     )
     
     _instance = None
