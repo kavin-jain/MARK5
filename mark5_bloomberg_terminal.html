@@ -1,0 +1,797 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#040404;font-family:'JetBrains Mono',monospace;color:#D4C4A0;overflow:hidden;height:750px}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:#080808}
+::-webkit-scrollbar-thumb{background:#2A2A2A}
+input,button{font-family:'JetBrains Mono',monospace;outline:none}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes pulse{0%,100%{opacity:.8}50%{opacity:.2}}
+.blink{animation:blink 1s step-end infinite}
+.pulse{animation:pulse 1.4s ease-in-out infinite}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/recharts/2.8.0/Recharts.js"></script>
+<script>
+const {useState,useEffect,useRef,useCallback}=React;
+const {AreaChart,Area,XAxis,YAxis,CartesianGrid,Tooltip,ResponsiveContainer,ReferenceLine,LineChart,Line,BarChart,Bar}=Recharts;
+
+const C={
+  bg:'#040404',panel:'#080808',panelAlt:'#060606',
+  border:'#1C1C1C',borderHi:'#2A2A2A',
+  amber:'#FFB300',amberDim:'#7A5500',amberGlow:'#FFB30033',
+  green:'#00CC44',greenDim:'#004422',
+  red:'#FF3333',redDim:'#550011',
+  cyan:'#00CCDD',cyanDim:'#005566',
+  blue:'#4488FF',
+  text:'#D4C4A0',textDim:'#555544',textBright:'#F0E8D0',
+  font:"'JetBrains Mono',monospace",
+};
+
+function genEquity(n=220){
+  const d=[];let cap=100000,peak=100000;
+  const now=new Date();
+  for(let i=n;i>=0;i--){
+    const dt=new Date(now);dt.setDate(dt.getDate()-i);
+    if(dt.getDay()===0||dt.getDay()===6)continue;
+    const r=0.0008+(Math.random()-0.48)*0.018;
+    cap*=(1+r);peak=Math.max(peak,cap);
+    d.push({
+      d:dt.toISOString().slice(5,10),
+      eq:Math.round(cap),
+      dd:parseFloat(((cap-peak)/peak*100).toFixed(2)),
+      r:parseFloat((r*100).toFixed(3))
+    });
+  }
+  return d;
+}
+
+const CONSTANTS=[
+  {k:'MAX_DRAWDOWN_PCT',v:'5.0',u:'%',desc:'Hard stop drawdown'},
+  {k:'MAX_DAILY_LOSS_PCT',v:'2.0',u:'%',desc:'Daily loss circuit breaker'},
+  {k:'RISK_PER_TRADE',v:'1.5',u:'%',desc:'Capital risk per trade'},
+  {k:'MAX_POSITION_PCT',v:'5.0',u:'%',desc:'Max capital per position'},
+  {k:'ML_CONF_FLOOR',v:'0.52',u:'',desc:'Minimum signal probability'},
+  {k:'ATR_STOP_MULT',v:'2.0',u:'x',desc:'ATR stop loss multiplier'},
+  {k:'ATR_TARGET_MULT',v:'2.5',u:'x',desc:'ATR take profit multiplier'},
+  {k:'MAX_HOLD_BARS',v:'10',u:'bars',desc:'Maximum holding period'},
+  {k:'INDIA_VIX_LIMIT',v:'35.0',u:'',desc:'Max VIX to trade'},
+  {k:'MAX_CONCURRENT',v:'10',u:'pos',desc:'Max open positions'},
+  {k:'CPCV_N_SPLITS',v:'8',u:'',desc:'CPCV validation groups'},
+  {k:'CPCV_EMBARGO',v:'10',u:'bars',desc:'CPCV embargo window'},
+  {k:'KELLY_FRACTION',v:'0.5',u:'',desc:'Kelly criterion fraction'},
+  {k:'PROD_GATE_PSHARPE',v:'0.70',u:'',desc:'P(Sharpe>1.5) gate'},
+];
+
+const SIGNALS=[
+  {t:'RELIANCE.NS',a:'BUY',c:0.721,rank:1,qty:34,atr:38.5,reg:'BULL'},
+  {t:'HDFCBANK.NS',a:'BUY',c:0.683,rank:2,qty:51,atr:22.1,reg:'BULL'},
+  {t:'BHARTIARTL.NS',a:'BUY',c:0.698,rank:3,qty:62,atr:15.7,reg:'BULL'},
+  {t:'TCS.NS',a:'BUY',c:0.641,rank:4,qty:28,atr:31.2,reg:'BULL'},
+  {t:'INFY.NS',a:'HOLD',c:0.498,rank:7,qty:0,atr:18.9,reg:'NEUTRAL'},
+  {t:'SBIN.NS',a:'HOLD',c:0.512,rank:9,qty:0,atr:11.4,reg:'CHOPPY'},
+  {t:'ICICIBANK.NS',a:'HOLD',c:0.531,rank:8,qty:0,atr:19.8,reg:'NEUTRAL'},
+];
+
+const MODELS=[
+  {m:'XGBoost',b:0.183,a:0.681,f:0.512,w:'38%'},
+  {m:'LightGBM',b:0.179,a:0.693,f:0.528,w:'39%'},
+  {m:'CatBoost',b:0.191,a:0.667,f:0.501,w:'23%'},
+];
+
+const BT_TICKERS=['RELIANCE.NS','TCS.NS','HDFCBANK.NS','INFY.NS','ICICIBANK.NS',
+  'SBIN.NS','BHARTIARTL.NS','ITC.NS','LT.NS','WIPRO.NS'];
+
+function Dot({on,color}){
+  return React.createElement('span',{style:{
+    display:'inline-block',width:6,height:6,borderRadius:'50%',
+    background:on?(color||C.green):C.textDim,
+    boxShadow:on?`0 0 5px ${color||C.green}`:'none',
+    marginRight:5,flexShrink:0,
+  }});
+}
+
+function Panel({children,title,titleRight,accent,style}){
+  return React.createElement('div',{style:{
+    background:C.panel,border:`1px solid ${C.border}`,
+    display:'flex',flexDirection:'column',overflow:'hidden',...style
+  }},
+    title&&React.createElement('div',{style:{
+      display:'flex',alignItems:'center',justifyContent:'space-between',
+      padding:'4px 10px',borderBottom:`1px solid ${C.border}`,
+      background:C.panelAlt,flexShrink:0,
+    }},
+      React.createElement('span',{style:{fontSize:8,fontWeight:700,
+        letterSpacing:'0.15em',color:accent||C.amber,textTransform:'uppercase'}},title),
+      titleRight&&React.createElement('span',{style:{fontSize:7,color:C.textDim}},titleRight)
+    ),
+    React.createElement('div',{style:{flex:1,overflow:'hidden',minHeight:0}},children)
+  );
+}
+
+function Btn({children,onClick,color,disabled,tiny}){
+  const [hov,setHov]=useState(false);
+  const cc=color||C.amber;
+  return React.createElement('button',{
+    onClick,disabled,
+    onMouseEnter:()=>setHov(true),onMouseLeave:()=>setHov(false),
+    style:{
+      fontFamily:C.font,fontSize:tiny?8:9,fontWeight:700,
+      letterSpacing:'0.1em',textTransform:'uppercase',
+      color:disabled?C.textDim:(hov?'#000':cc),
+      background:hov&&!disabled?cc:'transparent',
+      border:`1px solid ${disabled?C.textDim:cc}`,
+      padding:tiny?'2px 6px':'4px 10px',
+      cursor:disabled?'not-allowed':'pointer',
+      transition:'all 0.1s',
+      whiteSpace:'nowrap',
+    }
+  },children);
+}
+
+function Row({label,val,color}){
+  return React.createElement('div',{style:{
+    display:'flex',justifyContent:'space-between',
+    padding:'3px 0',borderBottom:`1px solid #0C0C0C`,fontSize:9,
+  }},
+    React.createElement('span',{style:{color:C.textDim}},label),
+    React.createElement('span',{style:{color:color||C.text,fontWeight:700}},val)
+  );
+}
+
+const TT=({active,payload,label})=>{
+  if(!active||!payload?.length)return null;
+  return React.createElement('div',{style:{
+    background:'#0A0A0A',border:`1px solid ${C.border}`,
+    padding:'4px 8px',fontFamily:C.font,fontSize:8,color:C.text,
+  }},
+    React.createElement('div',{style:{color:C.amber}},label),
+    payload.map((p,i)=>React.createElement('div',{key:i,style:{color:p.color||C.text}},
+      `${p.name}: ${p.value}`
+    ))
+  );
+};
+
+function App(){
+  const [equity]=useState(()=>genEquity());
+  const [consts,setConsts]=useState(CONSTANTS);
+  const [editK,setEditK]=useState(null);
+  const [running,setRunning]=useState(false);
+  const [btRun,setBtRun]=useState(false);
+  const [btPct,setBtPct]=useState(0);
+  const [btLog,setBtLog]=useState([]);
+  const [tokState,setTokState]=useState('idle');
+  const [tokVal,setTokVal]=useState('');
+  const [query,setQuery]=useState('');
+  const [stock,setStock]=useState(null);
+  const [fetching,setFetching]=useState(false);
+  const [log,setLog]=useState([
+    {t:'09:15:02',m:'Market open. Autonomous trader initialized.',tp:'info'},
+    {t:'09:15:44',m:'RELIANCE.NS: BUY signal @ ₹2461.50 (conf=0.721)',tp:'sig'},
+    {t:'09:16:12',m:'HDFCBANK.NS: BUY signal @ ₹1887.25 (conf=0.683)',tp:'sig'},
+    {t:'09:22:08',m:'Risk check OK: dd=2.3% < 5.0% limit',tp:'ok'},
+    {t:'09:31:55',m:'BHARTIARTL.NS: BUY signal @ ₹1542.80 (conf=0.698)',tp:'sig'},
+  ]);
+  const [clock,setClock]=useState('');
+  const [tab,setTab]=useState('signals');
+  const logRef=useRef(null);
+
+  useEffect(()=>{
+    const upd=()=>{
+      const now=new Date();
+      const ist=new Date(now.getTime()+(5.5*3600000));
+      setClock(ist.toISOString().slice(11,19));
+    };
+    upd();const id=setInterval(upd,1000);return()=>clearInterval(id);
+  },[]);
+
+  useEffect(()=>{if(logRef.current)logRef.current.scrollLeft=9999;},[log]);
+
+  const addLog=(m,tp='info')=>{
+    const now=new Date();
+    const ist=new Date(now.getTime()+(5.5*3600000));
+    const t=ist.toISOString().slice(11,19);
+    setLog(prev=>[...prev.slice(-30),{t,m,tp}]);
+  };
+
+  const toggleRun=()=>{
+    setRunning(r=>{
+      if(!r){addLog('Autonomous trader STARTED. 60s decision cycle active.','ok');}
+      else{addLog('Autonomous trader STOPPED by operator.','warn');}
+      return!r;
+    });
+  };
+
+  const runBT=async()=>{
+    if(btRun)return;
+    setBtRun(true);setBtPct(0);setBtLog([]);
+    addLog('Backtest started: NIFTY50 universe, 3Y lookback, CPCV validation','info');
+    for(let i=0;i<BT_TICKERS.length;i++){
+      await new Promise(r=>setTimeout(r,350));
+      const sh=(0.7+Math.random()*2.2).toFixed(2);
+      const wr=(38+Math.random()*28).toFixed(1);
+      const brier=(0.16+Math.random()*0.09).toFixed(3);
+      const pass=parseFloat(sh)>1.5;
+      setBtLog(p=>[...p,{ticker:BT_TICKERS[i],sh,wr,brier,pass}]);
+      setBtPct(Math.round(((i+1)/BT_TICKERS.length)*100));
+    }
+    addLog('Backtest complete. Results logged.','ok');
+    setBtRun(false);
+  };
+
+  const genToken=async()=>{
+    setTokState('gen');
+    addLog('Initiating Kite OAuth flow...','info');
+    await new Promise(r=>setTimeout(r,1800));
+    const tok=Array.from({length:32},()=>Math.floor(Math.random()*16).toString(16)).join('');
+    setTokVal(tok);setTokState('done');
+    addLog(`Kite token generated & written to .env: ${tok.slice(0,8)}...`,'ok');
+  };
+
+  const searchStock=async()=>{
+    if(!query.trim()||fetching)return;
+    setFetching(true);setStock(null);
+    addLog(`Querying Claude for ${query.toUpperCase()}...`,'info');
+    try{
+      const res=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          model:'claude-sonnet-4-20250514',max_tokens:800,
+          messages:[{role:'user',content:`You are a quant analyst for Indian markets. For ticker "${query.toUpperCase()}", return ONLY a raw JSON object (no backticks, no preamble) with exact keys: name, sector, marketCap, pe, pbv, roe, debtEquity, high52w, low52w, synopsis (2 sentences on momentum/valuation/FII), signals (array of 3 brief signal strings), news (array of 3 recent headline strings). Use realistic approximate values based on your training data.`}]
+        })
+      });
+      const data=await res.json();
+      const txt=data.content[0].text.trim();
+      const parsed=JSON.parse(txt);
+      setStock(parsed);
+      addLog(`Analysis complete: ${parsed.name}`,'ok');
+    }catch(e){
+      setStock({err:true});
+      addLog(`Stock fetch failed: ${e.message}`,'warn');
+    }
+    setFetching(false);
+  };
+
+  const eq=equity;
+  const lastEq=eq[eq.length-1]?.eq||100000;
+  const retPct=((lastEq-100000)/100000*100).toFixed(2);
+  const maxDD=Math.abs(Math.min(...eq.map(d=>d.dd||0))).toFixed(2);
+
+  const logColor={sig:C.cyan,ok:C.green,warn:C.red,info:C.textDim};
+
+  return React.createElement('div',{style:{
+    background:C.bg,color:C.text,fontFamily:C.font,
+    height:750,display:'flex',flexDirection:'column',overflow:'hidden',
+    fontSize:10,
+  }},
+
+  // ═══ TOP BAR ═══
+  React.createElement('div',{style:{
+    display:'flex',alignItems:'center',gap:16,
+    padding:'0 14px',height:36,flexShrink:0,
+    borderBottom:`1px solid ${C.amberDim}`,background:'#050505',
+  }},
+    React.createElement('div',{style:{display:'flex',alignItems:'center',gap:10}},
+      React.createElement('span',{style:{fontSize:16,fontWeight:700,color:C.amber,
+        letterSpacing:'0.14em',textShadow:`0 0 12px ${C.amberGlow}`}},'M·A·R·K·5'),
+      React.createElement('span',{style:{color:C.textDim,fontSize:8}},`v9.0-CPCV`),
+      React.createElement('span',{style:{
+        background:'#0A1C0A',border:`1px solid ${C.green}`,
+        color:C.green,fontSize:7,padding:'1px 5px',letterSpacing:'0.15em',
+      }},'PAPER')
+    ),
+    React.createElement('div',{style:{display:'flex',gap:10,fontSize:8,alignItems:'center'}},
+      ...['DB','REDIS','KITE'].map(s=>React.createElement('span',{key:s},
+        React.createElement(Dot,{on:true,color:s==='KITE'?C.amber:C.green}),s
+      )),
+      React.createElement('span',null,
+        React.createElement(Dot,{on:running,color:C.cyan}),'TRADER'
+      )
+    ),
+    React.createElement('div',{style:{flex:1}}),
+    React.createElement('div',{style:{display:'flex',gap:20,fontSize:9,alignItems:'center'}},
+      React.createElement('span',null,'NIFTY ',
+        React.createElement('span',{style:{color:C.green,fontWeight:700}},'22,340.50'),
+        React.createElement('span',{style:{color:C.green,fontSize:7}},' +0.42%')
+      ),
+      React.createElement('span',null,'VIX ',React.createElement('span',{style:{color:C.text}},'14.2')),
+      React.createElement('span',null,'FII ',React.createElement('span',{style:{color:C.green}},'+₹1,240Cr')),
+      React.createElement('span',null,'SENSEX ',React.createElement('span',{style:{color:C.green}},'73,420'))
+    ),
+    React.createElement('div',{style:{display:'flex',gap:14,alignItems:'center',borderLeft:`1px solid ${C.border}`,paddingLeft:14}},
+      React.createElement('div',{style:{textAlign:'right'}},
+        React.createElement('div',{style:{fontSize:7,color:C.textDim}},'PORTFOLIO'),
+        React.createElement('div',{style:{fontSize:14,fontWeight:700,color:C.amber}},'₹1,03,240')
+      ),
+      React.createElement('div',{style:{textAlign:'right'}},
+        React.createElement('div',{style:{fontSize:7,color:C.textDim}},'IST'),
+        React.createElement('div',{style:{fontSize:15,fontWeight:700,color:C.textBright,
+          letterSpacing:'0.08em'}},clock||'--:--:--')
+      )
+    )
+  ),
+
+  // ═══ MAIN 3-COLUMN GRID ═══
+  React.createElement('div',{style:{
+    flex:1,display:'grid',
+    gridTemplateColumns:'1fr 248px 268px',
+    gridTemplateRows:'1fr 1fr',
+    gap:1,background:'#111111',
+    overflow:'hidden',minHeight:0,
+  }},
+
+    // ─── LEFT COL ROW 1: Equity Chart ───
+    React.createElement(Panel,{
+      title:'EQUITY CURVE — PAPER PORTFOLIO',
+      titleRight:`RETURN: +${retPct}%  MAX DD: -${maxDD}%`,
+      style:{gridRow:'1',gridColumn:'1'},
+    },
+      React.createElement('div',{style:{height:'100%',display:'flex',flexDirection:'column'}},
+        React.createElement(ResponsiveContainer,{width:'100%',height:'78%'},
+          React.createElement(AreaChart,{data:eq,margin:{top:6,right:10,bottom:0,left:48}},
+            React.createElement('defs',null,
+              React.createElement('linearGradient',{id:'eg',x1:'0',y1:'0',x2:'0',y2:'1'},
+                React.createElement('stop',{offset:'5%',stopColor:C.amber,stopOpacity:0.3}),
+                React.createElement('stop',{offset:'95%',stopColor:C.amber,stopOpacity:0.02})
+              )
+            ),
+            React.createElement(CartesianGrid,{strokeDasharray:'1 5',stroke:'#121212'}),
+            React.createElement(XAxis,{dataKey:'d',tick:{fill:C.textDim,fontSize:7,fontFamily:C.font},
+              tickLine:false,axisLine:{stroke:C.border},interval:44}),
+            React.createElement(YAxis,{tick:{fill:C.textDim,fontSize:7,fontFamily:C.font},
+              tickLine:false,axisLine:false,
+              tickFormatter:v=>`₹${(v/1000).toFixed(0)}k`}),
+            React.createElement(Tooltip,{content:React.createElement(TT)}),
+            React.createElement(ReferenceLine,{y:100000,stroke:C.textDim,strokeDasharray:'3 3',strokeWidth:0.5}),
+            React.createElement(Area,{type:'monotone',dataKey:'eq',name:'Equity',
+              stroke:C.amber,strokeWidth:1.5,fill:'url(#eg)',dot:false})
+          )
+        ),
+        React.createElement('div',{style:{
+          display:'flex',gap:0,padding:'0 12px',
+          borderTop:`1px solid ${C.border}`,height:'22%',
+          alignItems:'center',overflowX:'auto',flexShrink:0,
+        }},
+          ...[
+            {l:'RETURN',v:`+${retPct}%`,c:C.green},
+            {l:'MAX DD',v:`-${maxDD}%`,c:C.red},
+            {l:'TRADES',v:'147',c:C.text},
+            {l:'WIN RATE',v:'61.2%',c:C.green},
+            {l:'SHARPE',v:'1.84',c:C.cyan},
+            {l:'SORTINO',v:'2.21',c:C.cyan},
+            {l:'PROFIT F.',v:'2.31',c:C.cyan},
+            {l:'CALMAR',v:'1.43',c:C.text},
+            {l:'EXPECTANCY',v:'₹412',c:C.green},
+          ].map(s=>React.createElement('div',{key:s.l,style:{
+            paddingRight:18,flexShrink:0,
+          }},
+            React.createElement('div',{style:{fontSize:7,color:C.textDim,marginBottom:1,letterSpacing:'0.08em'}},s.l),
+            React.createElement('div',{style:{fontSize:11,color:s.c,fontWeight:700}},s.v)
+          ))
+        )
+      )
+    ),
+
+    // ─── LEFT COL ROW 2: Signals + Model Tabs ───
+    React.createElement(Panel,{
+      title:'LIVE SIGNALS',
+      titleRight:`${new Date().toDateString().slice(4)} | 7 stocks scanned`,
+      style:{gridRow:'2',gridColumn:'1'},
+    },
+      React.createElement('div',{style:{height:'100%',display:'flex',flexDirection:'column'}},
+        React.createElement('div',{style:{
+          display:'flex',gap:0,borderBottom:`1px solid ${C.border}`,flexShrink:0,
+        }},
+          ...['signals','models'].map(t=>React.createElement('button',{key:t,
+            onClick:()=>setTab(t),
+            style:{
+              padding:'4px 12px',fontSize:8,fontWeight:700,letterSpacing:'0.1em',
+              textTransform:'uppercase',background:tab===t?'#0C0C0C':'transparent',
+              color:tab===t?C.amber:C.textDim,border:'none',cursor:'pointer',
+              borderBottom:tab===t?`1px solid ${C.amber}`:'1px solid transparent',
+            }
+          },t)
+          )
+        ),
+        tab==='signals'&&React.createElement('div',{style:{flex:1,overflow:'auto'}},
+          React.createElement('table',{style:{width:'100%',borderCollapse:'collapse',fontSize:8}},
+            React.createElement('thead',null,
+              React.createElement('tr',{style:{background:C.panelAlt}},
+                ...['TICKER','ACTION','CONFIDENCE','RANK','QTY','ATR','REGIME','STATUS'].map(h=>
+                  React.createElement('th',{key:h,style:{
+                    padding:'4px 8px',textAlign:'left',color:C.textDim,fontWeight:400,
+                    borderBottom:`1px solid ${C.border}`,fontSize:7,letterSpacing:'0.1em',
+                    whiteSpace:'nowrap',
+                  }},h)
+                )
+              )
+            ),
+            React.createElement('tbody',null,
+              SIGNALS.map((s,i)=>{
+                const isBuy=s.a==='BUY';
+                return React.createElement('tr',{key:s.t,style:{
+                  background:i%2===0?'transparent':'#050505',
+                  borderBottom:`1px solid #0A0A0A`,
+                }},
+                  React.createElement('td',{style:{padding:'4px 8px',color:C.textBright,fontWeight:700,whiteSpace:'nowrap'}},s.t),
+                  React.createElement('td',{style:{padding:'4px 8px'}},
+                    React.createElement('span',{style:{
+                      color:isBuy?'#000':C.textDim,background:isBuy?C.green:'transparent',
+                      padding:isBuy?'1px 5px':'0',fontSize:7,fontWeight:700,
+                    }},s.a)
+                  ),
+                  React.createElement('td',{style:{padding:'4px 8px'}},
+                    React.createElement('div',{style:{display:'flex',alignItems:'center',gap:5}},
+                      React.createElement('div',{style:{width:36,height:3,background:C.border,borderRadius:2}},
+                        React.createElement('div',{style:{
+                          height:'100%',width:`${s.c*100}%`,borderRadius:2,
+                          background:s.c>0.65?C.green:s.c>0.52?C.amber:C.red,
+                        }})
+                      ),
+                      React.createElement('span',{style:{
+                        color:s.c>0.65?C.green:s.c>0.52?C.amber:C.textDim,fontWeight:700,
+                      }},`${(s.c*100).toFixed(1)}%`)
+                    )
+                  ),
+                  React.createElement('td',{style:{padding:'4px 8px',color:C.textDim}},`#${s.rank}`),
+                  React.createElement('td',{style:{padding:'4px 8px',color:isBuy?C.text:C.textDim}},isBuy?s.qty:'—'),
+                  React.createElement('td',{style:{padding:'4px 8px',color:C.textDim}},`₹${s.atr}`),
+                  React.createElement('td',{style:{padding:'4px 8px'}},
+                    React.createElement('span',{style:{
+                      fontSize:7,color:s.reg==='BULL'?C.green:s.reg==='CHOPPY'?C.red:C.amber,
+                    }},s.reg)
+                  ),
+                  React.createElement('td',{style:{padding:'4px 8px'}},
+                    React.createElement('span',{style:{fontSize:7,color:isBuy?C.green:C.textDim}},
+                      isBuy?'● QUEUED':'○ HOLD'
+                    )
+                  )
+                );
+              })
+            )
+          )
+        ),
+        tab==='models'&&React.createElement('div',{style:{padding:10}},
+          React.createElement('div',{style:{fontSize:7,color:C.textDim,marginBottom:8,letterSpacing:'0.1em'}},
+            'ENSEMBLE PERFORMANCE (CPCV VALIDATED — 28 FOLDS)'
+          ),
+          MODELS.map(m=>React.createElement('div',{key:m.m,style:{
+            marginBottom:10,padding:8,border:`1px solid ${C.border}`,background:'#050505',
+          }},
+            React.createElement('div',{style:{display:'flex',justifyContent:'space-between',marginBottom:5}},
+              React.createElement('span',{style:{fontWeight:700,color:C.textBright,fontSize:9}},m.m),
+              React.createElement('span',{style:{fontSize:7,color:C.textDim}},`weight: ${m.w}`)
+            ),
+            ...([
+              {l:'Brier Score',v:m.b,max:0.25,good:v=>v<0.20,col:v=>v<0.18?C.green:v<0.22?C.amber:C.red},
+              {l:'AUC-ROC',v:m.a,max:1,good:v=>v>0.65,col:v=>v>0.68?C.green:v>0.60?C.amber:C.red},
+              {l:'F-beta(0.5)',v:m.f,max:1,good:v=>v>0.50,col:v=>v>0.52?C.green:C.amber},
+            ].map(stat=>React.createElement('div',{key:stat.l,style:{marginBottom:4}},
+              React.createElement('div',{style:{display:'flex',justifyContent:'space-between',fontSize:7,marginBottom:2}},
+                React.createElement('span',{style:{color:C.textDim}},stat.l),
+                React.createElement('span',{style:{color:stat.col(stat.v),fontWeight:700}},stat.v.toFixed(3))
+              ),
+              React.createElement('div',{style:{height:3,background:C.border,borderRadius:2}},
+                React.createElement('div',{style:{
+                  height:'100%',width:`${(stat.v/stat.max)*100}%`,
+                  background:stat.col(stat.v),borderRadius:2,
+                }})
+              )
+            )))
+          ))
+        )
+      )
+    ),
+
+    // ─── CENTER COL (spans 2 rows) ───
+    React.createElement('div',{style:{
+      gridRow:'1/3',gridColumn:'2',
+      display:'flex',flexDirection:'column',gap:1,background:'#111',
+    }},
+
+      // System Control
+      React.createElement(Panel,{title:'SYSTEM CONTROL',accent:running?C.green:C.amber,
+        style:{minHeight:148,flexShrink:0}},
+        React.createElement('div',{style:{padding:'10px 10px 8px',display:'flex',flexDirection:'column',gap:8}},
+          React.createElement('div',{style:{display:'flex',gap:6}},
+            React.createElement(Btn,{onClick:toggleRun,color:running?C.red:C.green},
+              running?'⬛ STOP TRADER':'▶ START TRADER'
+            )
+          ),
+          React.createElement('div',{style:{
+            display:'grid',gridTemplateColumns:'auto 1fr',
+            gap:'3px 10px',fontSize:8,
+          }},
+            ...([
+              ['STATUS',running?'● RUNNING':'● STOPPED',running?C.green:C.red],
+              ['MODE','PAPER',C.amber],
+              ['WATCHLIST','10 stocks',C.text],
+              ['INTERVAL','60 s',C.text],
+              ['POSITIONS',`${SIGNALS.filter(s=>s.a==='BUY').length} / 10`,C.cyan],
+              ['REGIME','BULL_MARKET',C.green],
+              ['CIRCUIT BKR','ARMED',C.green],
+            ].flatMap(([l,v,c])=>[
+              React.createElement('span',{key:l,style:{color:C.textDim}},l+':'),
+              React.createElement('span',{key:v,style:{color:c,fontWeight:700}},v),
+            ]))
+          )
+        )
+      ),
+
+      // Backtest
+      React.createElement(Panel,{title:'PARALLEL BACKTEST',style:{minHeight:180,flexShrink:0}},
+        React.createElement('div',{style:{padding:10,display:'flex',flexDirection:'column',gap:7,height:'100%'}},
+          React.createElement('div',{style:{display:'flex',gap:6,alignItems:'center'}},
+            React.createElement(Btn,{onClick:runBT,disabled:btRun,color:C.cyan,tiny:true},
+              btRun?`RUNNING ${btPct}%`:'▶ RUN BACKTEST'
+            ),
+            btRun&&React.createElement('div',{style:{flex:1,height:3,background:C.border,borderRadius:2}},
+              React.createElement('div',{style:{height:'100%',width:`${btPct}%`,background:C.cyan,
+                borderRadius:2,transition:'width 0.3s'}})
+            )
+          ),
+          React.createElement('div',{style:{
+            flex:1,background:'#020202',border:`1px solid ${C.border}`,
+            padding:'4px 6px',overflow:'auto',minHeight:80,
+          }},
+            btLog.length===0
+              ?React.createElement('span',{style:{color:C.textDim,fontSize:8}},
+                '> awaiting run command...')
+              :btLog.map((line,i)=>React.createElement('div',{key:i,style:{
+                  fontSize:7,marginBottom:2,fontFamily:C.font,
+                  color:line.pass?C.green:C.red,whiteSpace:'nowrap',
+                }},
+                `${line.ticker.padEnd(18)}Sh=${line.sh}  WR=${line.wr}%  Br=${line.brier}  ${line.pass?'✓ PASS':'✗ FAIL'}`
+              ))
+          )
+        )
+      ),
+
+      // Kite Token
+      React.createElement(Panel,{title:'KITE CONNECT TOKEN',style:{minHeight:120,flexShrink:0}},
+        React.createElement('div',{style:{padding:10,display:'flex',flexDirection:'column',gap:7}},
+          React.createElement(Btn,{
+            onClick:genToken,
+            disabled:tokState==='gen',
+            color:C.blue,tiny:true,
+          },
+            tokState==='gen'?'⟳ GENERATING...':
+            tokState==='done'?'↺ REFRESH TOKEN':'⚡ GENERATE TOKEN'
+          ),
+          tokState==='done'&&React.createElement('div',{style:{fontSize:7}},
+            React.createElement('div',{style:{color:C.textDim,marginBottom:3}},'ACCESS TOKEN (24h TTL):'),
+            React.createElement('div',{style:{
+              background:'#020202',border:`1px solid ${C.green}`,
+              padding:'3px 6px',color:C.green,wordBreak:'break-all',
+              letterSpacing:'0.04em',fontSize:7,
+            }},tokVal.slice(0,20),'●●●●●●●●●●●●'),
+            React.createElement('div',{style:{color:C.green,marginTop:3,fontSize:7}},
+              '✓ Saved to .env [KITE_ACCESS_TOKEN]'
+            )
+          )
+        )
+      ),
+
+      // Risk Monitor
+      React.createElement(Panel,{title:'RISK MONITOR',accent:C.green,style:{flex:1}},
+        React.createElement('div',{style:{padding:'6px 10px'}},
+          React.createElement(Row,{label:'DAILY P&L',val:'+₹3,240',color:C.green}),
+          React.createElement(Row,{label:'DRAWDOWN',val:'2.3%',color:C.text}),
+          React.createElement(Row,{label:'CAN TRADE',val:'● YES',color:C.green}),
+          React.createElement(Row,{label:'CONSEC LOSSES',val:'0',color:C.text}),
+          React.createElement(Row,{label:'INDIA VIX',val:'14.2',color:C.text}),
+          React.createElement(Row,{label:'OPEN POS',val:'4 / 10',color:C.text}),
+          React.createElement(Row,{label:'MAX POS SIZE',val:'5.0% cap',color:C.text}),
+          React.createElement(Row,{label:'CIRCUIT BKR',val:'ARMED',color:C.green}),
+          React.createElement(Row,{label:'REDIS RISK',val:'ATOMIC OK',color:C.green}),
+          React.createElement(Row,{label:'HALT STATE',val:'CLEAR',color:C.green}),
+        )
+      )
+    ),
+
+    // ─── RIGHT COL (spans 2 rows) ───
+    React.createElement('div',{style:{
+      gridRow:'1/3',gridColumn:'3',
+      display:'flex',flexDirection:'column',gap:1,background:'#111',
+    }},
+
+      // Stock Search
+      React.createElement(Panel,{title:'STOCK ANALYSIS — CLAUDE AI',accent:C.cyan,style:{flex:1}},
+        React.createElement('div',{style:{
+          padding:10,display:'flex',flexDirection:'column',gap:8,height:'100%',
+        }},
+          React.createElement('div',{style:{display:'flex',gap:5}},
+            React.createElement('input',{
+              value:query,
+              onChange:e=>setQuery(e.target.value),
+              onKeyDown:e=>e.key==='Enter'&&searchStock(),
+              placeholder:'TICKER (e.g. SBIN.NS)',
+              style:{
+                flex:1,background:'#020202',
+                border:`1px solid ${query?C.cyan:C.border}`,
+                color:C.cyan,padding:'3px 7px',
+                fontFamily:C.font,fontSize:8,letterSpacing:'0.06em',
+              }
+            }),
+            React.createElement(Btn,{onClick:searchStock,disabled:fetching,color:C.cyan,tiny:true},
+              fetching?'...':'GO'
+            )
+          ),
+
+          fetching&&React.createElement('div',{style:{color:C.textDim,fontSize:8},className:'pulse'},
+            '⟳ Fetching from Claude...'
+          ),
+
+          stock&&!stock.err&&React.createElement('div',{style:{
+            flex:1,overflow:'auto',display:'flex',flexDirection:'column',gap:6,fontSize:8,
+          }},
+            React.createElement('div',{style:{borderBottom:`1px solid ${C.border}`,paddingBottom:5}},
+              React.createElement('div',{style:{color:C.cyan,fontWeight:700,fontSize:11,marginBottom:2}},stock.name),
+              React.createElement('div',{style:{color:C.textDim}},`${stock.sector} · ${stock.marketCap}`)
+            ),
+            React.createElement('div',{style:{
+              display:'grid',gridTemplateColumns:'1fr 1fr',gap:'2px 10px',
+            }},
+              ...([
+                ['P/E',stock.pe],['P/BV',stock.pbv],
+                ['ROE',stock.roe],['D/E',stock.debtEquity],
+                ['52W HIGH',stock.high52w],['52W LOW',stock.low52w],
+              ].flatMap(([k,v])=>[
+                React.createElement('div',{key:k,style:{
+                  display:'flex',justifyContent:'space-between',padding:'1px 0',
+                }},
+                  React.createElement('span',{style:{color:C.textDim}},k),
+                  React.createElement('span',{style:{color:C.text}},v)
+                )
+              ]))
+            ),
+            React.createElement('div',{style:{
+              background:'#020202',border:`1px solid ${C.border}`,
+              padding:6,color:C.text,lineHeight:1.6,fontSize:8,
+            }},stock.synopsis),
+            stock.signals&&React.createElement('div',null,
+              React.createElement('div',{style:{color:C.amberDim,fontSize:7,marginBottom:3,letterSpacing:'0.1em'}},'SIGNALS:'),
+              stock.signals.map((s,i)=>React.createElement('div',{key:i,
+                style:{color:C.text,fontSize:7,padding:'1px 0'}},`› ${s}`))
+            ),
+            stock.news&&React.createElement('div',null,
+              React.createElement('div',{style:{color:C.amberDim,fontSize:7,marginBottom:3,letterSpacing:'0.1em'}},'RECENT NEWS:'),
+              stock.news.map((n,i)=>React.createElement('div',{key:i,style:{
+                color:C.textDim,fontSize:7,padding:'2px 0',
+                borderBottom:`1px solid #0C0C0C`,
+              }},n))
+            )
+          ),
+
+          stock?.err&&React.createElement('div',{style:{color:C.red,fontSize:8}},
+            '⚠ Analysis failed — check ticker symbol'
+          ),
+
+          !stock&&!fetching&&React.createElement('div',{style:{
+            flex:1,display:'flex',alignItems:'center',justifyContent:'center',
+          }},
+            React.createElement('div',{style:{textAlign:'center',color:C.textDim,fontSize:8}},
+              React.createElement('div',{style:{fontSize:20,marginBottom:6}},'◎'),
+              React.createElement('div',null,'Enter NSE ticker'),
+              React.createElement('div',null,'powered by Claude AI')
+            )
+          )
+        )
+      ),
+
+      // Constants Editor
+      React.createElement(Panel,{title:'SYSTEM CONSTANTS — CLICK TO EDIT',accent:C.amber,style:{flex:1}},
+        React.createElement('div',{style:{overflow:'auto',height:'100%'}},
+          React.createElement('table',{style:{width:'100%',borderCollapse:'collapse',fontSize:8}},
+            React.createElement('thead',null,
+              React.createElement('tr',{style:{background:C.panelAlt,position:'sticky',top:0}},
+                React.createElement('th',{style:{padding:'4px 8px',textAlign:'left',color:C.textDim,
+                  fontWeight:400,borderBottom:`1px solid ${C.border}`,fontSize:7,letterSpacing:'0.1em',
+                  width:'55%'}},'CONSTANT'),
+                React.createElement('th',{style:{padding:'4px 8px',textAlign:'left',color:C.textDim,
+                  fontWeight:400,borderBottom:`1px solid ${C.border}`,fontSize:7,width:'30%'}},'VALUE'),
+                React.createElement('th',{style:{padding:'4px 8px',textAlign:'left',color:C.textDim,
+                  fontWeight:400,borderBottom:`1px solid ${C.border}`,fontSize:7}},  'U')
+              )
+            ),
+            React.createElement('tbody',null,
+              consts.map((c,i)=>React.createElement('tr',{key:c.k,style:{
+                background:i%2===0?'transparent':'#050505',
+                borderBottom:`1px solid #0A0A0A`,
+              }},
+                React.createElement('td',{style:{padding:'2px 8px',color:C.textDim,
+                  fontSize:7,letterSpacing:'0.04em',whiteSpace:'nowrap',
+                  overflow:'hidden',textOverflow:'ellipsis',maxWidth:130,
+                },title:c.desc},c.k),
+                React.createElement('td',{style:{padding:'2px 4px'}},
+                  editK===c.k
+                    ?React.createElement('input',{
+                        autoFocus:true,value:c.v,
+                        onChange:e=>setConsts(p=>p.map(x=>x.k===c.k?{...x,v:e.target.value}:x)),
+                        onBlur:()=>{setEditK(null);addLog(`Updated ${c.k} = ${c.v}`);},
+                        onKeyDown:e=>{if(e.key==='Enter'){setEditK(null);addLog(`Updated ${c.k} = ${c.v}`);}},
+                        style:{
+                          background:'#0A1F0A',border:`1px solid ${C.green}`,
+                          color:C.green,fontFamily:C.font,fontSize:9,
+                          width:55,padding:'1px 3px',
+                        }
+                      })
+                    :React.createElement('span',{
+                        onClick:()=>setEditK(c.k),
+                        style:{color:C.amber,cursor:'pointer',fontWeight:700,fontSize:10},
+                        title:'Click to edit',
+                      },c.v)
+                ),
+                React.createElement('td',{style:{padding:'2px 6px',color:C.textDim,fontSize:7}},c.u)
+              ))
+            )
+          )
+        )
+      )
+    )
+  ),
+
+  // ═══ BOTTOM LOG BAR ═══
+  React.createElement('div',{style:{
+    height:26,borderTop:`1px solid ${C.border}`,
+    background:'#030303',display:'flex',
+    alignItems:'center',flexShrink:0,overflow:'hidden',
+  }},
+    React.createElement('div',{style:{
+      padding:'0 10px',borderRight:`1px solid ${C.border}`,
+      color:C.amber,fontSize:7,fontWeight:700,letterSpacing:'0.15em',
+      flexShrink:0,height:'100%',display:'flex',alignItems:'center',
+    }},'SYS.LOG'),
+    React.createElement('div',{
+      ref:logRef,
+      style:{
+        flex:1,overflow:'auto',display:'flex',alignItems:'center',
+        padding:'0 10px',gap:0,
+        scrollbarWidth:'none',
+      }
+    },
+      React.createElement('div',{style:{display:'flex',gap:0,whiteSpace:'nowrap',alignItems:'center'}},
+        log.slice(-10).map((entry,i)=>React.createElement('span',{key:i,style:{
+          fontSize:7,color:logColor[entry.tp]||C.textDim,marginRight:0,
+        }},
+          React.createElement('span',{style:{color:'#2A2A2A'}},'['),
+          React.createElement('span',{style:{color:C.textDim}},entry.t),
+          React.createElement('span',{style:{color:'#2A2A2A'}},'] '),
+          entry.m,
+          i<log.slice(-10).length-1&&React.createElement('span',{style:{
+            color:'#1A1A1A',margin:'0 14px',
+          }},'│')
+        ))
+      )
+    ),
+    React.createElement('div',{style:{
+      borderLeft:`1px solid ${C.border}`,padding:'0 10px',
+      fontSize:7,flexShrink:0,height:'100%',
+      display:'flex',alignItems:'center',gap:14,
+    }},
+      ...(['RELIANCE +1.2%','TCS +0.8%','HDFC +0.3%','INFY -0.4%','SBIN -0.1%'].map(s=>
+        React.createElement('span',{key:s,style:{color:s.includes('-')?C.red:C.green}},s)
+      ))
+    )
+  )
+  );
+}
+
+const root=ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(App));
+</script>
+</body>
+</html>

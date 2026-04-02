@@ -1,3 +1,20 @@
+"""
+MARK5 ALERT MANAGER v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, production certification
+- [Previous] v2.0: Async architecture with retry mechanism
+
+TRADING ROLE: Non-blocking system-wide alerting (Email/Slack)
+SAFETY LEVEL: CRITICAL - Main thread latency protection
+
+FEATURES:
+✅ Producer-Consumer Queue (Zero main-thread blocking)
+✅ Retry mechanism with exponential backoff
+✅ Thread-safe Singleton pattern
+"""
+
 import logging
 import json
 import requests
@@ -10,6 +27,30 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from typing import Dict, Optional, Any
 from datetime import datetime
+from enum import Enum
+
+
+# ── Enums required by autonomous.py ──────────────────────────────────────────
+class AlertLevel(Enum):
+    INFO     = "INFO"
+    LOW      = "LOW"
+    MEDIUM   = "MEDIUM"
+    HIGH     = "HIGH"
+    CRITICAL = "CRITICAL"
+
+
+class AlertType(Enum):
+    SYSTEM_ERROR        = "SYSTEM_ERROR"
+    TRADE_EXECUTED      = "TRADE_EXECUTED"
+    RISK_BREACH         = "RISK_BREACH"
+    HIGH_RISK_WARNING   = "HIGH_RISK_WARNING"
+    MODEL_DEGRADATION   = "MODEL_DEGRADATION"
+    DATA_QUALITY        = "DATA_QUALITY"
+    CIRCUIT_BREAKER     = "CIRCUIT_BREAKER"
+    WEEKLY_LIMIT        = "WEEKLY_LIMIT"
+    MONTHLY_LIMIT       = "MONTHLY_LIMIT"
+    DRAWDOWN_STOP       = "DRAWDOWN_STOP"
+    GENERAL             = "GENERAL"
 
 # Configure logging
 logger = logging.getLogger("MARK5_Alerts")
@@ -78,6 +119,25 @@ class AlertManager:
             self.slack_webhook_url = os.getenv('SLACK_WEBHOOK', self.slack_config.get('webhook_url', ''))
 
             logger.info(f"AlertManager configured. Mode: {'ACTIVE' if self.enabled else 'SILENT'}")
+
+    def create_alert(
+        self,
+        level: AlertLevel,
+        alert_type: AlertType,
+        title: str,
+        message: str,
+        metadata: Optional[Dict] = None,
+    ) -> None:
+        """
+        Structured alert creation — accepts enum values from autonomous.py.
+        Converts to string keys for the existing queue-based pipeline.
+        """
+        level_str = level.value if isinstance(level, AlertLevel) else str(level)
+        type_str  = alert_type.value if isinstance(alert_type, AlertType) else str(alert_type)
+        full_msg  = f"[{type_str}] {message}"
+        if metadata:
+            full_msg += f"\nMetadata: {metadata}"
+        self.send_alert(level=level_str, title=title, message=full_msg)
 
     def send_alert(self, level: str, title: str, message: str):
         """

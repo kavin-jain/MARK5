@@ -1,10 +1,19 @@
 """
-MARK5 Training Analytics v6.0 (FINANCIAL GRADE)
------------------------------------------------
-Architect: The Legendary Trader
-Improvements:
-1. ResultsAnalyzer: Percentage Drawdown, Sortino Ratio, Equity Curve.
-2. TrainingResultsAnalyzer: Regime Specialists, Drift Analysis.
+MARK5 Training Analytics v8.0 - PRODUCTION GRADE (FINANCIAL GRADE)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Production hardening & standardized header
+- [Previous] v6.0: Percentage drawdown, Sortino, Regime Specialists
+
+TRADING ROLE: Analyzes training results with financial metrics
+SAFETY LEVEL: HIGH - Identifies model drift and regime specialists
+
+FEATURES:
+✅ Sortino ratio calculation
+✅ Equity curve with percentage drawdown
+✅ Regime-specialist identification
+✅ Weekly performance delta tracking
 """
 
 import pandas as pd

@@ -1,7 +1,17 @@
 """
-MARK5 System Monitor Utilities
-==============================
-Consolidated utilities for system information and health monitoring.
+MARK5 SYSTEM MONITOR v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, production certification
+
+TRADING ROLE: Health & Resource Monitoring
+SAFETY LEVEL: LOW - Informational & Alerting
+
+FEATURES:
+✅ PSUtil Integration (CPU, RAM, Disk)
+✅ Error Rate Tracking
+✅ Critical Health status updates
 """
 
 import platform

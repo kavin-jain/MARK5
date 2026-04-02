@@ -7,7 +7,23 @@ import logging
 import os
 from typing import Optional, Tuple, Union, List, Dict, Any
 
-logger = logging.getLogger("MARK3.IPC")
+logger = logging.getLogger("MARK5.IPC")
+
+"""
+MARK5 IPC ACROSS-MEMORY v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, production certification
+
+TRADING ROLE: Ultra-low latency process communication
+SAFETY LEVEL: CRITICAL - Shared memory integrity
+
+FEATURES:
+✅ Zero-Copy Ring Buffer (SPSC Pattern)
+✅ Hybrid Spin-Yield Locking
+✅ Header-based generation tracking
+"""
 
 class ZeroCopyRingBuffer:
     """

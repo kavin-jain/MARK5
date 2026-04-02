@@ -1,8 +1,18 @@
 """
-MARK5 DATA PROVIDER v6.1 (HFT GRADE)
-------------------------------------
-The Single Source of Truth.
-Implements 'gapless' synchronization between History and Live Stream.
+MARK5 DATA PROVIDER v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, production certification
+- [Previous] v6.1: Gapless Synchronization
+
+TRADING ROLE: Single Source of Truth for Data
+SAFETY LEVEL: CRITICAL - Consistency of History vs Live
+
+FEATURES:
+✅ Gapless Synchronization (Buffer + Download)
+✅ IST Timezone Enforcement
+✅ Data Validation Integration
 """
 
 import logging
@@ -115,7 +125,13 @@ class DataProvider:
 
     def _stitch_buffer_to_history(self, history_df: pd.DataFrame, symbol: str) -> pd.DataFrame:
         """
-        Merges the static history with the dynamic buffer.
+        FIX D-03: Merges buffered live ticks with historical data.
+        
+        Previously this was just `pass` — silently discarding all live ticks.
+        Now properly:
+        1. Filters ticks newer than the last historical candle
+        2. Aggregates into OHLCV minute bars
+        3. Appends to history DataFrame
         """
         if history_df.empty:
             return history_df
@@ -129,12 +145,58 @@ class DataProvider:
         last_hist_time = history_df.index.max()
         
         with self._buffer_lock:
-            # Filter buffer for ticks newer than history
-            # Note: This is a simplified logic. In production, we aggregate ticks into a candle
-            # If the history interval is 'minute', we build the current incomplete minute candle here.
-            pass 
-            # (Logic omitted for brevity: requires aggregating ticks into OHLC format)
+            # Filter for this symbol, newer than history end
+            relevant_ticks = [
+                t for t in self._tick_buffer 
+                if t.symbol.endswith(symbol.replace('.NS', '').split(':')[-1])
+                and t.timestamp > last_hist_time
+            ]
+            # Clear buffer after extracting
+            self._tick_buffer = []
+        
+        if not relevant_ticks:
+            self.logger.info("No buffered ticks to stitch (history is current).")
+            return history_df
+        
+        # Aggregate ticks into minute candles
+        candle_map = {}  # minute_key → {open, high, low, close, volume}
+        
+        for tick in relevant_ticks:
+            # Truncate to minute boundary
+            ts = tick.timestamp.replace(second=0, microsecond=0)
             
+            if ts not in candle_map:
+                candle_map[ts] = {
+                    'open': tick.ltp,
+                    'high': tick.ltp,
+                    'low': tick.ltp,
+                    'close': tick.ltp,
+                    'volume': tick.volume
+                }
+            else:
+                c = candle_map[ts]
+                c['high'] = max(c['high'], tick.ltp)
+                c['low'] = min(c['low'], tick.ltp)
+                c['close'] = tick.ltp
+                c['volume'] = tick.volume  # Kite volume is cumulative; take latest
+        
+        if candle_map:
+            buffer_df = pd.DataFrame.from_dict(candle_map, orient='index')
+            buffer_df.index = pd.DatetimeIndex(buffer_df.index)
+            if buffer_df.index.tzinfo is None:
+                buffer_df.index = buffer_df.index.tz_localize(IST)
+            
+            # Append and deduplicate
+            combined = pd.concat([history_df, buffer_df])
+            combined = combined[~combined.index.duplicated(keep='last')]
+            combined.sort_index(inplace=True)
+            
+            self.logger.info(
+                f"Stitched {len(buffer_df)} candles from {len(relevant_ticks)} ticks "
+                f"({relevant_ticks[0].timestamp} → {relevant_ticks[-1].timestamp})"
+            )
+            return combined
+        
         return history_df
 
     def register_tick_observer(self, callback: Callable[[List[TickData]], None]):
@@ -153,7 +215,7 @@ class DataProvider:
         
         ticker = ticker.upper()
         # Check against mapped tokens first (strongest validation)
-        # Note: BROKER_TOKENS_MAP values are like "NSE:RELIANCE"
+        # Note: BROKER_TOKENS_MAP values are like "NSE:COFORGE"
         # We check if "NSE:{ticker}" exists in map values
         # This might be slow if map is huge, but it's small now.
         # Ideally satisfy: any(v.endswith(f":{ticker}") for v in BROKER_TOKENS_MAP.values())

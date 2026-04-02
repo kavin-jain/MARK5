@@ -1,3 +1,20 @@
+"""
+MARK5 EXECUTION SCHEMAS v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Production hardening & standardized header
+
+TRADING ROLE: Data models for order/position management
+SAFETY LEVEL: HIGH - Type safety for financial transactions
+
+SCHEMAS:
+✅ Order dataclass (with lifecycle timestamps)
+✅ Position dataclass (with P&L tracking)
+✅ OrderSide, OrderType, OrderStatus enums
+✅ Decimal precision utilities for Indian markets
+"""
+
 from dataclasses import dataclass, field
 from enum import Enum
 from datetime import datetime

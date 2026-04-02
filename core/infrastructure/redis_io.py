@@ -1,10 +1,18 @@
 """
-MARK3 REDIS IO (HFT OPTIMIZED v2.0)
------------------------------------
-Features:
-- MsgPack Serialization
-- LUA SCRIPTING for Atomic Risk Management
-- Connection Pooling
+MARK5 REDIS IO v8.0 - PRODUCTION GRADE (HFT OPTIMIZED)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, version bump
+- [Previous] v2.0: HFT optimization with LUA scripts
+
+TRADING ROLE: Low-latency data caching and atomic operations
+SAFETY LEVEL: HIGH - Atomic risk checks via LUA scripts
+
+FEATURES:
+✅ MsgPack serialization for speed
+✅ LUA scripting for atomic risk management
+✅ Connection pooling
 """
 
 import redis
@@ -50,7 +58,7 @@ class RedisManager:
     def __init__(self):
         if self._initialized: return
             
-        self.logger = logging.getLogger("MARK3.Redis")
+        self.logger = logging.getLogger("MARK5.Redis")
         config = get_config().redis
         
         self._pool = redis.ConnectionPool(
@@ -97,9 +105,17 @@ class RedisManager:
     def check_risk_atomic(self, account_id: str, potential_loss: float, max_loss: float, max_trades: int) -> bool:
         """
         Executes the Lua script to check risk limits atomically.
+        
+        CRITICAL: Fails CLOSED (blocks trading) if Redis unavailable.
+        This prevents uncontrolled losses when risk state cannot be verified.
         """
         if not self._risk_script_sha:
-            return True # Fail open if Redis is dead? Or closed? Let's fail open for now or logic breaks.
+            # FAIL CLOSED - Do NOT trade if we cannot verify risk state
+            self.logger.critical(
+                "🛑 RISK CHECK BLOCKED: Redis unavailable - cannot verify risk limits. "
+                "Trading halted for capital protection."
+            )
+            return False  # Block trade - fail closed for safety
             
         try:
             keys = [f"risk:{account_id}:daily_loss", f"risk:{account_id}:trade_count"]
@@ -107,6 +123,9 @@ class RedisManager:
             
             result = self.client.evalsha(self._risk_script_sha, 2, *keys, *args)
             return result == 1
+        except redis.exceptions.ConnectionError as e:
+            self.logger.critical(f"🛑 RISK CHECK BLOCKED: Redis connection lost - {e}")
+            return False  # Fail closed - block trading
         except Exception as e:
             self.logger.error(f"Atomic Risk Check Failed: {e}")
             # Fail closed (Safe) - if DB fails, do not trade.

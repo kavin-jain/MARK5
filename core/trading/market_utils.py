@@ -1,13 +1,23 @@
 """
-MARK5 Market Utilities
-======================
-Domain-specific utilities for market operations, costs, and status checks.
-Moved from core/utils/trading_utils.py to separate domain logic from generic utils.
+MARK5 Market Utilities v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Production hardening & standardized header
+
+TRADING ROLE: Domain-specific utilities for market operations
+SAFETY LEVEL: MEDIUM - Market status affects trading decisions
+
+FEATURES:
+✅ TransactionCostCalculator - Real NSE/BSE cost modeling
+✅ CircuitBreakerDetector - SEBI circuit limit detection
+✅ MarketStatusChecker - Holiday-aware market status (singleton)
 """
 
 import logging
 import threading
 from datetime import datetime, time, timedelta
+from zoneinfo import ZoneInfo
 from typing import Dict, Optional, Set
 import pandas as pd
 
@@ -30,6 +40,11 @@ class TransactionCostCalculator:
     
     def calculate_buy_costs(self, trade_value: float, quantity: int = 1) -> Dict[str, float]:
         """Calculate all costs associated with buying"""
+        # RULE 4 FIX: Handle Decimal inputs from other parts of the system
+        # Convert to float for internal calculations with float config values
+        if hasattr(trade_value, '__float__'):
+            trade_value = float(trade_value)
+        
         # Brokerage (lesser of 0.03% or ₹20)
         brokerage_pct = trade_value * self.config["BROKERAGE_PCT"]
         brokerage = min(brokerage_pct, self.config["BROKERAGE_FLAT"])
@@ -49,10 +64,11 @@ class TransactionCostCalculator:
         # Stamp duty
         stamp = trade_value * self.config["STAMP_DUTY"]
         
-        # Slippage (market impact)
-        slippage = trade_value * self.config["SLIPPAGE_PCT"]
+        # BUG-04 FIX: Slippage removed from cost calculator.
+        # Simulation already adjusts execution prices by slippage (buy_price = close + slippage).
+        # Including it here double-counted ~0.03% per trade.
         
-        total_cost = brokerage + stt + exchange + gst + sebi + stamp + slippage
+        total_cost = brokerage + stt + exchange + gst + sebi + stamp
         
         return {
             "brokerage": round(brokerage, 2),
@@ -61,13 +77,17 @@ class TransactionCostCalculator:
             "gst": round(gst, 2),
             "sebi_charges": round(sebi, 4),
             "stamp_duty": round(stamp, 2),
-            "slippage": round(slippage, 2),
             "total_cost": round(total_cost, 2),
             "cost_percentage": round((total_cost / trade_value) * 100, 4)
         }
     
     def calculate_sell_costs(self, trade_value: float, quantity: int = 1) -> Dict[str, float]:
         """Calculate all costs associated with selling"""
+        # RULE 4 FIX: Handle Decimal inputs from other parts of the system
+        # Convert to float for internal calculations with float config values
+        if hasattr(trade_value, '__float__'):
+            trade_value = float(trade_value)
+        
         # Brokerage (lesser of 0.03% or ₹20)
         brokerage_pct = trade_value * self.config["BROKERAGE_PCT"]
         brokerage = min(brokerage_pct, self.config["BROKERAGE_FLAT"])
@@ -84,10 +104,9 @@ class TransactionCostCalculator:
         # SEBI charges
         sebi = trade_value * self.config["SEBI_CHARGES"]
         
-        # Slippage (market impact)
-        slippage = trade_value * self.config["SLIPPAGE_PCT"]
+        # BUG-04 FIX: Slippage removed — simulation already adjusts sell prices.
         
-        total_cost = brokerage + stt + exchange + gst + sebi + slippage
+        total_cost = brokerage + stt + exchange + gst + sebi
         
         return {
             "brokerage": round(brokerage, 2),
@@ -95,7 +114,6 @@ class TransactionCostCalculator:
             "exchange_charges": round(exchange, 2),
             "gst": round(gst, 2),
             "sebi_charges": round(sebi, 4),
-            "slippage": round(slippage, 2),
             "total_cost": round(total_cost, 2),
             "cost_percentage": round((total_cost / trade_value) * 100, 4)
         }
@@ -267,7 +285,7 @@ class MarketStatusChecker:
     def is_market_holiday(self, date: datetime = None) -> bool:
         """Check if given date is a market holiday"""
         if date is None:
-            date = datetime.now()
+            date = datetime.now(tz=ZoneInfo('Asia/Kolkata'))
         
         date_str = date.strftime("%Y-%m-%d")
         return date_str in self.holidays
@@ -280,7 +298,7 @@ class MarketStatusChecker:
     def is_trading_day(self, date: datetime = None) -> bool:
         """Check if given date is a trading day (not weekend, not holiday)"""
         if date is None:
-            date = datetime.now()
+            date = datetime.now(tz=ZoneInfo('Asia/Kolkata'))
         
         # Check weekend
         if date.weekday() in self.market_hours["WEEKEND_DAYS"]:
@@ -294,7 +312,7 @@ class MarketStatusChecker:
     
     def get_market_status(self) -> Dict[str, any]:
         """Get comprehensive market status"""
-        now = datetime.now()
+        now = datetime.now(tz=ZoneInfo('Asia/Kolkata'))
         current_time = now.time()
         current_day = now.weekday()
         

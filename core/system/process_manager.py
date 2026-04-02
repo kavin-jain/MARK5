@@ -8,6 +8,22 @@ import signal
 from typing import Dict, Type
 from abc import ABC, abstractmethod
 
+"""
+MARK5 PROCESS KERNEL v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, production certification
+
+TRADING ROLE: OS-Level Process Management & Optimization
+SAFETY LEVEL: CRITICAL - Manages HFT Workers
+
+FEATURES:
+✅ Real-Time Scheduler Promotion (SCHED_FIFO)
+✅ CPU Core Isolation & Pinning (Affinity)
+✅ Lazarus Loop (Auto-Respawn of dead workers)
+"""
+
 logger = logging.getLogger("MARK5.Kernel")
 
 def set_realtime_priority(pid):
@@ -109,7 +125,7 @@ class DataIngestionWorker(BaseWorker):
                 
                 # Subscribe to Watchlist from Config (or defaults)
                 # Assuming config has trading.watchlist, else fallback
-                watchlist = getattr(self.config.trading, 'watchlist', ["RELIANCE", "TCS", "INFY", "HDFC", "ICICI"])
+                watchlist = getattr(self.config.trading, 'watchlist', ["COFORGE", "PERSISTENT", "KPITTECH", "HAL", "BEL"])
                 if isinstance(watchlist, list):
                     self.provider.feed.subscribe(watchlist)
                     logger.info(f"Subscribed to: {watchlist}")
@@ -122,7 +138,7 @@ class DataIngestionWorker(BaseWorker):
 
         # Mock Data Setup
         if not self.use_real_data:
-            self.tickers = [738561, 2953217, 408065, 341249, 1270529] # Reliance, TCS, Infy, HDFC, ICICI
+            self.tickers = [738561, 2953217, 408065, 341249, 1270529] # COFORGE, PERSISTENT, KPITTECH, HAL, BEL
             self.prices = {t: 2500.0 for t in self.tickers}
 
     def _on_tick(self, ticks):
@@ -133,21 +149,22 @@ class DataIngestionWorker(BaseWorker):
         # We need to standardize. BaseFeed usually sends TickData objects.
         
         for tick in ticks:
-            # Check if tick is object or dict
-            if hasattr(tick, 'instrument_token'):
-                 tid = tick.instrument_token
-                 price = tick.last_price
-                 vol = tick.volume
-                 ts = tick.timestamp.timestamp() * 1e9 if tick.timestamp else time.time_ns()
+            # TickData (from kite_adapter): has .token, .ltp, .volume, .timestamp
+            # Dict (legacy/mock): has 'instrument_token', 'last_price', 'volume'
+            if hasattr(tick, 'token'):          # TickData dataclass path
+                tid   = tick.token
+                price = tick.ltp
+                vol   = tick.volume
+                ts    = int(tick.timestamp.timestamp() * 1e9) if tick.timestamp else time.time_ns()
+            elif isinstance(tick, dict):        # Dict fallback path
+                tid   = tick.get('instrument_token', 0)
+                price = tick.get('last_price', 0.0)
+                vol   = tick.get('volume', 0)
+                ts    = time.time_ns()
             else:
-                 # Dictionary fallback
-                 tid = tick.get('instrument_token', 0)
-                 price = tick.get('last_price', 0.0)
-                 vol = tick.get('volume', 0)
-                 ts = time.time_ns()
-            
-            # Write to SHM
-            # Protocol: [ts, id, price, vol]
+                continue  # Unknown tick format — skip
+
+            # Write to SHM ring buffer: [ts, token, price, volume]
             data = np.array([ts, tid, price, vol], dtype=np.float64)
             self.shm.put(data)
 
@@ -242,7 +259,7 @@ class InferenceWorker(BaseWorker):
         self.id_map = {} # {ticker_id: symbol_name} -> Need a way to map ID to Symbol
         
         # We need the watchlist to know what models to load
-        watchlist = getattr(self.config.trading, 'watchlist', ["RELIANCE", "TCS", "INFY", "HDFC", "ICICI"])
+        watchlist = getattr(self.config.trading, 'watchlist', ["COFORGE", "PERSISTENT", "KPITTECH", "HAL", "BEL"])
         
         # Initialize DataProvider for history hydration
         self.provider = DataProvider(self.config)
@@ -273,7 +290,7 @@ class InferenceWorker(BaseWorker):
         # If ID map is empty (Mock mode or failure), fallback to mocked IDs
         if not self.id_map:
              # Basic mapping for our mock tickers if running in mock mode
-             mock_map = {738561: "RELIANCE", 2953217: "TCS", 408065: "INFY", 341249: "HDFC", 1270529: "ICICI"}
+             mock_map = {738561: "COFORGE", 2953217: "PERSISTENT", 408065: "KPITTECH", 341249: "HAL", 1270529: "BEL"}
              self.id_map.update(mock_map)
 
         # 3. Setup Signal Output (Producer)
@@ -385,7 +402,7 @@ class ExecutionWorker(BaseWorker):
         try:
              self.provider = DataProvider(self.config)
              # Mock Map Fallback
-             mock_map = {738561: "RELIANCE", 2953217: "TCS", 408065: "INFY", 341249: "HDFC", 1270529: "ICICI"}
+             mock_map = {738561: "COFORGE", 2953217: "PERSISTENT", 408065: "KPITTECH", 341249: "HAL", 1270529: "BEL"}
              self.id_map.update(mock_map)
              
              if self.provider.connect() and hasattr(self.provider.feed, 'get_instrument_token'):

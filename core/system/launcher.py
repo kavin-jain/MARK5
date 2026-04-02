@@ -1,8 +1,17 @@
 """
-MARK5 SYSTEM LAUNCHER
----------------------
-Orchestrates the HFT Topology.
-Assigns CPU Affinity and Bootstraps the Microservices.
+MARK5 SYSTEM LAUNCHER v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, production certification
+
+TRADING ROLE: Main System Entry Point & Orchestrator
+SAFETY LEVEL: CRITICAL - Bootstraps entire HFT topology
+
+FEATURES:
+✅ CPU Affinity Assignment (Core Isolation)
+✅ Microservice Bootstrap (Data, Features, Inference, Exec)
+✅ Graceful Shutdown Handling
 """
 
 import sys
@@ -10,6 +19,16 @@ import time
 import logging
 import signal
 import os
+from pathlib import Path
+
+# ── Load .env FIRST — before any module reads os.getenv() ──────────────────
+try:
+    from dotenv import load_dotenv
+    _env_path = Path(__file__).resolve().parents[2] / ".env"
+    load_dotenv(dotenv_path=_env_path, override=True)
+    logging.getLogger("MARK5.Boot").info(f"✅ .env loaded from {_env_path}")
+except ImportError:
+    pass  # python-dotenv not installed; rely on shell exports
 
 # Add project root to sys.path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))

@@ -8,16 +8,28 @@ from typing import Dict, Any, List
 from datetime import datetime
 from core.utils.config_manager import get_config
 
+"""
+MARK5 TIMESCALE DB MANAGER v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, production certification
+- [Previous] v1.0: Async Producer-Consumer Architecture
+
+TRADING ROLE: High-throughput market data persistence
+SAFETY LEVEL: HIGH - Decoupled from strategy critical path
+
+FEATURES:
+✅ Non-blocking write queue (Zero strategy latency)
+✅ Aggressive batching (Bulk inserts)
+✅ Resilient connection handling with auto-reconnect
+"""
+
 # Configuration for Batching
 BATCH_SIZE = 1000
 FLUSH_INTERVAL_SECONDS = 1.0
 
 class TimescaleManager:
-    """
-    Architectural Grade: Production / Asynchronous
-    Pattern: Producer-Consumer (Queue-based)
-    Purpose: Decouples Strategy Latency from Database Latency
-    """
     _instance = None
     _lock = threading.Lock()
     

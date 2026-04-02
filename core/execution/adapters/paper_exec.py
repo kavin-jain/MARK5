@@ -1,10 +1,27 @@
+"""
+MARK5 PAPER EXECUTOR v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Production hardening & standardized header
+
+TRADING ROLE: Simulated execution for paper trading
+SAFETY LEVEL: LOW - Testing environment only
+
+FEATURES:
+✅ Simulated network latency
+✅ Configurable slippage (BPS)
+✅ In-memory order book and fill tracking
+✅ Virtual position reconciliation
+"""
+
 import logging
 import uuid
 import random
 import time
 import msgpack
 from typing import Dict, List, Optional
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from datetime import datetime
 
 from .base_exec import BaseExecutor
@@ -151,8 +168,8 @@ class PaperExecutor(BaseExecutor):
         symbol = tick.get('symbol')
         try:
             ltp = Decimal(str(tick.get('last_price', 0)))
-        except:
-            return
+        except (TypeError, ValueError, InvalidOperation):
+            return  # Invalid price data - skip this tick
 
         if ltp <= 0: return
 

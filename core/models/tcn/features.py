@@ -25,6 +25,64 @@ class AlphaFeatureEngineer:
         self.feature_cols = []
         self.is_fitted = False
 
+    @property
+    def n_features(self) -> int:
+        """Return number of features (excluding OHLCV)"""
+        return len(self.feature_cols)
+
+    def save_scaler(self, path: str):
+        """Save fitted scaler state"""
+        import pickle
+        if not self.is_fitted:
+            raise ValueError("Scaler not fitted")
+        
+        state = {
+            'scaler': self.scaler,
+            'feature_cols': self.feature_cols,
+            'is_fitted': self.is_fitted
+        }
+        with open(path, 'wb') as f:
+            pickle.dump(state, f)
+
+    def load_scaler(self, path: str):
+        """Load fitted scaler state"""
+        import pickle
+        from pathlib import Path
+        
+        p = Path(path)
+        if not p.exists():
+            raise FileNotFoundError(f"Scaler not found: {path}")
+            
+        with open(p, 'rb') as f:
+            state = pickle.load(f)
+            
+        self.scaler = state['scaler']
+        self.feature_cols = state['feature_cols']
+        self.is_fitted = state['is_fitted']
+
+    def _validate_input(self, df: pd.DataFrame):
+        """Validate input data quality"""
+        if df is None or len(df) == 0:
+            raise ValueError("Empty DataFrame")
+            
+        required = ['open', 'high', 'low', 'close', 'volume']
+        missing = [c for c in required if c not in df.columns]
+        if missing:
+            raise ValueError(f"Missing columns: {missing}")
+            
+        if (df[['open', 'high', 'low', 'close']] <= 0).any().any():
+            raise ValueError("Invalid prices: Negative or Zero found")
+            
+        if (df['high'] < df['low']).any():
+             # Warning only? Or strict? Strict is safer for ML.
+             raise ValueError("Invalid OHLC: High < Low")
+             
+        if (df['close'] > df['high']).any() or (df['close'] < df['low']).any():
+             # Allow small floating point errors? 
+             # Let's be strict but typical data might have epsilon diffs.
+             # Strict for now.
+             raise ValueError("Invalid OHLC: Close outside High-Low")
+
     def _compute_rsi(self, series: pd.Series, period: int = 14) -> pd.Series:
         delta = series.diff()
         gain = (delta.where(delta > 0, 0)).rolling(window=period).mean()
@@ -38,25 +96,31 @@ class AlphaFeatureEngineer:
         CRITICAL: If training_mode=False, it uses the scaler fitted on training data 
         to normalize new data. This prevents data leakage.
         """
+        # 0. Validate Input
+        self._validate_input(df)
+
         # Work on copy
         data = df.copy()
+        epsilon = 1e-8 # Stability constant
         
         # 1. LOG RETURNS (Better for Neural Networks than arithmetic returns)
         # R_t = ln(P_t / P_{t-1})
-        data['log_ret'] = np.log(data['close'] / data['close'].shift(1))
-        data['log_ret_5'] = np.log(data['close'] / data['close'].shift(5))
+        data['log_ret'] = np.log(data['close'] / (data['close'].shift(1) + epsilon))
+        data['log_ret_5'] = np.log(data['close'] / (data['close'].shift(5) + epsilon))
         
         # 2. VOLATILITY NORMALIZED MOMENTUM (Z-Score of price vs MA)
         # This helps TCN understand "how far" price is from mean in std devs
-        data['dist_sma_20'] = (data['close'] - data['close'].rolling(20).mean()) / data['close'].rolling(20).std()
+        roll_std = data['close'].rolling(20).std()
+        data['dist_sma_20'] = (data['close'] - data['close'].rolling(20).mean()) / (roll_std + epsilon)
         
         # 3. RELATIVE VOLUME (RVOL)
         # Critical for spotting breakouts in Indian stocks
-        data['rvol'] = data['volume'] / data['volume'].rolling(20).mean()
+        roll_vol = data['volume'].rolling(20).mean()
+        data['rvol'] = data['volume'] / (roll_vol + epsilon)
         
         # 4. MICROSTRUCTURE PROXY: Effective Spread Estimate
         # High - Low relative to Close (Intraday volatility proxy)
-        data['high_low_ratio'] = (data['high'] - data['low']) / data['close']
+        data['high_low_ratio'] = (data['high'] - data['low']) / (data['close'] + epsilon)
         
         # 5. MARKET REGIME: ADX (Trend Strength)
         # (Simplified ADX implementation for brevity, typically requires smoothing)
@@ -66,7 +130,7 @@ class AlphaFeatureEngineer:
         data['atr_14'] = data['tr'].rolling(14).mean()
         
         # Normalize ATR by price (Percentage ATR) - Critical for stationarity
-        data['natr'] = data['atr_14'] / data['close']
+        data['natr'] = data['atr_14'] / (data['close'] + epsilon)
 
         # 6. OSCILLATORS
         data['rsi_14'] = self._compute_rsi(data['close'])
@@ -79,6 +143,9 @@ class AlphaFeatureEngineer:
         # CLEANUP
         # Drop NaNs created by rolling windows
         data = data.dropna()
+        
+        if len(data) == 0:
+             raise ValueError("All data dropped after feature engineering! Check window sizes vs input length.")
         
         # DEFINE FEATURE COLUMNS (Exclude OHLCV)
         self.feature_cols = [

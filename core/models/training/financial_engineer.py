@@ -37,7 +37,7 @@ class FinancialEngineer:
         
         # Optimization: Use stride_tricks for vectorization instead of loop
         # However, for safety in variable length, we keep the robust loop but check inputs
-        output = series.fillna(method='ffill').dropna()
+        output = series.ffill().dropna()
         if width >= len(output): return output.diff().fillna(0)
         
         series_vals = output.values
@@ -53,20 +53,37 @@ class FinancialEngineer:
     # -------------------------------------------------------------------------
     # 2. VOLATILITY ESTIMATION (Parkinson > StdDev)
     # -------------------------------------------------------------------------
-    def get_volatility(self, prices: pd.DataFrame, span0: int = 20) -> pd.Series:
+    def get_volatility(self, prices: pd.DataFrame, span0: int = 14) -> pd.Series:
         """
-        Uses Parkinson Volatility (High/Low) if available, else standard close-to-close.
-        Parkinson captures intraday range expansion better than Close Std.
+        ATR(14) / price — matches simulation barrier calculation exactly.
+        
+        CRITICAL: Training barriers MUST use the same volatility measure as
+        the simulation/live system. The simulation uses ATR(14)/price for
+        PT/SL barriers (test.py:669-674), so training must match.
+        
+        Previous bug: Used Parkinson vol (sqrt(0.361 × HL²)) which produces
+        fundamentally different thresholds than ATR.
         """
+        close = prices['close']
+        
         if 'high' in prices.columns and 'low' in prices.columns:
-            # Parkinson Volatility proxy
-            # 0.361 is constant for estimator
-            hl_ratio = np.log(prices['high'] / prices['low']) ** 2
-            vol = np.sqrt(0.361 * hl_ratio.ewm(span=span0).mean())
+            high = prices['high']
+            low = prices['low']
+            
+            # True Range = max(H-L, |H-Cprev|, |L-Cprev|)
+            prev_close = close.shift(1)
+            tr1 = high - low
+            tr2 = (high - prev_close).abs()
+            tr3 = (low - prev_close).abs()
+            true_range = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+            
+            # ATR(14) smoothed, normalized by price
+            atr = true_range.rolling(window=span0, min_periods=1).mean()
+            vol = atr / close  # Normalize: fraction of price
             return vol
         else:
             # Fallback to standard deviation of returns
-            return prices['close'].pct_change().ewm(span=span0).std()
+            return close.pct_change().rolling(window=span0, min_periods=1).std()
 
     # -------------------------------------------------------------------------
     # 3. TRIPLE BARRIER METHOD (With Cost-Awareness)
@@ -102,18 +119,23 @@ class FinancialEngineer:
             
         return out
 
-    def get_labels(self, prices: pd.DataFrame, t_events: list = None, run_bars: int = 5, pt_sl: list = [1, 1]) -> pd.DataFrame:
+    def get_labels(self, prices: pd.DataFrame, t_events: list = None, run_bars: int = 7, pt_sl: list = [2, 1]) -> pd.DataFrame:
         """
+        Triple barrier labeling for daily-bar swing trading.
+        
         :param prices: DataFrame containing 'close', 'high', 'low'
+        :param run_bars: Vertical barrier in trading days (default 7 = ~1.5 weeks)
+        :param pt_sl: [profit_target_multiplier, stop_loss_multiplier] of ATR(14)
         """
         close = prices['close']
         if t_events is None: t_events = close.index
             
-        # 1. Dynamic Volatility
-        vol = self.get_volatility(prices, span0=self.vol_window)
+        # 1. Dynamic Volatility — ATR(14) normalized by price
+        vol = self.get_volatility(prices, span0=14)
         
-        # 2. Vertical Barriers
-        t1 = close.index.searchsorted(t_events + pd.Timedelta(minutes=run_bars*5)) # Approx time mapping
+        # 2. Vertical Barriers — run_bars trading days ahead
+        # For daily bars, shift by run_bars positions in the index
+        t1 = close.index.searchsorted(t_events) + run_bars
         t1 = np.clip(t1, 0, len(close.index) - 1)
         t1_series = pd.Series(close.index[t1], index=t_events)
         
@@ -133,9 +155,20 @@ class FinancialEngineer:
         df_touches = self.apply_triple_barrier(close, events, pt_sl, events.index)
         
         # 5. Labeling
+        # C-2: NaT in sl/pt (barrier never hit) must be replaced with a sentinel
+        # before min(). pandas min() over a NaT column coerces the row result to
+        # NaT instead of falling back to t1, silently destroying label rows.
+        for col in ['sl', 'pt']:
+            if col in df_touches.columns:
+                df_touches[col] = df_touches[col].fillna(pd.Timestamp.max)
         df_touches['out'] = df_touches[['t1', 'sl', 'pt']].min(axis=1)
         df_touches = df_touches.dropna(subset=['out'])
-        
+
+        # C-1: Filter to timestamps that exist in close.index. Holiday/half-day
+        # sessions can produce 'out' timestamps not in close.index; .loc[] raises
+        # KeyError and aborts the entire labeling run.
+        df_touches = df_touches[df_touches['out'].isin(close.index)]
+
         prices_out = close.loc[df_touches['out'].values].values
         prices_in = close.loc[df_touches.index].values
         

@@ -1,6 +1,18 @@
 """
-MARK5 Configuration Manager (Architect Grade)
-Centralized configuration management with validation and environment support.
+MARK5 CONFIG MANAGER v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, production certification
+- [Previous] v6.0: Architect Grade Validation
+
+TRADING ROLE: Central Configuration Authority
+SAFETY LEVEL: CRITICAL - Controls all system parameters
+
+FEATURES:
+✅ YAML + Pydantic Validation
+✅ Environment Variable Overrides
+✅ Deep Merging of Defaults
 """
 
 import os
@@ -49,7 +61,10 @@ DEFAULT_SYSTEM_CONFIG = {
     },
     "execution": {
         "exchange": "NSE"
-    }
+    },
+    "models_dir": "models",
+    "reports_dir": "reports",
+    "logs_dir": "logs"
 }
 
 class ConfigManager:
@@ -66,7 +81,8 @@ class ConfigManager:
             return
             
         self.logger = logging.getLogger("MARK5.ConfigManager")
-        self.config_dir = Path("config")
+        project_root = Path(__file__).parent.parent.parent.resolve()
+        self.config_dir = project_root / "config"
         self.config_file = self.config_dir / "config.yaml"
         
         self._config = self._load_config()
@@ -85,6 +101,12 @@ class ConfigManager:
                         self._deep_merge(config_data, file_config)
             except Exception as e:
                 self.logger.error(f"Failed to load config file: {e}")
+
+        # Resolve paths to absolute paths relative to project root
+        project_root = str(Path(__file__).parent.parent.parent.resolve())
+        for path_key in ['models_dir', 'reports_dir', 'logs_dir']:
+            if path_key in config_data and not os.path.isabs(config_data[path_key]):
+                config_data[path_key] = os.path.join(project_root, config_data[path_key])
 
         # Validate with Pydantic
         try:

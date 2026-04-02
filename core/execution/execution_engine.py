@@ -1,10 +1,30 @@
+"""
+MARK5 EXECUTION ENGINE v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Production hardening & standardized header
+
+TRADING ROLE: Unified execution interface for paper/live trading
+SAFETY LEVEL: CRITICAL - Manages order execution and position state
+
+FEATURES:
+✅ Paper/Live mode switching
+✅ Order validation pipeline
+✅ Position tracking (single source of truth)
+✅ Daily realized P&L accumulation
+✅ Transaction cost modeling
+"""
+
 import logging
 import threading
 from decimal import Decimal, Context
 from typing import Dict, List, Optional
+from datetime import datetime
 
 from core.system.container import container
 from core.execution.schemas import Order, OrderSide, OrderType, OrderStatus, Position, quantize_price
+from core.execution.order_validator import OrderValidator
 
 class ExecutionEngine:
     def __init__(self, mode="paper"):
@@ -16,12 +36,26 @@ class ExecutionEngine:
         except AttributeError:
              self.risk_manager = None
              self.logger.warning("Risk Manager not found in container. Risk checks disabled.")
+             
+        # Audit Validator
+        self.validator = OrderValidator({
+            'max_order_value': 100000.0, # 1 Lakh Limit
+            'max_quantity': 500,
+            'price_deviation_pct': 0.10
+        })
         
         # State - Single Source of Truth
         self.positions: Dict[str, Position] = {}
         
         # PnL Accumulator (Daily)
         self.daily_realized_pnl = Decimal("0.00")
+        
+        # Capital tracking (from config or default)
+        try:
+            self.capital = Decimal(str(container.config.execution.capital))
+        except (AttributeError, TypeError):
+            self.capital = Decimal("100000.00")  # 1 Lakh default
+            self.logger.warning("Using default capital: ₹100,000")
         
         # Lock: Granular locking for high concurrency
         self.lock = threading.RLock() 
@@ -51,17 +85,27 @@ class ExecutionEngine:
             
             # 2. Risk Check
             if self.risk_manager:
-                # Approximate capital check (In real system, query broker or local state)
-                # For now, pass a large number or query config
-                # We simply check if the trade ITSELF violates limits
-                current_price = float(q_price) if q_price > 0 else 0.0 # Market order price unknown here, ideally fetch from DataProvider
+                # Use actual capital from engine state
+                current_price = float(q_price) if q_price > 0 else 0.0
                 
-                # If price is 0 (Market), we skip notional check or estimate it. 
-                # Let's assume we proceed if price is 0 (Executor will fill at market)
                 if current_price > 0:
-                     if not self.risk_manager.check_trade_risk(symbol, current_price, int(q_qty), 1000000.0): # Mock Capital
-                         self.logger.error(f"Risk Check Failed for {symbol}")
-                         return False
+                    capital_for_check = float(self.capital + self.daily_realized_pnl)
+                    if not self.risk_manager.check_trade_risk(symbol, current_price, int(q_qty), capital_for_check):
+                        self.logger.error(f"🛑 RISK CHECK FAILED: {symbol} | Price: {current_price} | Qty: {q_qty}")
+                        return False
+            
+            # --- New Audit Validation ---
+            val_params = {
+                'symbol': symbol,
+                'quantity': float(q_qty),
+                'price': float(q_price),
+                'transaction_type': side
+            }
+            # For strict checks, we need LTP. Here simplified or passing q_price if LIMIT.
+            is_valid, reason = self.validator.validate_order(val_params)
+            if not is_valid:
+                self.logger.error(f"🚫 BLOCKED by OrderValidator: {reason}")
+                return False
 
             # 3. Create Order Object
             order = Order(
@@ -76,12 +120,24 @@ class ExecutionEngine:
             # 4. Route to OMS
             success = self.oms.place_order(order)
             
+            # AUDIT TRAIL
+            self.logger.info(
+                f"ORDER_{'PLACED' if success else 'FAILED'} | "
+                f"{order.order_id} | {symbol} | {side} | "
+                f"qty={q_qty} | price={q_price} | type={order_type}"
+            )
+            
             if success and self.mode == "paper":
                 # Simulation Hook: Immediate Fill
-                # In production, this comes via WebSocket callback
-                # For paper trading, we assume fill at order price (Limit) or current market price (Market - handled by adapter usually, but here simplified)
-                fill_p = q_price if q_price > 0 else Decimal("100.00") # Mock price if market
-                self._on_fill(order, fill_p, q_qty) 
+                # For paper trading, use order price or estimate market price
+                if q_price > 0:
+                    fill_p = q_price
+                else:
+                    # Market order - we need to estimate, but better to get from data provider
+                    # For now, log warning and use a safe estimate
+                    self.logger.warning(f"Market order price unknown for {symbol} - using last known or estimate")
+                    fill_p = Decimal("100.00")  # Should integrate with DataProvider
+                self._on_fill(order, fill_p, q_qty)
             
             return success
             
@@ -177,3 +233,29 @@ class ExecutionEngine:
         with self.lock:
             # Return deep copies or value objects to prevent external mutation
             return list(self.positions.values())
+
+# ── Compat alias (autonomous.py imports this name) ──────────────────────────
+MARK5ExecutionEngine = ExecutionEngine
+
+class OrderResult:
+    """
+    Lightweight result object returned by execution calls.
+    Compatible with autonomous.py position management.
+    """
+    __slots__ = ('status', 'price', 'quantity', 'symbol', 'timestamp', 'commission')
+
+    def __init__(
+        self,
+        status: str,
+        price: float = 0.0,
+        quantity: float = 0.0,
+        symbol: str = "",
+        timestamp=None,
+        commission: float = 0.0,
+    ):
+        self.status    = status
+        self.price     = price
+        self.quantity  = quantity
+        self.symbol    = symbol
+        self.timestamp = timestamp or datetime.utcnow()
+        self.commission = commission

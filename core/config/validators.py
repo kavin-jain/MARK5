@@ -1,8 +1,18 @@
 """
-MARK5 SYSTEM CONFIGURATION (ARCHITECT GRADE)
---------------------------------------------
-The DNA of the system.
-Enforces strict logical consistency for HFT, Tax optimization, and ML Ensembles.
+MARK5 SYSTEM VALIDATORS v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, production certification
+- [Previous] v6.0: Architect Grade (The DNA)
+
+TRADING ROLE: Configuration Schema & Integrity Enforcement
+SAFETY LEVEL: CRITICAL - Invalid config halts system
+
+FEATURES:
+✅ Pydantic-based Strict Typing
+✅ Tax Engine Optimization Flags
+✅ HFT Latency Constraints
 """
 
 from typing import List, Dict, Optional, Literal
@@ -76,7 +86,7 @@ class MLModelConfig(BaseModel):
     drift_z_score_threshold: float = -2.0 # Retrain if performance drops 2 sigma
     
     # Inference
-    prediction_horizon_bars: int = 5
+    prediction_horizon_bars: int = 7
     min_confidence_threshold: float = Field(0.60, ge=0.51, le=0.99)
     
     class Config: frozen = True
@@ -100,7 +110,9 @@ class TimescaleConfig(BaseModel):
     host: str = "localhost"
     port: int = 5432
     user: str = "postgres"
-    password: SecretStr = SecretStr("password")
+    # SECURITY: Password must be set via config.yaml or environment variable
+    # Do not use default password in production
+    password: SecretStr = SecretStr("")  # Requires explicit configuration
     dbname: str = "mark5_timescale"
     min_connections: int = 1
     max_connections: int = 10
@@ -124,7 +136,22 @@ class KiteConfig(BaseModel):
     class Config: frozen = True
 
 class TradingConfig(BaseModel):
-    watchlist: List[str] = ["RELIANCE", "TCS", "INFY", "HDFC", "ICICI"]
+    # NIFTY Midcap 150 — liquid subset (≥₹500cr daily ADV, RULE 4 compliant)
+    # Mid-caps offer stronger momentum signals and less efficient pricing vs NIFTY50
+    watchlist: List[str] = [
+        # IT Midcap
+        "COFORGE", "PERSISTENT", "MPHASIS", "KPITTECH", "LTTS",
+        # Capital Goods / Defence
+        "HAL", "BEL", "POLYCAB", "DIXON", "ABB",
+        # Financials Midcap
+        "IDFCFIRSTB", "LICHSGFIN", "MUTHOOTFIN", "CHOLAFIN", "ABCAPITAL",
+        # Consumer / Retail
+        "IRCTC", "JUBLFOOD", "PAGEIND", "MARICO", "COLPAL",
+        # Chemicals / Pharma
+        "PIIND", "DEEPAKNTR", "AARTIIND", "LAURUSLABS", "GRANULES",
+        # Real Estate / Infra
+        "GODREJPROP", "OBEROIRLTY", "PRESTIGE", "CONCOR", "CUMMINSIND",
+    ]
     
     class Config: frozen = True
 
@@ -149,6 +176,9 @@ class SystemConfig(BaseModel):
     
     # Feature Flags
     enable_tax_optimization: bool = True # Use the IndianTaxEngine
-    enable_regime_detection: bool = True
+    # Output Directories
+    models_dir: str = "models"
+    reports_dir: str = "reports"
+    logs_dir: str = "logs"
     
     class Config: frozen = True

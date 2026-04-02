@@ -143,6 +143,20 @@ class RobustBacktester:
         The Core Simulation Loop.
         CRITICAL: Executions happen at OPEN of i+1 based on Signal at i.
         """
+        # 0. Input Validation
+        if not isinstance(df, pd.DataFrame) or not isinstance(signals, pd.Series):
+             logger.error("❌ Invalid input types: df must be DataFrame, signals must be Series")
+             return pd.Series(), {'error': 'Invalid Input'}
+        
+        required_cols = ['open', 'high', 'low', 'close']
+        if not all(col in df.columns for col in required_cols):
+             logger.error(f"❌ Missing columns. Required: {required_cols}")
+             return pd.Series(), {'error': 'Missing Columns'}
+             
+        if len(df) != len(signals):
+            logger.error("❌ Mismatched lengths between Data and Signals")
+            return pd.Series(), {'error': 'Length Mismatch'}
+
         logger.info(f"🚀 Starting Simulation on {len(df)} bars. Segment: {self.segment}")
         
         # Pre-calculations
@@ -156,51 +170,74 @@ class RobustBacktester:
         entry_price = 0.0
         entry_idx = 0
         trades: List[Trade] = []
-        equity_curve = [equity]
         
-        # Iterate (Vectorization is hard with complex path-dependent stops)
-        # We start from index 1 because we need prev close for ATR
+        # Initialize Equity Curve with correct index and initial capital
+        # We will update this as we iterate
+        equity_curve = pd.Series(self.capital, index=df.index)
+        
+        # Iterate
+        # We start from index 1 because we need prev close for ATR (and logic relies on i-1 for signals sometimes)
         # We stop at len-1 because we trade on Next Open
         
-        for i in range(1, len(df) - 1):
+        for i in range(1, len(df)):
             curr_date = df.index[i]
+            # Market Data for CURRENT bar 'i'
+            curr_open = df['open'].iloc[i]
+            curr_high = df['high'].iloc[i]
+            curr_low = df['low'].iloc[i]
             curr_close = df['close'].iloc[i]
-            curr_atr = df['ATR'].iloc[i]
-            signal = df['Signal'].iloc[i]
+            curr_atr = df['ATR'].iloc[i-1] # Use previous ATR for stop calculation to avoid lookahead? Standard is prev ATR.
+            
+            # Signal from PREVIOUS bar (i-1) triggers entry at OPEN of CURRENT bar (i)
+            prev_signal = df['Signal'].iloc[i-1] 
             
             # ---------------------------------------------------
             # 1. MANAGE EXISTING POSITIONS (Stop Loss / Take Profit)
             # ---------------------------------------------------
             if position != 0:
-                # We check Low/High of CURRENT bar 'i' to see if SL was hit
-                # (Assuming we entered at Open of 'i' or before)
-                
                 sl_hit = False
                 exit_price = 0.0
+                reason = ""
+                
+                # Check for GAP FIRST (Look-ahead bias fix)
+                # If Market Opens BEYOND Stop, we exit at OPEN
                 
                 if position > 0: # Long
                     stop_price = entry_price - (curr_atr * self.atr_multiplier)
-                    if df['low'].iloc[i] <= stop_price:
+                    
+                    # Scenario A: Gap Down below Stop
+                    if curr_open <= stop_price:
                         sl_hit = True
-                        exit_price = stop_price - (stop_price * self.slippage) # Slippage on Stop
+                        exit_price = curr_open * (1 - self.slippage) # Exit at Open if gapped
+                        reason = "SL_GAP"
+                    # Scenario B: Intraday Stop Hit
+                    elif curr_low <= stop_price:
+                        sl_hit = True
+                        exit_price = stop_price * (1 - self.slippage) 
                         reason = "SL_HIT"
-                    elif signal == -1: # Reverse/Exit Signal
+                    # Scenario C: Signal Reversal (Exit at Close)
+                    elif prev_signal == -1:
                         sl_hit = True
-                        # If signal is generated at 'i', we exit at 'i+1' OPEN. 
-                        # But wait, managing existing positions usually happens intraday.
-                        # For simplicity in TCN backtest, we exit at Close 'i' if signal flips
-                        exit_price = curr_close
+                        exit_price = curr_close * (1 - self.slippage)
                         reason = "SIGNAL_EXIT"
                         
                 elif position < 0: # Short
                     stop_price = entry_price + (curr_atr * self.atr_multiplier)
-                    if df['high'].iloc[i] >= stop_price:
+                    
+                    # Scenario A: Gap Up above Stop
+                    if curr_open >= stop_price:
+                         sl_hit = True
+                         exit_price = curr_open * (1 + self.slippage)
+                         reason = "SL_GAP"
+                    # Scenario B: Intraday Stop Hit
+                    elif curr_high >= stop_price:
                         sl_hit = True
-                        exit_price = stop_price + (stop_price * self.slippage)
+                        exit_price = stop_price * (1 + self.slippage)
                         reason = "SL_HIT"
-                    elif signal == 1:
+                    # Scenario C: Signal Reversal
+                    elif prev_signal == 1:
                         sl_hit = True
-                        exit_price = curr_close
+                        exit_price = curr_close * (1 + self.slippage)
                         reason = "SIGNAL_EXIT"
 
                 if sl_hit:
@@ -234,53 +271,52 @@ class RobustBacktester:
                     
                     position = 0
                     entry_price = 0.0
-
+            
             # ---------------------------------------------------
             # 2. ENTRY LOGIC (Strict Next-Open Execution)
             # ---------------------------------------------------
-            # If we are flat, look for entry
-            if position == 0 and signal != 0:
+            # executed_at_open determines if we just entered on this bar
+            # if we entered on this bar, we do NOT check intraday stops immediately 
+            # (unless we want strict checking, but usually safe to standard allow 1 bar)
+            # For this logic, if we are flat, we look to enter at THIS bar's Open based on Prev Signal
+            
+            entries_on_this_bar = False
+            
+            if position == 0 and prev_signal != 0:
                 # COMPLIANCE CHECK
-                if self.segment == 'EQUITY_DELIVERY' and signal == -1:
-                    # Ignore Short signal in Delivery
+                if self.segment == 'EQUITY_DELIVERY' and prev_signal == -1:
                     pass
                 else:
-                    # Execution happens at NEXT BAR OPEN
-                    next_open = df['open'].iloc[i+1]
+                    # Execution happens at CURRENT OPEN (since decision was made at prev close)
+                    fill_price = curr_open
                     
                     # Apply Slippage
-                    if signal == 1:
-                        fill_price = next_open * (1 + self.slippage)
+                    if prev_signal == 1:
+                        fill_price = fill_price * (1 + self.slippage)
                         direction = 1
                     else:
-                        fill_price = next_open * (1 - self.slippage)
+                        fill_price = fill_price * (1 - self.slippage)
                         direction = -1
                     
-                    # Position Sizing based on Risk
-                    # Risk amount = Capital * Risk%
-                    # Stop distance = ATR * Multiplier
-                    # Shares = Risk Amount / Stop Distance
+                    # Position Sizing
                     risk_amt = equity * self.risk_per_trade
                     stop_dist = curr_atr * self.atr_multiplier
                     
-                    logger.info(f"Debug: i={i}, Signal={signal}, Equity={equity}, ATR={curr_atr}, RiskAmt={risk_amt}, StopDist={stop_dist}")
-
                     if stop_dist > 0:
                         qty = int(risk_amt / stop_dist)
                     else:
                         qty = 0
                     
-                    logger.info(f"Debug: Qty={qty}, FillPrice={fill_price}, Cost={qty*fill_price}")
-
+                    # Minimum Trade Value check could be added here
+                    
                     if qty > 0 and (qty * fill_price) <= equity:
                         position = qty * direction
                         entry_price = fill_price
-                        entry_idx = i + 1 # We entered at i+1
-                        logger.info(f"Debug: ENTERED TRADE at {entry_price}")
-                    else:
-                         logger.info("Debug: Trade Rejected (Insufficient Funds or Zero Qty)")
+                        entry_idx = i
+                        entries_on_this_bar = True
             
-            equity_curve.append(equity)
+            # Update Equity Curve
+            equity_curve.iloc[i] = equity
             
         # ---------------------------------------------------
         # 2.5 CLOSE REMAINING POSITION
@@ -298,6 +334,8 @@ class RobustBacktester:
             net_pnl = gross_pnl - taxes['total']
             
             equity += net_pnl
+            # Update final equity point
+            equity_curve.iloc[-1] = equity
             
             trades.append(Trade(
                 entry_date=df.index[entry_idx],
@@ -313,45 +351,53 @@ class RobustBacktester:
                 exit_reason="END_OF_SIM",
                 hold_duration=(len(df) - 1 - entry_idx)
             ))
-            
-            logger.info(f"Debug: Force Closed remaining position at {last_price}")
 
-        # Convert to DF
-        equity_series = pd.Series(equity_curve, index=df.index[:len(equity_curve)])
-        
         # ---------------------------------------------------
         # 3. METRICS GENERATION
         # ---------------------------------------------------
         if not trades:
-            logger.error("❌ No trades generated. Check Signal Logic or Risk constraints.")
-            return equity_series, {}
+            logger.warning("❌ No trades generated.")
+            # Return valid but empty metrics structure to prevent KeyErrors
+            return equity_curve, {'trades': [], 'Total Return %': 0.0, 'Max Drawdown %': 0.0}
 
         trades_df = pd.DataFrame([vars(t) for t in trades])
         
         # Calculate Drawdown
-        rolling_max = equity_series.expanding().max()
-        drawdown = (equity_series - rolling_max) / rolling_max
+        rolling_max = equity_curve.expanding().max()
+        drawdown = (equity_curve - rolling_max) / rolling_max
         max_dd = drawdown.min()
         
         # Returns
-        returns = equity_series.pct_change().dropna()
+        returns = equity_curve.pct_change().dropna()
         
-        # Realistic Sharpe (Assuming Intraday 5min data -> 75 bars/day)
-        # If daily data, use 252. Adjust 'bars_per_year' accordingly.
-        # Here we assume daily input for simplicity, but for intraday multiply by sqrt(bars_per_year)
-        sharpe = (returns.mean() / returns.std()) * np.sqrt(252) 
+        # Safe Sharpe
+        if returns.std() > 1e-9:
+             sharpe = (returns.mean() / returns.std()) * np.sqrt(252) 
+        else:
+             sharpe = 0.0
+             
+        # Safe Profit Factor
+        gross_wins = trades_df[trades_df['net_pnl'] > 0]['net_pnl'].sum()
+        gross_losses = abs(trades_df[trades_df['net_pnl'] < 0]['net_pnl'].sum())
+        
+        if gross_losses > 1e-9:
+            prof_factor = gross_wins / gross_losses
+        elif gross_wins > 0:
+            prof_factor = float('inf')
+        else:
+            prof_factor = 0.0
         
         metrics = {
             'Total Return %': ((equity - self.initial_capital) / self.initial_capital) * 100,
             'Win Rate %': (len(trades_df[trades_df['net_pnl'] > 0]) / len(trades_df)) * 100,
-            'Profit Factor': abs(trades_df[trades_df['net_pnl'] > 0]['net_pnl'].sum() / trades_df[trades_df['net_pnl'] < 0]['net_pnl'].sum()),
+            'Profit Factor': prof_factor,
             'Max Drawdown %': max_dd * 100,
             'Sharpe Ratio': sharpe,
             'Total Trades': len(trades),
-            'Total Taxes Paid': sum(t.taxes['total'] for t in trades)
+            'Total Taxes Paid': sum(t.taxes['total'] for t in trades),
+            'trades': trades # Expose raw trades for reporting
         }
         
         logger.info(f"✅ Simulation Complete. Final Equity: ₹{equity:,.2f}")
-        logger.info(f"💰 Total Taxes Paid to Govt: ₹{metrics['Total Taxes Paid']:,.2f}")
         
-        return equity_series, metrics
+        return equity_curve, metrics

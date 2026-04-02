@@ -1,0 +1,13 @@
+MARK5 Phase 0 — Go / No-Go Summary
+==================================================
+TEST 1  IC Analysis:         2/5 features viable (need ≥ 4)
+TEST 2  Stationarity:        0 non-stationary (should be 0)
+TEST 3  Lookahead probe:     FAIL (decay=14.2%)
+TEST 4  Feature stability:   FAIL / SKIPPED (rank_corr=0.0513)
+TEST 5  Signal correlation:  PASS (avg=0.0335)
+
+DECISION GATES:
+  Features with IC ≥ 0.02:  2  ❌ STOP — fix features
+  Lookahead clean:          ❌
+  Features stable:          —
+  Signals independent:      ✅

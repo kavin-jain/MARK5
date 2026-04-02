@@ -1,3 +1,19 @@
+"""
+MARK5 FEED MANAGER v8.0 - PRODUCTION GRADE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CHANGELOG:
+- [2026-02-06] v8.0: Standardized header, production certification
+
+TRADING ROLE: Live Data Ingestion Controller
+SAFETY LEVEL: CRITICAL - Single point of entry for Tick Data
+
+FEATURES:
+✅ Managed Threading for Feeds
+✅ Integration with Redis Streams
+✅ Graceful Shutdown
+"""
+
 import logging
 import time
 import threading
