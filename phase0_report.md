@@ -1,13 +1,13 @@
 # MARK5 Phase 0 Validation Report
-**Generated:** 2026-03-20 05:49:30
+**Generated:** 2026-04-03 07:20:03
 
 ## Executive Summary
 
 | Check | Result |
 |-------|--------|
-| Dead features (IC < 0.02) | **9 of 9** |
-| Non-stationary features | **2 of 11** |
-| Bias tests | ✅ PASS |
+| Dead features (IC < 0.02) | **8 of 8** |
+| Non-stationary features | **0 of 8** |
+| Bias tests | ⚠️  Issues found |
 | CPCV gate P(Sharpe>1.5) > 70% | ❌ FAIL |
 | Critical bugs | **1** |
 | High severity bugs | **3** |
@@ -22,15 +22,14 @@
 
 | Feature | Mean IC | Std IC | ICIR | p-value | n_tickers | Verdict |
 |---------|---------|--------|------|---------|-----------|---------|
-| `dist_52w_high` | +0.0741 | 0.0563 | +1.315 | 0.1490 | 19 | ❌ KILL — not statistically significant |
-| `amihud_illiquidity` | +0.0591 | 0.0895 | +0.660 | 0.1273 | 19 | ❌ KILL — not statistically significant |
-| `gap_significance` | +0.0356 | 0.0363 | +0.980 | 0.4117 | 19 | ❌ KILL — not statistically significant |
-| `relative_strength_nifty` | +0.0067 | 0.0797 | +0.084 | 0.2723 | 19 | ❌ KILL — IC below threshold (noise) |
-| `lower_wick_ratio` | -0.0013 | 0.0434 | -0.031 | 0.4519 | 19 | ❌ KILL — IC below threshold (noise) |
-| `wick_asymmetry` | -0.0014 | 0.0388 | -0.036 | 0.5335 | 19 | ❌ KILL — IC below threshold (noise) |
-| `ofi_proxy` | -0.0164 | 0.0332 | -0.494 | 0.4616 | 19 | ❌ KILL — IC below threshold (noise) |
-| `price_vwap_deviation` | -0.0214 | 0.0620 | -0.345 | 0.3655 | 19 | ❌ KILL — not statistically significant |
-| `efficiency_ratio` | -0.0560 | 0.0562 | -0.995 | 0.2099 | 19 | ❌ KILL — not statistically significant |
+| `dist_52w_high` | +0.0625 | 0.0627 | +0.996 | 0.2258 | 19 | ❌ KILL — not statistically significant |
+| `gap_significance` | +0.0335 | 0.0355 | +0.944 | 0.4019 | 19 | ❌ KILL — not statistically significant |
+| `relative_strength_nifty` | +0.0086 | 0.0782 | +0.110 | 0.2673 | 19 | ❌ KILL — IC below threshold (noise) |
+| `post_earnings_drift` | +0.0083 | 0.0556 | +0.150 | 0.3581 | 19 | ❌ KILL — IC below threshold (noise) |
+| `rsi_14` | -0.0195 | 0.0552 | -0.352 | 0.4108 | 19 | ❌ KILL — IC below threshold (noise) |
+| `sector_rel_strength` | -0.0294 | 0.0667 | -0.441 | 0.3022 | 19 | ❌ KILL — not statistically significant |
+| `volume_zscore` | -0.0309 | 0.0434 | -0.712 | 0.3361 | 19 | ❌ KILL — not statistically significant |
+| `atr_regime` | -0.0433 | 0.0658 | -0.659 | 0.2929 | 19 | ❌ KILL — not statistically significant |
 
 ## 2. Stationarity Tests (ADF)
 
@@ -40,39 +39,36 @@
 
 | Feature | Mean ADF p-value | % Stationary | Verdict |
 |---------|-----------------|--------------|---------|
-| `fii_flow_3d` | 1.0000 | 0% | ⚠️ NON-STATIONARY → apply fractional differentiation (d ≈ 0.3–0.5) |
-| `relative_strength_nifty` | 0.0306 | 74% | ✅ STATIONARY |
-| `dist_52w_high` | 0.0057 | 95% | ✅ STATIONARY |
-| `efficiency_ratio` | 0.0000 | 100% | ✅ STATIONARY |
-| `ofi_proxy` | 0.0000 | 100% | ✅ STATIONARY |
-| `delivery_pct` | 1.0000 | 0% | ⚠️ NON-STATIONARY → apply fractional differentiation (d ≈ 0.3–0.5) |
-| `amihud_illiquidity` | 0.0040 | 100% | ✅ STATIONARY |
-| `lower_wick_ratio` | 0.0000 | 100% | ✅ STATIONARY |
-| `wick_asymmetry` | 0.0000 | 100% | ✅ STATIONARY |
+| `relative_strength_nifty` | 0.0173 | 84% | ✅ STATIONARY |
+| `rsi_14` | 0.0000 | 100% | ✅ STATIONARY |
+| `dist_52w_high` | 0.0163 | 95% | ✅ STATIONARY |
+| `post_earnings_drift` | 0.0001 | 100% | ✅ STATIONARY |
 | `gap_significance` | 0.0000 | 100% | ✅ STATIONARY |
-| `price_vwap_deviation` | 0.0000 | 100% | ✅ STATIONARY |
+| `sector_rel_strength` | 0.0023 | 100% | ✅ STATIONARY |
+| `volume_zscore` | 0.0000 | 100% | ✅ STATIONARY |
+| `atr_regime` | 0.0071 | 100% | ✅ STATIONARY |
 
 ## 3. Bias Tests
 
 ### 3.1 Lookahead Bias
 
-- Original Sharpe: **1.3947**
-- Shifted Sharpe (1-day lag): **0.0533**
-- Degradation ratio: **0.0382** (must be < 0.70)
-- Result: ✅ PASS
+- Original Sharpe: **N/A**
+- Shifted Sharpe (1-day lag): **N/A**
+- Degradation ratio: **N/A** (must be < 0.70)
+- Result: ❌ FAIL
 
 
 ### 3.2 Feature Importance Stability
 
-- Mean rank correlation across time folds: **0.7353** (target: >0.7)
+- Mean rank correlation across time folds: **0.7532** (target: >0.7)
 - Folds computed: 5
-- Top features (average importance): ['dist_52w_high', 'amihud_illiquidity', 'relative_strength_nifty', 'price_vwap_deviation', 'efficiency_ratio']
+- Top features (average importance): ['dist_52w_high', 'atr_regime', 'relative_strength_nifty', 'rsi_14', 'sector_rel_strength']
 - Result: ✅ PASS
 
 
 ### 3.3 Signal Correlation
 
-- Avg pairwise signal correlation: **0.1603** (target: <0.4)
+- Avg pairwise signal correlation: **0.1746** (target: <0.4)
 - Tickers: 19
 - Result: ✅ PASS
 
@@ -87,14 +83,14 @@
 |--------|-------|
 | Folds computed | 532 |
 | Tickers used | 19 |
-| Mean Sharpe | **0.0961** |
-| Std Sharpe | 2.8478 |
-| Worst-5% Sharpe | **-4.4434** |
-| P(Sharpe > 1.5) | **31.8%** |
-| Mean AUC | 0.5328 |
+| Mean Sharpe | **0.2005** |
+| Std Sharpe | 2.2288 |
+| Worst-5% Sharpe | **-4.09** |
+| P(Sharpe > 1.5) | **28.4%** |
+| Mean AUC | 0.5172 |
 | Production gate | ❌ FAIL |
 
-Sharpe distribution: min=-26.66, p25=-1.46, median=0.43, p75=1.87, max=10.09
+Sharpe distribution: min=-7.16, p25=-1.11, median=0.50, p75=1.70, max=8.37
 
 ## 5. Known Bugs
 
@@ -152,12 +148,11 @@ Sharpe distribution: min=-26.66, p25=-1.46, median=0.43, p75=1.87, max=10.09
 Complete in this order. Do not skip ahead.
 
 1. **Fix BUG-1**: Add training_end_date: Optional[pd.
-2. **Kill dead features**: Remove `dist_52w_high`, `amihud_illiquidity`, `gap_significance`, `relative_strength_nifty`, `lower_wick_ratio`, `wick_asymmetry`, `ofi_proxy`, `price_vwap_deviation`, `efficiency_ratio` from `FEATURE_COLS` in `features.py`. They have IC < 0.02 and contribute noise.
-3. **Fix non-stationary features**: Apply fractional differentiation (use `optimize_frac_diff.py`) to: `fii_flow_3d`, `delivery_pct`.
-4. **Fix BUG-2**: Either: (a) Remove delivery_pct from FEATURE_COLS list until bhav copy data is integrated via MarketDataProvider, OR (b) integrate NSE bhav copy delivery_volume column — available at: https://www.
-5. **Fix BUG-3**: In trainer.
-6. **Fix BUG-4**: Implement Almgren-Chriss model: slippage = 0.
-7. **Switch to CPCV**: Replace walk-forward in `trainer.py` with `CombinatorialPurgedKFold`. Current P(Sharpe > 1.5) = 32% — need > 70% before adding new features or data.
+2. **Kill dead features**: Remove `dist_52w_high`, `gap_significance`, `relative_strength_nifty`, `post_earnings_drift`, `rsi_14`, `sector_rel_strength`, `volume_zscore`, `atr_regime` from `FEATURE_COLS` in `features.py`. They have IC < 0.02 and contribute noise.
+3. **Fix BUG-2**: Either: (a) Remove delivery_pct from FEATURE_COLS list until bhav copy data is integrated via MarketDataProvider, OR (b) integrate NSE bhav copy delivery_volume column — available at: https://www.
+4. **Fix BUG-3**: In trainer.
+5. **Fix BUG-4**: Implement Almgren-Chriss model: slippage = 0.
+6. **Switch to CPCV**: Replace walk-forward in `trainer.py` with `CombinatorialPurgedKFold`. Current P(Sharpe > 1.5) = 28% — need > 70% before adding new features or data.
 
 ---
-*Report generated by `phase0_validation.py` at 2026-03-20 05:49:30. Do NOT proceed to Phase 1 until all CRITICAL and HIGH items are resolved.*
+*Report generated by `phase0_validation.py` at 2026-04-03 07:20:03. Do NOT proceed to Phase 1 until all CRITICAL and HIGH items are resolved.*

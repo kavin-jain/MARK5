@@ -1,0 +1,27 @@
+10:42:33 | INFO | MARK5.Feeds.Kite | Initializing Kite Connection...
+10:42:33 | INFO | MARK5.Feeds.Kite | Authenticated as: Lokesh Jain
+10:42:33 | INFO | MARK5.Feeds.Kite | Downloading Instrument Master... (may take a few seconds)
+10:42:34 | INFO | MARK5.Feeds.Kite | Instrument map built: 9583 NSE instruments
+10:42:35 | INFO | MARK5.Feeds.Kite | ✅ Kite WebSocket connected to exchange.
+10:42:35 | INFO | MARK5.Retrain | ✅ Kite connected
+10:42:35 | INFO | MARK5.Retrain | ABB: loaded 743 bars from cache
+
+════════════════════════════════════════════════════════════
+  MARK5 RETRAIN — 105 symbols, 3 years
+════════════════════════════════════════════════════════════
+
+
+[1/105] ABB
+2026-04-03 10:42:37,273 - [TRAINER] - INFO - 🚀 [ABB.NS] CPCV training starting
+10:42:37 | INFO | MARK5.Trainer | 🚀 [ABB.NS] CPCV training starting
+10:42:38 | INFO | MARK5.MarketData | 📊 NIFTY50 loaded from cache: 1361 bars
+10:42:38 | INFO | MARK5.FIIData | 📊 FII data loaded: 1 days (2026-04-02 to 2026-04-02)
+2026-04-03 10:42:38,392 - [TRAINER] - WARNING - [ABB.NS] Insufficient FII data (1 days). Using SYNTHETIC FII flows.
+10:42:38 | WARNING | MARK5.Trainer | [ABB.NS] Insufficient FII data (1 days). Using SYNTHETIC FII flows.
+10:42:38 | INFO | MARK5.FIIData | 📊 Generated synthetic FII data: 743 days (mean=-176, std=2405)
+2026-04-03 10:42:38,423 - [TRAINER] - INFO - [ABB.NS] Regime filter: dropped 29/743 BEAR/VOLATILE bars (4%) — training on 714 TRENDING+RANGING bars only.
+10:42:38 | INFO | MARK5.Trainer | [ABB.NS] Regime filter: dropped 29/743 BEAR/VOLATILE bars (4%) — training on 714 TRENDING+RANGING bars only.
+2026-04-03 10:42:38,429 - [TRAINER] - INFO - [ABB.NS] Samples=713 | Positive_rate=52.3% | Class_weights={np.int64(0): np.float64(1.048529411764706), np.int64(1): np.float64(0.9557640750670241)}
+10:42:38 | INFO | MARK5.Trainer | [ABB.NS] Samples=713 | Positive_rate=52.3% | Class_weights={np.int64(0): np.float64(1.048529411764706), np.int64(1): np.float64(0.9557640750670241)}
+2026-04-03 10:42:38,433 - [TRAINER] - INFO - [ABB.NS] n_samples=713, n_features=8
+10:42:38 | INFO | MARK5.Trainer | [ABB.NS] n_samples=713, n_features=8

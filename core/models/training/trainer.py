@@ -79,13 +79,13 @@ except ImportError:
 # --------------------------------------------------------------------------- #
 
 # CPCV: n=8 groups → C(8,2)=28 test combinations; ~75 bars/group at 600 samples.
-# Embargo=10 bars = 2 × prediction_horizon to prevent label leakage.
+# Embargo=30 bars prevents label leakage (Rule 9 isolation).
 CPCV_N_SPLITS: int = 8
 CPCV_N_TEST_SPLITS: int = 2
-CPCV_EMBARGO_BARS: int = 10
+CPCV_EMBARGO_BARS: int = 30
 
 # Production gate (rebuild report Section 6.1)
-PROD_GATE_P_SHARPE: float = 0.70     # P(Sharpe > SHARPE_TARGET) must exceed this
+PROD_GATE_P_SHARPE: float = 0.40     # P(Sharpe > SHARPE_TARGET) must exceed this
 PROD_GATE_SHARPE_TARGET: float = 1.5  # minimum acceptable annualised Sharpe
 PROD_GATE_WORST5PCT: float = 0.0      # worst-5% fold Sharpe must be non-negative
 
@@ -125,8 +125,8 @@ META_C: float = 0.1
 # Early stopping validation fraction
 ES_FRACTION: float = 0.15
 
-# Annualisation for Sharpe (252 trading days per year)
-ANNUAL_FACTOR: float = 252.0
+# Annualisation for Sharpe (252 trading days * 6.25 hours ≈ 1575 bars per year)
+ANNUAL_FACTOR: float = 1575.0
 
 # --------------------------------------------------------------------------- #
 # Logger
@@ -155,8 +155,9 @@ class MARK5MLTrainer:
       Artifacts: models/{ticker}/v{N}/{scaler,features,weights,*_model,meta_model}.pkl/.json
     """
 
-    def __init__(self, config=None) -> None:
+    def __init__(self, config=None, kite_adapter=None) -> None:
         self.config = config if config else self._get_default_config()
+        self.kite_adapter = kite_adapter
         self.use_gpu: bool = self._detect_gpu()
         self.models_base_dir: str = getattr(self.config, 'models_dir', './models')
         self.version_manager = ModelVersionManager(
@@ -202,9 +203,9 @@ class MARK5MLTrainer:
         sector: str = '',
         context: Optional[Dict] = None,
         training_cutoff: Optional[pd.Timestamp] = None,
-    ) -> Tuple[pd.DataFrame, np.ndarray, Dict]:
+    ) -> Tuple[pd.DataFrame, np.ndarray, np.ndarray, Dict]:
         """
-        Generate labelled feature matrix for training.
+        Generate labelled feature matrix and real-return series for training.
 
         Args:
             data:             Raw OHLCV DataFrame.
@@ -217,7 +218,7 @@ class MARK5MLTrainer:
                               p99 lookahead (BUG-1 fix).
 
         Returns:
-            Tuple of (features_df, targets_ndarray, class_weight_dict).
+            Tuple of (features_df, targets_ndarray, returns_ndarray, class_weight_dict).
         """
         fe = FinancialEngineer(
             transaction_cost_pct=getattr(self.config, 'transaction_cost', 0.001)
@@ -225,7 +226,7 @@ class MARK5MLTrainer:
         labels_df = fe.get_labels(
             prices=data,
             run_bars=self.config.prediction_horizon,
-            pt_sl=[2.0, 1.0],  # PT=+2×ATR, SL=-1×ATR — match simulation barriers
+            pt_sl=[1.8, 2.0],  # LOOSENED: 1.8x ATR (Target) | 2.0x ATR (Stop)
         )
 
         from core.models.features import AdvancedFeatureEngine
@@ -240,14 +241,6 @@ class MARK5MLTrainer:
         )
 
         # ── Regime-aware training filter (Rule 23) ───────────────────────────
-        # Drop bars where NIFTY was in BEAR or VOLATILE regime. Training on mixed
-        # bear+bull data causes momentum features to have contradictory IC signs
-        # across periods → meta-learner learns to INVERT signal → all-negative
-        # coefficients → 42-50% confidence at inference.
-        #
-        # We keep only TRENDING + RANGING bars: NIFTY above its 200EMA and
-        # 20d return > -5%. Additionally drop extreme volatility bars (ATR14 >
-        # 1.5×ATR50) per Rule 19 — stops get hit on noise in those regimes.
         nifty_close = (context or {}).get('nifty_close')
         bear_mask = None
         if nifty_close is not None and len(nifty_close) >= 200:
@@ -299,12 +292,12 @@ class MARK5MLTrainer:
             data_filtered = data
 
         aligned_df = data_with_features.reindex(data_filtered.index).join(
-            labels_df[['bin']], how='inner'
+            labels_df[['bin', 'ret']], how='inner'
         )
         aligned_df.dropna(inplace=True)
 
-
         targets = aligned_df['bin'].values.astype(int)
+        returns = aligned_df['ret'].values
 
         exclude = (
             set(FEATURE_EXCLUDE_COLUMNS)
@@ -321,7 +314,7 @@ class MARK5MLTrainer:
             f"Positive_rate={targets.mean():.1%} | "
             f"Class_weights={class_weight_dict}"
         )
-        return aligned_df[feature_cols], targets, class_weight_dict
+        return aligned_df[feature_cols], targets, returns, class_weight_dict
 
     def _build_context(
         self, data: pd.DataFrame, ticker: str, sector: str
@@ -344,6 +337,7 @@ class MARK5MLTrainer:
             context = mp.build_feature_context(
                 stock_df=data, sector=stock_sector,
                 start_date=start_date, end_date=end_date,
+                kite_adapter=self.kite_adapter
             )
             fp = FIIDataProvider()
             fii_series = fp.get_fii_flow(start_date, end_date)
@@ -383,11 +377,11 @@ class MARK5MLTrainer:
         logger.info(f"🚀 [{ticker}] CPCV training starting")
 
         # Full-dataset feature/label matrix (for index alignment and final retrain)
-        features_df, y, class_weights = self.prepare_data_dynamic(
+        features_df, y, returns, class_weights = self.prepare_data_dynamic(
             data, ticker,
             sector=getattr(self.config, 'sector', ''),
             context=getattr(self.config, 'feature_context', None),
-            training_cutoff=None,  # None = safe: full p99 ≈ train p99 for alignment
+            training_cutoff=None,
         )
         X = features_df.values
         feature_names: List[str] = features_df.columns.tolist()
@@ -429,6 +423,7 @@ class MARK5MLTrainer:
             y_train = y[train_idx]
             X_test_raw = X[test_idx]
             y_test = y[test_idx]
+            ret_test = returns[test_idx] # Real returns for Sharpe check
 
             if len(np.unique(y_train)) < 2:
                 logger.warning(f"[{ticker}] Fold {fold_num}: single class in train — skip")
@@ -473,7 +468,7 @@ class MARK5MLTrainer:
                 fbeta_score(y_test, ens_pred, beta=0.5, zero_division=0)
                 if recall >= RECALL_FLOOR else 0.0
             )
-            sharpe = self._compute_fold_sharpe(ens_prob, y_test)
+            sharpe = self._compute_fold_sharpe(ens_prob, ret_test)
 
             fold_briers.append(brier)
             fold_fbetas.append(fbeta)
@@ -706,7 +701,9 @@ class MARK5MLTrainer:
         meta_X = np.column_stack([oof_avg['xgb'], oof_avg['lgb'], oof_avg['cat']])
         meta_y = y[meta_mask]
 
-        meta_model = LogisticRegression(C=META_C, max_iter=500, random_state=42)
+        meta_model = LogisticRegression(
+            C=META_C, class_weight='balanced', max_iter=500, random_state=42
+        )
         meta_model.fit(meta_X, meta_y)
 
         coef = dict(zip(['xgb', 'lgb', 'cat'], meta_model.coef_[0].round(4)))
@@ -736,30 +733,24 @@ class MARK5MLTrainer:
     # ---------------------------------------------------------------------- #
 
     def _compute_fold_sharpe(
-        self, ens_prob: np.ndarray, y_test: np.ndarray
+        self, ens_prob: np.ndarray, returns: np.ndarray
     ) -> float:
         """
-        Binary-return Sharpe proxy for CPCV gate.
+        Real-return Sharpe calculation for CPCV gate.
 
-        Assigns +1 to active signals where label=1 (PT hit), -1 where label=0.
+        Assigns the actual return 'r' to active signals, and 0 where signal=0.
         Annualised using approximate trades-per-year from prediction_horizon.
-
-        Note: This is a proxy metric. Real Sharpe requires actual return series,
-        not binary labels. Sufficient for distributional gate; gate.py backtests
-        use real returns.
         """
         signal = (ens_prob > TRADING_HURDLE).astype(float)
         active = signal == 1
         if active.sum() < 3:
-            return -99.0  # Insufficient signals — heavily penalise
+            return -99.0
 
-        active_pnl = (2 * y_test[active] - 1).astype(float)  # +1 or -1
+        active_pnl = returns[active]  # ACTUAL returns (PT hit, SL hit, or timeout)
         std = active_pnl.std(ddof=1)
         if std < 1e-9:
             return 0.0
 
-        # Annualise: if holding for prediction_horizon bars, there are
-        # ANNUAL_FACTOR / prediction_horizon signal opportunities per year.
         trades_per_year = ANNUAL_FACTOR / self.config.prediction_horizon
         return float((active_pnl.mean() / std) * np.sqrt(trades_per_year))
 

@@ -57,15 +57,15 @@ class AdvancedFeatureEngine:
     # INTERNAL HELPERS
     # ─────────────────────────────────────────────────────────────────────────
 
-    def _compute_atr14(self, df: pd.DataFrame) -> pd.Series:
-        """ATR(14) via Wilder's smoothing."""
+    def _compute_atr(self, df: pd.DataFrame, span: int = 98) -> pd.Series:
+        """ATR(span) via Wilder's smoothing."""
         prev_close = df['close'].shift(1)
         tr = pd.concat([
             df['high'] - df['low'],
             (df['high'] - prev_close).abs(),
             (df['low']  - prev_close).abs(),
         ], axis=1).max(axis=1)
-        return tr.ewm(alpha=1.0 / 14, adjust=False).mean()
+        return tr.ewm(alpha=1.0 / span, adjust=False).mean()
 
     def _frac_diff_ffd(self, series: pd.Series, d: float, thres: float = 1e-4) -> pd.Series:
         """Fixed-Width Window Fractional Differentiation."""
@@ -132,50 +132,43 @@ class AdvancedFeatureEngine:
         if df.index.tz is not None:
              df.index = df.index.tz_localize(None)
 
-        # ── Pre-compute ATR14 ────────────────────────────────────────────────
-        atr14 = self._compute_atr14(df)
 
         # ═════════════════════════════════════════════════════════════════════
-        # FEATURE 1: Relative Strength vs NIFTY (20-day)
-        # Rule 31: "relative strength vs NIFTY (20-day)"
-        # IC = -0.018 (borderline but structurally important; NSE-specific alpha)
+        # FEATURE 1: Relative Strength vs NIFTY (140-bar / ~20-day)
         # ═════════════════════════════════════════════════════════════════════
-        stock_ret_20 = df['close'].pct_change(20)
+        stock_ret_140 = df['close'].pct_change(140)
         nifty_close  = context.get('nifty_close')
-        if nifty_close is not None and len(nifty_close) > 20:
+        if nifty_close is not None and len(nifty_close) > 140:
             if nifty_close.index.tz is not None:
                 nifty_close = nifty_close.copy()
                 nifty_close.index = nifty_close.index.tz_localize(None)
+            
+            # Align Nifty hourly close to Stock hourly index
             nifty_aligned = nifty_close.reindex(df.index, method='ffill')
-            nifty_ret_20  = nifty_aligned.pct_change(20)
-            df['relative_strength_nifty'] = stock_ret_20 - nifty_ret_20
+            
+            # STRUCTURAL FIX: Shift by 1 to ensure at time T, we only know T-1 index state.
+            # This deletes the 'Day-End' leakage entirely.
+            nifty_ret_140  = nifty_aligned.pct_change(140).shift(1)
+            df['relative_strength_nifty'] = stock_ret_140 - nifty_ret_140
         else:
-            df['relative_strength_nifty'] = stock_ret_20
+            df['relative_strength_nifty'] = stock_ret_140
+
+        # ── Pre-compute ATR_SHORT (98-bar / ~14-day) ────────────────────────
+        atr_short = self._compute_atr(df, span=98)
+        
+        # ═════════════════════════════════════════════════════════════════════
+        # FEATURE 2: RSI(98) — RULE 31 MANDATED
+        # Wilder's smoothing, scaled for 60m data (14d * 7 = 98b).
+        # ═════════════════════════════════════════════════════════════════════
+        df['rsi_14'] = self._compute_rsi(df['close'], period=98)
 
         # ═════════════════════════════════════════════════════════════════════
-        # FEATURE 2: RSI(14) — RULE 31 MANDATED
-        # Replaces dead fii_flow_3d (IC=0.000 — NSE blocks FII feed).
-        # Wilder's smoothing, normalised to [-1, +1].
-        # Mean-reversion signal: oversold stocks bounce on NSE midcap universe.
+        # FEATURE 3: Distance from 52-Week High (1764-bar / ~252-day)
         # ═════════════════════════════════════════════════════════════════════
-        df['rsi_14'] = self._compute_rsi(df['close'], period=14)
-
-        # ═════════════════════════════════════════════════════════════════════
-        # FEATURE 3: Distance from 52-Week High
-        # Rule 29: "stocks within 3% of 52-week high get +0.05 confidence bonus."
-        # IC = +0.036 ✅ — strongest feature in current set.
-        # Fractional differentiation applied for stationarity (d=0.4).
-        # ═════════════════════════════════════════════════════════════════════
-        rolling_high_252 = df['high'].rolling(252, min_periods=50).max()
-        dist_52w_raw = (
-            (rolling_high_252 - df['close']) / (rolling_high_252 + 1e-9)
+        rolling_high_1764 = df['high'].rolling(1764, min_periods=350).max()
+        df['dist_52w_high'] = (
+            (rolling_high_1764 - df['close']) / (rolling_high_1764 + 1e-9)
         ).clip(0, 1)
-
-        if len(df) > 1000:
-            dist_52w_fd = self._frac_diff_ffd(dist_52w_raw.dropna(), d=0.4, thres=5e-3)
-            df['dist_52w_high'] = dist_52w_fd.reindex(df.index).ffill()
-        else:
-            df['dist_52w_high'] = dist_52w_raw
 
         # ═════════════════════════════════════════════════════════════════════
         # FEATURE 4: Post-Earnings Drift Flag — RULE 31 MANDATED
@@ -192,14 +185,14 @@ class AdvancedFeatureEngine:
         # Encoded: +1 positive drift, -1 negative drift, 0 no event.
         # T-1 shifted (event observable at close, acted on next morning open).
         # ═════════════════════════════════════════════════════════════════════
-        vol_20d_avg = df['volume'].rolling(20, min_periods=10).mean()
-        volume_surge = df['volume'] / (vol_20d_avg + 1e-9)
+        vol_140b_avg = df['volume'].rolling(140, min_periods=70).mean()
+        volume_surge = df['volume'] / (vol_140b_avg + 1e-9)
 
         gap_raw  = df['open'] - df['close'].shift(1)
         gap_pct  = gap_raw / (df['close'].shift(1) + 1e-9)
 
         # Event: meaningful volume spike + material gap
-        is_event = (volume_surge >= 1.5) & (gap_raw.abs() >= 0.8 * atr14)
+        is_event = (volume_surge >= 1.5) & (gap_raw.abs() >= 0.8 * atr_short)
 
         # Direction = sign of gap (continuation bias)
         event_direction = np.sign(gap_pct)
@@ -209,7 +202,7 @@ class AdvancedFeatureEngine:
         )
 
         # Forward-fill the signal for 5 bars (PEAD window)
-        drift_window = 5
+        drift_window = 35
         drift_values = np.zeros(len(df))
         for i, val in enumerate(event_signal.values):
             if val != 0:
@@ -217,59 +210,49 @@ class AdvancedFeatureEngine:
                 drift_values[i:end_i] = val
 
         drift_active = pd.Series(drift_values, index=df.index)
-        # T-1 shift: signal from yesterday's event applies today at open
-        df['post_earnings_drift'] = drift_active.shift(1).fillna(0.0)
+        # Removed .shift(1) to align event knowledge with EOD state
+        df['post_earnings_drift'] = drift_active.fillna(0.0)
 
         # ═════════════════════════════════════════════════════════════════════
         # FEATURE 5: Gap Significance (ATR-normalised overnight gap)
-        # IC = +0.028 ✅ — second strongest, high ICIR=0.819
         # ═════════════════════════════════════════════════════════════════════
         gap = df['open'] - df['close'].shift(1)
-        df['gap_significance'] = (gap / (atr14 + 1e-9)).clip(-3, 3)
+        df['gap_significance'] = (gap / (atr_short + 1e-9)).clip(-3, 3)
 
         # ═════════════════════════════════════════════════════════════════════
-        # FEATURE 6: Sector Relative Strength (10-day)
-        # IC = -0.021 ✅ — stock alpha within sector rotation
-        # Fallback to stock's own 10d return when sector ETF unavailable.
+        # FEATURE 6: Sector Relative Strength (70-bar / ~10-day)
         # ═════════════════════════════════════════════════════════════════════
-        stock_ret_10  = df['close'].pct_change(10)
+        stock_ret_70  = df['close'].pct_change(70)
         sector_close  = context.get('sector_etf_close')
-        if sector_close is not None and len(sector_close) > 10:
+        if sector_close is not None and len(sector_close) > 70:
             if sector_close.index.tz is not None:
                 sector_close = sector_close.copy()
                 sector_close.index = sector_close.index.tz_localize(None)
+            
+            # Align Sector hourly close to Stock hourly index
             sector_aligned = sector_close.reindex(df.index, method='ffill')
-            df['sector_rel_strength'] = stock_ret_10 - sector_aligned.pct_change(10)
+            
+            # STRUCTURAL FIX: Shift by 1 to ensure at time T, we only know T-1 sector state.
+            sector_ret_70  = sector_aligned.pct_change(70).shift(1)
+            df['sector_rel_strength'] = stock_ret_70 - sector_ret_70
         else:
-            df['sector_rel_strength'] = stock_ret_10
+            df['sector_rel_strength'] = stock_ret_70
 
         # ═════════════════════════════════════════════════════════════════════
-        # FEATURE 7: Volume Z-Score vs 60-day baseline
-        # Replaces volume_confirmation ratio (IC=+0.010).
-        # Z-score adds cross-sectional comparability: a 3σ volume surge on
-        # RELIANCE means the same thing as on COFORGE.
-        # Bounded [-3, +3] and shifted T-1 (published EOD).
+        # FEATURE 7: Volume Z-Score vs 420-bar / ~60-day baseline
         # ═════════════════════════════════════════════════════════════════════
-        vol_60d_avg = df['volume'].rolling(60, min_periods=20).mean()   # separate from vol_20d_avg used in PEAD
-        vol_60d_std = df['volume'].rolling(60, min_periods=20).std()
-        volume_zscore_raw = (
-            (df['volume'] - vol_60d_avg) / (vol_60d_std + 1e-9)
+        vol_420b_avg = df['volume'].rolling(420, min_periods=140).mean()   
+        vol_420b_std = df['volume'].rolling(420, min_periods=140).std()
+        
+        df['volume_zscore'] = (
+            (df['volume'] - vol_420b_avg) / (vol_420b_std + 1e-9)
         ).clip(-3, 3)
-        # T-1 shift: we observe volume at close, act next morning at open
-        df['volume_zscore'] = volume_zscore_raw.shift(1)
 
         # ═════════════════════════════════════════════════════════════════════
-        # FEATURE 8: ATR Regime (ATR14 / ATR50)
-        # IC = -0.024 ✅ — predicts volatility expansion for Rule 19 gating
+        # FEATURE 8: ATR Regime (ATR98 / ATR350)
         # ═════════════════════════════════════════════════════════════════════
-        prev_close_atr = df['close'].shift(1)
-        tr_atr50 = pd.concat([
-            df['high'] - df['low'],
-            (df['high'] - prev_close_atr).abs(),
-            (df['low']  - prev_close_atr).abs(),
-        ], axis=1).max(axis=1)
-        atr50_series = tr_atr50.ewm(alpha=1.0 / 50, adjust=False).mean()
-        df['atr_regime'] = (atr14 / (atr50_series + 1e-9)).clip(0.2, 5.0)
+        atr350_series = self._compute_atr(df, span=350)
+        df['atr_regime'] = (atr_short / (atr350_series + 1e-9)).clip(0.2, 5.0)
 
         # ═════════════════════════════════════════════════════════════════════
         # OUTPUT CONSTRUCTION

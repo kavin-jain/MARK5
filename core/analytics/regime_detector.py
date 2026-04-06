@@ -193,11 +193,13 @@ class MarketRegimeDetector:
             short_vol_last = short_vol.iloc[-1]
             long_vol_last = long_vol.iloc[-1]
             
-            # Calculate Z-Score of current volatility vs historical distribution (last 300 bars)
+            # Calculate Z-Score of current volatility vs strictly HISTORICAL distribution
+            # Shift by 1 to ensure 'vol_mean' and 'vol_std' are inference-safe.
             vol_history = short_vol.dropna()
             if len(vol_history) > 30:
-                vol_mean = vol_history.mean()
-                vol_std = vol_history.std()
+                hist_vol = vol_history.shift(1).dropna()
+                vol_mean = hist_vol.mean()
+                vol_std = hist_vol.std()
                 vol_zscore = (short_vol_last - vol_mean) / vol_std if vol_std > 0 else 0.0
             else:
                 vol_zscore = 0.0
@@ -223,12 +225,16 @@ class MarketRegimeDetector:
             if len(sma_long.dropna()) > 0:
                 current_price = close.iloc[-1]
                 
-                # Calculate Z-Score of Price deviation from Long SMA
+                # Calculate Z-Score of Price deviation from Long SMA (Inference Safe)
                 dist_from_long = (close - sma_long) / sma_long
-                dist_mean = dist_from_long.rolling(200).mean().iloc[-1]
-                dist_std = dist_from_long.rolling(200).std().iloc[-1]
+                dist_history = dist_from_long.shift(1).dropna()
                 
-                trend_zscore = (dist_from_long.iloc[-1] - dist_mean) / dist_std if dist_std > 0 else 0.0
+                if len(dist_history) >= 200:
+                    dist_mean = dist_history.iloc[-200:].mean()
+                    dist_std = dist_history.iloc[-200:].std()
+                    trend_zscore = (dist_from_long.iloc[-1] - dist_mean) / dist_std if dist_std > 0 else 0.0
+                else:
+                    trend_zscore = 0.0
                 
                 trend_alignment = 0
                 if current_price > sma_short.iloc[-1]: trend_alignment += 1
@@ -266,9 +272,12 @@ class MarketRegimeDetector:
                 avg_volume = volume.rolling(vol_window).mean()
                 current_volume = volume.iloc[-1]
                 
-                # Z-Score of Volume
-                vol_series = volume.rolling(vol_window).apply(lambda x: (x[-1] - x.mean()) / x.std() if x.std() > 0 else 0)
-                volume_zscore = vol_series.iloc[-1]
+                # Z-Score of Volume (Benchmark against shifted history)
+                hist_vol_series = volume.shift(1).rolling(vol_window)
+                hist_mean = hist_vol_series.mean().iloc[-1]
+                hist_std = hist_vol_series.std().iloc[-1]
+                
+                volume_zscore = (current_volume - hist_mean) / hist_std if hist_std > 0 else 0.0
                 
                 if volume_zscore > 2.0: volume_regime = "HIGH_VOLUME"
                 elif volume_zscore < -1.0: volume_regime = "LOW_VOLUME"

@@ -34,9 +34,9 @@ MIDCAP_100 = [
     # Industrials / Capital Goods
     'SIEMENS', 'ABB', 'HAVELLS', 'CGPOWER', 'POLYCAB', 'CUMMINSIND', 'DIXON',
     # IT / Technology
-    'LTIMINDTREE', 'TATATECH', 'PERSISTENT',
+    'LTIM', 'TATATECH', 'PERSISTENT',
     # Auto / Auto Ancillaries
-    'TVSMOTOR', 'SAMVARDHANA', 'APOLLOTYRE', 'MRF',
+    'TVSMOTOR', 'MOTHERSON', 'APOLLOTYRE', 'MRF',
     # Pharma / Healthcare
     'TORNTPHARM', 'ZYDUSLIFE', 'MAXHEALTH', 'ALKEM',
     # FMCG / Consumer
@@ -71,7 +71,7 @@ SMALLCAP_NEXT = [
     # Consumer
     'BATAINDIA', 'PAGEIND', 'RELAXO', 'GODREJIND',
     # Infra / Engineering
-    'SUZLON', 'KALPATPOWR', 'KEC', 'GRINDWELL',
+    'SUZLON', 'KPIL', 'KEC', 'GRINDWELL',
     # IT mid-small
     'MPHASIS', 'COFORGE', 'MASTEK',
     # Real estate small
@@ -229,7 +229,7 @@ def main():
     small_failed = []
     for sym in SMALLCAP_NEXT:
         if sym in largecap or sym in midcap:
-            smallcap[sym] = largecap.get(sym) or midcap.get(sym)
+            smallcap[sym] = largecap.get(sym) if largecap.get(sym) is not None else midcap.get(sym)
             continue
         df = download_stock(kite, sym)
         if df is not None:
@@ -308,13 +308,16 @@ def main():
         print("  ⚠️  No clear winner — stay on current NIFTY50 universe")
         rec_universe = "largecap"
 
-    if illiquid_small:
-        print(f"\n  Illiquid smallcaps to EXCLUDE: {illiquid_small}")
-
+    # ── Final Ticker Sync and Recommendation ──────────────────────────────────
     liquid_mid   = [s for s in midcap if s not in largecap]
-    liquid_small = [s for s in smallcap if s not in illiquid_small and s not in largecap and s not in midcap]
-    total = len(largecap) + len(liquid_mid) + len(liquid_small)
-    print(f"\n  Potential combined universe: {len(largecap)} large + {len(liquid_mid)} mid + {len(liquid_small)} small = {total} stocks")
+    liquid_small = [s for s in smallcap if s not in largecap and s not in midcap and s not in illiquid_small]
+    
+    # Calculate unique totals
+    all_unique = set(largecap.keys()) | set(midcap.keys()) | set(smallcap.keys())
+    # Exclude known illiquids from smallcap
+    all_filtered = all_unique - set(illiquid_small)
+    
+    print(f"\n  Potential combined universe: {len(largecap)} large + {len(liquid_mid)} mid + {len(liquid_small)} small = {len(all_filtered)} stocks")
     print(f"  (Rule 34 min=30: {'✅ SATISFIED' if total >= 30 else '❌ FAIL'})")
     print()
 
