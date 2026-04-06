@@ -10,7 +10,7 @@ window (2024-10-01 to 2026-04-01), eliminating in-sample bias for the
 final backtest.
 """
 
-import os, sys, argparse, logging, warnings, time
+import os, sys, argparse, logging, warnings, time, shutil
 warnings.filterwarnings("ignore")
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -52,8 +52,16 @@ def main():
     except Exception as e:
         logger.warning(f"  NIFTY load failed: {e}")
 
-    # No FIIDataProvider locally historically, but will pass None
-    context = {'nifty_close': nifty_close, 'fii_net': None}
+    fii_series = None
+    try:
+        fp = FIIDataProvider()
+        fii_series = fp.get_fii_flow("2020-01-01", CUTOFF_DATE)
+        if fii_series is not None:
+            logger.info(f"  FII data loaded up to cutoff: {len(fii_series)} bars")
+    except Exception as e:
+        logger.warning(f"  FII load failed: {e}")
+
+    context = {'nifty_close': nifty_close, 'fii_net': fii_series}
 
     results = {"success": [], "failed": []}
     trainer = MARK5MLTrainer()
@@ -63,9 +71,6 @@ def main():
         ticker_ns = f"{symbol}.NS"
         print(f"\n[{i}/{len(parquets)}] {symbol}")
         mdir = Path(PROJECT_ROOT) / "models" / ticker_ns
-        if mdir.exists() and any(x.name.startswith('v') for x in mdir.iterdir() if x.is_dir()):
-            logger.info(f"  {symbol}: Already trained — skipping")
-            continue
 
         try:
             df = pd.read_parquet(ppath)
@@ -94,8 +99,6 @@ def main():
         t0 = time.time()
         try:
             # Recreate models dir blindly
-            import shutil
-            mdir = Path(PROJECT_ROOT) / "models" / ticker_ns
             if mdir.exists(): shutil.rmtree(mdir)
             
             result = trainer.train_advanced_ensemble(ticker_ns, df)
@@ -119,6 +122,10 @@ def main():
     print(f"  ✅  Success : {len(results['success'])}")
     print(f"  ❌  Failed  : {len(results['failed'])}")
     print(f"{'═'*62}\n")
+
+    trained_count = len(results["success"])
+    assert trained_count >= 90, f"Only {trained_count} models trained — something is wrong (check logs)"
+    print(f"✅ OOS integrity confirmed: {trained_count} models trained strictly on data ≤ {CUTOFF_DATE}")
 
 if __name__ == "__main__":
     main()

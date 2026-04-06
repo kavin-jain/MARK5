@@ -7,7 +7,7 @@ from itertools import combinations
 from typing import Tuple, Generator
 
 class CombinatorialPurgedKFold:
-    def __init__(self, n_splits: int = 6, n_test_splits: int = 2, embargo: int = 10):
+    def __init__(self, n_splits: int = 6, n_test_splits: int = 2, embargo: int = 30):
         """
         Args:
             n_splits (int): Number of total groups to partition the timeline into.

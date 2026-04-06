@@ -1,22 +1,13 @@
-"""
-MARK5 Financial Engineering Core v2.0 - ARCHITECT REVISION
-Changes:
-- Parkinson Volatility (High/Low) for better intraday sensitivity.
-- Transaction Cost Aware Labeling (The "Real World" filter).
-- Vectorized optimizations.
-"""
-
 import numpy as np
 import pandas as pd
 from typing import Tuple, Optional, Union, List
+import logging
+
+logger = logging.getLogger("MARK5.FinancialEngineer")
 
 class FinancialEngineer:
     
-    def __init__(self, volatility_window: int = 20, transaction_cost_pct: float = 0.001):
-        """
-        :param volatility_window: Window for dynamic thresholds.
-        :param transaction_cost_pct: 0.001 = 0.1% round trip (covers STT + Slippage).
-        """
+    def __init__(self, volatility_window: int = 14, transaction_cost_pct: float = 0.001):
         self.vol_window = volatility_window
         self.tc_pct = transaction_cost_pct
 
@@ -35,156 +26,145 @@ class FinancialEngineer:
         w = self.get_weights_ffd(d, thres, len(series))
         width = len(w) - 1
         
-        # Optimization: Use stride_tricks for vectorization instead of loop
-        # However, for safety in variable length, we keep the robust loop but check inputs
         output = series.ffill().dropna()
         if width >= len(output): return output.diff().fillna(0)
         
         series_vals = output.values
         w_flat = w.flatten()
-        
-        # Convolve is faster than explicit loops for sliding windows
-        # Valid mode ensures we don't have boundary leakage effects at the start
         res = np.convolve(series_vals, w_flat, mode='valid')
         
-        # Align index: The result is shorter than input by 'width'
         return pd.Series(res, index=output.index[width:])
 
     # -------------------------------------------------------------------------
-    # 2. VOLATILITY ESTIMATION (Parkinson > StdDev)
+    # 2. VOLATILITY ESTIMATION (ATR 14 / Close)
     # -------------------------------------------------------------------------
     def get_volatility(self, prices: pd.DataFrame, span0: int = 14) -> pd.Series:
-        """
-        ATR(14) / price — matches simulation barrier calculation exactly.
-        
-        CRITICAL: Training barriers MUST use the same volatility measure as
-        the simulation/live system. The simulation uses ATR(14)/price for
-        PT/SL barriers (test.py:669-674), so training must match.
-        
-        Previous bug: Used Parkinson vol (sqrt(0.361 × HL²)) which produces
-        fundamentally different thresholds than ATR.
-        """
         close = prices['close']
-        
         if 'high' in prices.columns and 'low' in prices.columns:
             high = prices['high']
             low = prices['low']
             
-            # True Range = max(H-L, |H-Cprev|, |L-Cprev|)
             prev_close = close.shift(1)
             tr1 = high - low
             tr2 = (high - prev_close).abs()
             tr3 = (low - prev_close).abs()
             true_range = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
             
-            # ATR(14) smoothed, normalized by price
-            atr = true_range.rolling(window=span0, min_periods=1).mean()
-            vol = atr / close  # Normalize: fraction of price
+            atr = true_range.ewm(alpha=1.0/span0, adjust=False).mean()
+            vol = atr / close 
             return vol
         else:
-            # Fallback to standard deviation of returns
             return close.pct_change().rolling(window=span0, min_periods=1).std()
 
     # -------------------------------------------------------------------------
-    # 3. TRIPLE BARRIER METHOD (With Cost-Awareness)
+    # 3. TRIPLE BARRIER METHOD (Aligned with Experiment D)
     # -------------------------------------------------------------------------
     def apply_triple_barrier(self, 
-                             close: pd.Series, 
+                             prices: pd.DataFrame, 
                              events: pd.DataFrame, 
-                             pt_sl: list, 
-                             molecule: list) -> pd.DataFrame:
+                             pt_sl: list) -> pd.DataFrame:
         
-        events_ = events.loc[molecule]
-        out = events_[['t1']].copy(deep=True)
+        out = events[['t1', 't_day4']].copy(deep=True)
         
-        if pt_sl[0] > 0: pt = pt_sl[0] * events_['trgt']
-        else: pt = pd.Series(index=events.index) # NaNs
+        # Absolute percentage barriers based on ATR
+        pt = pt_sl[0] * events['trgt']
+        sl = -pt_sl[1] * events['trgt']
+        early_exit_thresh = 0.5 * events['trgt']
 
-        if pt_sl[1] > 0: sl = -pt_sl[1] * events_['trgt']
-        else: sl = pd.Series(index=events.index) # NaNs
-
-        # Vectorization is hard here due to path dependency, sticking to loop but optimized
-        # We process only valid event indices
-        for loc, t1 in events_['t1'].fillna(close.index[-1]).items():
-            df0 = close[loc:t1] 
-            df0 = (df0 / close[loc] - 1) * 1 
+        for loc, row in events.iterrows():
+            t1 = row['t1']
+            t_day4 = row['t_day4']
             
-            # Earliest stop loss hit
-            sl_hit = df0[df0 < sl[loc]].index.min()
-            # Earliest profit take hit
-            pt_hit = df0[df0 > pt[loc]].index.min()
+            df0 = prices.loc[loc:t1] 
+            if df0.empty: continue
+            
+            c0 = df0['close'].iloc[0]
+            
+            # REALITY CHECK: Use Highs for Targets, Lows for Stops
+            dh = df0['high'] / c0 - 1
+            dl = df0['low'] / c0 - 1
+            dc = df0['close'] / c0 - 1
+            
+            # Find exact timestamps of barrier hits
+            pt_hit = dh[dh >= pt[loc]].index.min()
+            sl_hit = dl[dl <= sl[loc]].index.min()
+            
+            # Experiment D: Early Time-Stop Logic
+            early_exit_hit = pd.NaT
+            if pd.notna(t_day4) and t_day4 in dc.index:
+                if dc.loc[t_day4] < early_exit_thresh[loc]:
+                    early_exit_hit = t_day4
             
             out.loc[loc, 'sl'] = sl_hit
             out.loc[loc, 'pt'] = pt_hit
+            out.loc[loc, 'early_exit'] = early_exit_hit
             
         return out
 
-    def get_labels(self, prices: pd.DataFrame, t_events: list = None, run_bars: int = 7, pt_sl: list = [2, 1]) -> pd.DataFrame:
-        """
-        Triple barrier labeling for daily-bar swing trading.
-        
-        :param prices: DataFrame containing 'close', 'high', 'low'
-        :param run_bars: Vertical barrier in trading days (default 7 = ~1.5 weeks)
-        :param pt_sl: [profit_target_multiplier, stop_loss_multiplier] of ATR(14)
-        """
+    def get_labels(self, prices: pd.DataFrame, t_events: list = None, run_bars: int = 70, pt_sl: list = [2.5, 2.0]) -> pd.DataFrame:
         close = prices['close']
         if t_events is None: t_events = close.index
             
-        # 1. Dynamic Volatility — ATR(14) normalized by price
-        vol = self.get_volatility(prices, span0=14)
+        vol = self.get_volatility(prices, span0=self.vol_window)
         
-        # 2. Vertical Barriers — run_bars trading days ahead
-        # For daily bars, shift by run_bars positions in the index
-        t1 = close.index.searchsorted(t_events) + run_bars
-        t1 = np.clip(t1, 0, len(close.index) - 1)
-        t1_series = pd.Series(close.index[t1], index=t_events)
+        # Calculate T+70 (Hard Time Limit) and T+28 (Early Exit Limit)
+        t_idx = close.index.searchsorted(t_events)
+        t1_idx = np.clip(t_idx + run_bars, 0, len(close.index) - 1)
+        t4_idx = np.clip(t_idx + 28, 0, len(close.index) - 1)
         
-        # 3. Events
-        events = pd.DataFrame({'t1': t1_series, 'trgt': vol.loc[t_events]})
+        t1_series = pd.Series(close.index[t1_idx], index=t_events)
+        t4_series = pd.Series(close.index[t4_idx], index=t_events)
+        
+        events = pd.DataFrame({'t1': t1_series, 't_day4': t4_series, 'trgt': vol.loc[t_events]})
         events = events.dropna(subset=['trgt'])
         
-        # Filter: Skip events where volatility is too low to cover transaction costs
-        # If Target < Transaction Cost, don't even label it, it's noise.
+        # Drop environments where transaction costs eat the whole ATR
         min_vol_threshold = self.tc_pct * 1.5
         events = events[events['trgt'] > min_vol_threshold]
 
         if events.empty:
-            return pd.DataFrame(columns=['ret', 'bin', 'out'])
+            return pd.DataFrame(columns=['ret', 'bin', 'fwd_ret'])
 
-        # 4. Apply Triple Barrier
-        df_touches = self.apply_triple_barrier(close, events, pt_sl, events.index)
+        # Apply Physics-Accurate Barriers
+        df_touches = self.apply_triple_barrier(prices, events, pt_sl)
         
-        # 5. Labeling
-        # C-2: NaT in sl/pt (barrier never hit) must be replaced with a sentinel
-        # before min(). pandas min() over a NaT column coerces the row result to
-        # NaT instead of falling back to t1, silently destroying label rows.
-        for col in ['sl', 'pt']:
+        # FIX: Unified Timezone Handling for min(axis=1)
+        tz = prices.index.tz
+        max_ts = pd.Timestamp('2100-01-01')
+        if tz is not None:
+            max_ts = max_ts.tz_localize(tz)
+        
+        # Replace NaTs with future infinity so min() works correctly
+        for col in ['sl', 'pt', 'early_exit']:
             if col in df_touches.columns:
-                df_touches[col] = df_touches[col].fillna(pd.Timestamp.max)
-        df_touches['out'] = df_touches[['t1', 'sl', 'pt']].min(axis=1)
-        df_touches = df_touches.dropna(subset=['out'])
-
-        # C-1: Filter to timestamps that exist in close.index. Holiday/half-day
-        # sessions can produce 'out' timestamps not in close.index; .loc[] raises
-        # KeyError and aborts the entire labeling run.
+                df_touches[col] = df_touches[col].fillna(max_ts)
+                
+        # Find the EARLIEST event that occurred
+        df_touches['out'] = df_touches[['t1', 'sl', 'pt', 'early_exit']].min(axis=1)
+        # Record WHICH barrier was hit (for accurate labeling)
+        df_touches['first_touch'] = df_touches[['t1', 'sl', 'pt', 'early_exit']].idxmin(axis=1)
+        
+        # Ensure 'out' is comparable with index
         df_touches = df_touches[df_touches['out'].isin(close.index)]
 
-        prices_out = close.loc[df_touches['out'].values].values
+        prices_out = close.loc[df_touches['out']].values
         prices_in = close.loc[df_touches.index].values
         
         out = pd.DataFrame(index=df_touches.index)
         out['ret'] = prices_out / prices_in - 1
         
-        # --- THE REALITY CHECK (Transaction Costs) ---
-        # 1 = Buy (Profit > Cost)
-        # 0 = Hold/Sell (Loss OR Profit < Cost)
-        
-        # For Binary Classification (Signal vs Noise):
-        # We only want to learn trades that clear the hurdle rate.
+        # Expose a clean 10-day forward return for the IC script
+        prices_t1 = close.loc[events.loc[out.index, 't1']].values
+        out['fwd_ret'] = prices_t1 / prices_in - 1
+
+        # --- STRICT BINARY LABELING ---
+        # 1 = True Breakout (Hit 2.5R Target OR timed out with >1.0 ATR profit)
+        # 0 = Noise/Loss (Hit Stop, Early Exit, or timed out with flat/negative return)
         out['bin'] = 0
-        out.loc[out['ret'] > self.tc_pct, 'bin'] = 1 
         
-        # Optional: Multiclass 
-        # out.loc[out['ret'] < -self.tc_pct, 'bin'] = -1 
+        hit_pt = df_touches['first_touch'] == 'pt'
+        survived_with_profit = (df_touches['first_touch'] == 't1') & (out['ret'] > events.loc[out.index, 'trgt'] * 1.0)
+        
+        out.loc[hit_pt | survived_with_profit, 'bin'] = 1 
         
         return out

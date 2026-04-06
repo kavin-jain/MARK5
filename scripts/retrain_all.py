@@ -35,13 +35,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger("MARK5.Retrain")
 
+from scripts.nifty50_universe import NIFTY_50, NIFTY_MIDCAP_TICKERS
+
 # ── Universe ──────────────────────────────────────────────────────────────────
-DEFAULT_SYMBOLS = [
-    "RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK",
-    "AXISBANK", "KOTAKBANK", "SBIN", "BAJFINANCE", "MARUTI",
-    "BHARTIARTL", "ASIANPAINT", "TITAN", "LT", "WIPRO",
-    "HCLTECH", "SUNPHARMA", "ULTRACEMCO", "HINDUNILVR", "ONGC",
-]
+# Combined 105-stock universe (NIFTY 50 + NIFTY Midcap 100)
+_N50 = [t.replace('.NS', '') for t in NIFTY_50.keys()]
+_MID = [t.replace('.NS', '') for t in NIFTY_MIDCAP_TICKERS]
+DEFAULT_SYMBOLS = sorted(list(set(_N50 + _MID)))
 
 def parse_args():
     p = argparse.ArgumentParser(description="MARK5 Full Model Retrain")
@@ -54,43 +54,15 @@ def parse_args():
 
 
 def is_model_corrupt(ticker_ns: str) -> bool:
-    """Returns True if the existing model for this ticker has corrupt scalers."""
-    import joblib
-    models_root = Path(PROJECT_ROOT) / "models"
-    path = models_root / ticker_ns
-    if not path.exists():
-        return True  # No model = needs training
-    versions = sorted(
-        [v for v in os.listdir(path) if v.startswith("v") and v[1:].isdigit()],
-        key=lambda x: int(x[1:]), reverse=True
-    )
-    if not versions:
-        return True
-    vdir = path / versions[0]
-    scaler_file = vdir / "scaler.pkl"
-    feat_file   = vdir / "features.json"
-    if not scaler_file.exists() or not feat_file.exists():
-        return True
-    try:
-        import json
-        scaler = joblib.load(scaler_file)
-        with open(feat_file) as f:
-            schema = json.load(f)
-        for i, feat in enumerate(schema):
-            mean = scaler.mean_[i]
-            std  = float(scaler.var_[i] ** 0.5)
-            if abs(mean) > 1e6 or std == 0.0:
-                return True
-        return False
-    except Exception:
-        return True
+    """Forced True: we need a full universe refresh with corrected feature logic."""
+    return True
 
 
 def fetch_ohlcv(symbol: str, years: float, adapter) -> pd.DataFrame:
-    """Fetch daily bars from Kite, cache as parquet."""
+    """Fetch 60m bars from Kite, cache as parquet."""
     cache_dir = Path(PROJECT_ROOT) / "data" / "cache"
     cache_dir.mkdir(parents=True, exist_ok=True)
-    cache_path = cache_dir / f"{symbol}_daily.parquet"
+    cache_path = cache_dir / f"{symbol}_60m.parquet"
 
     # Use recent cache if < 24h old
     if cache_path.exists() and (time.time() - cache_path.stat().st_mtime) < 86400:
@@ -102,29 +74,17 @@ def fetch_ohlcv(symbol: str, years: float, adapter) -> pd.DataFrame:
             pass
 
     try:
-        df = adapter.fetch_ohlcv(symbol, period=f"{int(years * 365)}d", interval="day")
-        if df is not None and len(df) >= 200:
+        # Fetch 60m data (adapter handle chunking)
+        df = adapter.fetch_ohlcv(symbol, period=f"{int(years * 365)}d", interval="60m")
+        if df is not None and len(df) >= 500: # Need more bars for 60m
             df.to_parquet(cache_path)
-            logger.info(f"{symbol}: fetched {len(df)} bars from Kite ✅")
+            logger.info(f"{symbol}: fetched {len(df)} 60m bars from Kite ✅")
             return df
     except Exception as e:
         logger.warning(f"{symbol}: Kite fetch failed — {e}")
 
-    # yfinance fallback
-    try:
-        import yfinance as yf
-        ticker_yf = f"{symbol}.NS"
-        df = yf.download(ticker_yf, period=f"{int(years)}y", interval="1d",
-                         auto_adjust=True, progress=False)
-        if df is not None and len(df) >= 200:
-            df.columns = [c.lower() for c in df.columns]
-            df = df[["open", "high", "low", "close", "volume"]]
-            df.to_parquet(cache_path)
-            logger.info(f"{symbol}: fetched {len(df)} bars from yfinance ⬇️")
-            return df
-    except Exception as e:
-        logger.error(f"{symbol}: All data sources failed — {e}")
-
+    # yfinance REMOVED per RULE 4
+    logger.error(f"{symbol}: Data source failed — {symbol} skipped.")
     return None
 
 
@@ -193,7 +153,7 @@ def main():
             if df.index.tz is not None:
                 df.index = df.index.tz_localize(None)
 
-            trainer = MARK5MLTrainer()
+            trainer = MARK5MLTrainer(kite_adapter=adapter)
             result  = trainer.train_advanced_ensemble(ticker_ns, df)
 
             elapsed = time.time() - t0

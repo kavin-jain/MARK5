@@ -54,16 +54,11 @@ from core.models.features import AdvancedFeatureEngine
 from core.models.registry import RobustModelRegistry as ModelRegistry
 from core.trading.risk_manager import FastRiskAnalyzer, RiskAlerts, PortfolioRiskAnalyzer
 from core.infrastructure.alerts import AlertManager, AlertLevel, AlertType
-from core.utils.intraday import (
-    generate_intraday_labels,
-    filter_trading_hours,
-    calculate_intraday_metrics,
-    is_market_open
-)
+from core.trading.market_utils import MarketStatusChecker
 
 # Import prediction engine
 try:
-    from core.prediction_engine import MARK5PredictionEngine
+    from core.models.predictor import MARK5Predictor
     PREDICTION_ENGINE_AVAILABLE = True
 except ImportError:
     PREDICTION_ENGINE_AVAILABLE = False
@@ -72,7 +67,7 @@ except ImportError:
 from core.trading.decision import DecisionEngine as MARK5DecisionEngine
 from core.analytics.journal import TradeJournal
 from core.infrastructure.database_manager import MARK5DatabaseManager
-from core.models.learning_engine import LearningEngine
+from core.models.training.engine import LearningEngine
 
 
 @dataclass
@@ -187,7 +182,7 @@ class AutonomousTrader:
         self.prediction_engine = None
         if PREDICTION_ENGINE_AVAILABLE:
             try:
-                self.prediction_engine = MARK5PredictionEngine()
+                self.prediction_engine = MARK5Predictor("NIFTY_50") # Will be overridden per ticker or we remove the global predictor if not needed
                 self.logger.info("✅ Prediction engine initialized")
             except Exception as e:
                 self.logger.error(f"❌ Prediction engine initialization failed: {e}")
@@ -198,7 +193,7 @@ class AutonomousTrader:
         self.logger.info("✅ Trade Journal initialized")
         
         # Learning Engine (for retraining)
-        self.learner = LearningEngine(self.db_manager, self.model_registry)
+        self.learner = LearningEngine(self.db_manager)
 
         # Decision Engine
         if self.prediction_engine:

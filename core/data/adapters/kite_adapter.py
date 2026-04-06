@@ -49,16 +49,19 @@ IST = pytz.timezone('Asia/Kolkata')
 
 # Well-known Kite instrument tokens for indices
 KITE_INDEX_TOKENS = {
-    'NIFTY50': 256265,       # NSE NIFTY 50
-    'NIFTYBANK': 260105,     # NSE NIFTY BANK
-    'INDIAVIX': 264969,      # NSE INDIA VIX
-    'SENSEX': 1,             # BSE SENSEX
+    'NIFTY 50': 256265,       # NSE NIFTY 50 (Standard name)
+    'NIFTY50': 256265,        # Alias
+    'NIFTY BANK': 260105,     # NSE NIFTY BANK
+    'NIFTYBANK': 260105,      # Alias
+    'INDIA VIX': 264969,      # NSE INDIA VIX
+    'INDIAVIX': 264969,       # Alias
+    'SENSEX': 1,              # BSE SENSEX
 }
 
 # Kite API max data per request (conservative limits)
-KITE_MAX_DAYS_MINUTE = 60    # Max 60 days for minute-level data
+KITE_MAX_DAYS_MINUTE = 400    # Max 400 days for 60minute data (official limit)
 KITE_MAX_DAYS_DAY = 2000     # Max ~5.5 years for daily data
-KITE_RATE_LIMIT_DELAY = 0.12 # 100ms+ between API calls (10 req/s limit)
+KITE_RATE_LIMIT_DELAY = 0.35 # 0.35s between API calls (per Roadmap)
 
 
 # =============================================================================
@@ -432,7 +435,7 @@ class KiteFeedAdapter(BaseFeed):
             to_date: Explicit end date (default: now IST)
             
         Returns:
-            DataFrame with DatetimeIndex (IST), columns=[open, high, low, close, volume]
+            DataFrame with DatetimeIndex (IST), columns=[open, high, low, close, volume, oi]
         """
         # Map common aliases to Kite expected strings
         interval_map = {
@@ -481,7 +484,7 @@ class KiteFeedAdapter(BaseFeed):
                     to_date=chunk_end.strftime('%Y-%m-%d %H:%M:%S'),
                     interval=interval,
                     continuous=False,
-                    oi=False
+                    oi=True  # Enabled per Engineering Roadmap
                 )
                 all_records.extend(records)
             except Exception as e:
@@ -513,7 +516,12 @@ class KiteFeedAdapter(BaseFeed):
         
         # Standardize column names to lowercase
         df.columns = [c.lower() for c in df.columns]
-        df = df[['open', 'high', 'low', 'close', 'volume']]
+        
+        # Keep OI if present (Rule 31: download but don't use as feature yet)
+        cols = ['open', 'high', 'low', 'close', 'volume']
+        if 'oi' in df.columns:
+            cols.append('oi')
+        df = df[cols]
         
         # Remove exact duplicates
         df = df[~df.index.duplicated(keep='last')]

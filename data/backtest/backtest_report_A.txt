@@ -1,0 +1,1512 @@
+======================================================================
+MARK5 FULL UNIVERSE BACKTEST REPORT  [Experiment A: 20-Day Hold]
+Period:    2024-10-01 → 2026-04-01
+Universe:  105 stocks (NIFTY50 + Midcap100)
+Generated: 2026-04-03 09:53 IST
+R:R Ratio: 2:1  |  Stop = 2×ATR  |  Target = 4×ATR
+Sharpe/DD: Daily NAV mark-to-market  (NOT per-trade estimates)
+======================================================================
+
+━━━ PORTFOLIO SUMMARY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Starting Capital:  ₹2,000,000.00
+  Final Capital:     ₹1,813,502.08
+  Total Return:            -9.32%
+  CAGR:                    -6.31%
+  Sharpe Ratio:           -1.244    (≥1.0 target, Rule 62) [daily NAV]
+  Max Drawdown:            10.31%   (≤18% target, Rule 62) [daily NAV]
+  Profit Factor:           0.661   (≥1.5 target, Rule 62)
+  Win Rate:                 32.6%   (≥44% target, Rule 62)
+
+  ─── Period & Benchmark Comparison ──────────────────────────────
+  Period:           2024-10-01 → 2026-03-20
+  Calendar days:    535 days  (17.6 months)
+  Trading sessions: 366 days
+  NIFTY50 start:     25,796.90  →   23,114.50
+  NIFTY50 B&H:         -10.40%  CAGR   -7.22%
+  MARK5 system:         -9.32%  CAGR   -6.31%
+  Alpha vs index:       +1.07%  CAGR   +0.91%
+
+  ─── Rule 62 Compliance ─────────────────────────────────────────
+  ❌ Sharpe ≥ 1.0             : -1.244
+  ✅ Max DD ≤ 18%             : 10.31%
+  ❌ Profit Factor ≥ 1.5      : 0.661
+  ❌ Win Rate ≥ 44%           : 32.6%
+
+━━━ TRADE STATISTICS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Total Trades:         129
+  Winners:              42  (32.6%)
+  Losers:               87
+  Avg Win:                +6.70%
+  Avg Loss:               -4.51%
+  Avg Hold Period:      11.7 days
+  Total Costs Paid:    ₹ 30,918.10
+
+  Exit Type Breakdown:
+    STOP_LOSS           :   63  (48.8%)
+    TIME_EXIT           :   37  (28.7%)
+    TARGET              :   15  (11.6%)
+    GAP_RISK            :   12  (9.3%)
+    STILL_OPEN_CLOSE    :    2  (1.6%)
+
+  Sector Exposure (all trades):
+    Metals              :   5 trades | ₹    28,735
+    IT                  :  14 trades | ₹    15,523
+    Other               :  21 trades | ₹    11,054
+    Energy              :   6 trades | ₹     4,143
+    Retail              :   3 trades | ₹     1,445
+    Telecom             :   6 trades | ₹    -9,060
+    Chemicals           :   3 trades | ₹   -12,842
+    Financials          :  15 trades | ₹   -17,420
+    Industrials         :  12 trades | ₹   -18,173
+    FMCG                :   8 trades | ₹   -28,394
+    Realty              :   5 trades | ₹   -29,092
+    Auto                :  17 trades | ₹   -56,064
+    Pharma              :  14 trades | ₹   -76,353
+
+━━━ TOP 10 STOCKS BY NET PNL ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Symbol             Trades    Win%   Avg Ret       Net PnL
+  ────────────────────────────────────────────────────────
+  COFORGE.NS              3  100.0%    +8.50%  ₹ 32,649.03
+  HINDALCO.NS             2  100.0%    +8.43%  ₹ 23,427.02
+  BSE.NS                  9   55.6%    +3.08%  ₹ 20,470.31
+  HAL.NS                  1  100.0%   +11.88%  ₹ 15,166.99
+  POWERGRID.NS            1  100.0%   +10.68%  ₹ 14,945.91
+  HEROMOTOCO.NS           3   66.7%    +3.42%  ₹ 14,163.15
+  TVSMOTOR.NS             1  100.0%    +8.91%  ₹ 12,366.57
+  PERSISTENT.NS           6   50.0%    +1.32%  ₹ 11,660.77
+  HDFCLIFE.NS             1  100.0%    +7.08%  ₹  9,835.19
+  NTPC.NS                 2  100.0%    +2.94%  ₹  8,218.62
+
+━━━ BOTTOM 5 STOCKS BY NET PNL ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Symbol             Trades    Win%   Avg Ret       Net PnL
+  ────────────────────────────────────────────────────────
+  MPHASIS.NS              3    0.0%    -4.29%  ₹-18,432.30
+  SUNPHARMA.NS            4    0.0%    -3.38%  ₹-19,374.21
+  TORNTPHARM.NS           4    0.0%    -4.27%  ₹-23,912.77
+  PRESTIGE.NS             5   20.0%    -4.05%  ₹-29,091.96
+  M&M.NS                  6    0.0%    -5.21%  ₹-44,887.71
+
+━━━ FULL TRADE JOURNAL ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  [001] TRENT.NS  —  ✅ WIN  [Sector: Retail]
+  ┌─ Signal:   2024-10-04  |  Regime: RANGING
+  ├─ Entry:    2024-10-07  |  ₹7314.51 × 20 shares  =  ₹146,290
+  ├─ Stops:    SL=₹6893.69  |  PT=₹8156.15  |  ATR=₹210.41  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7626  |  ML conf=73.8%
+  ├─ Why BUY:  Rank #11/105 | ML=73.7% ≥ gate=55% | Regime=RANGING | Sector=Retail | Score=+0.7626
+  ├─ Exit:     2024-10-09  |  TARGET @ ₹8156.15  (3d)
+  ├─ Why EXIT: Target hit at ₹8156.15
+  ├─ MFE/MAE:  Best=13.78%  |  Worst=-0.42%
+  └─ P&L:      Gross=₹16,832.80  |  Costs=₹273.49  |  Net=₹16,559.31  (+11.32%)
+
+  [002] BAJAJ-AUTO.NS  —  ❌ LOSS  [Sector: Auto]
+  ┌─ Signal:   2024-10-04  |  Regime: RANGING
+  ├─ Entry:    2024-10-07  |  ₹11489.24 × 13 shares  =  ₹149,360
+  ├─ Stops:    SL=₹10925.81  |  PT=₹12616.10  |  ATR=₹281.71  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7550  |  ML conf=82.7%
+  ├─ Why BUY:  Rank #12/105 | ML=82.6% ≥ gate=55% | Regime=RANGING | Sector=Auto | Score=+0.7550
+  ├─ Exit:     2024-10-17  |  GAP_RISK @ ₹10945.00  (9d)
+  ├─ Why EXIT: Gap down -3.4% > 3% threshold (Rule 26)
+  ├─ MFE/MAE:  Best=2.13%  |  Worst=-14.51%
+  └─ P&L:      Gross=₹-7,075.12  |  Costs=₹248.68  |  Net=₹-7,323.80  (-4.90%)
+
+  [003] COLPAL.NS  —  ❌ LOSS  [Sector: FMCG]
+  ┌─ Signal:   2024-10-04  |  Regime: RANGING
+  ├─ Entry:    2024-10-07  |  ₹3768.31 × 39 shares  =  ₹146,964
+  ├─ Stops:    SL=₹3581.82  |  PT=₹4141.28  |  ATR=₹93.24  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.1768  |  ML conf=60.2%
+  ├─ Why BUY:  Rank #6/105 | ML=60.2% ≥ gate=55% | Regime=RANGING | Sector=FMCG | Score=+1.1768
+  ├─ Exit:     2024-10-14  |  STOP_LOSS @ ₹3581.82  (6d)
+  ├─ Why EXIT: Stop hit at ₹3581.82 (stop was ₹3581.82)
+  ├─ MFE/MAE:  Best=0.18%  |  Worst=-7.12%
+  └─ P&L:      Gross=₹-7,273.11  |  Costs=₹245.07  |  Net=₹-7,518.18  (-5.12%)
+
+  [004] BSE.NS  —  ✅ WIN  [Sector: Other]
+  ┌─ Signal:   2024-10-04  |  Regime: RANGING
+  ├─ Entry:    2024-10-07  |  ₹1397.90 × 57 shares  =  ₹79,680
+  ├─ Stops:    SL=₹1187.83  |  PT=₹1818.04  |  ATR=₹105.04  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+3.7384  |  ML conf=57.6%
+  ├─ Why BUY:  Rank #1/105 | ML=57.6% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+3.7384
+  ├─ Exit:     2024-10-16  |  GAP_RISK @ ₹1525.00  (8d)
+  ├─ Why EXIT: Gap down -3.7% > 3% threshold (Rule 26)
+  ├─ MFE/MAE:  Best=19.00%  |  Worst=-9.83%
+  └─ P&L:      Gross=₹7,244.70  |  Costs=₹168.11  |  Net=₹7,076.59  (+8.88%)
+
+  [005] M&M.NS  —  ❌ LOSS  [Sector: Auto]
+  ┌─ Signal:   2024-10-04  |  Regime: RANGING
+  ├─ Entry:    2024-10-07  |  ₹3029.51 × 49 shares  =  ₹148,446
+  ├─ Stops:    SL=₹2837.07  |  PT=₹3414.40  |  ATR=₹96.22  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7229  |  ML conf=59.7%
+  ├─ Why BUY:  Rank #13/105 | ML=59.6% ≥ gate=55% | Regime=RANGING | Sector=Auto | Score=+0.7229
+  ├─ Exit:     2024-10-23  |  STOP_LOSS @ ₹2837.07  (13d)
+  ├─ Why EXIT: Stop hit at ₹2837.07 (stop was ₹2837.07)
+  ├─ MFE/MAE:  Best=6.30%  |  Worst=-8.19%
+  └─ P&L:      Gross=₹-9,429.56  |  Costs=₹244.53  |  Net=₹-9,674.09  (-6.52%)
+
+  [006] SUNPHARMA.NS  —  ❌ LOSS  [Sector: Pharma]
+  ┌─ Signal:   2024-10-11  |  Regime: RANGING
+  ├─ Entry:    2024-10-14  |  ₹1903.95 × 78 shares  =  ₹148,508
+  ├─ Stops:    SL=₹1832.96  |  PT=₹2045.94  |  ATR=₹35.50  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6832  |  ML conf=87.4%
+  ├─ Why BUY:  Rank #12/105 | ML=87.4% ≥ gate=55% | Regime=RANGING | Sector=Pharma | Score=+0.6832
+  ├─ Exit:     2024-10-23  |  STOP_LOSS @ ₹1832.96  (8d)
+  ├─ Why EXIT: Stop hit at ₹1832.96 (stop was ₹1832.96)
+  ├─ MFE/MAE:  Best=1.03%  |  Worst=-3.78%
+  └─ P&L:      Gross=₹-5,537.22  |  Costs=₹249.36  |  Net=₹-5,786.58  (-3.90%)
+
+  [007] TRENT.NS  —  ❌ LOSS  [Sector: Retail]
+  ┌─ Signal:   2024-10-18  |  Regime: RANGING
+  ├─ Entry:    2024-10-21  |  ₹7827.82 × 19 shares  =  ₹148,729
+  ├─ Stops:    SL=₹7286.22  |  PT=₹8911.02  |  ATR=₹270.80  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6709  |  ML conf=73.8%
+  ├─ Why BUY:  Rank #15/105 | ML=73.8% ≥ gate=55% | Regime=RANGING | Sector=Retail | Score=+0.6709
+  ├─ Exit:     2024-10-25  |  STOP_LOSS @ ₹7286.22  (5d)
+  ├─ Why EXIT: Stop hit at ₹7286.22 (stop was ₹7286.22)
+  ├─ MFE/MAE:  Best=0.28%  |  Worst=-9.76%
+  └─ P&L:      Gross=₹-10,290.40  |  Costs=₹243.88  |  Net=₹-10,534.28  (-7.08%)
+
+  [008] DIXON.NS  —  ❌ LOSS  [Sector: Industrials]
+  ┌─ Signal:   2024-10-18  |  Regime: RANGING
+  ├─ Entry:    2024-10-21  |  ₹15485.47 × 9 shares  =  ₹139,369
+  ├─ Stops:    SL=₹14601.85  |  PT=₹17252.71  |  ATR=₹441.81  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.4150  |  ML conf=56.6%
+  ├─ Why BUY:  Rank #3/105 | ML=56.6% ≥ gate=55% | Regime=RANGING | Sector=Industrials | Score=+1.4150
+  ├─ Exit:     2024-10-25  |  STOP_LOSS @ ₹14601.85  (5d)
+  ├─ Why EXIT: Stop hit at ₹14601.85 (stop was ₹14601.85)
+  ├─ MFE/MAE:  Best=2.68%  |  Worst=-15.65%
+  └─ P&L:      Gross=₹-7,952.58  |  Costs=₹233.56  |  Net=₹-8,186.14  (-5.87%)
+
+  [009] TORNTPHARM.NS  —  ❌ LOSS  [Sector: Pharma]
+  ┌─ Signal:   2024-10-25  |  Regime: VOLATILE
+  ├─ Entry:    2024-10-28  |  ₹3438.43 × 43 shares  =  ₹147,852
+  ├─ Stops:    SL=₹3252.09  |  PT=₹3811.12  |  ATR=₹93.17  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4514  |  ML conf=57.8%
+  ├─ Why BUY:  Rank #14/105 | ML=57.8% ≥ gate=55% | Regime=VOLATILE | Sector=Pharma | Score=+0.4514
+  ├─ Exit:     2024-10-29  |  STOP_LOSS @ ₹3252.09  (2d)
+  ├─ Why EXIT: Stop hit at ₹3252.09 (stop was ₹3252.09)
+  ├─ MFE/MAE:  Best=2.13%  |  Worst=-8.07%
+  └─ P&L:      Gross=₹-8,012.62  |  Costs=₹245.42  |  Net=₹-8,258.04  (-5.58%)
+
+  [010] SUNPHARMA.NS  —  ❌ LOSS  [Sector: Pharma]
+  ┌─ Signal:   2024-10-25  |  Regime: VOLATILE
+  ├─ Entry:    2024-10-28  |  ₹1864.13 × 79 shares  =  ₹147,266
+  ├─ Stops:    SL=₹1795.46  |  PT=₹2001.47  |  ATR=₹34.34  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4580  |  ML conf=88.4%
+  ├─ Why BUY:  Rank #13/105 | ML=88.4% ≥ gate=55% | Regime=VOLATILE | Sector=Pharma | Score=+0.4580
+  ├─ Exit:     2024-11-04  |  STOP_LOSS @ ₹1795.46  (6d)
+  ├─ Why EXIT: Stop hit at ₹1795.46 (stop was ₹1795.46)
+  ├─ MFE/MAE:  Best=3.14%  |  Worst=-5.58%
+  └─ P&L:      Gross=₹-5,424.93  |  Costs=₹247.75  |  Net=₹-5,672.68  (-3.85%)
+
+  [011] BSE.NS  —  ✅ WIN  [Sector: Other]
+  ┌─ Signal:   2024-10-18  |  Regime: RANGING
+  ├─ Entry:    2024-10-21  |  ₹1441.94 × 53 shares  =  ₹76,423
+  ├─ Stops:    SL=₹1216.58  |  PT=₹1892.65  |  ATR=₹112.68  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.5255  |  ML conf=57.5%
+  ├─ Why BUY:  Rank #2/105 | ML=57.5% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+1.5255
+  ├─ Exit:     2024-11-18  |  TIME_EXIT @ ₹1568.50  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=14.88%  |  Worst=-7.69%
+  └─ P&L:      Gross=₹6,707.68  |  Costs=₹162.88  |  Net=₹6,544.80  (+8.56%)
+
+  [012] DRREDDY.NS  —  ❌ LOSS  [Sector: Pharma]
+  ┌─ Signal:   2024-11-08  |  Regime: VOLATILE
+  ├─ Entry:    2024-11-11  |  ₹1284.64 × 105 shares  =  ₹134,887
+  ├─ Stops:    SL=₹1204.83  |  PT=₹1444.25  |  ATR=₹39.90  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4801  |  ML conf=57.2%
+  ├─ Why BUY:  Rank #14/105 | ML=57.2% ≥ gate=55% | Regime=VOLATILE | Sector=Pharma | Score=+0.4801
+  ├─ Exit:     2024-11-18  |  STOP_LOSS @ ₹1204.83  (5d)
+  ├─ Why EXIT: Stop hit at ₹1204.83 (stop was ₹1204.83)
+  ├─ MFE/MAE:  Best=0.83%  |  Worst=-8.91%
+  └─ P&L:      Gross=₹-8,380.05  |  Costs=₹226.74  |  Net=₹-8,606.79  (-6.38%)
+
+  [013] PERSISTENT.NS  —  ✅ WIN  [Sector: IT]
+  ┌─ Signal:   2024-10-25  |  Regime: VOLATILE
+  ├─ Entry:    2024-10-28  |  ₹5660.66 × 26 shares  =  ₹147,177
+  ├─ Stops:    SL=₹5241.58  |  PT=₹6498.82  |  ATR=₹209.54  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.2157  |  ML conf=74.4%
+  ├─ Why BUY:  Rank #4/105 | ML=74.4% ≥ gate=55% | Regime=VOLATILE | Sector=IT | Score=+1.2157
+  ├─ Exit:     2024-11-26  |  TIME_EXIT @ ₹5968.95  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=6.20%  |  Worst=-6.41%
+  └─ P&L:      Gross=₹8,015.54  |  Costs=₹264.00  |  Net=₹7,751.54  (+5.27%)
+
+  [014] DIXON.NS  —  ✅ WIN  [Sector: Industrials]
+  ┌─ Signal:   2024-10-25  |  Regime: VOLATILE
+  ├─ Entry:    2024-10-28  |  ₹14114.10 × 6 shares  =  ₹84,685
+  ├─ Stops:    SL=₹12855.45  |  PT=₹16631.40  |  ATR=₹629.33  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7354  |  ML conf=58.5%
+  ├─ Why BUY:  Rank #9/105 | ML=58.5% ≥ gate=55% | Regime=VOLATILE | Sector=Industrials | Score=+0.7354
+  ├─ Exit:     2024-11-26  |  TIME_EXIT @ ₹15501.10  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=13.14%  |  Worst=-2.86%
+  └─ P&L:      Gross=₹8,322.00  |  Costs=₹176.46  |  Net=₹8,145.54  (+9.62%)
+
+  [015] COFORGE.NS  —  ✅ WIN  [Sector: IT]
+  ┌─ Signal:   2024-11-01  |  Regime: VOLATILE
+  ├─ Entry:    2024-11-04  |  ₹1514.51 × 77 shares  =  ₹116,617
+  ├─ Stops:    SL=₹1406.30  |  PT=₹1730.94  |  ATR=₹54.11  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.8557  |  ML conf=56.8%
+  ├─ Why BUY:  Rank #6/105 | ML=56.8% ≥ gate=55% | Regime=VOLATILE | Sector=IT | Score=+0.8557
+  ├─ Exit:     2024-11-26  |  TARGET @ ₹1730.94  (15d)
+  ├─ Why EXIT: Target hit at ₹1730.94
+  ├─ MFE/MAE:  Best=14.62%  |  Worst=-1.35%
+  └─ P&L:      Gross=₹16,665.11  |  Costs=₹231.55  |  Net=₹16,433.56  (+14.09%)
+
+  [016] BSE.NS  —  ❌ LOSS  [Sector: Other]
+  ┌─ Signal:   2024-11-22  |  Regime: RANGING
+  ├─ Entry:    2024-11-25  |  ₹1615.11 × 85 shares  =  ₹137,284
+  ├─ Stops:    SL=₹1475.68  |  PT=₹1893.97  |  ATR=₹69.71  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7330  |  ML conf=57.8%
+  ├─ Why BUY:  Rank #4/105 | ML=57.8% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+0.7330
+  ├─ Exit:     2024-11-26  |  STOP_LOSS @ ₹1475.68  (2d)
+  ├─ Why EXIT: Stop hit at ₹1475.68 (stop was ₹1475.68)
+  ├─ MFE/MAE:  Best=2.25%  |  Worst=-9.36%
+  └─ P&L:      Gross=₹-11,851.55  |  Costs=₹225.88  |  Net=₹-12,077.43  (-8.80%)
+
+  [017] CIPLA.NS  —  ❌ LOSS  [Sector: Pharma]
+  ┌─ Signal:   2024-11-29  |  Regime: RANGING
+  ├─ Entry:    2024-12-02  |  ₹1532.77 × 96 shares  =  ₹147,146
+  ├─ Stops:    SL=₹1465.25  |  PT=₹1667.81  |  ATR=₹33.76  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4367  |  ML conf=75.1%
+  ├─ Why BUY:  Rank #15/105 | ML=75.1% ≥ gate=55% | Regime=RANGING | Sector=Pharma | Score=+0.4367
+  ├─ Exit:     2024-12-10  |  STOP_LOSS @ ₹1465.25  (7d)
+  ├─ Why EXIT: Stop hit at ₹1465.25 (stop was ₹1465.25)
+  ├─ MFE/MAE:  Best=1.08%  |  Worst=-5.25%
+  └─ P&L:      Gross=₹-6,481.92  |  Costs=₹246.29  |  Net=₹-6,728.21  (-4.57%)
+
+  [018] PERSISTENT.NS  —  ✅ WIN  [Sector: IT]
+  ┌─ Signal:   2024-11-29  |  Regime: RANGING
+  ├─ Entry:    2024-12-02  |  ₹5911.56 × 25 shares  =  ₹147,789
+  ├─ Stops:    SL=₹5633.77  |  PT=₹6467.13  |  ATR=₹138.89  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4746  |  ML conf=66.4%
+  ├─ Why BUY:  Rank #14/105 | ML=66.4% ≥ gate=55% | Regime=RANGING | Sector=IT | Score=+0.4746
+  ├─ Exit:     2024-12-12  |  TARGET @ ₹6467.13  (9d)
+  ├─ Why EXIT: Target hit at ₹6467.13
+  ├─ MFE/MAE:  Best=10.11%  |  Worst=-0.98%
+  └─ P&L:      Gross=₹13,889.25  |  Costs=₹272.02  |  Net=₹13,617.23  (+9.21%)
+
+  [019] M&M.NS  —  ❌ LOSS  [Sector: Auto]
+  ┌─ Signal:   2024-11-22  |  Regime: RANGING
+  ├─ Entry:    2024-11-25  |  ₹3076.54 × 47 shares  =  ₹144,597
+  ├─ Stops:    SL=₹2855.55  |  PT=₹3518.51  |  ATR=₹110.49  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7423  |  ML conf=59.2%
+  ├─ Why BUY:  Rank #3/105 | ML=59.3% ≥ gate=55% | Regime=RANGING | Sector=Auto | Score=+0.7423
+  ├─ Exit:     2024-12-20  |  TIME_EXIT @ ₹2906.35  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=2.38%  |  Worst=-6.18%
+  └─ P&L:      Gross=₹-7,998.93  |  Costs=₹240.86  |  Net=₹-8,239.79  (-5.70%)
+
+  [020] MPHASIS.NS  —  ❌ LOSS  [Sector: IT]
+  ┌─ Signal:   2024-12-13  |  Regime: TRENDING
+  ├─ Entry:    2024-12-16  |  ₹3147.74 × 47 shares  =  ₹147,944
+  ├─ Stops:    SL=₹3010.28  |  PT=₹3422.65  |  ATR=₹68.73  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4315  |  ML conf=62.5%
+  ├─ Why BUY:  Rank #15/105 | ML=62.5% ≥ gate=55% | Regime=TRENDING | Sector=IT | Score=+0.4315
+  ├─ Exit:     2024-12-19  |  STOP_LOSS @ ₹3010.28  (4d)
+  ├─ Why EXIT: Stop hit at ₹3010.28 (stop was ₹3010.28)
+  ├─ MFE/MAE:  Best=0.55%  |  Worst=-5.46%
+  └─ P&L:      Gross=₹-6,460.62  |  Costs=₹247.44  |  Net=₹-6,708.06  (-4.53%)
+
+  [021] ETERNAL.NS  —  ❌ LOSS  [Sector: FMCG]
+  ┌─ Signal:   2024-11-29  |  Regime: RANGING
+  ├─ Entry:    2024-12-02  |  ₹282.04 × 526 shares  =  ₹148,353
+  ├─ Stops:    SL=₹260.75  |  PT=₹324.62  |  ATR=₹10.64  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7099  |  ML conf=62.9%
+  ├─ Why BUY:  Rank #8/105 | ML=62.9% ≥ gate=55% | Regime=RANGING | Sector=FMCG | Score=+0.7099
+  ├─ Exit:     2024-12-30  |  TIME_EXIT @ ₹282.10  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=8.03%  |  Worst=-4.59%
+  └─ P&L:      Gross=₹31.56  |  Costs=₹255.93  |  Net=₹-224.37  (-0.15%)
+
+  [022] LT.NS  —  ❌ LOSS  [Sector: Industrials]
+  ┌─ Signal:   2024-11-29  |  Regime: RANGING
+  ├─ Entry:    2024-12-02  |  ₹3708.70 × 40 shares  =  ₹148,348
+  ├─ Stops:    SL=₹3545.86  |  PT=₹4034.39  |  ATR=₹81.42  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.5531  |  ML conf=59.5%
+  ├─ Why BUY:  Rank #11/105 | ML=59.5% ≥ gate=55% | Regime=RANGING | Sector=Industrials | Score=+0.5531
+  ├─ Exit:     2024-12-30  |  TIME_EXIT @ ₹3578.95  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=6.87%  |  Worst=-3.85%
+  └─ P&L:      Gross=₹-5,190.00  |  Costs=₹249.56  |  Net=₹-5,439.56  (-3.67%)
+
+  [023] PRESTIGE.NS  —  ❌ LOSS  [Sector: Realty]
+  ┌─ Signal:   2024-12-20  |  Regime: RANGING
+  ├─ Entry:    2024-12-23  |  ₹1779.53 × 83 shares  =  ₹147,701
+  ├─ Stops:    SL=₹1666.32  |  PT=₹2005.94  |  ATR=₹56.60  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.5592  |  ML conf=69.6%
+  ├─ Why BUY:  Rank #14/105 | ML=69.6% ≥ gate=55% | Regime=RANGING | Sector=Realty | Score=+0.5592
+  ├─ Exit:     2024-12-30  |  STOP_LOSS @ ₹1666.32  (5d)
+  ├─ Why EXIT: Stop hit at ₹1666.32 (stop was ₹1666.32)
+  ├─ MFE/MAE:  Best=0.42%  |  Worst=-7.17%
+  └─ P&L:      Gross=₹-9,396.43  |  Costs=₹243.52  |  Net=₹-9,639.95  (-6.53%)
+
+  [024] M&M.NS  —  ❌ LOSS  [Sector: Auto]
+  ┌─ Signal:   2025-01-03  |  Regime: RANGING
+  ├─ Entry:    2025-01-06  |  ₹3211.20 × 45 shares  =  ₹144,504
+  ├─ Stops:    SL=₹3064.04  |  PT=₹3505.53  |  ATR=₹73.58  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6721  |  ML conf=58.9%
+  ├─ Why BUY:  Rank #14/105 | ML=58.9% ≥ gate=55% | Regime=RANGING | Sector=Auto | Score=+0.6721
+  ├─ Exit:     2025-01-08  |  STOP_LOSS @ ₹3064.04  (3d)
+  ├─ Why EXIT: Stop hit at ₹3064.04 (stop was ₹3064.04)
+  ├─ MFE/MAE:  Best=0.74%  |  Worst=-4.80%
+  └─ P&L:      Gross=₹-6,622.20  |  Costs=₹242.41  |  Net=₹-6,864.61  (-4.75%)
+
+  [025] EICHERMOT.NS  —  ❌ LOSS  [Sector: Auto]
+  ┌─ Signal:   2025-01-03  |  Regime: RANGING
+  ├─ Entry:    2025-01-06  |  ₹5313.41 × 27 shares  =  ₹143,462
+  ├─ Stops:    SL=₹5069.06  |  PT=₹5802.11  |  ATR=₹122.17  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.4315  |  ML conf=56.9%
+  ├─ Why BUY:  Rank #6/105 | ML=56.8% ≥ gate=55% | Regime=RANGING | Sector=Auto | Score=+1.4315
+  ├─ Exit:     2025-01-10  |  STOP_LOSS @ ₹5069.06  (5d)
+  ├─ Why EXIT: Stop hit at ₹5069.06 (stop was ₹5069.06)
+  ├─ MFE/MAE:  Best=0.69%  |  Worst=-5.15%
+  └─ P&L:      Gross=₹-6,597.45  |  Costs=₹240.97  |  Net=₹-6,838.42  (-4.77%)
+
+  [026] MUTHOOTFIN.NS  —  ❌ LOSS  [Sector: Financials]
+  ┌─ Signal:   2024-12-13  |  Regime: TRENDING
+  ├─ Entry:    2024-12-16  |  ₹2097.35 × 71 shares  =  ₹148,912
+  ├─ Stops:    SL=₹2004.33  |  PT=₹2283.39  |  ATR=₹46.51  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.0220  |  ML conf=60.6%
+  ├─ Why BUY:  Rank #7/105 | ML=60.6% ≥ gate=55% | Regime=TRENDING | Sector=Financials | Score=+1.0220
+  ├─ Exit:     2025-01-13  |  TIME_EXIT @ ₹2096.50  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=8.47%  |  Worst=-3.69%
+  └─ P&L:      Gross=₹-60.35  |  Costs=₹256.60  |  Net=₹-316.95  (-0.21%)
+
+  [027] PERSISTENT.NS  —  ❌ LOSS  [Sector: IT]
+  ┌─ Signal:   2024-12-20  |  Regime: RANGING
+  ├─ Entry:    2024-12-23  |  ₹6419.56 × 23 shares  =  ₹147,650
+  ├─ Stops:    SL=₹6087.72  |  PT=₹7083.23  |  ATR=₹165.92  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.9637  |  ML conf=68.2%
+  ├─ Why BUY:  Rank #8/105 | ML=68.2% ≥ gate=55% | Regime=RANGING | Sector=IT | Score=+0.9637
+  ├─ Exit:     2025-01-13  |  STOP_LOSS @ ₹6087.72  (15d)
+  ├─ Why EXIT: Stop hit at ₹6087.72 (stop was ₹6087.72)
+  ├─ MFE/MAE:  Best=5.44%  |  Worst=-6.77%
+  └─ P&L:      Gross=₹-7,632.32  |  Costs=₹245.60  |  Net=₹-7,877.92  (-5.34%)
+
+  [028] DRREDDY.NS  —  ❌ LOSS  [Sector: Pharma]
+  ┌─ Signal:   2025-01-03  |  Regime: RANGING
+  ├─ Entry:    2025-01-06  |  ₹1361.08 × 107 shares  =  ₹145,636
+  ├─ Stops:    SL=₹1294.13  |  PT=₹1494.98  |  ATR=₹33.48  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7418  |  ML conf=57.3%
+  ├─ Why BUY:  Rank #13/105 | ML=57.3% ≥ gate=55% | Regime=RANGING | Sector=Pharma | Score=+0.7418
+  ├─ Exit:     2025-01-17  |  STOP_LOSS @ ₹1294.13  (10d)
+  ├─ Why EXIT: Stop hit at ₹1294.13 (stop was ₹1294.13)
+  ├─ MFE/MAE:  Best=3.29%  |  Worst=-5.37%
+  └─ P&L:      Gross=₹-7,163.65  |  Costs=₹243.34  |  Net=₹-7,406.99  (-5.09%)
+
+  [029] BSE.NS  —  ❌ LOSS  [Sector: Other]
+  ┌─ Signal:   2025-01-17  |  Regime: RANGING
+  ├─ Entry:    2025-01-20  |  ₹2025.52 × 71 shares  =  ₹143,812
+  ├─ Stops:    SL=₹1868.45  |  PT=₹2339.66  |  ATR=₹78.54  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.2359  |  ML conf=57.6%
+  ├─ Why BUY:  Rank #3/105 | ML=57.6% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+1.2359
+  ├─ Exit:     2025-01-22  |  STOP_LOSS @ ₹1868.45  (3d)
+  ├─ Why EXIT: Stop hit at ₹1868.45 (stop was ₹1868.45)
+  ├─ MFE/MAE:  Best=0.94%  |  Worst=-7.83%
+  └─ P&L:      Gross=₹-11,151.97  |  Costs=₹235.91  |  Net=₹-11,387.88  (-7.92%)
+
+  [030] GODREJCP.NS  —  ❌ LOSS  [Sector: FMCG]
+  ┌─ Signal:   2025-01-10  |  Regime: BEAR
+  ├─ Entry:    2025-01-13  |  ₹1166.17 × 123 shares  =  ₹143,439
+  ├─ Stops:    SL=₹1115.20  |  PT=₹1268.11  |  ATR=₹25.49  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6316  |  ML conf=72.3%
+  ├─ Why BUY:  Rank #11/105 | ML=72.3% ≥ gate=70% | Regime=BEAR | Sector=FMCG | Score=+0.6316
+  ├─ Exit:     2025-01-27  |  STOP_LOSS @ ₹1115.20  (11d)
+  ├─ Why EXIT: Stop hit at ₹1115.20 (stop was ₹1115.20)
+  ├─ MFE/MAE:  Best=2.68%  |  Worst=-5.89%
+  └─ P&L:      Gross=₹-6,269.31  |  Costs=₹241.34  |  Net=₹-6,510.65  (-4.54%)
+
+  [031] BHARTIARTL.NS  —  ❌ LOSS  [Sector: Telecom]
+  ┌─ Signal:   2025-01-17  |  Regime: RANGING
+  ├─ Entry:    2025-01-20  |  ₹1638.82 × 88 shares  =  ₹144,216
+  ├─ Stops:    SL=₹1576.88  |  PT=₹1762.69  |  ATR=₹30.97  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4268  |  ML conf=69.2%
+  ├─ Why BUY:  Rank #15/105 | ML=69.2% ≥ gate=55% | Regime=RANGING | Sector=Telecom | Score=+0.4268
+  ├─ Exit:     2025-01-31  |  STOP_LOSS @ ₹1576.88  (10d)
+  ├─ Why EXIT: Stop hit at ₹1576.88 (stop was ₹1576.88)
+  ├─ MFE/MAE:  Best=1.41%  |  Worst=-3.94%
+  └─ P&L:      Gross=₹-5,450.72  |  Costs=₹243.43  |  Net=₹-5,694.15  (-3.95%)
+
+  [032] ASIANPAINT.NS  —  ❌ LOSS  [Sector: Chemicals]
+  ┌─ Signal:   2025-01-17  |  Regime: RANGING
+  ├─ Entry:    2025-01-20  |  ₹2273.39 × 63 shares  =  ₹143,224
+  ├─ Stops:    SL=₹2178.19  |  PT=₹2463.79  |  ATR=₹47.60  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.5441  |  ML conf=63.9%
+  ├─ Why BUY:  Rank #11/105 | ML=63.9% ≥ gate=55% | Regime=RANGING | Sector=Chemicals | Score=+0.5441
+  ├─ Exit:     2025-02-05  |  GAP_RISK @ ₹2269.00  (14d)
+  ├─ Why EXIT: Gap down -3.6% > 3% threshold (Rule 26)
+  ├─ MFE/MAE:  Best=6.39%  |  Worst=-2.70%
+  └─ P&L:      Gross=₹-276.57  |  Costs=₹248.34  |  Net=₹-524.91  (-0.37%)
+
+  [033] BAJAJFINSV.NS  —  ❌ LOSS  [Sector: Financials]
+  ┌─ Signal:   2025-01-24  |  Regime: RANGING
+  ├─ Entry:    2025-01-27  |  ₹1715.71 × 83 shares  =  ₹142,404
+  ├─ Stops:    SL=₹1634.04  |  PT=₹1879.05  |  ATR=₹40.84  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6664  |  ML conf=57.9%
+  ├─ Why BUY:  Rank #12/105 | ML=57.9% ≥ gate=55% | Regime=RANGING | Sector=Financials | Score=+0.6664
+  ├─ Exit:     2025-02-01  |  STOP_LOSS @ ₹1634.04  (6d)
+  ├─ Why EXIT: Stop hit at ₹1634.04 (stop was ₹1634.04)
+  ├─ MFE/MAE:  Best=8.18%  |  Worst=-5.75%
+  └─ P&L:      Gross=₹-6,778.61  |  Costs=₹239.26  |  Net=₹-7,017.87  (-4.93%)
+
+  [034] MUTHOOTFIN.NS  —  ✅ WIN  [Sector: Financials]
+  ┌─ Signal:   2025-01-17  |  Regime: RANGING
+  ├─ Entry:    2025-01-20  |  ₹2152.30 × 67 shares  =  ₹144,204
+  ├─ Stops:    SL=₹2023.86  |  PT=₹2409.17  |  ATR=₹64.22  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6471  |  ML conf=60.9%
+  ├─ Why BUY:  Rank #8/105 | ML=60.9% ≥ gate=55% | Regime=RANGING | Sector=Financials | Score=+0.6471
+  ├─ Exit:     2025-02-13  |  TIME_EXIT @ ₹2317.80  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=8.48%  |  Worst=-2.52%
+  └─ P&L:      Gross=₹11,088.50  |  Costs=₹263.56  |  Net=₹10,824.94  (+7.51%)
+
+  [035] TITAN.NS  —  ❌ LOSS  [Sector: Other]
+  ┌─ Signal:   2025-01-31  |  Regime: RANGING
+  ├─ Entry:    2025-02-01  |  ₹3528.76 × 40 shares  =  ₹141,150
+  ├─ Stops:    SL=₹3369.46  |  PT=₹3847.36  |  ATR=₹79.65  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.5510  |  ML conf=60.7%
+  ├─ Why BUY:  Rank #13/105 | ML=60.7% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+0.5510
+  ├─ Exit:     2025-02-10  |  STOP_LOSS @ ₹3369.46  (7d)
+  ├─ Why EXIT: Stop hit at ₹3369.46 (stop was ₹3369.46)
+  ├─ MFE/MAE:  Best=3.49%  |  Worst=-6.17%
+  └─ P&L:      Gross=₹-6,372.00  |  Costs=₹237.99  |  Net=₹-6,609.99  (-4.68%)
+
+  [036] M&M.NS  —  ❌ LOSS  [Sector: Auto]
+  ┌─ Signal:   2025-02-07  |  Regime: RANGING
+  ├─ Entry:    2025-02-10  |  ₹3210.80 × 44 shares  =  ₹141,275
+  ├─ Stops:    SL=₹3015.34  |  PT=₹3601.73  |  ATR=₹97.73  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6529  |  ML conf=58.8%
+  ├─ Why BUY:  Rank #10/105 | ML=58.7% ≥ gate=55% | Regime=RANGING | Sector=Auto | Score=+0.6529
+  ├─ Exit:     2025-02-12  |  STOP_LOSS @ ₹3015.34  (3d)
+  ├─ Why EXIT: Stop hit at ₹3015.34 (stop was ₹3015.34)
+  ├─ MFE/MAE:  Best=1.87%  |  Worst=-7.96%
+  └─ P&L:      Gross=₹-8,600.24  |  Costs=₹235.45  |  Net=₹-8,835.69  (-6.25%)
+
+  [037] BHARTIARTL.NS  —  ❌ LOSS  [Sector: Telecom]
+  ┌─ Signal:   2025-01-31  |  Regime: RANGING
+  ├─ Entry:    2025-02-01  |  ₹1627.81 × 87 shares  =  ₹141,619
+  ├─ Stops:    SL=₹1556.27  |  PT=₹1770.90  |  ATR=₹35.77  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4050  |  ML conf=68.8%
+  ├─ Why BUY:  Rank #15/105 | ML=68.8% ≥ gate=55% | Regime=RANGING | Sector=Telecom | Score=+0.4050
+  ├─ Exit:     2025-02-28  |  TIME_EXIT @ ₹1570.20  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=6.18%  |  Worst=-4.20%
+  └─ P&L:      Gross=₹-5,012.07  |  Costs=₹240.31  |  Net=₹-5,252.38  (-3.71%)
+
+  [038] MRF.NS  —  ❌ LOSS  [Sector: Other]
+  ┌─ Signal:   2025-02-14  |  Regime: RANGING
+  ├─ Entry:    2025-02-17  |  ₹109309.20 × 1 shares  =  ₹109,309
+  ├─ Stops:    SL=₹104381.00  |  PT=₹119165.60  |  ATR=₹2464.10  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.5265  |  ML conf=61.2%
+  ├─ Why BUY:  Rank #15/105 | ML=61.1% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+0.5265
+  ├─ Exit:     2025-02-28  |  STOP_LOSS @ ₹104381.00  (9d)
+  ├─ Why EXIT: Stop hit at ₹104381.00 (stop was ₹104381.00)
+  ├─ MFE/MAE:  Best=1.00%  |  Worst=-5.02%
+  └─ P&L:      Gross=₹-4,928.20  |  Costs=₹194.96  |  Net=₹-5,123.16  (-4.69%)
+
+  [039] MARUTI.NS  —  ❌ LOSS  [Sector: Auto]
+  ┌─ Signal:   2025-02-14  |  Regime: RANGING
+  ├─ Entry:    2025-02-17  |  ₹12607.90 × 11 shares  =  ₹138,687
+  ├─ Stops:    SL=₹12020.95  |  PT=₹13781.80  |  ATR=₹293.48  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.9492  |  ML conf=57.7%
+  ├─ Why BUY:  Rank #4/105 | ML=57.7% ≥ gate=55% | Regime=RANGING | Sector=Auto | Score=+0.9492
+  ├─ Exit:     2025-02-28  |  STOP_LOSS @ ₹12020.95  (9d)
+  ├─ Why EXIT: Stop hit at ₹12020.95 (stop was ₹12020.95)
+  ├─ MFE/MAE:  Best=2.20%  |  Worst=-6.32%
+  └─ P&L:      Gross=₹-6,456.45  |  Costs=₹234.42  |  Net=₹-6,690.87  (-4.82%)
+
+  [040] BAJAJFINSV.NS  —  ✅ WIN  [Sector: Financials]
+  ┌─ Signal:   2025-02-07  |  Regime: RANGING
+  ├─ Entry:    2025-02-10  |  ₹1805.80 × 78 shares  =  ₹140,852
+  ├─ Stops:    SL=₹1689.29  |  PT=₹2038.81  |  ATR=₹58.25  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.5796  |  ML conf=57.8%
+  ├─ Why BUY:  Rank #12/105 | ML=57.8% ≥ gate=55% | Regime=RANGING | Sector=Financials | Score=+0.5796
+  ├─ Exit:     2025-03-10  |  TIME_EXIT @ ₹1840.35  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=7.37%  |  Worst=-4.35%
+  └─ P&L:      Gross=₹2,694.90  |  Costs=₹248.62  |  Net=₹2,446.28  (+1.74%)
+
+  [041] BERGEPAINT.NS  —  ❌ LOSS  [Sector: Chemicals]
+  ┌─ Signal:   2025-03-07  |  Regime: VOLATILE
+  ├─ Entry:    2025-03-10  |  ₹509.71 × 275 shares  =  ₹140,170
+  ├─ Stops:    SL=₹484.15  |  PT=₹560.82  |  ATR=₹12.78  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.9756  |  ML conf=57.6%
+  ├─ Why BUY:  Rank #7/105 | ML=57.6% ≥ gate=55% | Regime=VOLATILE | Sector=Chemicals | Score=+0.9756
+  ├─ Exit:     2025-03-12  |  STOP_LOSS @ ₹484.15  (3d)
+  ├─ Why EXIT: Stop hit at ₹484.15 (stop was ₹484.15)
+  ├─ MFE/MAE:  Best=0.98%  |  Worst=-5.73%
+  └─ P&L:      Gross=₹-7,029.00  |  Costs=₹235.81  |  Net=₹-7,264.81  (-5.18%)
+
+  [042] BHARTIARTL.NS  —  ❌ LOSS  [Sector: Telecom]
+  ┌─ Signal:   2025-03-21  |  Regime: RANGING
+  ├─ Entry:    2025-03-24  |  ₹1740.87 × 80 shares  =  ₹139,270
+  ├─ Stops:    SL=₹1660.08  |  PT=₹1902.46  |  ATR=₹40.40  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6680  |  ML conf=64.5%
+  ├─ Why BUY:  Rank #15/105 | ML=64.5% ≥ gate=55% | Regime=RANGING | Sector=Telecom | Score=+0.6680
+  ├─ Exit:     2025-03-28  |  STOP_LOSS @ ₹1660.08  (5d)
+  ├─ Why EXIT: Stop hit at ₹1660.08 (stop was ₹1660.08)
+  ├─ MFE/MAE:  Best=1.39%  |  Worst=-4.65%
+  └─ P&L:      Gross=₹-6,463.20  |  Costs=₹235.24  |  Net=₹-6,698.44  (-4.81%)
+
+  [043] POWERGRID.NS  —  ✅ WIN  [Sector: Energy]
+  ┌─ Signal:   2025-03-14  |  Regime: VOLATILE
+  ├─ Entry:    2025-03-17  |  ₹270.14 × 518 shares  =  ₹139,933
+  ├─ Stops:    SL=₹255.46  |  PT=₹299.50  |  ATR=₹7.34  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.3919  |  ML conf=58.7%
+  ├─ Why BUY:  Rank #14/105 | ML=58.7% ≥ gate=55% | Regime=VOLATILE | Sector=Energy | Score=+0.3919
+  ├─ Exit:     2025-04-03  |  TARGET @ ₹299.50  (13d)
+  ├─ Why EXIT: Target hit at ₹299.50
+  ├─ MFE/MAE:  Best=11.04%  |  Worst=-1.92%
+  └─ P&L:      Gross=₹15,208.48  |  Costs=₹262.57  |  Net=₹14,945.91  (+10.68%)
+
+  [044] BAJAJFINSV.NS  —  ❌ LOSS  [Sector: Financials]
+  ┌─ Signal:   2025-03-28  |  Regime: TRENDING
+  ├─ Entry:    2025-04-01  |  ₹1999.00 × 69 shares  =  ₹137,931
+  ├─ Stops:    SL=₹1897.74  |  PT=₹2201.53  |  ATR=₹50.63  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7219  |  ML conf=57.5%
+  ├─ Why BUY:  Rank #10/105 | ML=57.5% ≥ gate=55% | Regime=TRENDING | Sector=Financials | Score=+0.7219
+  ├─ Exit:     2025-04-04  |  STOP_LOSS @ ₹1897.74  (4d)
+  ├─ Why EXIT: Stop hit at ₹1897.74 (stop was ₹1897.74)
+  ├─ MFE/MAE:  Best=0.15%  |  Worst=-5.10%
+  └─ P&L:      Gross=₹-6,986.94  |  Costs=₹232.71  |  Net=₹-7,219.65  (-5.23%)
+
+  [045] APOLLOTYRE.NS  —  ❌ LOSS  [Sector: Auto]
+  ┌─ Signal:   2025-03-07  |  Regime: VOLATILE
+  ├─ Entry:    2025-03-10  |  ₹411.91 × 341 shares  =  ₹140,461
+  ├─ Stops:    SL=₹386.54  |  PT=₹462.65  |  ATR=₹12.69  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4524  |  ML conf=66.8%
+  ├─ Why BUY:  Rank #14/105 | ML=66.7% ≥ gate=55% | Regime=VOLATILE | Sector=Auto | Score=+0.4524
+  ├─ Exit:     2025-04-07  |  GAP_RISK @ ₹375.00  (19d)
+  ├─ Why EXIT: Gap down -8.1% > 3% threshold (Rule 26)
+  ├─ MFE/MAE:  Best=6.98%  |  Worst=-8.96%
+  └─ P&L:      Gross=₹-12,586.31  |  Costs=₹229.45  |  Net=₹-12,815.76  (-9.12%)
+
+  [046] MRF.NS  —  ✅ WIN  [Sector: Other]
+  ┌─ Signal:   2025-03-07  |  Regime: VOLATILE
+  ├─ Entry:    2025-03-10  |  ₹107946.84 × 1 shares  =  ₹107,947
+  ├─ Stops:    SL=₹103740.00  |  PT=₹116360.51  |  ATR=₹2103.42  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6227  |  ML conf=59.3%
+  ├─ Why BUY:  Rank #10/105 | ML=59.3% ≥ gate=55% | Regime=VOLATILE | Sector=Other | Score=+0.6227
+  ├─ Exit:     2025-04-08  |  TIME_EXIT @ ₹112592.40  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=7.46%  |  Worst=-2.92%
+  └─ P&L:      Gross=₹4,645.56  |  Costs=₹204.71  |  Net=₹4,440.85  (+4.11%)
+
+  [047] SHRIRAMFIN.NS  —  ❌ LOSS  [Sector: Other]
+  ┌─ Signal:   2025-03-07  |  Regime: VOLATILE
+  ├─ Entry:    2025-03-10  |  ₹631.87 × 205 shares  =  ₹129,533
+  ├─ Stops:    SL=₹592.38  |  PT=₹710.84  |  ATR=₹19.74  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.2314  |  ML conf=57.8%
+  ├─ Why BUY:  Rank #3/105 | ML=57.8% ≥ gate=55% | Regime=VOLATILE | Sector=Other | Score=+1.2314
+  ├─ Exit:     2025-04-07  |  GAP_RISK @ ₹596.00  (19d)
+  ├─ Why EXIT: Gap down -8.8% > 3% threshold (Rule 26)
+  ├─ MFE/MAE:  Best=9.99%  |  Worst=-6.75%
+  └─ P&L:      Gross=₹-7,353.35  |  Costs=₹220.46  |  Net=₹-7,573.81  (-5.85%)
+
+  [048] BHARTIARTL.NS  —  ✅ WIN  [Sector: Telecom]
+  ┌─ Signal:   2025-04-04  |  Regime: RANGING
+  ├─ Entry:    2025-04-07  |  ₹1730.87 × 81 shares  =  ₹140,200
+  ├─ Stops:    SL=₹1650.39  |  PT=₹1891.83  |  ATR=₹40.24  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.5789  |  ML conf=60.6%
+  ├─ Why BUY:  Rank #14/105 | ML=60.6% ≥ gate=55% | Regime=RANGING | Sector=Telecom | Score=+0.5789
+  ├─ Exit:     2025-04-17  |  TARGET @ ₹1891.83  (7d)
+  ├─ Why EXIT: Target hit at ₹1891.83
+  ├─ MFE/MAE:  Best=9.64%  |  Worst=-3.55%
+  └─ P&L:      Gross=₹13,037.76  |  Costs=₹260.30  |  Net=₹12,777.46  (+9.11%)
+
+  [049] GODREJCP.NS  —  ❌ LOSS  [Sector: FMCG]
+  ┌─ Signal:   2025-04-11  |  Regime: RANGING
+  ├─ Entry:    2025-04-15  |  ₹1235.93 × 112 shares  =  ₹138,424
+  ├─ Stops:    SL=₹1147.69  |  PT=₹1412.40  |  ATR=₹44.12  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.9240  |  ML conf=57.0%
+  ├─ Why BUY:  Rank #4/105 | ML=57.0% ≥ gate=55% | Regime=RANGING | Sector=FMCG | Score=+0.9240
+  ├─ Exit:     2025-05-09  |  GAP_RISK @ ₹1200.00  (17d)
+  ├─ Why EXIT: Gap down -3.3% > 3% threshold (Rule 26)
+  ├─ MFE/MAE:  Best=4.20%  |  Worst=-3.30%
+  └─ P&L:      Gross=₹-4,024.16  |  Costs=₹237.02  |  Net=₹-4,261.18  (-3.08%)
+
+  [050] BSE.NS  —  ✅ WIN  [Sector: Other]
+  ┌─ Signal:   2025-04-11  |  Regime: RANGING
+  ├─ Entry:    2025-04-15  |  ₹1918.92 × 54 shares  =  ₹103,622
+  ├─ Stops:    SL=₹1714.13  |  PT=₹2328.49  |  ATR=₹102.39  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+2.0240  |  ML conf=57.7%
+  ├─ Why BUY:  Rank #1/105 | ML=57.7% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+2.0240
+  ├─ Exit:     2025-05-12  |  TARGET @ ₹2328.49  (18d)
+  ├─ Why EXIT: Target hit at ₹2328.49
+  ├─ MFE/MAE:  Best=22.41%  |  Worst=-0.62%
+  └─ P&L:      Gross=₹22,116.78  |  Costs=₹219.91  |  Net=₹21,896.87  (+21.13%)
+
+  [051] HAL.NS  —  ✅ WIN  [Sector: Other]
+  ┌─ Signal:   2025-04-11  |  Regime: RANGING
+  ├─ Entry:    2025-04-15  |  ₹4254.25 × 30 shares  =  ₹127,628
+  ├─ Stops:    SL=₹3899.64  |  PT=₹4963.48  |  ATR=₹177.31  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4975  |  ML conf=55.5%
+  ├─ Why BUY:  Rank #11/105 | ML=55.5% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+0.4975
+  ├─ Exit:     2025-05-14  |  TIME_EXIT @ ₹4768.00  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=12.78%  |  Worst=-2.51%
+  └─ P&L:      Gross=₹15,412.50  |  Costs=₹245.51  |  Net=₹15,166.99  (+11.88%)
+
+  [052] HDFCLIFE.NS  —  ✅ WIN  [Sector: Financials]
+  ┌─ Signal:   2025-04-11  |  Regime: RANGING
+  ├─ Entry:    2025-04-15  |  ₹691.50 × 201 shares  =  ₹138,992
+  ├─ Stops:    SL=₹659.06  |  PT=₹756.37  |  ATR=₹16.22  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4539  |  ML conf=55.4%
+  ├─ Why BUY:  Rank #15/105 | ML=55.4% ≥ gate=55% | Regime=RANGING | Sector=Financials | Score=+0.4539
+  ├─ Exit:     2025-05-14  |  TIME_EXIT @ ₹741.70  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=8.46%  |  Worst=-0.17%
+  └─ P&L:      Gross=₹10,090.20  |  Costs=₹255.01  |  Net=₹9,835.19  (+7.08%)
+
+  [053] BHARTIARTL.NS  —  ❌ LOSS  [Sector: Telecom]
+  ┌─ Signal:   2025-04-18  |  Regime: VOLATILE
+  ├─ Entry:    2025-04-21  |  ₹1899.35 × 73 shares  =  ₹138,653
+  ├─ Stops:    SL=₹1798.40  |  PT=₹2101.25  |  ATR=₹50.48  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.0237  |  ML conf=59.4%
+  ├─ Why BUY:  Rank #3/105 | ML=59.4% ≥ gate=55% | Regime=VOLATILE | Sector=Telecom | Score=+1.0237
+  ├─ Exit:     2025-05-19  |  TIME_EXIT @ ₹1818.30  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=0.93%  |  Worst=-4.91%
+  └─ P&L:      Gross=₹-5,916.65  |  Costs=₹235.03  |  Net=₹-6,151.68  (-4.44%)
+
+  [054] APOLLOTYRE.NS  —  ❌ LOSS  [Sector: Auto]
+  ┌─ Signal:   2025-05-09  |  Regime: TRENDING
+  ├─ Entry:    2025-05-12  |  ₹475.47 × 293 shares  =  ₹139,313
+  ├─ Stops:    SL=₹443.53  |  PT=₹539.34  |  ATR=₹15.97  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6264  |  ML conf=69.3%
+  ├─ Why BUY:  Rank #13/105 | ML=69.3% ≥ gate=55% | Regime=TRENDING | Sector=Auto | Score=+0.6264
+  ├─ Exit:     2025-06-06  |  TIME_EXIT @ ₹471.20  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=7.22%  |  Worst=-3.96%
+  └─ P&L:      Gross=₹-1,251.11  |  Costs=₹241.65  |  Net=₹-1,492.76  (-1.07%)
+
+  [055] BSE.NS  —  ✅ WIN  [Sector: Other]
+  ┌─ Signal:   2025-05-16  |  Regime: TRENDING
+  ├─ Entry:    2025-05-19  |  ₹2440.94 × 58 shares  =  ₹141,575
+  ├─ Stops:    SL=₹2242.01  |  PT=₹2838.80  |  ATR=₹99.46  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.3079  |  ML conf=57.6%
+  ├─ Why BUY:  Rank #3/105 | ML=57.7% ≥ gate=55% | Regime=TRENDING | Sector=Other | Score=+1.3079
+  ├─ Exit:     2025-06-05  |  TARGET @ ₹2838.80  (14d)
+  ├─ Why EXIT: Target hit at ₹2838.80
+  ├─ MFE/MAE:  Best=19.54%  |  Worst=-5.84%
+  └─ P&L:      Gross=₹23,075.88  |  Costs=₹274.47  |  Net=₹22,801.41  (+16.11%)
+
+  [056] M&M.NS  —  ❌ LOSS  [Sector: Auto]
+  ┌─ Signal:   2025-05-16  |  Regime: TRENDING
+  ├─ Entry:    2025-05-19  |  ₹3116.56 × 45 shares  =  ₹140,245
+  ├─ Stops:    SL=₹2927.96  |  PT=₹3493.76  |  ATR=₹94.30  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.9239  |  ML conf=59.7%
+  ├─ Why BUY:  Rank #7/105 | ML=59.7% ≥ gate=55% | Regime=TRENDING | Sector=Auto | Score=+0.9239
+  ├─ Exit:     2025-06-13  |  TIME_EXIT @ ₹3006.00  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=1.30%  |  Worst=-5.92%
+  └─ P&L:      Gross=₹-4,975.20  |  Costs=₹238.42  |  Net=₹-5,213.62  (-3.72%)
+
+  [057] SBILIFE.NS  —  ❌ LOSS  [Sector: Financials]
+  ┌─ Signal:   2025-05-16  |  Regime: TRENDING
+  ├─ Entry:    2025-05-19  |  ₹1773.99 × 80 shares  =  ₹141,919
+  ├─ Stops:    SL=₹1689.96  |  PT=₹1942.05  |  ATR=₹42.01  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6719  |  ML conf=59.2%
+  ├─ Why BUY:  Rank #12/105 | ML=59.2% ≥ gate=55% | Regime=TRENDING | Sector=Financials | Score=+0.6719
+  ├─ Exit:     2025-06-13  |  TIME_EXIT @ ₹1755.20  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=3.38%  |  Worst=-3.04%
+  └─ P&L:      Gross=₹-1,503.20  |  Costs=₹245.01  |  Net=₹-1,748.21  (-1.23%)
+
+  [058] PRESTIGE.NS  —  ❌ LOSS  [Sector: Realty]
+  ┌─ Signal:   2025-06-06  |  Regime: RANGING
+  ├─ Entry:    2025-06-09  |  ₹1756.45 × 82 shares  =  ₹144,029
+  ├─ Stops:    SL=₹1646.01  |  PT=₹1977.34  |  ATR=₹55.22  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+2.0574  |  ML conf=67.0%
+  ├─ Why BUY:  Rank #4/105 | ML=67.0% ≥ gate=55% | Regime=RANGING | Sector=Realty | Score=+2.0574
+  ├─ Exit:     2025-06-12  |  STOP_LOSS @ ₹1646.01  (4d)
+  ├─ Why EXIT: Stop hit at ₹1646.01 (stop was ₹1646.01)
+  ├─ MFE/MAE:  Best=0.00%  |  Worst=-7.68%
+  └─ P&L:      Gross=₹-9,056.08  |  Costs=₹238.77  |  Net=₹-9,294.85  (-6.45%)
+
+  [059] COFORGE.NS  —  ✅ WIN  [Sector: IT]
+  ┌─ Signal:   2025-05-23  |  Regime: RANGING
+  ├─ Entry:    2025-05-26  |  ₹1674.17 × 85 shares  =  ₹142,304
+  ├─ Stops:    SL=₹1560.46  |  PT=₹1901.60  |  ATR=₹56.86  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6231  |  ML conf=63.8%
+  ├─ Why BUY:  Rank #12/105 | ML=63.8% ≥ gate=55% | Regime=RANGING | Sector=IT | Score=+0.6231
+  ├─ Exit:     2025-06-20  |  TIME_EXIT @ ₹1832.00  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=13.19%  |  Worst=-1.06%
+  └─ P&L:      Gross=₹13,415.55  |  Costs=₹263.72  |  Net=₹13,151.83  (+9.24%)
+
+  [060] CUMMINSIND.NS  —  ❌ LOSS  [Sector: Industrials]
+  ┌─ Signal:   2025-06-06  |  Regime: RANGING
+  ├─ Entry:    2025-06-09  |  ₹3403.40 × 42 shares  =  ₹142,943
+  ├─ Stops:    SL=₹3236.39  |  PT=₹3737.43  |  ATR=₹83.51  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.8868  |  ML conf=58.3%
+  ├─ Why BUY:  Rank #10/105 | ML=58.3% ≥ gate=55% | Regime=RANGING | Sector=Industrials | Score=+0.8868
+  ├─ Exit:     2025-06-19  |  STOP_LOSS @ ₹3236.39  (9d)
+  ├─ Why EXIT: Stop hit at ₹3236.39 (stop was ₹3236.39)
+  ├─ MFE/MAE:  Best=0.47%  |  Worst=-5.26%
+  └─ P&L:      Gross=₹-7,014.42  |  Costs=₹239.73  |  Net=₹-7,254.15  (-5.08%)
+
+  [061] BSE.NS  —  ❌ LOSS  [Sector: Other]
+  ┌─ Signal:   2025-06-13  |  Regime: RANGING
+  ├─ Entry:    2025-06-16  |  ₹2727.73 × 52 shares  =  ₹141,842
+  ├─ Stops:    SL=₹2514.82  |  PT=₹3153.56  |  ATR=₹106.46  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.8007  |  ML conf=57.6%
+  ├─ Why BUY:  Rank #9/105 | ML=57.6% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+0.8007
+  ├─ Exit:     2025-06-18  |  GAP_RISK @ ₹2525.00  (3d)
+  ├─ Why EXIT: Gap down -5.2% > 3% threshold (Rule 26)
+  ├─ MFE/MAE:  Best=1.51%  |  Worst=-8.35%
+  └─ P&L:      Gross=₹-10,541.96  |  Costs=₹233.89  |  Net=₹-10,775.85  (-7.60%)
+
+  [062] TRENT.NS  —  ❌ LOSS  [Sector: Retail]
+  ┌─ Signal:   2025-06-20  |  Regime: RANGING
+  ├─ Entry:    2025-06-23  |  ₹5855.85 × 24 shares  =  ₹140,540
+  ├─ Stops:    SL=₹5543.71  |  PT=₹6480.14  |  ATR=₹156.07  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6588  |  ML conf=73.8%
+  ├─ Why BUY:  Rank #15/105 | ML=73.8% ≥ gate=55% | Regime=RANGING | Sector=Retail | Score=+0.6588
+  ├─ Exit:     2025-07-04  |  GAP_RISK @ ₹5675.00  (10d)
+  ├─ Why EXIT: Gap down -8.3% > 3% threshold (Rule 26)
+  ├─ MFE/MAE:  Best=6.92%  |  Worst=-8.64%
+  └─ P&L:      Gross=₹-4,340.40  |  Costs=₹239.61  |  Net=₹-4,580.01  (-3.26%)
+
+  [063] PRESTIGE.NS  —  ✅ WIN  [Sector: Realty]
+  ┌─ Signal:   2025-06-13  |  Regime: RANGING
+  ├─ Entry:    2025-06-16  |  ₹1646.64 × 86 shares  =  ₹141,611
+  ├─ Stops:    SL=₹1521.08  |  PT=₹1897.75  |  ATR=₹62.78  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.3896  |  ML conf=68.2%
+  ├─ Why BUY:  Rank #6/105 | ML=68.1% ≥ gate=55% | Regime=RANGING | Sector=Realty | Score=+1.3896
+  ├─ Exit:     2025-07-11  |  TIME_EXIT @ ₹1695.00  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=6.95%  |  Worst=-3.93%
+  └─ P&L:      Gross=₹4,158.96  |  Costs=₹251.47  |  Net=₹3,907.49  (+2.76%)
+
+  [064] MUTHOOTFIN.NS  —  ✅ WIN  [Sector: Financials]
+  ┌─ Signal:   2025-06-13  |  Regime: RANGING
+  ├─ Entry:    2025-06-16  |  ₹2605.60 × 54 shares  =  ₹140,702
+  ├─ Stops:    SL=₹2455.16  |  PT=₹2906.49  |  ATR=₹75.22  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.8976  |  ML conf=62.7%
+  ├─ Why BUY:  Rank #3/105 | ML=62.7% ≥ gate=55% | Regime=RANGING | Sector=Financials | Score=+1.8976
+  ├─ Exit:     2025-07-11  |  TIME_EXIT @ ₹2640.60  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=3.30%  |  Worst=-3.44%
+  └─ P&L:      Gross=₹1,890.00  |  Costs=₹247.43  |  Net=₹1,642.57  (+1.17%)
+
+  [065] PERSISTENT.NS  —  ❌ LOSS  [Sector: IT]
+  ┌─ Signal:   2025-06-20  |  Regime: RANGING
+  ├─ Entry:    2025-06-23  |  ₹6072.07 × 23 shares  =  ₹139,658
+  ├─ Stops:    SL=₹5750.21  |  PT=₹6715.78  |  ATR=₹160.93  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7360  |  ML conf=61.6%
+  ├─ Why BUY:  Rank #13/105 | ML=61.6% ≥ gate=55% | Regime=RANGING | Sector=IT | Score=+0.7360
+  ├─ Exit:     2025-07-08  |  STOP_LOSS @ ₹5750.21  (12d)
+  ├─ Why EXIT: Stop hit at ₹5750.21 (stop was ₹5750.21)
+  ├─ MFE/MAE:  Best=1.78%  |  Worst=-5.55%
+  └─ P&L:      Gross=₹-7,402.78  |  Costs=₹234.64  |  Net=₹-7,637.42  (-5.47%)
+
+  [066] APOLLOHOSP.NS  —  ❌ LOSS  [Sector: Pharma]
+  ┌─ Signal:   2025-07-04  |  Regime: RANGING
+  ├─ Entry:    2025-07-07  |  ₹7566.28 × 18 shares  =  ₹136,193
+  ├─ Stops:    SL=₹7304.28  |  PT=₹8090.28  |  ATR=₹131.00  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.1851  |  ML conf=57.7%
+  ├─ Why BUY:  Rank #6/105 | ML=57.7% ≥ gate=55% | Regime=RANGING | Sector=Pharma | Score=+1.1851
+  ├─ Exit:     2025-07-11  |  STOP_LOSS @ ₹7304.28  (5d)
+  ├─ Why EXIT: Stop hit at ₹7304.28 (stop was ₹7304.28)
+  ├─ MFE/MAE:  Best=0.91%  |  Worst=-5.38%
+  └─ P&L:      Gross=₹-4,716.00  |  Costs=₹233.04  |  Net=₹-4,949.04  (-3.63%)
+
+  [067] COFORGE.NS  —  ✅ WIN  [Sector: IT]
+  ┌─ Signal:   2025-06-20  |  Regime: RANGING
+  ├─ Entry:    2025-06-23  |  ₹1816.81 × 78 shares  =  ₹141,711
+  ├─ Stops:    SL=₹1705.95  |  PT=₹2038.52  |  ATR=₹55.43  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.0657  |  ML conf=67.3%
+  ├─ Why BUY:  Rank #9/105 | ML=67.3% ≥ gate=55% | Regime=RANGING | Sector=IT | Score=+1.0657
+  ├─ Exit:     2025-07-18  |  TIME_EXIT @ ₹1859.30  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=9.75%  |  Worst=-0.62%
+  └─ P&L:      Gross=₹3,314.22  |  Costs=₹250.58  |  Net=₹3,063.64  (+2.16%)
+
+  [068] GODREJCP.NS  —  ❌ LOSS  [Sector: FMCG]
+  ┌─ Signal:   2025-07-11  |  Regime: RANGING
+  ├─ Entry:    2025-07-14  |  ₹1289.29 × 110 shares  =  ₹141,822
+  ├─ Stops:    SL=₹1239.50  |  PT=₹1388.86  |  ATR=₹24.89  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.8609  |  ML conf=76.2%
+  ├─ Why BUY:  Rank #12/105 | ML=76.2% ≥ gate=55% | Regime=RANGING | Sector=FMCG | Score=+0.8609
+  ├─ Exit:     2025-07-21  |  STOP_LOSS @ ₹1239.50  (6d)
+  ├─ Why EXIT: Stop hit at ₹1239.50 (stop was ₹1239.50)
+  ├─ MFE/MAE:  Best=0.00%  |  Worst=-4.10%
+  └─ P&L:      Gross=₹-5,476.90  |  Costs=₹240.03  |  Net=₹-5,716.93  (-4.03%)
+
+  [069] MPHASIS.NS  —  ❌ LOSS  [Sector: IT]
+  ┌─ Signal:   2025-07-11  |  Regime: RANGING
+  ├─ Entry:    2025-07-14  |  ₹2830.83 × 50 shares  =  ₹141,542
+  ├─ Stops:    SL=₹2708.33  |  PT=₹3075.83  |  ATR=₹61.25  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.1612  |  ML conf=64.6%
+  ├─ Why BUY:  Rank #7/105 | ML=64.7% ≥ gate=55% | Regime=RANGING | Sector=IT | Score=+1.1612
+  ├─ Exit:     2025-07-24  |  STOP_LOSS @ ₹2708.33  (9d)
+  ├─ Why EXIT: Stop hit at ₹2708.33 (stop was ₹2708.33)
+  ├─ MFE/MAE:  Best=2.83%  |  Worst=-7.23%
+  └─ P&L:      Gross=₹-6,125.00  |  Costs=₹238.84  |  Net=₹-6,363.84  (-4.50%)
+
+  [070] PRESTIGE.NS  —  ❌ LOSS  [Sector: Realty]
+  ┌─ Signal:   2025-07-18  |  Regime: RANGING
+  ├─ Entry:    2025-07-21  |  ₹1783.98 × 79 shares  =  ₹140,934
+  ├─ Stops:    SL=₹1693.62  |  PT=₹1964.69  |  ATR=₹45.18  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.1084  |  ML conf=72.4%
+  ├─ Why BUY:  Rank #5/105 | ML=72.4% ≥ gate=55% | Regime=RANGING | Sector=Realty | Score=+1.1084
+  ├─ Exit:     2025-07-24  |  STOP_LOSS @ ₹1693.62  (4d)
+  ├─ Why EXIT: Stop hit at ₹1693.62 (stop was ₹1693.62)
+  ├─ MFE/MAE:  Best=1.68%  |  Worst=-5.54%
+  └─ P&L:      Gross=₹-7,138.44  |  Costs=₹236.76  |  Net=₹-7,375.20  (-5.23%)
+
+  [071] BEL.NS  —  ❌ LOSS  [Sector: Other]
+  ┌─ Signal:   2025-07-11  |  Regime: RANGING
+  ├─ Entry:    2025-07-14  |  ₹405.70 × 349 shares  =  ₹141,589
+  ├─ Stops:    SL=₹386.82  |  PT=₹443.46  |  ATR=₹9.44  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6045  |  ML conf=55.3%
+  ├─ Why BUY:  Rank #15/105 | ML=55.3% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+0.6045
+  ├─ Exit:     2025-07-28  |  STOP_LOSS @ ₹386.82  (11d)
+  ├─ Why EXIT: Stop hit at ₹386.82 (stop was ₹386.82)
+  ├─ MFE/MAE:  Best=1.77%  |  Worst=-5.52%
+  └─ P&L:      Gross=₹-6,589.12  |  Costs=₹238.35  |  Net=₹-6,827.47  (-4.82%)
+
+  [072] CUMMINSIND.NS  —  ✅ WIN  [Sector: Industrials]
+  ┌─ Signal:   2025-07-11  |  Regime: RANGING
+  ├─ Entry:    2025-07-14  |  ₹3570.57 × 39 shares  =  ₹139,252
+  ├─ Stops:    SL=₹3419.31  |  PT=₹3873.08  |  ATR=₹75.63  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.1429  |  ML conf=60.0%
+  ├─ Why BUY:  Rank #8/105 | ML=59.9% ≥ gate=55% | Regime=RANGING | Sector=Industrials | Score=+1.1429
+  ├─ Exit:     2025-08-08  |  TARGET @ ₹3873.08  (20d)
+  ├─ Why EXIT: Target hit at ₹3873.08
+  ├─ MFE/MAE:  Best=9.23%  |  Worst=-2.96%
+  └─ P&L:      Gross=₹11,797.89  |  Costs=₹257.46  |  Net=₹11,540.43  (+8.29%)
+
+  [073] ETERNAL.NS  —  ❌ LOSS  [Sector: FMCG]
+  ┌─ Signal:   2025-07-25  |  Regime: VOLATILE
+  ├─ Entry:    2025-07-28  |  ₹310.16 × 428 shares  =  ₹132,748
+  ├─ Stops:    SL=₹289.64  |  PT=₹351.20  |  ATR=₹10.26  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+2.8452  |  ML conf=62.6%
+  ├─ Why BUY:  Rank #1/105 | ML=62.6% ≥ gate=55% | Regime=VOLATILE | Sector=FMCG | Score=+2.8452
+  ├─ Exit:     2025-08-07  |  STOP_LOSS @ ₹289.64  (9d)
+  ├─ Why EXIT: Stop hit at ₹289.64 (stop was ₹289.64)
+  ├─ MFE/MAE:  Best=0.67%  |  Worst=-7.02%
+  └─ P&L:      Gross=₹-8,782.56  |  Costs=₹223.24  |  Net=₹-9,005.80  (-6.78%)
+
+  [074] TORNTPHARM.NS  —  ❌ LOSS  [Sector: Pharma]
+  ┌─ Signal:   2025-07-25  |  Regime: VOLATILE
+  ├─ Entry:    2025-07-28  |  ₹3625.32 × 38 shares  =  ₹137,762
+  ├─ Stops:    SL=₹3498.79  |  PT=₹3878.38  |  ATR=₹63.26  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.5680  |  ML conf=59.4%
+  ├─ Why BUY:  Rank #3/105 | ML=59.4% ≥ gate=55% | Regime=VOLATILE | Sector=Pharma | Score=+1.5680
+  ├─ Exit:     2025-08-07  |  STOP_LOSS @ ₹3490.20  (9d)
+  ├─ Why EXIT: Stop hit at ₹3490.20 (stop was ₹3498.79)
+  ├─ MFE/MAE:  Best=4.48%  |  Worst=-3.73%
+  └─ P&L:      Gross=₹-5,134.56  |  Costs=₹234.73  |  Net=₹-5,369.29  (-3.90%)
+
+  [075] DIXON.NS  —  ❌ LOSS  [Sector: Industrials]
+  ┌─ Signal:   2025-07-25  |  Regime: VOLATILE
+  ├─ Entry:    2025-07-28  |  ₹16765.75 × 8 shares  =  ₹134,126
+  ├─ Stops:    SL=₹16096.61  |  PT=₹18104.04  |  ATR=₹334.57  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.3684  |  ML conf=57.3%
+  ├─ Why BUY:  Rank #4/105 | ML=57.3% ≥ gate=55% | Regime=VOLATILE | Sector=Industrials | Score=+1.3684
+  ├─ Exit:     2025-08-08  |  STOP_LOSS @ ₹16096.61  (10d)
+  ├─ Why EXIT: Stop hit at ₹16096.61 (stop was ₹16096.61)
+  ├─ MFE/MAE:  Best=2.29%  |  Worst=-5.70%
+  └─ P&L:      Gross=₹-5,353.12  |  Costs=₹229.35  |  Net=₹-5,582.47  (-4.16%)
+
+  [076] MUTHOOTFIN.NS  —  ❌ LOSS  [Sector: Financials]
+  ┌─ Signal:   2025-08-08  |  Regime: VOLATILE
+  ├─ Entry:    2025-08-11  |  ₹2607.81 × 53 shares  =  ₹138,214
+  ├─ Stops:    SL=₹2487.15  |  PT=₹2849.12  |  ATR=₹60.33  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6962  |  ML conf=67.5%
+  ├─ Why BUY:  Rank #6/105 | ML=67.5% ≥ gate=55% | Regime=VOLATILE | Sector=Financials | Score=+0.6962
+  ├─ Exit:     2025-08-13  |  STOP_LOSS @ ₹2487.15  (3d)
+  ├─ Why EXIT: Stop hit at ₹2487.15 (stop was ₹2487.15)
+  ├─ MFE/MAE:  Best=0.71%  |  Worst=-5.03%
+  └─ P&L:      Gross=₹-6,394.98  |  Costs=₹233.83  |  Net=₹-6,628.81  (-4.80%)
+
+  [077] TVSMOTOR.NS  —  ✅ WIN  [Sector: Auto]
+  ┌─ Signal:   2025-08-01  |  Regime: VOLATILE
+  ├─ Entry:    2025-08-04  |  ₹2892.89 × 48 shares  =  ₹138,859
+  ├─ Stops:    SL=₹2768.56  |  PT=₹3141.55  |  ATR=₹62.16  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4269  |  ML conf=62.3%
+  ├─ Why BUY:  Rank #15/105 | ML=62.3% ≥ gate=55% | Regime=VOLATILE | Sector=Auto | Score=+0.4269
+  ├─ Exit:     2025-08-18  |  TARGET @ ₹3155.90  (10d)
+  ├─ Why EXIT: Target hit at ₹3155.90
+  ├─ MFE/MAE:  Best=12.54%  |  Worst=-0.36%
+  └─ P&L:      Gross=₹12,624.48  |  Costs=₹257.91  |  Net=₹12,366.57  (+8.91%)
+
+  [078] HEROMOTOCO.NS  —  ✅ WIN  [Sector: Auto]
+  ┌─ Signal:   2025-08-08  |  Regime: VOLATILE
+  ├─ Entry:    2025-08-11  |  ₹4605.30 × 30 shares  =  ₹138,159
+  ├─ Stops:    SL=₹4376.20  |  PT=₹5063.50  |  ATR=₹114.55  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.2328  |  ML conf=66.9%
+  ├─ Why BUY:  Rank #4/105 | ML=66.9% ≥ gate=55% | Regime=VOLATILE | Sector=Auto | Score=+1.2328
+  ├─ Exit:     2025-08-18  |  TARGET @ ₹5063.50  (5d)
+  ├─ Why EXIT: Target hit at ₹5063.50
+  ├─ MFE/MAE:  Best=11.15%  |  Worst=-1.44%
+  └─ P&L:      Gross=₹13,746.00  |  Costs=₹258.30  |  Net=₹13,487.70  (+9.76%)
+
+  [079] MUTHOOTFIN.NS  —  ❌ LOSS  [Sector: Financials]
+  ┌─ Signal:   2025-08-15  |  Regime: RANGING
+  ├─ Entry:    2025-08-18  |  ₹2802.80 × 49 shares  =  ₹137,337
+  ├─ Stops:    SL=₹2638.21  |  PT=₹3131.97  |  ATR=₹82.29  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.7777  |  ML conf=69.5%
+  ├─ Why BUY:  Rank #2/105 | ML=69.5% ≥ gate=55% | Regime=RANGING | Sector=Financials | Score=+1.7777
+  ├─ Exit:     2025-08-28  |  STOP_LOSS @ ₹2638.21  (8d)
+  ├─ Why EXIT: Stop hit at ₹2638.21 (stop was ₹2638.21)
+  ├─ MFE/MAE:  Best=0.15%  |  Worst=-5.98%
+  └─ P&L:      Gross=₹-8,064.91  |  Costs=₹230.57  |  Net=₹-8,295.48  (-6.04%)
+
+  [080] M&M.NS  —  ❌ LOSS  [Sector: Auto]
+  ┌─ Signal:   2025-08-22  |  Regime: RANGING
+  ├─ Entry:    2025-08-25  |  ₹3429.71 × 41 shares  =  ₹140,618
+  ├─ Stops:    SL=₹3287.71  |  PT=₹3713.71  |  ATR=₹71.00  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.1098  |  ML conf=59.0%
+  ├─ Why BUY:  Rank #8/105 | ML=59.0% ≥ gate=55% | Regime=RANGING | Sector=Auto | Score=+1.1098
+  ├─ Exit:     2025-08-28  |  STOP_LOSS @ ₹3287.71  (3d)
+  ├─ Why EXIT: Stop hit at ₹3287.71 (stop was ₹3287.71)
+  ├─ MFE/MAE:  Best=0.00%  |  Worst=-4.15%
+  └─ P&L:      Gross=₹-5,822.00  |  Costs=₹237.91  |  Net=₹-6,059.91  (-4.31%)
+
+  [081] BHARTIARTL.NS  —  ✅ WIN  [Sector: Telecom]
+  ┌─ Signal:   2025-08-08  |  Regime: VOLATILE
+  ├─ Entry:    2025-08-11  |  ₹1863.93 × 74 shares  =  ₹137,931
+  ├─ Stops:    SL=₹1787.94  |  PT=₹2015.90  |  ATR=₹37.99  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4178  |  ML conf=68.7%
+  ├─ Why BUY:  Rank #13/105 | ML=68.7% ≥ gate=55% | Regime=VOLATILE | Sector=Telecom | Score=+0.4178
+  ├─ Exit:     2025-09-09  |  TIME_EXIT @ ₹1893.70  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=4.72%  |  Worst=-0.98%
+  └─ P&L:      Gross=₹2,202.98  |  Costs=₹243.91  |  Net=₹1,959.07  (+1.42%)
+
+  [082] ETERNAL.NS  —  ✅ WIN  [Sector: FMCG]
+  ┌─ Signal:   2025-08-08  |  Regime: VOLATILE
+  ├─ Entry:    2025-08-11  |  ₹301.05 × 428 shares  =  ₹128,849
+  ├─ Stops:    SL=₹280.57  |  PT=₹342.01  |  ATR=₹10.24  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.9514  |  ML conf=62.9%
+  ├─ Why BUY:  Rank #2/105 | ML=62.9% ≥ gate=55% | Regime=VOLATILE | Sector=FMCG | Score=+1.9514
+  ├─ Exit:     2025-09-09  |  TIME_EXIT @ ₹325.70  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=11.08%  |  Worst=-0.51%
+  └─ P&L:      Gross=₹10,550.20  |  Costs=₹241.31  |  Net=₹10,308.89  (+8.00%)
+
+  [083] TITAN.NS  —  ❌ LOSS  [Sector: Other]
+  ┌─ Signal:   2025-08-29  |  Regime: RANGING
+  ├─ Entry:    2025-09-01  |  ₹3632.82 × 38 shares  =  ₹138,047
+  ├─ Stops:    SL=₹3513.88  |  PT=₹3870.71  |  ATR=₹59.47  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7269  |  ML conf=59.2%
+  ├─ Why BUY:  Rank #8/105 | ML=59.2% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+0.7269
+  ├─ Exit:     2025-09-16  |  STOP_LOSS @ ₹3513.88  (12d)
+  ├─ Why EXIT: Stop hit at ₹3513.88 (stop was ₹3513.88)
+  ├─ MFE/MAE:  Best=2.95%  |  Worst=-3.60%
+  └─ P&L:      Gross=₹-4,519.72  |  Costs=₹235.88  |  Net=₹-4,755.60  (-3.44%)
+
+  [084] ALKEM.NS  —  ✅ WIN  [Sector: Pharma]
+  ┌─ Signal:   2025-08-22  |  Regime: RANGING
+  ├─ Entry:    2025-08-25  |  ₹5435.43 × 25 shares  =  ₹135,886
+  ├─ Stops:    SL=₹5172.72  |  PT=₹5960.86  |  ATR=₹131.36  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.9367  |  ML conf=59.0%
+  ├─ Why BUY:  Rank #9/105 | ML=59.0% ≥ gate=55% | Regime=RANGING | Sector=Pharma | Score=+0.9367
+  ├─ Exit:     2025-09-22  |  TIME_EXIT @ ₹5495.00  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=2.58%  |  Worst=-4.25%
+  └─ P&L:      Gross=₹1,489.25  |  Costs=₹240.16  |  Net=₹1,249.09  (+0.92%)
+
+  [085] ASIANPAINT.NS  —  ❌ LOSS  [Sector: Chemicals]
+  ┌─ Signal:   2025-08-29  |  Regime: RANGING
+  ├─ Entry:    2025-09-01  |  ₹2519.26 × 55 shares  =  ₹138,559
+  ├─ Stops:    SL=₹2431.69  |  PT=₹2694.40  |  ATR=₹43.79  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4313  |  ML conf=59.9%
+  ├─ Why BUY:  Rank #14/105 | ML=59.9% ≥ gate=55% | Regime=RANGING | Sector=Chemicals | Score=+0.4313
+  ├─ Exit:     2025-09-23  |  STOP_LOSS @ ₹2431.69  (17d)
+  ├─ Why EXIT: Stop hit at ₹2431.69 (stop was ₹2431.69)
+  ├─ MFE/MAE:  Best=3.28%  |  Worst=-3.62%
+  └─ P&L:      Gross=₹-4,816.35  |  Costs=₹236.24  |  Net=₹-5,052.59  (-3.65%)
+
+  [086] ETERNAL.NS  —  ❌ LOSS  [Sector: FMCG]
+  ┌─ Signal:   2025-09-19  |  Regime: RANGING
+  ├─ Entry:    2025-09-22  |  ₹340.17 × 412 shares  =  ₹140,150
+  ├─ Stops:    SL=₹327.48  |  PT=₹365.56  |  ATR=₹6.35  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.8221  |  ML conf=62.8%
+  ├─ Why BUY:  Rank #11/105 | ML=62.8% ≥ gate=55% | Regime=RANGING | Sector=FMCG | Score=+0.8221
+  ├─ Exit:     2025-09-26  |  STOP_LOSS @ ₹327.48  (5d)
+  ├─ Why EXIT: Stop hit at ₹327.48 (stop was ₹327.48)
+  ├─ MFE/MAE:  Best=1.10%  |  Worst=-5.93%
+  └─ P&L:      Gross=₹-5,228.28  |  Costs=₹237.98  |  Net=₹-5,466.26  (-3.90%)
+
+  [087] BAJAJ-AUTO.NS  —  ❌ LOSS  [Sector: Auto]
+  ┌─ Signal:   2025-09-12  |  Regime: RANGING
+  ├─ Entry:    2025-09-15  |  ₹9031.01 × 15 shares  =  ₹135,465
+  ├─ Stops:    SL=₹8598.65  |  PT=₹9895.72  |  ATR=₹216.18  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4316  |  ML conf=69.8%
+  ├─ Why BUY:  Rank #15/105 | ML=69.8% ≥ gate=55% | Regime=RANGING | Sector=Auto | Score=+0.4316
+  ├─ Exit:     2025-10-01  |  STOP_LOSS @ ₹8598.65  (13d)
+  ├─ Why EXIT: Stop hit at ₹8598.65 (stop was ₹8598.65)
+  ├─ MFE/MAE:  Best=2.15%  |  Worst=-4.92%
+  └─ P&L:      Gross=₹-6,485.40  |  Costs=₹229.86  |  Net=₹-6,715.26  (-4.96%)
+
+  [088] LT.NS  —  ❌ LOSS  [Sector: Industrials]
+  ┌─ Signal:   2025-09-26  |  Regime: RANGING
+  ├─ Entry:    2025-09-29  |  ₹3739.87 × 37 shares  =  ₹138,375
+  ├─ Stops:    SL=₹3624.67  |  PT=₹3970.27  |  ATR=₹57.60  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.5332  |  ML conf=59.3%
+  ├─ Why BUY:  Rank #12/105 | ML=59.3% ≥ gate=55% | Regime=RANGING | Sector=Industrials | Score=+0.5332
+  ├─ Exit:     2025-10-01  |  STOP_LOSS @ ₹3624.67  (3d)
+  ├─ Why EXIT: Stop hit at ₹3624.67 (stop was ₹3624.67)
+  ├─ MFE/MAE:  Best=0.00%  |  Worst=-3.34%
+  └─ P&L:      Gross=₹-4,262.40  |  Costs=₹236.66  |  Net=₹-4,499.06  (-3.25%)
+
+  [089] HEROMOTOCO.NS  —  ✅ WIN  [Sector: Auto]
+  ┌─ Signal:   2025-09-12  |  Regime: RANGING
+  ├─ Entry:    2025-09-15  |  ₹5326.66 × 26 shares  =  ₹138,493
+  ├─ Stops:    SL=₹5077.99  |  PT=₹5824.00  |  ATR=₹124.34  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.1043  |  ML conf=63.2%
+  ├─ Why BUY:  Rank #10/105 | ML=63.2% ≥ gate=55% | Regime=RANGING | Sector=Auto | Score=+1.1043
+  ├─ Exit:     2025-10-13  |  TIME_EXIT @ ₹5559.00  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=6.24%  |  Worst=-1.80%
+  └─ P&L:      Gross=₹6,040.84  |  Costs=₹249.38  |  Net=₹5,791.46  (+4.18%)
+
+  [090] HINDALCO.NS  —  ✅ WIN  [Sector: Metals]
+  ┌─ Signal:   2025-09-26  |  Regime: RANGING
+  ├─ Entry:    2025-09-29  |  ₹745.37 × 187 shares  =  ₹139,384
+  ├─ Stops:    SL=₹717.36  |  PT=₹801.40  |  ATR=₹14.01  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7439  |  ML conf=55.9%
+  ├─ Why BUY:  Rank #8/105 | ML=55.9% ≥ gate=55% | Regime=RANGING | Sector=Metals | Score=+0.7439
+  ├─ Exit:     2025-10-24  |  TARGET @ ₹811.35  (18d)
+  ├─ Why EXIT: Target hit at ₹811.35
+  ├─ MFE/MAE:  Best=10.88%  |  Worst=-0.07%
+  └─ P&L:      Gross=₹12,338.26  |  Costs=₹258.30  |  Net=₹12,079.96  (+8.67%)
+
+  [091] LT.NS  —  ✅ WIN  [Sector: Industrials]
+  ┌─ Signal:   2025-10-03  |  Regime: RANGING
+  ├─ Entry:    2025-10-06  |  ₹3721.86 × 37 shares  =  ₹137,709
+  ├─ Stops:    SL=₹3594.05  |  PT=₹3977.49  |  ATR=₹63.91  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6722  |  ML conf=59.3%
+  ├─ Why BUY:  Rank #14/105 | ML=59.3% ≥ gate=55% | Regime=RANGING | Sector=Industrials | Score=+0.6722
+  ├─ Exit:     2025-10-28  |  TARGET @ ₹3977.49  (16d)
+  ├─ Why EXIT: Target hit at ₹3977.49
+  ├─ MFE/MAE:  Best=7.10%  |  Worst=-0.51%
+  └─ P&L:      Gross=₹9,458.31  |  Costs=₹252.44  |  Net=₹9,205.87  (+6.68%)
+
+  [092] BSE.NS  —  ❌ LOSS  [Sector: Other]
+  ┌─ Signal:   2025-10-17  |  Regime: RANGING
+  ├─ Entry:    2025-10-20  |  ₹2505.70 × 55 shares  =  ₹137,814
+  ├─ Stops:    SL=₹2332.36  |  PT=₹2852.39  |  ATR=₹86.67  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.0740  |  ML conf=57.6%
+  ├─ Why BUY:  Rank #7/105 | ML=57.6% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+1.0740
+  ├─ Exit:     2025-10-31  |  STOP_LOSS @ ₹2332.36  (9d)
+  ├─ Why EXIT: Stop hit at ₹2332.36 (stop was ₹2332.36)
+  ├─ MFE/MAE:  Best=1.12%  |  Worst=-7.17%
+  └─ P&L:      Gross=₹-9,533.70  |  Costs=₹229.45  |  Net=₹-9,763.15  (-7.08%)
+
+  [093] MUTHOOTFIN.NS  —  ✅ WIN  [Sector: Financials]
+  ┌─ Signal:   2025-10-03  |  Regime: RANGING
+  ├─ Entry:    2025-10-06  |  ₹3175.97 × 43 shares  =  ₹136,567
+  ├─ Stops:    SL=₹3047.70  |  PT=₹3432.51  |  ATR=₹64.14  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.4116  |  ML conf=61.4%
+  ├─ Why BUY:  Rank #4/105 | ML=61.4% ≥ gate=55% | Regime=RANGING | Sector=Financials | Score=+1.4116
+  ├─ Exit:     2025-11-03  |  TIME_EXIT @ ₹3190.60  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=6.36%  |  Worst=-2.72%
+  └─ P&L:      Gross=₹629.09  |  Costs=₹240.07  |  Net=₹389.02  (+0.28%)
+
+  [094] BEL.NS  —  ✅ WIN  [Sector: Other]
+  ┌─ Signal:   2025-10-03  |  Regime: RANGING
+  ├─ Entry:    2025-10-06  |  ₹412.91 × 336 shares  =  ₹138,738
+  ├─ Stops:    SL=₹395.13  |  PT=₹448.47  |  ATR=₹8.89  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7184  |  ML conf=55.2%
+  ├─ Why BUY:  Rank #12/105 | ML=55.2% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+0.7184
+  ├─ Exit:     2025-11-03  |  TIME_EXIT @ ₹422.30  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=4.38%  |  Worst=-2.74%
+  └─ P&L:      Gross=₹3,155.04  |  Costs=₹246.21  |  Net=₹2,908.83  (+2.10%)
+
+  [095] LT.NS  —  ❌ LOSS  [Sector: Industrials]
+  ┌─ Signal:   2025-10-31  |  Regime: TRENDING
+  ├─ Entry:    2025-11-03  |  ₹4032.02 × 34 shares  =  ₹137,089
+  ├─ Stops:    SL=₹3908.96  |  PT=₹4278.13  |  ATR=₹61.53  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.3046  |  ML conf=59.5%
+  ├─ Why BUY:  Rank #8/105 | ML=59.5% ≥ gate=55% | Regime=TRENDING | Sector=Industrials | Score=+1.3046
+  ├─ Exit:     2025-11-06  |  STOP_LOSS @ ₹3908.96  (3d)
+  ├─ Why EXIT: Stop hit at ₹3908.96 (stop was ₹3908.96)
+  ├─ MFE/MAE:  Best=0.22%  |  Worst=-3.97%
+  └─ P&L:      Gross=₹-4,184.04  |  Costs=₹234.95  |  Net=₹-4,418.99  (-3.22%)
+
+  [096] CUMMINSIND.NS  —  ❌ LOSS  [Sector: Industrials]
+  ┌─ Signal:   2025-10-31  |  Regime: TRENDING
+  ├─ Entry:    2025-11-03  |  ₹4350.35 × 32 shares  =  ₹139,211
+  ├─ Stops:    SL=₹4190.56  |  PT=₹4669.92  |  ATR=₹79.89  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.3888  |  ML conf=58.7%
+  ├─ Why BUY:  Rank #7/105 | ML=58.7% ≥ gate=55% | Regime=TRENDING | Sector=Industrials | Score=+1.3888
+  ├─ Exit:     2025-11-19  |  STOP_LOSS @ ₹4190.56  (12d)
+  ├─ Why EXIT: Stop hit at ₹4190.56 (stop was ₹4190.56)
+  ├─ MFE/MAE:  Best=3.33%  |  Worst=-3.84%
+  └─ P&L:      Gross=₹-5,113.28  |  Costs=₹236.80  |  Net=₹-5,350.08  (-3.84%)
+
+  [097] PERSISTENT.NS  —  ✅ WIN  [Sector: IT]
+  ┌─ Signal:   2025-10-24  |  Regime: TRENDING
+  ├─ Entry:    2025-10-27  |  ₹5885.88 × 23 shares  =  ₹135,375
+  ├─ Stops:    SL=₹5587.88  |  PT=₹6481.88  |  ATR=₹149.00  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.8387  |  ML conf=61.0%
+  ├─ Why BUY:  Rank #11/105 | ML=61.0% ≥ gate=55% | Regime=TRENDING | Sector=IT | Score=+0.8387
+  ├─ Exit:     2025-11-24  |  TIME_EXIT @ ₹6374.50  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=9.19%  |  Worst=-3.18%
+  └─ P&L:      Gross=₹11,238.26  |  Costs=₹251.32  |  Net=₹10,986.94  (+8.12%)
+
+  [098] PRESTIGE.NS  —  ❌ LOSS  [Sector: Realty]
+  ┌─ Signal:   2025-11-07  |  Regime: RANGING
+  ├─ Entry:    2025-11-10  |  ₹1746.24 × 80 shares  =  ₹139,699
+  ├─ Stops:    SL=₹1665.57  |  PT=₹1907.58  |  ATR=₹40.34  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7588  |  ML conf=70.9%
+  ├─ Why BUY:  Rank #12/105 | ML=70.9% ≥ gate=55% | Regime=RANGING | Sector=Realty | Score=+0.7588
+  ├─ Exit:     2025-11-24  |  STOP_LOSS @ ₹1665.57  (11d)
+  ├─ Why EXIT: Stop hit at ₹1665.57 (stop was ₹1665.57)
+  ├─ MFE/MAE:  Best=2.01%  |  Worst=-7.16%
+  └─ P&L:      Gross=₹-6,453.60  |  Costs=₹235.85  |  Net=₹-6,689.45  (-4.79%)
+
+  [099] BSE.NS  —  ✅ WIN  [Sector: Other]
+  ┌─ Signal:   2025-11-07  |  Regime: RANGING
+  ├─ Entry:    2025-11-10  |  ₹2692.69 × 52 shares  =  ₹140,020
+  ├─ Stops:    SL=₹2526.15  |  PT=₹3025.78  |  ATR=₹83.27  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.4872  |  ML conf=57.7%
+  ├─ Why BUY:  Rank #6/105 | ML=57.7% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+1.4872
+  ├─ Exit:     2025-12-05  |  TIME_EXIT @ ₹2815.90  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=9.93%  |  Worst=-3.35%
+  └─ P&L:      Gross=₹6,406.92  |  Costs=₹251.97  |  Net=₹6,154.95  (+4.40%)
+
+  [100] BPCL.NS  —  ❌ LOSS  [Sector: Energy]
+  ┌─ Signal:   2025-11-07  |  Regime: RANGING
+  ├─ Entry:    2025-11-10  |  ₹356.28 × 393 shares  =  ₹140,018
+  ├─ Stops:    SL=₹340.19  |  PT=₹388.47  |  ATR=₹8.05  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.3331  |  ML conf=57.6%
+  ├─ Why BUY:  Rank #7/105 | ML=57.7% ≥ gate=55% | Regime=RANGING | Sector=Energy | Score=+1.3331
+  ├─ Exit:     2025-12-05  |  TIME_EXIT @ ₹350.30  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=4.12%  |  Worst=-3.84%
+  └─ P&L:      Gross=₹-2,350.14  |  Costs=₹241.30  |  Net=₹-2,591.44  (-1.85%)
+
+  [101] SHRIRAMFIN.NS  —  ❌ LOSS  [Sector: Other]
+  ┌─ Signal:   2025-11-28  |  Regime: RANGING
+  ├─ Entry:    2025-12-01  |  ₹858.28 × 163 shares  =  ₹139,900
+  ├─ Stops:    SL=₹822.72  |  PT=₹929.39  |  ATR=₹17.78  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+2.1019  |  ML conf=60.0%
+  ├─ Why BUY:  Rank #1/105 | ML=60.0% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+2.1019
+  ├─ Exit:     2025-12-03  |  STOP_LOSS @ ₹822.72  (3d)
+  ├─ Why EXIT: Stop hit at ₹822.72 (stop was ₹822.72)
+  ├─ MFE/MAE:  Best=0.78%  |  Worst=-4.58%
+  └─ P&L:      Gross=₹-5,796.28  |  Costs=₹236.93  |  Net=₹-6,033.21  (-4.31%)
+
+  [102] PERSISTENT.NS  —  ❌ LOSS  [Sector: IT]
+  ┌─ Signal:   2025-11-28  |  Regime: RANGING
+  ├─ Entry:    2025-12-01  |  ₹6381.88 × 21 shares  =  ₹134,019
+  ├─ Stops:    SL=₹6146.17  |  PT=₹6853.31  |  ATR=₹117.86  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7095  |  ML conf=67.9%
+  ├─ Why BUY:  Rank #14/105 | ML=67.9% ≥ gate=55% | Regime=RANGING | Sector=IT | Score=+0.7095
+  ├─ Exit:     2025-12-10  |  STOP_LOSS @ ₹6146.17  (8d)
+  ├─ Why EXIT: Stop hit at ₹6146.17 (stop was ₹6146.17)
+  ├─ MFE/MAE:  Best=2.68%  |  Worst=-5.77%
+  └─ P&L:      Gross=₹-4,949.91  |  Costs=₹229.69  |  Net=₹-5,179.60  (-3.87%)
+
+  [103] MPHASIS.NS  —  ❌ LOSS  [Sector: IT]
+  ┌─ Signal:   2025-12-05  |  Regime: VOLATILE
+  ├─ Entry:    2025-12-08  |  ₹2971.27 × 47 shares  =  ₹139,650
+  ├─ Stops:    SL=₹2862.27  |  PT=₹3189.27  |  ATR=₹54.50  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.5162  |  ML conf=66.3%
+  ├─ Why BUY:  Rank #14/105 | ML=66.3% ≥ gate=55% | Regime=VOLATILE | Sector=IT | Score=+0.5162
+  ├─ Exit:     2025-12-09  |  STOP_LOSS @ ₹2862.27  (2d)
+  ├─ Why EXIT: Stop hit at ₹2862.27 (stop was ₹2862.27)
+  ├─ MFE/MAE:  Best=0.00%  |  Worst=-4.36%
+  └─ P&L:      Gross=₹-5,123.00  |  Costs=₹237.40  |  Net=₹-5,360.40  (-3.84%)
+
+  [104] HEROMOTOCO.NS  —  ❌ LOSS  [Sector: Auto]
+  ┌─ Signal:   2025-12-05  |  Regime: VOLATILE
+  ├─ Entry:    2025-12-08  |  ₹6313.16 × 22 shares  =  ₹138,890
+  ├─ Stops:    SL=₹6091.37  |  PT=₹6756.73  |  ATR=₹110.89  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.9668  |  ML conf=61.1%
+  ├─ Why BUY:  Rank #1/105 | ML=61.1% ≥ gate=55% | Regime=VOLATILE | Sector=Auto | Score=+1.9668
+  ├─ Exit:     2025-12-09  |  STOP_LOSS @ ₹6091.37  (2d)
+  ├─ Why EXIT: Stop hit at ₹6091.37 (stop was ₹6091.37)
+  ├─ MFE/MAE:  Best=0.60%  |  Worst=-5.50%
+  └─ P&L:      Gross=₹-4,879.38  |  Costs=₹236.63  |  Net=₹-5,116.01  (-3.68%)
+
+  [105] MUTHOOTFIN.NS  —  ✅ WIN  [Sector: Financials]
+  ┌─ Signal:   2025-11-21  |  Regime: RANGING
+  ├─ Entry:    2025-11-24  |  ₹3639.64 × 38 shares  =  ₹138,306
+  ├─ Stops:    SL=₹3458.10  |  PT=₹4002.73  |  ATR=₹90.77  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.5773  |  ML conf=73.9%
+  ├─ Why BUY:  Rank #4/105 | ML=73.9% ≥ gate=55% | Regime=RANGING | Sector=Financials | Score=+1.5773
+  ├─ Exit:     2025-12-19  |  TIME_EXIT @ ₹3781.20  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=6.27%  |  Worst=-1.24%
+  └─ P&L:      Gross=₹5,379.28  |  Costs=₹248.31  |  Net=₹5,130.97  (+3.71%)
+
+  [106] SUNPHARMA.NS  —  ❌ LOSS  [Sector: Pharma]
+  ┌─ Signal:   2025-12-05  |  Regime: VOLATILE
+  ├─ Entry:    2025-12-08  |  ₹1806.20 × 77 shares  =  ₹139,077
+  ├─ Stops:    SL=₹1756.10  |  PT=₹1906.40  |  ATR=₹25.05  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.8310  |  ML conf=95.6%
+  ├─ Why BUY:  Rank #11/105 | ML=95.6% ≥ gate=55% | Regime=VOLATILE | Sector=Pharma | Score=+0.8310
+  ├─ Exit:     2025-12-18  |  STOP_LOSS @ ₹1756.10  (9d)
+  ├─ Why EXIT: Stop hit at ₹1756.10 (stop was ₹1756.10)
+  ├─ MFE/MAE:  Best=0.31%  |  Worst=-3.89%
+  └─ P&L:      Gross=₹-3,857.70  |  Costs=₹238.14  |  Net=₹-4,095.84  (-2.94%)
+
+  [107] HCLTECH.NS  —  ❌ LOSS  [Sector: IT]
+  ┌─ Signal:   2025-12-12  |  Regime: RANGING
+  ├─ Entry:    2025-12-15  |  ₹1674.04 × 82 shares  =  ₹137,271
+  ├─ Stops:    SL=₹1624.14  |  PT=₹1773.84  |  ATR=₹24.95  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.8179  |  ML conf=58.7%
+  ├─ Why BUY:  Rank #8/105 | ML=58.7% ≥ gate=55% | Regime=RANGING | Sector=IT | Score=+0.8179
+  ├─ Exit:     2025-12-30  |  STOP_LOSS @ ₹1624.14  (11d)
+  ├─ Why EXIT: Stop hit at ₹1624.14 (stop was ₹1624.14)
+  ├─ MFE/MAE:  Best=0.83%  |  Worst=-3.76%
+  └─ P&L:      Gross=₹-4,091.80  |  Costs=₹235.31  |  Net=₹-4,327.11  (-3.15%)
+
+  [108] HINDALCO.NS  —  ✅ WIN  [Sector: Metals]
+  ┌─ Signal:   2025-12-19  |  Regime: RANGING
+  ├─ Entry:    2025-12-22  |  ₹860.43 × 161 shares  =  ₹138,529
+  ├─ Stops:    SL=₹826.68  |  PT=₹927.93  |  ATR=₹16.88  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.2077  |  ML conf=56.2%
+  ├─ Why BUY:  Rank #5/105 | ML=56.2% ≥ gate=55% | Regime=RANGING | Sector=Metals | Score=+1.2077
+  ├─ Exit:     2026-01-05  |  TARGET @ ₹932.50  (10d)
+  ├─ Why EXIT: Target hit at ₹932.50
+  ├─ MFE/MAE:  Best=9.00%  |  Worst=-0.37%
+  └─ P&L:      Gross=₹11,603.27  |  Costs=₹256.21  |  Net=₹11,347.06  (+8.19%)
+
+  [109] TITAN.NS  —  ✅ WIN  [Sector: Other]
+  ┌─ Signal:   2026-01-02  |  Regime: RANGING
+  ├─ Entry:    2026-01-05  |  ₹4053.73 × 34 shares  =  ₹137,827
+  ├─ Stops:    SL=₹3943.63  |  PT=₹4273.93  |  ATR=₹55.05  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.8269  |  ML conf=59.5%
+  ├─ Why BUY:  Rank #8/105 | ML=59.5% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+0.8269
+  ├─ Exit:     2026-01-07  |  TARGET @ ₹4273.93  (3d)
+  ├─ Why EXIT: Target hit at ₹4273.93
+  ├─ MFE/MAE:  Best=6.37%  |  Worst=-0.19%
+  └─ P&L:      Gross=₹7,486.80  |  Costs=₹250.20  |  Net=₹7,236.60  (+5.25%)
+
+  [110] LT.NS  —  ❌ LOSS  [Sector: Industrials]
+  ┌─ Signal:   2025-12-12  |  Regime: RANGING
+  ├─ Entry:    2025-12-15  |  ₹4074.84 × 34 shares  =  ₹138,545
+  ├─ Stops:    SL=₹3940.64  |  PT=₹4343.24  |  ATR=₹67.10  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7002  |  ML conf=59.4%
+  ├─ Why BUY:  Rank #14/105 | ML=59.4% ≥ gate=55% | Regime=RANGING | Sector=Industrials | Score=+0.7002
+  ├─ Exit:     2026-01-12  |  TIME_EXIT @ ₹4019.00  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=2.95%  |  Worst=-3.20%
+  └─ P&L:      Gross=₹-1,898.56  |  Costs=₹239.78  |  Net=₹-2,138.34  (-1.54%)
+
+  [111] EICHERMOT.NS  —  ✅ WIN  [Sector: Auto]
+  ┌─ Signal:   2025-12-12  |  Regime: RANGING
+  ├─ Entry:    2025-12-15  |  ₹7203.60 × 19 shares  =  ₹136,868
+  ├─ Stops:    SL=₹6946.03  |  PT=₹7718.74  |  ATR=₹128.79  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7495  |  ML conf=55.1%
+  ├─ Why BUY:  Rank #10/105 | ML=55.1% ≥ gate=55% | Regime=RANGING | Sector=Auto | Score=+0.7495
+  ├─ Exit:     2026-01-12  |  TIME_EXIT @ ₹7436.00  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=5.69%  |  Worst=-2.64%
+  └─ P&L:      Gross=₹4,415.60  |  Costs=₹245.11  |  Net=₹4,170.49  (+3.05%)
+
+  [112] SUNDARMFIN.NS  —  ✅ WIN  [Sector: Other]
+  ┌─ Signal:   2025-12-19  |  Regime: RANGING
+  ├─ Entry:    2025-12-22  |  ₹4956.45 × 27 shares  =  ₹133,824
+  ├─ Stops:    SL=₹4707.78  |  PT=₹5453.79  |  ATR=₹124.34  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7686  |  ML conf=57.4%
+  ├─ Why BUY:  Rank #9/105 | ML=57.4% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+0.7686
+  ├─ Exit:     2026-01-20  |  TIME_EXIT @ ₹5059.00  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=8.79%  |  Worst=-2.29%
+  └─ P&L:      Gross=₹2,768.85  |  Costs=₹238.82  |  Net=₹2,530.03  (+1.89%)
+
+  [113] TITAN.NS  —  ❌ LOSS  [Sector: Other]
+  ┌─ Signal:   2026-01-09  |  Regime: RANGING
+  ├─ Entry:    2026-01-12  |  ₹4207.10 × 33 shares  =  ₹138,834
+  ├─ Stops:    SL=₹4069.54  |  PT=₹4482.21  |  ATR=₹68.78  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.4220  |  ML conf=60.5%
+  ├─ Why BUY:  Rank #2/105 | ML=60.5% ≥ gate=55% | Regime=RANGING | Sector=Other | Score=+1.4220
+  ├─ Exit:     2026-01-20  |  STOP_LOSS @ ₹4069.54  (6d)
+  ├─ Why EXIT: Stop hit at ₹4069.54 (stop was ₹4069.54)
+  ├─ MFE/MAE:  Best=1.80%  |  Worst=-3.39%
+  └─ P&L:      Gross=₹-4,539.48  |  Costs=₹236.97  |  Net=₹-4,776.45  (-3.44%)
+
+  [114] COALINDIA.NS  —  ✅ WIN  [Sector: Metals]
+  ┌─ Signal:   2026-01-09  |  Regime: RANGING
+  ├─ Entry:    2026-01-12  |  ₹419.11 × 333 shares  =  ₹139,564
+  ├─ Stops:    SL=₹399.20  |  PT=₹458.94  |  ATR=₹9.96  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.2460  |  ML conf=63.1%
+  ├─ Why BUY:  Rank #3/105 | ML=63.1% ≥ gate=55% | Regime=RANGING | Sector=Metals | Score=+1.2460
+  ├─ Exit:     2026-01-29  |  TARGET @ ₹458.94  (12d)
+  ├─ Why EXIT: Target hit at ₹458.94
+  ├─ MFE/MAE:  Best=10.13%  |  Worst=-1.80%
+  └─ P&L:      Gross=₹13,263.39  |  Costs=₹259.68  |  Net=₹13,003.71  (+9.32%)
+
+  [115] TORNTPHARM.NS  —  ❌ LOSS  [Sector: Pharma]
+  ┌─ Signal:   2026-01-16  |  Regime: RANGING
+  ├─ Entry:    2026-01-19  |  ₹4037.33 × 34 shares  =  ₹137,269
+  ├─ Stops:    SL=₹3878.17  |  PT=₹4355.64  |  ATR=₹79.58  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.8582  |  ML conf=55.3%
+  ├─ Why BUY:  Rank #8/105 | ML=55.3% ≥ gate=55% | Regime=RANGING | Sector=Pharma | Score=+0.8582
+  ├─ Exit:     2026-01-30  |  STOP_LOSS @ ₹3878.17  (9d)
+  ├─ Why EXIT: Stop hit at ₹3878.17 (stop was ₹3878.17)
+  ├─ MFE/MAE:  Best=1.73%  |  Worst=-8.48%
+  └─ P&L:      Gross=₹-5,411.44  |  Costs=₹233.70  |  Net=₹-5,645.14  (-4.11%)
+
+  [116] MUTHOOTFIN.NS  —  ❌ LOSS  [Sector: Financials]
+  ┌─ Signal:   2026-01-23  |  Regime: VOLATILE
+  ├─ Entry:    2026-01-27  |  ₹3832.83 × 36 shares  =  ₹137,982
+  ├─ Stops:    SL=₹3637.02  |  PT=₹4224.46  |  ATR=₹97.91  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.3742  |  ML conf=69.2%
+  ├─ Why BUY:  Rank #15/105 | ML=69.2% ≥ gate=55% | Regime=VOLATILE | Sector=Financials | Score=+0.3742
+  ├─ Exit:     2026-02-01  |  GAP_RISK @ ₹3700.00  (5d)
+  ├─ Why EXIT: Gap down -3.4% > 3% threshold (Rule 26)
+  ├─ MFE/MAE:  Best=8.26%  |  Worst=-9.16%
+  └─ P&L:      Gross=₹-4,781.88  |  Costs=₹235.47  |  Net=₹-5,017.35  (-3.64%)
+
+  [117] HCLTECH.NS  —  ❌ LOSS  [Sector: IT]
+  ┌─ Signal:   2026-01-23  |  Regime: VOLATILE
+  ├─ Entry:    2026-01-27  |  ₹1720.86 × 81 shares  =  ₹139,390
+  ├─ Stops:    SL=₹1649.37  |  PT=₹1863.83  |  ATR=₹35.74  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4815  |  ML conf=60.8%
+  ├─ Why BUY:  Rank #9/105 | ML=60.8% ≥ gate=55% | Regime=VOLATILE | Sector=IT | Score=+0.4815
+  ├─ Exit:     2026-02-01  |  STOP_LOSS @ ₹1649.37  (5d)
+  ├─ Why EXIT: Stop hit at ₹1649.37 (stop was ₹1649.37)
+  ├─ MFE/MAE:  Best=0.79%  |  Worst=-6.26%
+  └─ P&L:      Gross=₹-5,790.69  |  Costs=₹236.22  |  Net=₹-6,026.91  (-4.32%)
+
+  [118] COALINDIA.NS  —  ❌ LOSS  [Sector: Metals]
+  ┌─ Signal:   2026-01-30  |  Regime: VOLATILE
+  ├─ Entry:    2026-02-01  |  ₹440.22 × 318 shares  =  ₹139,990
+  ├─ Stops:    SL=₹414.09  |  PT=₹492.48  |  ATR=₹13.06  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.3039  |  ML conf=64.5%
+  ├─ Why BUY:  Rank #7/105 | ML=64.5% ≥ gate=55% | Regime=VOLATILE | Sector=Metals | Score=+1.3039
+  ├─ Exit:     2026-02-02  |  STOP_LOSS @ ₹414.09  (2d)
+  ├─ Why EXIT: Stop hit at ₹414.09 (stop was ₹414.09)
+  ├─ MFE/MAE:  Best=0.09%  |  Worst=-6.18%
+  └─ P&L:      Gross=₹-8,309.34  |  Costs=₹234.00  |  Net=₹-8,543.34  (-6.10%)
+
+  [119] ONGC.NS  —  ❌ LOSS  [Sector: Energy]
+  ┌─ Signal:   2026-01-30  |  Regime: VOLATILE
+  ├─ Entry:    2026-02-01  |  ₹262.93 × 533 shares  =  ₹140,142
+  ├─ Stops:    SL=₹248.84  |  PT=₹291.12  |  ATR=₹7.05  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.5592  |  ML conf=55.5%
+  ├─ Why BUY:  Rank #2/105 | ML=55.5% ≥ gate=55% | Regime=VOLATILE | Sector=Energy | Score=+1.5592
+  ├─ Exit:     2026-02-01  |  STOP_LOSS @ ₹248.84  (1d)
+  ├─ Why EXIT: Stop hit at ₹248.84 (stop was ₹248.84)
+  ├─ MFE/MAE:  Best=2.50%  |  Worst=-5.98%
+  └─ P&L:      Gross=₹-7,509.97  |  Costs=₹235.19  |  Net=₹-7,745.16  (-5.53%)
+
+  [120] NTPC.NS  —  ✅ WIN  [Sector: Energy]
+  ┌─ Signal:   2026-01-16  |  Regime: RANGING
+  ├─ Entry:    2026-01-19  |  ₹343.67 × 407 shares  =  ₹139,874
+  ├─ Stops:    SL=₹328.65  |  PT=₹373.71  |  ATR=₹7.51  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6374  |  ML conf=60.1%
+  ├─ Why BUY:  Rank #14/105 | ML=60.0% ≥ gate=55% | Regime=RANGING | Sector=Energy | Score=+0.6374
+  ├─ Exit:     2026-02-13  |  TIME_EXIT @ ₹363.00  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=8.24%  |  Worst=-2.20%
+  └─ P&L:      Gross=₹7,867.31  |  Costs=₹253.55  |  Net=₹7,613.76  (+5.44%)
+
+  [121] BPCL.NS  —  ❌ LOSS  [Sector: Energy]
+  ┌─ Signal:   2026-02-06  |  Regime: RANGING
+  ├─ Entry:    2026-02-09  |  ₹386.69 × 357 shares  =  ₹138,048
+  ├─ Stops:    SL=₹363.01  |  PT=₹434.05  |  ATR=₹11.84  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.3423  |  ML conf=59.5%
+  ├─ Why BUY:  Rank #5/105 | ML=59.5% ≥ gate=55% | Regime=RANGING | Sector=Energy | Score=+1.3423
+  ├─ Exit:     2026-02-20  |  STOP_LOSS @ ₹363.01  (10d)
+  ├─ Why EXIT: Stop hit at ₹363.01 (stop was ₹363.01)
+  ├─ MFE/MAE:  Best=1.09%  |  Worst=-6.31%
+  └─ P&L:      Gross=₹-8,453.76  |  Costs=₹231.09  |  Net=₹-8,684.85  (-6.29%)
+
+  [122] PFC.NS  —  ❌ LOSS  [Sector: Financials]
+  ┌─ Signal:   2026-02-06  |  Regime: RANGING
+  ├─ Entry:    2026-02-09  |  ₹425.42 × 325 shares  =  ₹138,262
+  ├─ Stops:    SL=₹394.22  |  PT=₹487.82  |  ATR=₹15.60  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+1.8702  |  ML conf=55.8%
+  ├─ Why BUY:  Rank #1/105 | ML=55.8% ≥ gate=55% | Regime=RANGING | Sector=Financials | Score=+1.8702
+  ├─ Exit:     2026-03-02  |  GAP_RISK @ ₹400.00  (16d)
+  ├─ Why EXIT: Gap down -3.3% > 3% threshold (Rule 26)
+  ├─ MFE/MAE:  Best=1.17%  |  Worst=-6.62%
+  └─ P&L:      Gross=₹-8,261.50  |  Costs=₹231.63  |  Net=₹-8,493.13  (-6.14%)
+
+  [123] NTPC.NS  —  ✅ WIN  [Sector: Energy]
+  ┌─ Signal:   2026-02-13  |  Regime: RANGING
+  ├─ Entry:    2026-02-16  |  ₹362.78 × 382 shares  =  ₹138,582
+  ├─ Stops:    SL=₹343.49  |  PT=₹401.37  |  ATR=₹9.65  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6282  |  ML conf=60.3%
+  ├─ Why BUY:  Rank #12/105 | ML=60.3% ≥ gate=55% | Regime=RANGING | Sector=Energy | Score=+0.6282
+  ├─ Exit:     2026-03-02  |  GAP_RISK @ ₹365.00  (11d)
+  ├─ Why EXIT: Gap down -4.4% > 3% threshold (Rule 26)
+  ├─ MFE/MAE:  Best=7.10%  |  Worst=-0.16%
+  └─ P&L:      Gross=₹848.04  |  Costs=₹243.18  |  Net=₹604.86  (+0.44%)
+
+  [124] CUMMINSIND.NS  —  ❌ LOSS  [Sector: Industrials]
+  ┌─ Signal:   2026-02-20  |  Regime: RANGING
+  ├─ Entry:    2026-02-23  |  ₹4802.70 × 28 shares  =  ₹134,476
+  ├─ Stops:    SL=₹4480.59  |  PT=₹5446.93  |  ATR=₹161.06  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.9692  |  ML conf=60.0%
+  ├─ Why BUY:  Rank #8/105 | ML=60.0% ≥ gate=55% | Regime=RANGING | Sector=Industrials | Score=+0.9692
+  ├─ Exit:     2026-03-04  |  GAP_RISK @ ₹4661.10  (7d)
+  ├─ Why EXIT: Gap down -3.2% > 3% threshold (Rule 26)
+  ├─ MFE/MAE:  Best=3.84%  |  Worst=-4.98%
+  └─ P&L:      Gross=₹-3,964.80  |  Costs=₹231.54  |  Net=₹-4,196.34  (-3.12%)
+
+  [125] COALINDIA.NS  —  ✅ WIN  [Sector: Metals]
+  ┌─ Signal:   2026-02-06  |  Regime: RANGING
+  ├─ Entry:    2026-02-09  |  ₹434.22 × 318 shares  =  ₹138,082
+  ├─ Stops:    SL=₹405.31  |  PT=₹492.03  |  ATR=₹14.45  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.5661  |  ML conf=58.4%
+  ├─ Why BUY:  Rank #12/105 | ML=58.4% ≥ gate=55% | Regime=RANGING | Sector=Metals | Score=+0.5661
+  ├─ Exit:     2026-03-09  |  TIME_EXIT @ ₹437.65  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=5.59%  |  Worst=-6.36%
+  └─ P&L:      Gross=₹1,090.74  |  Costs=₹242.77  |  Net=₹847.97  (+0.61%)
+
+  [126] SBIN.NS  —  ❌ LOSS  [Sector: Financials]
+  ┌─ Signal:   2026-02-06  |  Regime: RANGING
+  ├─ Entry:    2026-02-09  |  ₹1120.56 × 123 shares  =  ₹137,829
+  ├─ Stops:    SL=₹1059.57  |  PT=₹1242.55  |  ATR=₹30.50  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.6152  |  ML conf=56.2%
+  ├─ Why BUY:  Rank #8/105 | ML=56.2% ≥ gate=55% | Regime=RANGING | Sector=Financials | Score=+0.6152
+  ├─ Exit:     2026-03-09  |  TIME_EXIT @ ₹1098.50  (20d)
+  ├─ Why EXIT: Max hold period reached (20 days, Rule 3)
+  ├─ MFE/MAE:  Best=10.19%  |  Worst=-5.02%
+  └─ P&L:      Gross=₹-2,713.38  |  Costs=₹237.78  |  Net=₹-2,951.16  (-2.14%)
+
+  [127] CIPLA.NS  —  ❌ LOSS  [Sector: Pharma]
+  ┌─ Signal:   2026-03-13  |  Regime: BEAR
+  ├─ Entry:    2026-03-16  |  ₹1315.36 × 104 shares  =  ₹136,797
+  ├─ Stops:    SL=₹1264.10  |  PT=₹1417.87  |  ATR=₹25.63  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.5998  |  ML conf=75.0%
+  ├─ Why BUY:  Rank #8/105 | ML=75.0% ≥ gate=70% | Regime=BEAR | Sector=Pharma | Score=+0.5998
+  ├─ Exit:     2026-03-19  |  STOP_LOSS @ ₹1253.90  (4d)
+  ├─ Why EXIT: Stop hit at ₹1253.90 (stop was ₹1264.10)
+  ├─ MFE/MAE:  Best=0.95%  |  Worst=-6.08%
+  └─ P&L:      Gross=₹-6,391.84  |  Costs=₹231.85  |  Net=₹-6,623.69  (-4.84%)
+
+  [128] TORNTPHARM.NS  —  ❌ LOSS  [Sector: Pharma]
+  ┌─ Signal:   2026-03-06  |  Regime: VOLATILE
+  ├─ Entry:    2026-03-09  |  ₹4299.29 × 31 shares  =  ₹133,278
+  ├─ Stops:    SL=₹4085.43  |  PT=₹4727.00  |  ATR=₹106.93  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.7131  |  ML conf=60.3%
+  ├─ Why BUY:  Rank #8/105 | ML=60.3% ≥ gate=55% | Regime=VOLATILE | Sector=Pharma | Score=+0.7131
+  ├─ Exit:     2026-04-01  |  STILL_OPEN_CLOSE @ ₹4157.00  (16d)
+  ├─ Why EXIT: End of backtest — closed at last price
+  ├─ MFE/MAE:  Best=4.27%  |  Worst=-3.56%
+  └─ P&L:      Gross=₹-4,410.99  |  Costs=₹229.31  |  Net=₹-4,640.30  (-3.48%)
+
+  [129] SUNPHARMA.NS  —  ❌ LOSS  [Sector: Pharma]
+  ┌─ Signal:   2026-03-20  |  Regime: BEAR
+  ├─ Entry:    2026-03-23  |  ₹1775.69 × 76 shares  =  ₹134,952
+  ├─ Stops:    SL=₹1702.50  |  PT=₹1922.06  |  ATR=₹36.59  |  R:R=2.0:1
+  ├─ Signals:  Rank score=+0.4860  |  ML conf=96.7%
+  ├─ Why BUY:  Rank #7/105 | ML=96.7% ≥ gate=70% | Regime=BEAR | Sector=Pharma | Score=+0.4860
+  ├─ Exit:     2026-04-01  |  STILL_OPEN_CLOSE @ ₹1728.50  (6d)
+  ├─ Why EXIT: End of backtest — closed at last price
+  ├─ MFE/MAE:  Best=2.44%  |  Worst=-3.52%
+  └─ P&L:      Gross=₹-3,586.44  |  Costs=₹232.67  |  Net=₹-3,819.11  (-2.83%)
+\n======================================================================
+Report:  data/backtest/backtest_report_A.txt
+Trades:  data/backtest/backtest_trades_A.csv
+NAV CSV: data/backtest/backtest_nav_A.csv

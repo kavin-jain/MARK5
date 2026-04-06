@@ -86,15 +86,10 @@ class LearningEngine:
         df = self._get_trade_data(limit=1000)
         if df.empty: return {}
 
-        # 1. Pivot to get PnL matrix (Index=TradeTime, Columns=Model)
-        # Approximation: We align by closest timestamp or just take recent streams
-        # For simplicity in this architecture, we calculate Kelly per model and apply a penalty matrix
-        
         models = df['signal_type'].unique()
         raw_kellys = {}
-        performance_vectors = {}
 
-        # Calculate Individual Kelly
+        # 1. Calculate Individual Kelly
         for m in models:
             subset = df[df['signal_type'] == m]
             if len(subset) < 20: 
@@ -111,14 +106,8 @@ class LearningEngine:
             R = avg_win / avg_loss if avg_loss > 0 else 1.0
             kelly = (W - (1 - W) / R)
             raw_kellys[m] = max(0.0, kelly * 0.5) # Half Kelly
-            
-            # Store normalized PnL vector for correlation
-            # We paddle with 0s to align lengths for correlation check (naive but fast)
-            pnl_vec = subset['net_pnl'].values[-50:] 
-            if len(pnl_vec) < 50: pnl_vec = np.pad(pnl_vec, (50-len(pnl_vec), 0), 'constant')
-            performance_vectors[m] = pnl_vec
 
-        # 2. Correlation Penalty
+        # 2. Correlation Penalty (Institutional Alignment Truth)
         final_weights = {}
         
         for m1 in models:
@@ -128,16 +117,23 @@ class LearningEngine:
                 
             correlation_penalty = 1.0
             
+            # Extract PnL series for m1 with timestamps for alignment
+            s1 = df[df['signal_type'] == m1].set_index('exit_timestamp')['net_pnl']
+            
             for m2 in models:
                 if m1 == m2 or raw_kellys.get(m2, 0) == 0: continue
                 
-                # Calculate Correlation
-                v1 = performance_vectors.get(m1, np.zeros(50))
-                v2 = performance_vectors.get(m2, np.zeros(50))
+                # Extract PnL series for m2
+                s2 = df[df['signal_type'] == m2].set_index('exit_timestamp')['net_pnl']
                 
-                if np.std(v1) == 0 or np.std(v2) == 0: continue
+                # Use pandas intersection to align synchronous trade exits
+                common_dates = s1.index.intersection(s2.index)
                 
-                corr = np.corrcoef(v1, v2)[0, 1]
+                if common_dates.size < 15:
+                    corr = 0.0
+                else:
+                    corr = s1.loc[common_dates].corr(s2.loc[common_dates])
+                    if np.isnan(corr): corr = 0.0
                 
                 # If highly correlated (> 0.7), reduce weight
                 if corr > 0.7:
@@ -151,10 +147,20 @@ class LearningEngine:
         
         return {k: round(v/total, 3) for k, v in final_weights.items()}
 
-    def run_learning_cycle(self, ticker: str) -> Dict:
+    def run_learning_cycle(self, ticker: str, context: Optional[Dict] = None) -> Dict:
+        """
+        Executes the full learning/risk cycle for a given ticker.
+        If context['fii_is_synthetic'] is True, applies a 0.5x penalty to conviction.
+        """
         drift = self.detect_robust_drift(ticker)
         weights = self.optimize_weights_covariance_kelly()
         
+        # ── FII Integrity Check (Rule 51 Fallback) ───────────────────────────
+        fii_penalty = 1.0
+        if context and context.get('fii_is_synthetic'):
+            self.logger.warning(f"[{ticker}] Synthetic FII data detected — penalizing signal weight 50%")
+            fii_penalty = 0.5
+            
         action = "MAINTAIN"
         if drift['drift']:
             action = "HALT_TRADING" # Hard Stop
@@ -163,5 +169,6 @@ class LearningEngine:
             "ticker": ticker,
             "action": action,
             "drift_status": drift,
-            "new_weights": weights
+            "new_weights": weights,
+            "fii_penalty": fii_penalty
         }

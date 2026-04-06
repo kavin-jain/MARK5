@@ -70,24 +70,24 @@ class MarketDataProvider:
             DataFrame with columns: open, high, low, close, volume
         DatetimeIndex aligned to IST trading days.
         """
-        cache_path = os.path.join(self.cache_dir, 'NIFTY50_1d.parquet')
+        cache_path = os.path.join(self.cache_dir, 'NIFTY50_60m.parquet')
         
         # Try cache first
         if os.path.exists(cache_path):
             df = pd.read_parquet(cache_path)
             if not df.empty and 'close' in df.columns:
-                logger.info(f"📊 NIFTY50 loaded from cache: {len(df)} bars")
+                logger.debug(f"📊 NIFTY50 60m loaded from cache: {len(df)} bars")
                 return df
         
         if kite_adapter:
-            logger.info(f"📡 Downloading NIFTY50 index via Kite ({start_date} to {end_date})...")
-            # FIX: Use NIFTY50_KITE constant ('NIFTY 50') instead of 'NIFTY50'
-            nifty = kite_adapter.fetch_index_data(NIFTY50_KITE, days_back=2000)
+            logger.info(f"📡 Downloading NIFTY50 index (60m) via Kite ({start_date} to {end_date})...")
+            # FIX: Use '60minute' interval to match stock clock
+            nifty = kite_adapter.fetch_index_data(NIFTY50_KITE, days_back=2000, interval='60minute')
             if nifty is not None and not nifty.empty:
                 if nifty.index.tz is not None:
                     nifty.index = nifty.index.tz_localize(None)
                 nifty.to_parquet(cache_path)
-                logger.info(f"✅ NIFTY50: {len(nifty)} daily bars cached")
+                logger.info(f"✅ NIFTY50 60m: {len(nifty)} bars cached")
                 return nifty
 
         logger.warning("⚠️ NIFTY50 data unavailable — relative strength will use stock-only returns")
@@ -113,7 +113,7 @@ class MarketDataProvider:
         if etf_symbol is None:
             return None
         
-        cache_path = os.path.join(self.cache_dir, f'{etf_symbol.replace(".", "_")}_1d.parquet')
+        cache_path = os.path.join(self.cache_dir, f'{etf_symbol.replace(".", "_")}_60m.parquet')
         
         # Try cache
         if os.path.exists(cache_path):
@@ -124,11 +124,19 @@ class MarketDataProvider:
         # Kite Primary Download
         if kite_adapter:
             try:
-                data = kite_adapter.fetch_ohlcv(etf_symbol, start=start_date, end=end_date, interval='day')
+                # FIX: Use '60minute' interval and correct date arguments
+                from_dt = pd.to_datetime(start_date)
+                to_dt = pd.to_datetime(end_date)
+                data = kite_adapter.fetch_ohlcv(
+                    etf_symbol, 
+                    from_date=from_dt, 
+                    to_date=to_dt, 
+                    interval='60minute'
+                )
                 if data is not None and not data.empty:
                     data.columns = [str(c).lower() for c in data.columns]
                     data.to_parquet(cache_path)
-                    logger.info(f"✅ Sector ETF {etf_symbol}: {len(data)} bars cached")
+                    logger.info(f"✅ Sector ETF {etf_symbol} (60m): {len(data)} bars cached")
                     return data['close']
             except Exception as e:
                 logger.warning(f"Sector ETF {etf_symbol} download failed: {e}")
