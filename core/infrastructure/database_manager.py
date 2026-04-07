@@ -141,6 +141,18 @@ class MARK5DatabaseManager:
     def init_database(self) -> None:
         conn = self._get_conn()
 
+        # Helper to safely add columns (v9.1 hardening)
+        def add_col(table, col, definition):
+            try:
+                # Check current columns
+                cursor = conn.execute(f"PRAGMA table_info({table})")
+                existing = [row[1] for row in cursor.fetchall()]
+                if col not in existing:
+                    logger.info(f"VAULT: Migrating {table} -> adding {col}")
+                    conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {definition}")
+            except Exception as e:
+                logger.error(f"VAULT: Migration failed for {table}.{col}: {e}")
+
         conn.execute("""
             CREATE TABLE IF NOT EXISTS trade_journal (
                 id               INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -190,6 +202,15 @@ class MARK5DatabaseManager:
                 updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         """)
+
+        # Migration 2026-04-06: Ensure extended P&L columns exist for v9.0+
+        add_col("trade_journal", "remaining_quantity", "INTEGER DEFAULT 0")
+        add_col("trade_journal", "total_exit_quantity", "INTEGER DEFAULT 0")
+        add_col("trade_journal", "total_gross_pnl", "DECIMAL DEFAULT 0")
+        add_col("trade_journal", "total_net_pnl", "DECIMAL DEFAULT 0")
+        add_col("trade_journal", "exit_reason", "TEXT")
+        add_col("trade_journal", "fees", "DECIMAL")
+        conn.commit()
 
         conn.execute("""
             CREATE TABLE IF NOT EXISTS risk_configuration (

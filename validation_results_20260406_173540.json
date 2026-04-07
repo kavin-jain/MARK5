@@ -1,0 +1,39 @@
+{
+  "overall_status": "FAIL",
+  "passed": 0,
+  "warnings": 2,
+  "failed": 4,
+  "total": 6,
+  "elapsed": 3.0031843185424805,
+  "results": {
+    "End-to-End Pipeline": {
+      "valid": false,
+      "reason": "Data Provider not ready"
+    },
+    "Data Quality": {
+      "status": "WARN",
+      "error": "DataQualityGuard not found"
+    },
+    "Model Availability": {
+      "status": "FAIL",
+      "error": "No models found"
+    },
+    "Prediction Latency": {
+      "status": "FAIL",
+      "error": "cannot import name 'MARK5PredictionAPI' from 'core.models.predictor' (/home/lynx/Documents/MARK5/core/models/predictor.py)"
+    },
+    "Risk Management": {
+      "status": "FAIL",
+      "error": "'FinalValidationSuite' object has no attribute 'logger'"
+    },
+    "Database Integrity": {
+      "status": "WARN",
+      "missing_tables": [
+        "model_metadata",
+        "model_performance",
+        "predictions",
+        "trading_signals"
+      ]
+    }
+  }
+}

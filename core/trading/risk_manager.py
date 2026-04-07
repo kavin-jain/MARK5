@@ -41,6 +41,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 import numpy as np
+import pandas as pd
 
 
 # ---------------------------------------------------------------------------
@@ -302,6 +303,12 @@ class RiskManager:
         self.positions:           Dict[str, PositionRisk] = {}
         self.today                = date.today()
 
+        # Rule 20: Correlation Cache
+        self._correlation_matrix: Optional[pd.DataFrame] = None
+        self._last_correlation_update: Optional[datetime] = None
+        self._correlation_window = 60 # 60 trading days
+        self._correlation_cache_ttl = 1800 # 30 minutes
+
         self._check_daily_reset()
 
         self.logger.info(
@@ -362,7 +369,77 @@ class RiskManager:
             )
             return False
 
+        # ── RULE 20: CORRELATION CHECK ──
+        if not self.check_correlation_limit(symbol):
+            return False
+
         return True
+
+    def check_correlation_limit(self, symbol: str) -> bool:
+        """
+        Rule 20: Maximum same-sector exposure / Correlation check.
+        If two open positions have 60-day rolling return correlation > 0.70:
+        treat them as one position for all risk calculations.
+        Do not add a third correlated position regardless of signal strength.
+        """
+        if not self.positions:
+            return True
+        
+        if self._correlation_matrix is None or self._should_refresh_correlation():
+            # In a real system, we'd fetch historical data here or rely on 
+            # a data_provider passed in. For now, we'll assume the 
+            # correlation matrix is updated by the main loop or 
+            # we return True if we can't calculate it yet.
+            if self._correlation_matrix is None:
+                return True
+        
+        if symbol not in self._correlation_matrix.columns:
+            return True # No data for this symbol yet
+            
+        high_corr_count = 0
+        for open_sym in self.positions.keys():
+            if open_sym == symbol: continue
+            if open_sym not in self._correlation_matrix.columns: continue
+            
+            corr = self._correlation_matrix.loc[symbol, open_sym]
+            if corr > 0.70:
+                high_corr_count += 1
+                self.logger.info(f"Rule 20: High correlation ({corr:.2f}) between {symbol} and {open_sym}")
+        
+        # Rule 20: Max 2 correlated positions. If count >= 2, we reject the 3rd.
+        if high_corr_count >= 2:
+            self.logger.warning(
+                f"Risk reject Rule 20: {symbol} has high correlation (>0.7) "
+                f"with {high_corr_count} existing positions."
+            )
+            return False
+            
+        return True
+
+    def update_correlation_matrix(self, price_histories: Dict[str, pd.Series]) -> None:
+        """
+        Update the cached correlation matrix using 60-day rolling returns.
+        Called by the main loop (AutonomousTrader) every 30 minutes.
+        """
+        try:
+            df = pd.DataFrame(price_histories)
+            returns = df.pct_change().dropna()
+            
+            # 60-day window
+            if len(returns) > self._correlation_window:
+                returns = returns.tail(self._correlation_window)
+                
+            self._correlation_matrix = returns.corr()
+            self._last_correlation_update = datetime.now()
+            self.logger.info(f"Rule 20: Correlation matrix updated for {len(price_histories)} symbols.")
+        except Exception as e:
+            self.logger.error(f"Failed to update correlation matrix: {e}")
+
+    def _should_refresh_correlation(self) -> bool:
+        if not self._last_correlation_update:
+            return True
+        elapsed = (datetime.now() - self._last_correlation_update).total_seconds()
+        return elapsed > self._correlation_cache_ttl
 
     # ------------------------------------------------------------------
     # Real-time P&L tracking
@@ -476,6 +553,15 @@ class RiskManager:
                 f"(mult={self.regime_multipliers[normalised]:.2f})"
             )
             self.current_regime = normalised
+
+    def calculate_var(self, returns: np.ndarray, confidence: float = 0.95) -> float:
+        """
+        Calculate Value at Risk (VaR) using historical simulation.
+        Institutional-grade risk metric for validation suite.
+        """
+        if len(returns) < 10:
+            return 0.0
+        return float(np.percentile(returns, (1 - confidence) * 100))
 
     # ------------------------------------------------------------------
     # Position sizing

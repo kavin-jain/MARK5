@@ -28,6 +28,7 @@ FEATURES:
 import logging
 import json
 import uuid
+import threading
 from collections import deque
 from datetime import datetime
 from typing import Dict, Optional, List
@@ -89,6 +90,7 @@ class TradeJournal:
         # Rolling Sharpe state — in-memory, per ticker
         self._return_history: Dict[str, deque] = {}
         self._rolling_sharpe_cache: Dict[str, float] = {}
+        self._lock = threading.Lock()
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -452,17 +454,19 @@ class TradeJournal:
 
     def update_rolling_sharpe(self, ticker: str, trade_return: float) -> None:
         """Update rolling Sharpe ratio for a ticker after each closed trade."""
-        if ticker not in self._return_history:
-            self._return_history[ticker] = deque(maxlen=60)
-        self._return_history[ticker].append(trade_return)
+        with self._lock:
+            if ticker not in self._return_history:
+                self._return_history[ticker] = deque(maxlen=60)
+            self._return_history[ticker].append(trade_return)
 
-        history = self._return_history[ticker]
-        if len(history) >= 10:
-            arr = np.array(history)
-            std = arr.std()
-            sharpe = (arr.mean() / std * np.sqrt(252)) if std > 0 else 0.0
-            self._rolling_sharpe_cache[ticker] = sharpe
+            history = self._return_history[ticker]
+            if len(history) >= 10:
+                arr = np.array(history)
+                std = arr.std()
+                sharpe = (arr.mean() / std * np.sqrt(252)) if std > 0 else 0.0
+                self._rolling_sharpe_cache[ticker] = sharpe
 
     def get_rolling_sharpe(self, ticker: str) -> float:
         """Return cached rolling Sharpe, defaulting to 0.5 (neutral) if unknown."""
-        return self._rolling_sharpe_cache.get(ticker, 0.5)
+        with self._lock:
+            return self._rolling_sharpe_cache.get(ticker, 0.5)

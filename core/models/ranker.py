@@ -343,22 +343,6 @@ class CrossSectionalRanker:
                 result = predictor.predict(hist_to_date)
                 confidence = float(result.get('confidence', 0.0))
 
-                # Wick-confirmed entry boost (v2.1)
-                # If the prior day showed a bullish rejection candle and today
-                # confirms with volume, raise confidence by 15% (cap 0.95).
-                # This never creates a BUY signal — it only reinforces one that
-                # already cleared the ML threshold.
-                try:
-                    wick_confirm = _feature_engine.get_wick_confirmed_entry(hist_to_date)
-                    if wick_confirm.iloc[-1]:
-                        boosted = min(confidence * 1.15, 0.95)
-                        logger.debug(
-                            f"  📐 {symbol}: wick boost {confidence:.2%} → {boosted:.2%}"
-                        )
-                        confidence = boosted
-                except Exception as _wick_err:
-                    logger.debug(f"  {symbol}: wick check skipped ({_wick_err})")
-
                 if confidence >= min_conf:
                     candidates.append((symbol, rank_score, confidence))
                     passed += 1

@@ -84,7 +84,7 @@ from typing import Dict, Optional, List, Any
 
 from core.trading.market_utils import MarketStatusChecker
 market_checker = MarketStatusChecker()
-from core.utils.constants import CACHE_TTL_CONFIG
+from core.utils.constants import CACHE_TTL_CONFIG, MarketRegime
 
 class MarketRegimeDetector:
     def __init__(self, config, db_manager=None):
@@ -106,6 +106,9 @@ class MarketRegimeDetector:
         Returns:
             Dict: Market regime analysis
         """
+        # FIX: never mutate the caller's DataFrame — work on a copy throughout
+        data = data.copy()
+
         # ✅ P1 FIX: Validate required features before regime detection
         REGIME_REQUIRED_FEATURES = [
             'close', 'volume', 'returns', 'volatility_20', 'sma_20', 'sma_50'
@@ -114,6 +117,7 @@ class MarketRegimeDetector:
         # Calculate missing SMAs if possible
         if 'close' in data.columns:
             if 'sma_20' not in data.columns:
+                data = data.copy()
                 data['sma_20'] = data['close'].rolling(window=getattr(self.config, 'sma_short_window', 20)).mean()
             if 'sma_50' not in data.columns:
                 data['sma_50'] = data['close'].rolling(window=getattr(self.config, 'sma_long_window', 50)).mean()
@@ -340,16 +344,25 @@ class MarketRegimeDetector:
             elif volatility_regime == "HIGH_VOLATILITY":
                 overall_regime = "VOLATILE_MARKET"
                 regime_confidence = vol_confidence
+            # Standardize output to the core.utils.constants.MarketRegime Enum
+            if overall_regime == "STRONG_BULL":
+                final_enum = MarketRegime.TRENDING
+            elif overall_regime == "BULL_MARKET":
+                final_enum = MarketRegime.TRENDING
+            elif overall_regime == "BEAR_MARKET":
+                final_enum = MarketRegime.BEAR
+            elif overall_regime == "VOLATILE_MARKET":
+                final_enum = MarketRegime.VOLATILE
             else:
-                overall_regime = "SIDEWAYS_MARKET"
-                regime_confidence = 0.6
+                final_enum = MarketRegime.RANGING
             
             confidence_multipliers = self._calculate_confidence_multipliers(
                 overall_regime, volatility_regime, trend_regime, momentum_regime
             )
             
             regime_analysis = {
-                'overall_regime': overall_regime,
+                'overall_regime': final_enum,
+                'overall_regime_str': overall_regime,
                 'regime_confidence': regime_confidence,
                 'volatility_regime': volatility_regime,
                 'trend_regime': trend_regime,

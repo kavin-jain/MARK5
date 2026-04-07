@@ -1,0 +1,39 @@
+{
+  "overall_status": "FAIL",
+  "passed": 0,
+  "warnings": 2,
+  "failed": 4,
+  "total": 6,
+  "elapsed": 3.0031747817993164,
+  "results": {
+    "End-to-End Pipeline": {
+      "valid": false,
+      "reason": "Data Provider not ready"
+    },
+    "Data Quality": {
+      "status": "WARN",
+      "error": "DataQualityGuard not found"
+    },
+    "Model Availability": {
+      "status": "FAIL",
+      "error": "No models found"
+    },
+    "Prediction Latency": {
+      "status": "FAIL",
+      "error": "MARK5Predictor.__init__() missing 1 required positional argument: 'ticker'"
+    },
+    "Risk Management": {
+      "status": "FAIL",
+      "error": "RiskManager.calculate_position_size() got an unexpected keyword argument 'entry_price'"
+    },
+    "Database Integrity": {
+      "status": "WARN",
+      "missing_tables": [
+        "model_metadata",
+        "model_performance",
+        "predictions",
+        "trading_signals"
+      ]
+    }
+  }
+}

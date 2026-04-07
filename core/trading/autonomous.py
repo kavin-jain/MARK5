@@ -67,7 +67,8 @@ except ImportError:
 from core.trading.decision import DecisionEngine as MARK5DecisionEngine
 from core.analytics.journal import TradeJournal
 from core.infrastructure.database_manager import MARK5DatabaseManager
-from core.models.training.engine import LearningEngine
+from core.models.training.trainer import MARK5MLTrainer as LearningEngine
+from core.analytics.regime_detector import MarketRegimeDetector
 
 
 @dataclass
@@ -194,6 +195,10 @@ class AutonomousTrader:
         
         # Learning Engine (for retraining)
         self.learner = LearningEngine(self.db_manager)
+
+        # Regime Detector
+        self.regime_detector = MarketRegimeDetector(self.config, db_manager=self.db_manager)
+        self.logger.info("✅ Market Regime Detector initialized")
 
         # Decision Engine
         if self.prediction_engine:
@@ -449,6 +454,21 @@ class AutonomousTrader:
                 except Exception as e:
                     self.logger.error(f"Error processing {ticker}: {e}")
         
+        # 2b. Rule 20: Periodic Correlation Matrix Update (Every 30m)
+        if self.risk_analyzer._should_refresh_correlation():
+            self.logger.info("📊 Rule 20: Updating portfolio correlation matrix (30m cycle)...")
+            price_histories = {}
+            for ticker in self.watchlist:
+                try:
+                    hist = self.collector.fetch_stock_data(ticker, period='60d', interval='1d')
+                    if hist is not None and not hist.empty:
+                        price_histories[ticker] = hist['close']
+                except Exception as e:
+                    self.logger.debug(f"Could not fetch history for correlation: {ticker} - {e}")
+            
+            if price_histories:
+                self.risk_analyzer.update_correlation_matrix(price_histories)
+        
         # 3. Manage Positions (Check SL/TP)
         # Fetch fresh quotes for open positions
         open_positions = self.execution_engine.get_positions()
@@ -482,27 +502,35 @@ class AutonomousTrader:
         if not self.decision_engine:
             return
 
-        # --- REGIME PRE-SCREEN (Week 2 Rollout - Log Only) ---
+        # --- REGIME PRE-SCREEN (Audit v10.5 - Standardized) ---
         try:
-            # Get latest regime via container or detector instance
-            # Since decision_engine uses detector, we fetch from it if possible
-            # Or we can just call it directly. Assume we have detector linked.
-            if hasattr(self, 'decision_engine'):
-                if hasattr(self.decision_engine, 'regime_detector'):
-                    regime_info = self.decision_engine.regime_detector.detect_market_regime(ticker)
-                    regime = regime_info.get('overall_regime', 'UNKNOWN')
+            # 1. Fetch data for regime detection (daily bars for context)
+            hist_data = self.collector.fetch_stock_data(ticker, period='60d', interval='1d')
+            if hist_data is not None and not hist_data.empty:
+                regime_info = self.regime_detector.detect_market_regime(ticker, hist_data)
+                regime = regime_info['overall_regime'] # Standardized Enum
+                
+                # 2. Update Risk & Sizer with latest regime
+                # self.risk_analyzer is the PortfolioRiskAnalyzer
+                self.risk_analyzer.set_regime(regime.value) 
+                
+                # self.decision_engine.sizer is the VolatilityAwarePositionSizer
+                if hasattr(self.decision_engine, 'sizer'):
+                    self.decision_engine.sizer.set_regime(regime)
                     
-                    if regime in ['CHOPPY', 'VOLATILE']:
-                        # Log but do not block yet
-                        self.logger.info(f"🚧 REGIME PRE-SCREEN: {ticker} is in {regime} regime.")
-                        # return  # Week 3 hard block
+                regime_name = regime.name if hasattr(regime, 'name') else str(regime)
+                self.logger.info(f"🌐 Ticker {ticker} Regime: {regime_name} "
+                                 f"(Confidence: {regime_info['regime_confidence']:.2f})")
+                    
+                if regime_name in ['VOLATILE', 'BEAR']:
+                    # Log but do not block yet
+                    self.logger.info(f"🚧 REGIME PRE-SCREEN: {ticker} is in {regime_name} regime.")
 
-                    # RULE 90 - Rolling Sharpe Gate
-                    if hasattr(self, 'trade_journal'):
-                        sharpe = self.trade_journal.get_rolling_sharpe(ticker)
-                        if sharpe < 0.5:
-                            self.logger.info(f"🚧 SHARPE PRE-SCREEN: {ticker} has Rolling Sharpe < 0.5 ({sharpe:.2f}).")
-                            # return  # Week 3 hard block
+                # RULE 90 - Rolling Sharpe Gate
+                if hasattr(self, 'trade_journal'):
+                    sharpe = self.trade_journal.get_rolling_sharpe(ticker)
+                    if sharpe < 0.5:
+                        self.logger.info(f"🚧 SHARPE PRE-SCREEN: {ticker} has Rolling Sharpe < 0.5 ({sharpe:.2f}).")
         except Exception as e:
             self.logger.error(f"Pre-screen error for {ticker}: {e}")
         # ----------------------------------------------------
