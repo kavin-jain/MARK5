@@ -1,0 +1,34 @@
+{
+  "overall_status": "FAIL",
+  "passed": 0,
+  "warnings": 1,
+  "failed": 5,
+  "total": 6,
+  "elapsed": 3.235119581222534,
+  "results": {
+    "End-to-End Pipeline": {
+      "valid": false,
+      "reason": "Data Provider not ready"
+    },
+    "Data Quality": {
+      "status": "WARN",
+      "error": "DataQualityGuard not found"
+    },
+    "Model Availability": {
+      "status": "FAIL",
+      "error": "No models found"
+    },
+    "Prediction Latency": {
+      "status": "FAIL",
+      "error": "cannot import name 'MARK5PredictionAPI' from 'core.models.predictor' (/home/lynx/Documents/MARK5/core/models/predictor.py)"
+    },
+    "Risk Management": {
+      "status": "FAIL",
+      "error": "RiskManager.calculate_position_size() got an unexpected keyword argument 'entry_price'"
+    },
+    "Database Integrity": {
+      "status": "FAIL",
+      "error": "Database not found"
+    }
+  }
+}

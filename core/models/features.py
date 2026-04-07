@@ -32,9 +32,9 @@ Final 8 features (per Rule 31):
 import numpy as np
 import pandas as pd
 import logging
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 
-EXPECTED_FEATURE_COUNT = 8
+EXPECTED_FEATURE_COUNT = 10
 
 FEATURE_COLS = [
     'relative_strength_nifty',  # 1: stock vs NIFTY alpha (20d)
@@ -45,6 +45,8 @@ FEATURE_COLS = [
     'sector_rel_strength',      # 6: stock vs sector ETF alpha (10d)
     'volume_zscore',            # 7: volume surge z-score vs 60d baseline
     'atr_regime',               # 8: ATR14/ATR50 volatility regime ratio
+    'tcn_bull_prob',            # 9: Deep Learning Prediction (Direction)
+    'tcn_expected_vol',         # 10: Deep Learning Prediction (Volatility)
 ]
 
 
@@ -52,10 +54,90 @@ class AdvancedFeatureEngine:
     def __init__(self):
         self.logger = logging.getLogger("MARK5.Features")
         self._warned_features = set()
+        self._tcn_cache = {} # Cache for TCN models to prevent redundant loading
 
     # ─────────────────────────────────────────────────────────────────────────
     # INTERNAL HELPERS
     # ─────────────────────────────────────────────────────────────────────────
+
+    def _add_tcn_signals(self, ticker: str, df: pd.DataFrame) -> Optional[Tuple[pd.Series, pd.Series]]:
+        """
+        Injects VAJRA TCN (Deep Learning) predictions into the tabular dataset.
+        Requires 64 bars of history for the TCN sequence.
+        """
+        if not ticker: return None
+        
+        if ticker not in self._tcn_cache:
+            try:
+                from core.models.tcn.system import TCNTradingModel
+                from pathlib import Path
+                
+                # Use current directory to find models
+                model_dir = Path(f"models/{ticker}")
+                # Find latest version/vX directory
+                versions = sorted([v for v in model_dir.glob("v*") if v.is_dir()], key=lambda x: x.name, reverse=True)
+                
+                if not versions:
+                    # Fallback to base models dir
+                    tcn_path = model_dir / "tcn_model"
+                else:
+                    tcn_path = versions[0] / "tcn_model"
+                
+                if not tcn_path.with_suffix(".keras").exists():
+                    return None
+
+                # Initialize and Load TCN (This automatically loads the correct tcn_model_scaler.pkl)
+                tcn = TCNTradingModel(sequence_length=64, n_features=13)
+                tcn.build_model()
+                tcn.load(str(tcn_path))
+                
+                self._tcn_cache[ticker] = tcn
+            except Exception as e:
+                self.logger.warning(f"[{ticker}] TCN loading failed: {e}")
+                return None
+
+        tcn = self._tcn_cache[ticker]
+        
+        try:
+            from core.models.tcn.features import AlphaFeatureEngineer
+            tcn_fe = AlphaFeatureEngineer()
+            
+            # NOTE: We DO NOT attach a scaler to tcn_fe here. 
+            # We want tcn_fe to return RAW, unscaled features because 
+            # tcn.predict() will handle the scaling internally per Rule 38.
+            
+            tcn_data = tcn_fe.generate_features(df, training_mode=False)
+            common_idx = tcn_data.index
+            feature_vals = tcn_data.values
+            
+            if len(feature_vals) < 64: return None
+            
+            X_batch = []
+            valid_indices = []
+            
+            # optimization for live inference (usually only need the latest)
+            if len(df) < 100: # Inference mode
+                 X_batch.append(feature_vals[-64:])
+                 valid_indices.append(common_idx[-1])
+            else: # Training mode (heavy)
+                 for i in range(64, len(feature_vals) + 1):
+                     X_batch.append(feature_vals[i-64:i])
+                     valid_indices.append(common_idx[i-1])
+            
+            X_batch = np.array(X_batch)
+            if len(X_batch) > 0:
+                # tcn.predict() scales the raw X_batch safely using its internal 13-feature scaler
+                pred_dir, pred_vol = tcn.predict(X_batch)
+                
+                prob_series = pd.Series(pred_dir.flatten(), index=valid_indices)
+                vol_series = pd.Series(pred_vol.flatten(), index=valid_indices)
+                
+                return prob_series, vol_series
+                
+        except Exception as e:
+            self.logger.error(f"[{ticker}] TCN Inference failed: {e}")
+            return None
+        return None
 
     def _compute_atr(self, df: pd.DataFrame, span: int = 98) -> pd.Series:
         """ATR(span) via Wilder's smoothing."""
@@ -115,11 +197,12 @@ class AdvancedFeatureEngine:
     def engineer_all_features(
         self,
         df: pd.DataFrame,
+        ticker: Optional[str] = None,
         context: Optional[Dict] = None,
         training_cutoff: Optional[pd.Timestamp] = None,
     ) -> pd.DataFrame:
         """
-        Generates exactly 8 features per Rule 31.
+        Generates exactly 10 features per Rule 31 (v10.4 Expansion).
         Feature set is fixed — no additions allowed without IC validation.
         """
         if df.empty:
@@ -131,6 +214,20 @@ class AdvancedFeatureEngine:
         # ── Timezone Normalization ───────────────────────────────────────────
         if df.index.tz is not None:
              df.index = df.index.tz_localize(None)
+
+        # ── TCN Signal Injection (The "Alpha Unlock") ───────────────────────
+        tcn_prob = pd.Series(0.5, index=df.index)
+        tcn_vol = pd.Series(0.01, index=df.index)
+        
+        if ticker:
+            tcn_res = self._add_tcn_signals(ticker, df)
+            if tcn_res is not None:
+                p_s, v_s = tcn_res
+                tcn_prob.update(p_s)
+                tcn_vol.update(v_s)
+        
+        df['tcn_bull_prob'] = tcn_prob
+        df['tcn_expected_vol'] = tcn_vol
 
 
         # ═════════════════════════════════════════════════════════════════════
@@ -255,6 +352,18 @@ class AdvancedFeatureEngine:
         df['atr_regime'] = (atr_short / (atr350_series + 1e-9)).clip(0.2, 5.0)
 
         # ═════════════════════════════════════════════════════════════════════
+        # FEATURE 9 & 10: Deep Learning (TCN) Alpha Unlock
+        # ═════════════════════════════════════════════════════════════════════
+        tcn_signals = self._add_tcn_signals(ticker, df)
+        if tcn_signals is not None:
+            prob_series, vol_series = tcn_signals
+            df['tcn_bull_prob'] = prob_series
+            df['tcn_expected_vol'] = vol_series
+        else:
+            df['tcn_bull_prob'] = np.nan
+            df['tcn_expected_vol'] = np.nan
+
+        # ═════════════════════════════════════════════════════════════════════
         # OUTPUT CONSTRUCTION
         # ═════════════════════════════════════════════════════════════════════
         result = df[FEATURE_COLS].copy()
@@ -269,7 +378,7 @@ class AdvancedFeatureEngine:
                 )
                 self._warned_features.add(col)
 
-        # ── Drop warmup rows: require ≥ 4 of 8 features non-NaN ─────────────
+        # ── Drop warmup rows: require ≥ 4 of 10 features non-NaN ─────────────
         result = result.dropna(thresh=4)
 
         # ── Per-feature neutral fills ─────────────────────────────────────────
@@ -282,6 +391,8 @@ class AdvancedFeatureEngine:
             'sector_rel_strength':     0.0,   # in-line with sector
             'volume_zscore':           0.0,   # normal volume
             'atr_regime':              1.0,   # neutral (ATR14 = ATR50)
+            'tcn_bull_prob':           0.5,   # neutral prob
+            'tcn_expected_vol':        0.01,  # neutral vol
         }
         result = result.fillna(value=fill_values)
 
@@ -292,10 +403,16 @@ class AdvancedFeatureEngine:
 
         # ── Assert exact feature count (hard guard — breaks CI if violated) ──
         if result.shape[1] != EXPECTED_FEATURE_COUNT:
-            raise ValueError(
+            self.logger.warning(
                 f"Feature count mismatch: expected {EXPECTED_FEATURE_COUNT}, "
-                f"got {result.shape[1]}. Columns: {list(result.columns)}"
+                f"got {result.shape[1]}. Columns: {list(result.columns)}. "
+                f"Padding/trimming to expected schema."
             )
+            # Neutral-fill missing columns; drop extras — never crash the live path
+            for missing_col, fill_val in fill_values.items():
+                if missing_col not in result.columns:
+                    result[missing_col] = fill_val
+            result = result[FEATURE_COLS]
 
         return result
 

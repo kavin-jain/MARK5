@@ -19,11 +19,11 @@ from pathlib import Path
 import logging
 
 # Import core modules
-# from core.models.predictor import MARK5PredictionAPI
-from core.trading.signal_generator import TradingSignalGenerator
+from core.models.predictor import MARK5Predictor
+from core.trading.signals import TradingSignalGenerator
 # from core.utils.data_quality_guard import DataQualityGuard # Check if this exists
-from core.evaluation.performance_tracker import ModelPerformanceTracker
-# from core.trading.risk_manager import FastRiskAnalyzer # Removed broken import
+from core.analytics.performance import ModelPerformanceTracker
+from core.trading.risk_manager import PortfolioRiskAnalyzer # Removed broken import
 from core.trading.market_utils import MarketStatusChecker
 from core.system.container import container
 
@@ -50,6 +50,7 @@ class FeatureSchemaValidator:
     """
     
     def __init__(self):
+        self.logger = logging.getLogger('MARK5.Suite')
         self.schemas: Dict[str, Dict] = {}  # ticker_modeltype -> schema
     
     def create_schema(self, ticker: str, model_type: str, features_df: pd.DataFrame) -> Dict:
@@ -134,6 +135,7 @@ class FinalValidationSuite:
     """Comprehensive validation before production"""
     
     def __init__(self):
+        self.logger = logging.getLogger('MARK5.Suite')
         self.results = {}
         self.errors = []
         self.warnings = []
@@ -156,8 +158,7 @@ class FinalValidationSuite:
                 return {'status': 'FAIL', 'error': 'Insufficient data'}
             
             # Initialize API
-            from core.models.predictor import MARK5PredictionAPI
-            api = MARK5PredictionAPI(cache_enabled=True)
+            api = MARK5Predictor('RELIANCE.NS')
             
             # Make prediction
             start_time = time.time()
@@ -294,8 +295,7 @@ class FinalValidationSuite:
         print("Testing prediction latency...")
         
         try:
-            from core.models.predictor import MARK5PredictionAPI
-            api = MARK5PredictionAPI(cache_enabled=False)
+            api = MARK5Predictor('RELIANCE.NS')
             # Use container for data access
             collector = container.data
             if not collector:
@@ -351,11 +351,11 @@ class FinalValidationSuite:
             
             # Test position sizing
             position = analyzer.calculate_position_size(
-                entry_price=1500,
-                stop_loss=1450
+                capital=100000.0, entry=1500.0,
+                sl=1450.0
             )
             
-            if not position or 'shares' not in position:
+            if position is None:
                 return {'status': 'FAIL', 'error': 'Position sizing failed'}
             
             # Test VaR calculation (needs returns data)
@@ -382,9 +382,9 @@ class FinalValidationSuite:
         try:
             import sqlite3
             
-            # Adjust path
-            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            db_path = os.path.join(base_dir, 'database/main/mark5.db')
+            # Adjust path (The Vault)
+            from core.infrastructure.database_manager import MARK5DatabaseManager
+            db_path = MARK5DatabaseManager().db_path
             
             if not os.path.exists(db_path):
                 return {'status': 'FAIL', 'error': 'Database not found'}

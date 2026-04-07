@@ -18,6 +18,8 @@ SAFETY LEVEL: CRITICAL - Initializes all core services
 """
 
 import logging
+import os
+from kiteconnect import KiteConnect
 
 from core.system.container import container
 from core.utils.config_manager import get_config
@@ -39,6 +41,9 @@ def bootstrap_system(env: str = "prod"):
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger("MARK5.Boot")
     logger.info(f"Booting MARK5 in '{env}' mode...")
+
+    # 0. Pre-flight: Kite Session Validation
+    _validate_kite_session(logger)
 
     # 1. Configuration
     config = get_config()
@@ -93,6 +98,29 @@ def bootstrap_system(env: str = "prod"):
 
     logger.info("✅ System bootstrapped successfully.")
     return container
+
+
+def _validate_kite_session(logger):
+    """Verify that Kite API credentials and access token are present and valid."""
+    api_key = os.getenv("KITE_API_KEY")
+    access_token = os.getenv("KITE_ACCESS_TOKEN")
+
+    if not api_key or not access_token:
+        logger.error("❌ CRITICAL: Missing KITE_API_KEY or KITE_ACCESS_TOKEN in environment.")
+        logger.error("👉 Run 'python3 core/utils/tools/generate_kite_token.py' to authenticate.")
+        raise RuntimeError("Authentication Missing: Kite Connect session not found.")
+
+    try:
+        # Quick validation: initialize client and check profile (if possible)
+        kite = KiteConnect(api_key=api_key)
+        kite.set_access_token(access_token)
+        # Note: We don't call kite.profile() here to avoid unnecessary API hits 
+        # during every bootstrap, but we verify the tokens are at least set.
+        # Deep validation happens in the DataProvider/OrderManager.
+        logger.info("🔐 Kite session tokens detected.")
+    except Exception as e:
+        logger.error(f"❌ CRITICAL: Kite session validation failed: {e}")
+        raise
 
 
 if __name__ == "__main__":

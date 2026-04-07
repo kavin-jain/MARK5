@@ -38,10 +38,10 @@ class SignalType(Enum):
 
 
 class MarketRegime(Enum):
-    BULL_MARKET    = "BULL_MARKET"
-    BEAR_MARKET    = "BEAR_MARKET"
-    SIDEWAYS_MARKET = "SIDEWAYS_MARKET"
-    VOLATILE_MARKET = "VOLATILE_MARKET"
+    TRENDING = "TRENDING"  # BULL/BEAR strong trend
+    RANGING  = "RANGING"   # SIDEWAYS / Mean-reversion
+    VOLATILE = "VOLATILE"  # HIGH_VOLATILITY
+    BEAR     = "BEAR"      # BEAR_MARKET / CRISIS
 
 
 class RiskLevel(Enum):

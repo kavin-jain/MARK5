@@ -28,8 +28,9 @@ import pandas as pd
 
 # DEBUG: Check trainer module
 try:
-    import core.models.trainer
-    import core.data.collector
+    # Remove stale debug imports
+    # import core.models.trainer
+    # import core.data.collector
     from core.models.training.trainer import MARK5MLTrainer
     print(f"DEBUG: MARK5MLTrainer source: {MARK5MLTrainer.train_advanced_ensemble}")
 except Exception as e:

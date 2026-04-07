@@ -108,12 +108,27 @@ class MARK5Predictor:
                 if os.path.exists(cal_path):
                     calibrators[name] = joblib.load(cal_path)
 
-            # Load stacking meta-learner (v10.0+); None for older model versions.
+            # Load Meta-Learner (v10.0+)
             meta_model = None
-            meta_path = f"{base_dir}/meta_model.pkl"
-            if os.path.exists(meta_path):
-                meta_model = joblib.load(meta_path)
-                self.logger.info("Meta-learner loaded for stacking inference.")
+            meta_model_path = f"{base_dir}/meta_model.pkl"
+            if os.path.exists(meta_model_path):
+                meta_model = joblib.load(meta_model_path)
+
+            # Load Metadata & Enforce PRODUCTION GATE (v10.1)
+            meta_path = f"{base_dir}/metadata.json"
+            if not os.path.exists(meta_path):
+                self.logger.warning(f"No metadata for {self.ticker} — refusing to load unverified model.")
+                return
+
+            with open(meta_path, 'r') as fh:
+                metadata = json.load(fh)
+
+            if not metadata.get('passes_gate', False):
+                self.logger.error(
+                    f"🛑 GATE FAIL: {self.ticker} v{metadata.get('version')} "
+                    f"did NOT pass production gate. Refusing to trade."
+                )
+                return
 
             # ATOMIC SWAP — meta_model passed to constructor (v10.0+)
             new_container = AtomicModelContainer(
@@ -124,7 +139,7 @@ class MARK5Predictor:
                 self._container = new_container
 
             self.logger.info(
-                f"✅ Models hot-swapped: {list(models.keys())} | "
+                f"✅ Models hot-swapped for {self.ticker}: {list(models.keys())} | "
                 f"meta={'yes' if meta_model else 'no'}"
             )
 
@@ -143,7 +158,7 @@ class MARK5Predictor:
 
         try:
             # 1. Feature Engineering
-            df_feats = self.feature_engine.engineer_all_features(raw_data)
+            df_feats = self.feature_engine.engineer_all_features(raw_data, ticker=self.ticker)
             
             
             # 2. Schema Alignment (Strict)
@@ -202,30 +217,41 @@ class MARK5Predictor:
                 return {'signal': 'HOLD', 'reason': 'All models failed'}
 
             # ── Ensemble: stacking meta-learner (v10+) or arithmetic mean fallback ──
-            # Meta-model (LogisticRegression) was trained on OOF predictions from CPCV.
-            # It learns the correct weighting of base models from held-out data.
-            # Arithmetic mean is the fallback for older model artifacts (v9 and below).
-            if container.meta_model is not None and len(model_probs_class1) == 3:
-                # Stacking path: feed base model probs to meta-learner.
-                # Order must match training order: [xgb, lgb, cat].
-                # model_probs_class1 preserves insertion order from the model loop above.
-                meta_X = np.array(model_probs_class1).reshape(1, -1)
+            # Only use the core triplet for the meta-learner to prevent shape mismatches
+            stacking_keys = ['xgb', 'lgb', 'cat']
+            stacking_probs = [
+                model_details[name]['raw'] 
+                for name in stacking_keys 
+                if name in model_details
+            ]
+
+            if container.meta_model is not None and len(stacking_probs) == 3:
+                # Stacking path: MUST use explicit key order matching CPCV training.
+                # Training order in trainer.py is always [xgb, lgb, cat].
+                # model_details dict preserves insertion order but a failed model
+                # would shift indices — so we index by name, not position.
+                meta_X = np.array([
+                    model_details.get(m, {}).get('raw', 0.5)
+                    for m in ('xgb', 'lgb', 'cat')
+                ]).reshape(1, -1)
                 confidence = float(container.meta_model.predict_proba(meta_X)[0, 1])
                 ensemble_method = 'stacking'
             else:
-                # Fallback: arithmetic mean (v9 artifacts or partial model loads).
-                confidence = float(np.mean(model_probs_class1))
+                # Fallback: arithmetic mean
+                confidence = float(np.mean(model_probs_class1)) if model_probs_class1 else 0.0
                 ensemble_method = 'arithmetic_mean'
             
-            # RAW probability hurdle: 0.52 (above 0.50 random baseline)
-            PROBABILITY_HURDLE = 0.52
-
+            # HURDLE UP (v10.2): Increased to 0.60 to kill "Ghost Confidence" noise
+            PROBABILITY_HURDLE = 0.60
+            
             if confidence >= PROBABILITY_HURDLE:
                 signal = "BUY"
             else:
                 signal = "HOLD"
                 if confidence >= 0.50:
                     signal = f"HOLD (Conf {confidence:.0%} < {PROBABILITY_HURDLE:.0%} hurdle)"
+
+            # C-3: Real entropy from final probability distribution.
 
             # C-3: Real entropy from final probability distribution.
             entropy_val = self._calculate_entropy(

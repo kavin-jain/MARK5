@@ -22,10 +22,8 @@ SIZING METHODOLOGY:
 import logging
 import numpy as np
 from decimal import Decimal
-from typing import Dict, Optional, Tuple, List
-from enum import Enum
-from collections import deque
 from dataclasses import dataclass
+from core.utils.constants import MarketRegime
 
 logger = logging.getLogger("MARK5.PositionSizer")
 
@@ -53,12 +51,7 @@ SPREAD_BPS_SEMILIQUID: float = 0.0008  # 8bps  — ₹5cr–₹50cr ADV
 SPREAD_BPS_LIQUID: float = 0.0003      # 3bps  — > ₹50cr ADV (Nifty 50 level)
 
 
-class MarketRegime(Enum):
-    """Market regime for sizing adjustments"""
-    LOW_VOLATILITY = "LOW_VOLATILITY"    # Trending, calm
-    NORMAL = "NORMAL"                     # Average conditions
-    HIGH_VOLATILITY = "HIGH_VOLATILITY"  # Choppy, uncertain
-    CRISIS = "CRISIS"                     # Extreme volatility, risk-off
+# Standardized MarketRegime imported from constants
 
 
 @dataclass
@@ -112,12 +105,12 @@ class VolatilityAwarePositionSizer:
     Constrained by: max_position_size_pct, max_capital_per_trade
     """
     
-    # Regime-based multipliers (reduce exposure in uncertainty)
+    # Regime-based multipliers (rebuild report Section 7.2) -- Rule 23
     DEFAULT_REGIME_MULTIPLIERS = {
-        MarketRegime.LOW_VOLATILITY: 1.0,   # No upward bias — RULE 17
-        MarketRegime.NORMAL: 1.0,           # Standard sizing
-        MarketRegime.HIGH_VOLATILITY: 0.5,  # RULE 17: ATR>1.5× → reduce 50%
-        MarketRegime.CRISIS: 0.3,           # Minimal exposure
+        MarketRegime.TRENDING: 1.0,  # Full position sizing
+        MarketRegime.RANGING:  0.7,  # Size at 70%
+        MarketRegime.VOLATILE: 0.5,  # Size at 50%
+        MarketRegime.BEAR:     0.3,  # Long entries suspended / Size at 30%
     }
     
     def __init__(
@@ -150,7 +143,7 @@ class VolatilityAwarePositionSizer:
         
         # Regime settings
         self.regime_multipliers = dict(self.DEFAULT_REGIME_MULTIPLIERS)
-        self.current_regime = MarketRegime.NORMAL
+        self.current_regime = MarketRegime.RANGING # Default to RANGING
         
         # Performance tracking
         self.trade_history: deque = deque(maxlen=50)  # Last 50 trades
@@ -236,8 +229,24 @@ class VolatilityAwarePositionSizer:
                 )
                 return 0, {'reason': 'Sector concentration limit', 'final_qty': 0}
 
-        # Dynamic multipliers
+        # ── RULE 23: TREND/RANGE/BEAR MULTIPLY & GATE ──
         regime_mult = self._get_regime_multiplier()
+        
+        # Rule 23: BEAR Market Entry Gate
+        # "Long entries suspended. Cash only unless signal confidence > 70%."
+        if self.current_regime == MarketRegime.BEAR:
+            if conviction < 0.70:
+                logger.warning(
+                    f"{symbol}: LONG entry suspended (Rule 23 BEAR gate: "
+                    f"conviction {conviction:.2f} < 0.70)"
+                )
+                return 0, {'reason': 'Rule 23 BEAR Entry Gate', 'final_qty': 0}
+            else:
+                # High-conviction override allowed under Rule 23
+                # We use a 0.7 multiplier (scaling) instead of the 0.3 base.
+                regime_mult = 0.7 
+                logger.info(f"{symbol}: BEAR Market high-conviction entry allowed (multiplier: 0.7)")
+
         perf_mult = self._get_performance_multiplier()
         dd_mult = self._get_drawdown_multiplier()
         final_multiplier = regime_mult * perf_mult * dd_mult

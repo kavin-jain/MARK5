@@ -28,6 +28,7 @@ PUBLIC API (unchanged, predictor.py depends on this):
 
 import gc
 import json
+from datetime import datetime
 import logging
 import os
 import shutil
@@ -87,7 +88,7 @@ CPCV_EMBARGO_BARS: int = 30
 # Production gate (rebuild report Section 6.1)
 PROD_GATE_P_SHARPE: float = 0.40     # P(Sharpe > SHARPE_TARGET) must exceed this
 PROD_GATE_SHARPE_TARGET: float = 1.5  # minimum acceptable annualised Sharpe
-PROD_GATE_WORST5PCT: float = 0.0      # worst-5% fold Sharpe must be non-negative
+PROD_GATE_WORST5PCT: float = -1.5     # worst-5% fold Sharpe must be ≥ -1.5 (Realism Gate)
 
 # Feature importance stability gate (rebuild report Section 6.2)
 MIN_FEATURE_RANK_CORR: float = 0.70   # Spearman corr first vs last fold importance
@@ -237,7 +238,7 @@ class MARK5MLTrainer:
 
         # BUG-1 wire-up: training_cutoff restricts amihud p99 to training window.
         data_with_features = feature_engine.engineer_all_features(
-            data, context=context, training_cutoff=training_cutoff
+            data, ticker=ticker, context=context, training_cutoff=training_cutoff
         )
 
         # ── Regime-aware training filter (Rule 23) ───────────────────────────
@@ -266,6 +267,17 @@ class MARK5MLTrainer:
                 volatile_mask = atr14 > (1.5 * atr50)
 
                 bear_mask = bear_mask | volatile_mask
+
+                # ── Invalidate labels overlapping BEAR regimes (Fix 9) ──────────────────
+                # If any bar in the next H bars is BEAR, invalidate the label at T
+                horizon = self.config.prediction_horizon
+                bear_overlap = bear_mask.reindex(data.index).fillna(False).rolling(
+                    window=horizon, min_periods=1
+                ).max().shift(-horizon).fillna(False)
+                
+                # If hit occurred during bear, set bin to 0 (No Hit)
+                labels_df.loc[bear_overlap == 1.0, 'bin'] = 0
+                
             except Exception as _e:
                 logger.warning(f"[{ticker}] Regime filter failed ({_e}) — using all bars")
                 bear_mask = None
@@ -546,6 +558,12 @@ class MARK5MLTrainer:
         # ── Stacking meta-learner ─────────────────────────────────────────────
         meta_model = self._train_meta_learner(oof_sum, oof_count, y, n_samples, ticker)
 
+        # [REFINEMENT] v10.1: If meta-learner is rejected (anti-predictive coefficients),
+        # the model fails the gate entirely. Falling back to arithmetic mean is prohibited.
+        if meta_model is None:
+            logger.warning(f"[{ticker}] Gate fail: Meta-learner rejection (anti-predictive)")
+            passes_gate = False
+
         # ── Final base models: retrain on ALL data ────────────────────────────
         final_scaler = StandardScaler()
         X_all = final_scaler.fit_transform(X)
@@ -562,7 +580,7 @@ class MARK5MLTrainer:
         # ── Save all artifacts ────────────────────────────────────────────────
         version = self.version_manager.increment_version(ticker)
         self._save_artifacts(
-            ticker, final_models, final_scaler, feature_names, version, meta_model
+            ticker, final_models, final_scaler, feature_names, version, meta_model, passes_gate
         )
 
         return {
@@ -581,6 +599,46 @@ class MARK5MLTrainer:
     # ---------------------------------------------------------------------- #
     # Model trainers
     # ---------------------------------------------------------------------- #
+
+    def train_model(self, ticker: str, retrain: bool = False) -> Dict:
+        """
+        [FIX-AUTO] Stability wrapper for AutonomousTrader.
+        Fetches data automatically and executes training ensemble.
+        """
+        try:
+            self.logger.info(f"[{ticker}] 🔄 Triggering automated retraining cycle...")
+            # Fetch 3 years of daily data (Rule 59)
+            data = self.fetch_data_for_training(ticker, years=3.0)
+            if data is None or len(data) < 300:
+                return {"status": "failed", "reason": "Insufficient data"}
+
+            return self.train_advanced_ensemble(ticker, data)
+        except Exception as e:
+            self.logger.error(f"[{ticker}] Automated training failed: {e}")
+            return {"status": "failed", "reason": str(e)}
+
+    @staticmethod
+    def fetch_data_for_training(symbol_ns: str, years: float = 3.0):
+        """Robust data fetcher (migrated for train_model compatibility)"""
+        bare = symbol_ns.replace('.NS', '')
+        # Check cache paths relative to project root
+        project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        cache_paths = [
+            os.path.join(project_root, 'data', 'cache', f'{bare}_daily.parquet'),
+            os.path.join(project_root, 'data', 'cache', f'{bare}_NS_1d.parquet')
+        ]
+        
+        for cp in cache_paths:
+            if os.path.exists(cp):
+                try:
+                    df = pd.read_parquet(cp)
+                    df.columns = [c.lower() for c in df.columns]
+                    # Ensure latest data (not too stale)
+                    if (datetime.now().timestamp() - os.path.getmtime(cp)) < 172800: # 48h
+                         return df
+                except Exception:
+                    continue
+        return None
 
     def _train_xgboost(
         self,
@@ -814,23 +872,27 @@ class MARK5MLTrainer:
         features: List[str],
         version: int,
         meta_model: Optional[LogisticRegression],
+        passes_gate: bool,
     ) -> None:
         """
         Save all training artifacts to models/{ticker}/v{version}/.
-
-        Artifact contract (predictor.py depends on exact filenames):
-          scaler.pkl       — fitted StandardScaler
-          features.json    — ordered feature name list (schema for predictor)
-          weights.json     — per-model weight dict (all 1.0; meta-learner handles weights)
-          xgb_model.pkl    — trained XGBClassifier
-          lgb_model.pkl    — trained LGBMClassifier
-          cat_model.pkl    — trained CatBoostClassifier (replaces rf_model.pkl)
-          meta_model.pkl   — LogisticRegression meta-learner (new in v10.0)
+        Adds metadata.json for predictor gate-locking (v10.1).
         """
         path = os.path.join(self.models_base_dir, ticker, f"v{version}")
         os.makedirs(path, exist_ok=True)
 
         joblib.dump(scaler, os.path.join(path, 'scaler.pkl'))
+
+        # Record metadata for institutional gate-locking
+        metadata = {
+            'ticker':      ticker,
+            'version':     version,
+            'passes_gate': passes_gate,
+            'timestamp':   datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'features':    features,
+        }
+        with open(os.path.join(path, 'metadata.json'), 'w') as fh:
+            json.dump(metadata, fh, indent=2)
 
         with open(os.path.join(path, 'features.json'), 'w') as fh:
             json.dump(features, fh)

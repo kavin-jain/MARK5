@@ -38,7 +38,7 @@ MAX_HOLD_DAYS        = 10
 RISK_PER_TRADE       = Decimal('0.015')
 MAX_POSITION_SIZE    = Decimal('150000')
 MAX_CAPITAL_DEPLOYED = Decimal('0.60')
-CONFIDENCE_NORMAL    = 0.55
+CONFIDENCE_NORMAL    = 0.60
 CONFIDENCE_BEAR      = 0.70
 RANKING_TOP_N        = 15
 BACKTEST_START       = '2024-10-01'
@@ -351,12 +351,14 @@ def build_daily_nav(all_trades: List[dict], all_data: Dict[str, pd.DataFrame],
     days   = nifty_index[(nifty_index >= start) & (nifty_index <= end)]
 
     # Pre-index trades for fast lookup
+    if not all_trades:
+        return pd.Series(float(PORTFOLIO_VALUE), index=days)
+
     trades_df = pd.DataFrame([{
         'symbol':      t['symbol'],
-        'entry_date':  pd.Timestamp(t['entry_date']) if not isinstance(t['entry_date'], pd.Timestamp) else t['entry_date'],
+        'entry_date':  pd.Timestamp(t['entry_date']),
         'exit_date':   pd.Timestamp(t['exit_date']),
         'entry_price': t['entry_price'],
-        'exit_price':  t['exit_price'],
         'qty':         t['qty'],
         'net_pnl':     t['net_pnl'],
     } for t in all_trades])
@@ -424,7 +426,7 @@ def run_backtest():
     all_data: Dict[str, pd.DataFrame] = {}
     for sym in MARK5_LIVE_TICKERS:
         bare    = sym.replace('.NS', '')
-        cache_f = CACHE_DIR / f"{bare}_NS_1d.parquet"
+        cache_f = CACHE_DIR / f"{bare}_60m.parquet"
         if not cache_f.exists():
             continue
         df = pd.read_parquet(cache_f)
@@ -434,8 +436,8 @@ def run_backtest():
         all_data[sym] = df
     print(f"  Loaded: {len(all_data)} stocks")
 
-    # ── Load NIFTY50 ──────────────────────────────────────────────────────────
-    nifty_raw   = pd.read_parquet(CACHE_DIR / 'NIFTY50_1d.parquet')
+    # ── Load NIFTY50 (60m) ────────────────────────────────────────────────────
+    nifty_raw   = pd.read_parquet(CACHE_DIR / 'NIFTY50_60m.parquet')
     nifty_close = nifty_raw['close'] if 'close' in nifty_raw.columns else nifty_raw['Close']
     if nifty_close.index.tz is not None:
         nifty_close.index = nifty_close.index.tz_localize(None)
@@ -469,10 +471,12 @@ def run_backtest():
     for sig_date in fridays:
         today_naive = sig_date.normalize()
 
+        # ── Filter symbols with enough history for indicator "warm-up" ────────
         avail = {}
         for sym, df in all_data.items():
             hist = df[df.index <= today_naive]
-            if len(hist) >= 60:
+            # [CRITICAL] 52-week indicators need 1764 60m bars to warm up.
+            if len(hist) >= 1770:
                 avail[sym] = hist
 
         if len(avail) < 10:

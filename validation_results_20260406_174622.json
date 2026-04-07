@@ -1,0 +1,41 @@
+{
+  "overall_status": "FAIL",
+  "passed": 1,
+  "warnings": 2,
+  "failed": 3,
+  "total": 6,
+  "elapsed": 14.4581139087677,
+  "results": {
+    "End-to-End Pipeline": {
+      "valid": false,
+      "reason": "Data Provider not ready"
+    },
+    "Data Quality": {
+      "status": "WARN",
+      "error": "DataQualityGuard not found"
+    },
+    "Model Availability": {
+      "status": "FAIL",
+      "error": "No models found"
+    },
+    "Prediction Latency": {
+      "valid": false,
+      "reason": "Data Provider not ready"
+    },
+    "Risk Management": {
+      "status": "PASS",
+      "position_sizing": 3,
+      "var_95": -0.028736789324698163,
+      "risk_controls": "functional"
+    },
+    "Database Integrity": {
+      "status": "WARN",
+      "missing_tables": [
+        "model_metadata",
+        "model_performance",
+        "predictions",
+        "trading_signals"
+      ]
+    }
+  }
+}
