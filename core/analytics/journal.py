@@ -186,7 +186,7 @@ class TradeJournal:
 
     @staticmethod
     def _calculate_nse_taxes(
-        buy_val: float, sell_val: float, is_intraday: bool = True
+        buy_val: float, sell_val: float, is_intraday: bool = False
     ) -> float:
         """Exact NSE Equity Intraday/Delivery Tax calculation."""
         turnover = buy_val + sell_val
@@ -264,7 +264,7 @@ class TradeJournal:
             gross_pnl  = exit_val - cost_basis
 
             taxes = self._calculate_nse_taxes(
-                buy_val=cost_basis, sell_val=exit_val, is_intraday=True
+                buy_val=cost_basis, sell_val=exit_val, is_intraday=False
             )
             net_pnl  = gross_pnl - taxes - validated.commission
             pnl_pct  = (net_pnl / cost_basis * 100) if cost_basis > 0 else 0.0

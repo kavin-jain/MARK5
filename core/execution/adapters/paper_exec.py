@@ -102,9 +102,8 @@ class PaperExecutor(BaseExecutor):
         self._execute_fill(order, final_price)
 
     def _execute_fill(self, order: Order, price: Decimal) -> None:
-        order.status = order.price = price
+        order.price = price
         order.status = OrderStatus.COMPLETE
-        order.price  = price
         self._update_virtual_position(order)
         if order.exchange_order_id in self.active_orders:
             del self.active_orders[order.exchange_order_id]

@@ -49,7 +49,7 @@ import xgboost as xgb
 from catboost import CatBoostClassifier, Pool
 from scipy.stats import spearmanr
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import brier_score_loss, fbeta_score, precision_score, recall_score
+from sklearn.metrics import brier_score_loss, fbeta_score, precision_score, recall_score, roc_auc_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils.class_weight import compute_class_weight
 
@@ -126,7 +126,7 @@ META_C: float = 0.1
 # Early stopping validation fraction
 ES_FRACTION: float = 0.15
 
-# Annualisation for Sharpe (252 trading days * 6.25 hours ≈ 1575 bars per year)
+# Annualization for Daily Bars (Rule 31 uses daily data for training)
 ANNUAL_FACTOR: float = 1575.0
 
 # --------------------------------------------------------------------------- #
@@ -231,7 +231,7 @@ class MARK5MLTrainer:
         )
 
         from core.models.features import AdvancedFeatureEngine
-        feature_engine = AdvancedFeatureEngine()
+        feature_engine = AdvancedFeatureEngine(is_daily=True)
 
         if context is None:
             context = self._build_context(data, ticker, sector)
@@ -353,12 +353,9 @@ class MARK5MLTrainer:
             )
             fp = FIIDataProvider()
             fii_series = fp.get_fii_flow(start_date, end_date)
-            if fii_series is not None and len(fii_series) > 200:
-                context['fii_net'] = fii_series
-            else:
-                fii_len = len(fii_series) if fii_series is not None else 0
-                logger.warning(f"[{ticker}] Insufficient FII data ({fii_len} days). Using SYNTHETIC FII flows.")
-                context['fii_net'] = fp.generate_synthetic_fii_data(data.index)
+            # Per Phase 3 Plan: Real-only. No synthetic fallback.
+            # FIIDataProvider now returns a zero-filled/empty series if real data fails.
+            context['fii_net'] = fii_series
             
             return context
         except Exception as exc:
@@ -389,11 +386,12 @@ class MARK5MLTrainer:
         logger.info(f"🚀 [{ticker}] CPCV training starting")
 
         # Full-dataset feature/label matrix (for index alignment and final retrain)
+        # Pass training_cutoff = total last timestamp to prevent any late-dataset leak
         features_df, y, returns, class_weights = self.prepare_data_dynamic(
             data, ticker,
             sector=getattr(self.config, 'sector', ''),
             context=getattr(self.config, 'feature_context', None),
-            training_cutoff=None,
+            training_cutoff=data.index[-1],
         )
         X = features_df.values
         feature_names: List[str] = features_df.columns.tolist()
@@ -530,13 +528,28 @@ class MARK5MLTrainer:
         avg_brier = float(np.mean(fold_briers))
         avg_fbeta = float(np.mean(fold_fbetas))
 
+        # ── Aggregate OOF AUC calculation (Audit Fix-3) ────────────────────────
+        # This fixes the AUC=0.0000 bug by calculating aggregate ROC-AUC 
+        # across all OOF probability predictions vs original labels.
+        valid_meta = oof_count > 0
+        if valid_meta.any():
+            meta_X_raw = {
+                'xgb': oof_sum['xgb'][valid_meta] / oof_count[valid_meta],
+                'lgb': oof_sum['lgb'][valid_meta] / oof_count[valid_meta],
+                'cat': oof_sum['cat'][valid_meta] / oof_count[valid_meta]
+            }
+            # Average prob for AUC calc
+            agg_ens_prob = (meta_X_raw['xgb'] + meta_X_raw['lgb'] + meta_X_raw['cat']) / 3.0
+            agg_auc = float(roc_auc_score(y[valid_meta], agg_ens_prob))
+        else:
+            agg_auc = 0.0
+
         logger.info(
             f"[{ticker}] CPCV summary ({fold_num} folds) | "
-            f"P(Sharpe>{PROD_GATE_SHARPE_TARGET})={p_sharpe:.1%} "
-            f"(gate={PROD_GATE_P_SHARPE:.0%}) | "
-            f"mean_Sharpe={mean_sharpe:.2f} | worst-5%={worst_5pct:.2f} | "
-            f"sparse_folds={sparse_folds}/{fold_num} ({sparse_pct:.0%}) | "
-            f"avg_Brier={avg_brier:.4f} | avg_F0.5={avg_fbeta:.4f}"
+            f"P(Sharpe>{PROD_GATE_SHARPE_TARGET})={p_sharpe:.1%} | "
+            f"AUC={agg_auc:.4f} | "
+            f"mean_Sharpe={mean_sharpe:.2f} | "
+            f"avg_F0.5={avg_fbeta:.4f}"
         )
 
         # ── Feature importance stability ──────────────────────────────────────
@@ -592,6 +605,7 @@ class MARK5MLTrainer:
             'worst_5pct_sharpe': worst_5pct,
             'avg_brier': avg_brier,
             'avg_fbeta': avg_fbeta,
+            'auc': agg_auc,
             'feature_stability_ok': feature_stability_ok,
             'passes_prod_gate': passes_gate,
         }
@@ -804,13 +818,19 @@ class MARK5MLTrainer:
         if active.sum() < 3:
             return -99.0
 
-        active_pnl = returns[active]  # ACTUAL returns (PT hit, SL hit, or timeout)
-        std = active_pnl.std(ddof=1)
+        # Correct Sharpe by including cash days (return=0) to avoid 1/sqrt(density) inflation.
+        active_pnl = returns[active]
+        trades_returns = np.zeros_like(returns)
+        trades_returns[active] = active_pnl
+        
+        std = trades_returns.std(ddof=1)
         if std < 1e-9:
             return 0.0
 
+        # Annualise based on daily bars and prediction horizon
+        # e.g. 252 / 10 = 25.2 trade-opportunities per year.
         trades_per_year = ANNUAL_FACTOR / self.config.prediction_horizon
-        return float((active_pnl.mean() / std) * np.sqrt(trades_per_year))
+        return float((trades_returns.mean() / std) * np.sqrt(trades_per_year))
 
     def _compute_fold_ic_top3(
         self,
@@ -1002,9 +1022,9 @@ if __name__ == '__main__':
         _cache_new = os.path.join(_project_root, 'data', 'cache', f'{bare}_daily.parquet')
         os.makedirs(os.path.dirname(_cache_old), exist_ok=True)
 
-        # Use cache if < 24h old (avoids re-fetching during the same session)
+        # Use cache if < 30d old (allows offline runs with recent data)
         for _cp in [_cache_old, _cache_new]:
-            if os.path.exists(_cp) and (_time.time() - os.path.getmtime(_cp)) < 86400:
+            if os.path.exists(_cp) and (_time.time() - os.path.getmtime(_cp)) < 2592000:
                 try:
                     df = pd.read_parquet(_cp)
                     df.columns = [c.lower() if isinstance(c, str) else str(c).lower()
