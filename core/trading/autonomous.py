@@ -56,6 +56,31 @@ from core.trading.risk_manager import FastRiskAnalyzer, RiskAlerts, PortfolioRis
 from core.infrastructure.alerts import AlertManager, AlertLevel, AlertType
 from core.trading.market_utils import MarketStatusChecker
 
+def calculate_intraday_metrics(trades: List[Dict]) -> Dict:
+    """
+    Helper to calculate summary metrics for the day's trades.
+    Required by internal report generation (v8.0).
+    """
+    if not trades:
+        return {}
+    
+    pnls = [float(t.get('net_pnl', 0.0)) for t in trades]
+    wins = [p for p in pnls if p > 0]
+    losses = [p for p in pnls if p < 0]
+    
+    total_trades = len(trades)
+    win_rate = len(wins) / total_trades if total_trades > 0 else 0
+    total_pnl = sum(pnls)
+    
+    return {
+        'total_trades': total_trades,
+        'win_rate': round(win_rate, 4),
+        'total_pnl': round(total_pnl, 2),
+        'avg_win': round(np.mean(wins), 2) if wins else 0.0,
+        'avg_loss': round(np.mean(losses), 2) if losses else 0.0,
+        'profit_factor': round(sum(wins) / abs(sum(losses)), 2) if losses and sum(losses) != 0 else 999.9
+    }
+
 # Import prediction engine
 try:
     from core.models.predictor import MARK5Predictor
@@ -149,7 +174,7 @@ class AutonomousTrader:
         self.logger.info("✅ Data provider initialized")
         
         # Feature engineer
-        self.feature_engine = AdvancedFeatureEngine()
+        self.feature_engine = AdvancedFeatureEngine(is_daily=False)
         self.logger.info("✅ Feature engine initialized")
         
         # Execution engine
@@ -217,7 +242,7 @@ class AutonomousTrader:
         # Trading state
         self.watchlist = self.config.get('watchlist', [])
         self.active_signals: Dict[str, TradingSignal] = {}
-        self.running = False
+        self.running = threading.Event()
         
         # Thread locks for race condition prevention
         self._trades_lock = threading.Lock()  # Protects trades_today, orders_executed
@@ -349,15 +374,16 @@ class AutonomousTrader:
             
         # Keep main thread alive
         try:
-            while self.running:
-                time.sleep(1)
+            self.running.set()
+            while self.running.is_set():
+                self.running.wait(1)
         except KeyboardInterrupt:
             self.stop()
 
     def stop(self):
         """Stop the trading loop and clean up resources"""
         self.logger.info("🛑 Stopping autonomous trader...")
-        self.running = False
+        self.running.clear()
         
         if self.scheduler.running:
             self.scheduler.shutdown(wait=False)
@@ -1004,8 +1030,8 @@ if __name__ == '__main__':
     try:
         trader.start()
         
-        while trader.running:
-            time.sleep(10)
+        while trader.running.is_set():
+            trader.running.wait(10)
             status = trader.get_live_status()
             
             os.system('clear' if os.name == 'posix' else 'cls')

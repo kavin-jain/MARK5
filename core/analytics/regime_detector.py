@@ -332,18 +332,21 @@ class MarketRegimeDetector:
             STRONG_BULL_RET_MIN: float = 0.07   # 7% in 20 days ≈ 88% annualised
 
             if current_adx > STRONG_BULL_ADX_MIN and current_price > current_ema_200 and ret_20d > STRONG_BULL_RET_MIN:
-                overall_regime = "STRONG_BULL"
+                overall_regime = MarketRegime.TRENDING.value
                 regime_confidence = 1.0 # High confidence due to strict numeric rules
                 self.logger.warning(f"🚨 RULE 88 TRIGGERED: STRONG BULL {ticker} (ADX: {current_adx:.1f}, ret20d: {ret_20d:.1%})")
             elif trend_regime == "BULLISH" and volatility_regime in ["LOW_VOLATILITY", "NORMAL_VOLATILITY"]:
-                overall_regime = "BULL_MARKET"
+                overall_regime = MarketRegime.TRENDING.value
                 regime_confidence = 0.8 * trend_strength + 0.2 * vol_confidence
             elif trend_regime == "BEARISH" and volatility_regime in ["HIGH_VOLATILITY", "NORMAL_VOLATILITY"]:
-                overall_regime = "BEAR_MARKET"
+                overall_regime = MarketRegime.BEAR.value
                 regime_confidence = 0.8 * trend_strength + 0.2 * vol_confidence
             elif volatility_regime == "HIGH_VOLATILITY":
-                overall_regime = "VOLATILE_MARKET"
+                overall_regime = MarketRegime.VOLATILE.value
                 regime_confidence = vol_confidence
+            else:
+                overall_regime = MarketRegime.RANGING.value
+                regime_confidence = 0.5
             # Standardize output to the core.utils.constants.MarketRegime Enum
             if overall_regime == "STRONG_BULL":
                 final_enum = MarketRegime.TRENDING
@@ -401,24 +404,22 @@ class MarketRegimeDetector:
             self.logger.error(f"Market regime detection failed for {ticker}: {e}")
             return self.get_default_regime()
 
-    def get_default_regime(self, reason: str = None) -> Dict:
-        """Return default regime when detection fails"""
+    def get_default_regime(self) -> Dict:
+        """Fallback regime when detection fails."""
         return {
-            'overall_regime': 'SIDEWAYS_MARKET',
-            'regime_confidence': 0.5,
-            'volatility_regime': 'NORMAL_VOLATILITY',
-            'trend_regime': 'NEUTRAL',
-            'momentum_regime': 'NEUTRAL',
-            'volume_regime': 'NORMAL_VOLUME',
-            'trend_strength': 0.5,
+            'market_regime': MarketRegime.RANGING.value,
+            'volatility_regime': "NORMAL_VOLATILITY",
+            'trend_regime': "NEUTRAL",
+            'momentum_regime': "NEUTRAL",
+            'volume_regime': "NORMAL_VOLUME",
+            'regime_confidence': 0.0,
             'volatility_ratio': 1.0,
             'momentum_1m': 0.0,
             'momentum_3m': 0.0,
-            'volume_ratio': 1.0,
+            'trend_strength': 0.5,
+            'current_adx': 0.0,
             'rolling_60d_sharpe': 0.0,
-            'confidence_multipliers': {'prediction': 1.0, 'signal': 1.0},
-            'analysis_timestamp': datetime.now().isoformat(),
-            'reason': reason
+            'confidence_multipliers': {'prediction': 1.0, 'signal': 1.0}
         }
 
     def _calculate_confidence_multipliers(self, overall_regime: str, volatility_regime: str,

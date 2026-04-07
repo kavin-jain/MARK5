@@ -32,6 +32,27 @@ from core.execution.schemas import (
 from core.execution.order_validator import OrderValidator
 
 
+class OrderResult:
+    """Lightweight result object for position close calls."""
+    __slots__ = ("status", "price", "quantity", "symbol", "timestamp", "commission")
+
+    def __init__(
+        self,
+        status: str,
+        price: float = 0.0,
+        quantity: float = 0.0,
+        symbol: str = "",
+        timestamp=None,
+        commission: float = 0.0,
+    ):
+        self.status     = status
+        self.price      = price
+        self.quantity   = quantity
+        self.symbol     = symbol
+        self.timestamp  = timestamp or datetime.utcnow()
+        self.commission = commission
+
+
 class ExecutionEngine:
     def __init__(self, mode: str = "paper"):
         self.logger = logging.getLogger("MARK5.Exec")
@@ -275,7 +296,6 @@ class ExecutionEngine:
         qty  = abs(pos.quantity)
         success = self.execute_order(symbol, side, qty, order_type="MARKET")
         if success:
-            from core.execution.execution_engine import OrderResult
             return OrderResult(
                 status   = "SUCCESS",
                 symbol   = symbol,
@@ -286,10 +306,6 @@ class ExecutionEngine:
 
     def stop(self) -> None:
         self.logger.info("Execution engine stopped.")
-
-
-# Compatibility aliases
-MARK5ExecutionEngine = ExecutionEngine
 
 
 class OrderResult:

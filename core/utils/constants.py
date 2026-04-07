@@ -228,28 +228,28 @@ DEFAULT_WATCHLIST: List[str] = [
 # ---------------------------------------------------------------------------
 
 SIGNAL_THRESHOLDS: Dict[str, Dict[str, float]] = {
-    MarketRegime.BULL_MARKET.value: {
+    MarketRegime.TRENDING.value: {
         SignalType.STRONG_BUY.value:  0.75,
         SignalType.BUY.value:         0.55,
         SignalType.HOLD.value:        0.40,
         SignalType.SELL.value:        0.60,
         SignalType.STRONG_SELL.value: 0.75,
     },
-    MarketRegime.BEAR_MARKET.value: {
+    MarketRegime.BEAR.value: {
         SignalType.STRONG_BUY.value:  0.80,
         SignalType.BUY.value:         0.65,
         SignalType.HOLD.value:        0.35,
         SignalType.SELL.value:        0.50,
         SignalType.STRONG_SELL.value: 0.70,
     },
-    MarketRegime.SIDEWAYS_MARKET.value: {
+    MarketRegime.RANGING.value: {
         SignalType.STRONG_BUY.value:  0.78,
         SignalType.BUY.value:         0.60,
         SignalType.HOLD.value:        0.45,
         SignalType.SELL.value:        0.60,
         SignalType.STRONG_SELL.value: 0.78,
     },
-    MarketRegime.VOLATILE_MARKET.value: {
+    MarketRegime.VOLATILE.value: {
         SignalType.STRONG_BUY.value:  0.85,
         SignalType.BUY.value:         0.70,
         SignalType.HOLD.value:        0.30,

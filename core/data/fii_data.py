@@ -15,15 +15,26 @@ from datetime import datetime, timedelta
 from typing import Optional
 from pathlib import Path
 
-logger = logging.getLogger("MARK5.FIIData")
-
 # NSE publishes FII/DII activity at this endpoint
 NSE_FII_API = "https://www.nseindia.com/api/fiidiiTradeReact"
+
+logger = logging.getLogger("MARK5.FIIData")
+
 NSE_HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36',
-    'Accept': 'application/json',
-    'Accept-Language': 'en-US,en;q=0.9',
-    'Referer': 'https://www.nseindia.com/market-data/fii-dii',
+    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+    "accept-language": "en-US,en;q=0.9,en-IN;q=0.8",
+    "cache-control": "max-age=0",
+    "sec-ch-ua": '"Chromium";v="129"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"Windows"',
+    "sec-fetch-dest": "document",
+    "sec-fetch-mode": "navigate",
+    "sec-fetch-site": "none",
+    "sec-fetch-user": "?1",
+    "upgrade-insecure-requests": "1",
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+    "referer": "https://www.nseindia.com/market-data/fii-dii",
+    "x-requested-with": "XMLHttpRequest"
 }
 
 FII_CACHE_DIR = os.path.join(os.path.dirname(__file__), '..', '..', 'data', 'fii_dii')
@@ -55,30 +66,37 @@ class FIIDataProvider:
         Returns:
             pd.Series with DatetimeIndex and FII net values in crores.
             Positive = net buying, Negative = net selling.
+            Gaps are filled with 0.0 (Neutral Fallback) per Phase 3 Plan.
         """
         # Try loading cached data
         df = self._load_cache()
         
+        query_start = pd.Timestamp(start_date) if start_date else None
+        query_end = pd.Timestamp(end_date) if end_date else pd.Timestamp.now()
+        
         if df is not None and not df.empty:
-            if start_date:
-                df = df[df.index >= pd.Timestamp(start_date)]
-            if end_date:
-                df = df[df.index <= pd.Timestamp(end_date)]
+            if query_start:
+                df = df[df.index >= query_start]
+            if query_end:
+                df = df[df.index <= query_end]
             
             if not df.empty:
-                logger.info(f"📊 FII data loaded: {len(df)} days ({df.index[0].date()} to {df.index[-1].date()})")
+                logger.info(f"📊 Real FII data loaded: {len(df)} days")
                 return df['fii_net']
         
-        # No cached data — try fetching from NSE
-        logger.warning("⚠️ No FII data cached. Attempting NSE fetch...")
+        # No cached data — try fetching fresh from NSE for today
+        logger.info("📡 FII cache empty/outdated. Attempting NSE fetch...")
         fetched = self._fetch_from_nse()
         
         if fetched is not None and not fetched.empty:
             self._save_cache(fetched)
+            if query_start:
+                fetched = fetched[fetched.index >= query_start]
             return fetched['fii_net']
         
-        # Fallback: return empty series (RULE 51: don't block trading)
-        logger.warning("⚠️ FII data unavailable. Using zero fallback (per RULE 51).")
+        # Neutral Fallback (REVISED Phase 3): 
+        # Return empty but typed series. The feature engine handles reindexing/filling.
+        logger.warning("⚠️ FII real data unavailable. Returning empty series (Zero Fallback).")
         return pd.Series(dtype=float, name='fii_net')
     
     def _load_cache(self) -> Optional[pd.DataFrame]:
@@ -96,61 +114,62 @@ class FIIDataProvider:
     def _save_cache(self, df: pd.DataFrame):
         """Save FII/DII data to CSV cache."""
         try:
+            # Merge with existing if present to avoid overwriting history
+            existing = self._load_cache()
+            if existing is not None:
+                df = pd.concat([existing, df]).sort_index()
+                df = df[~df.index.duplicated(keep='last')]
+                
             df.to_csv(self.cache_file)
-            logger.info(f"💾 FII data cached: {len(df)} days to {self.cache_file}")
+            logger.debug(f"💾 FII cache updated. Total records: {len(df)}")
         except Exception as e:
             logger.error(f"Cache save error: {e}")
     
     def _fetch_from_nse(self) -> Optional[pd.DataFrame]:
         """
         Fetch FII/DII data from NSE API.
-        NSE requires a session cookie, so we first hit the main page.
+        Hardened with session priming and retries.
         """
-        try:
-            import requests
-            
-            session = requests.Session()
-            session.headers.update(NSE_HEADERS)
-            
-            # Get session cookie from main page
-            session.get("https://www.nseindia.com", timeout=10)
-            
-            # Fetch FII/DII data
-            response = session.get(NSE_FII_API, timeout=10)
-            
-            if response.status_code != 200:
-                logger.warning(f"NSE API returned {response.status_code}")
-                return None
-            
-            data = response.json()
-            
-            # Parse the response
-            records = []
-            for entry in data:
-                try:
-                    date = pd.Timestamp(entry.get('date', ''))
+        import requests
+        import time
+
+        for attempt in range(2):
+            try:
+                session = requests.Session()
+                session.headers.update(NSE_HEADERS)
+                
+                # Step 1: Prime the session
+                session.get("https://www.nseindia.com", timeout=10)
+                time.sleep(1)
+                
+                # Step 2: Fetch current snapshot
+                response = session.get(NSE_FII_API, timeout=10)
+                
+                if response.status_code != 200:
+                    continue
+
+                data = response.json()
+                records = []
+                for entry in data:
+                    date_str = entry.get('date', '')
+                    if not date_str: continue
+                    
+                    date = pd.Timestamp(date_str)
                     category = entry.get('category', '')
-                    # M-8: NSE may return netValue as int/float or as a comma-formatted
-                    # string. Wrap in str() before .replace() to handle both safely.
-                    net_value = float(str(entry.get('netValue', '0')).replace(',', ''))
+                    # netValue can have commas if big
+                    net_val = float(str(entry.get('netValue', '0')).replace(',', ''))
                     
                     if 'FII' in category.upper() or 'FPI' in category.upper():
-                        records.append({'date': date, 'fii_net': net_value})
-                except (ValueError, KeyError):
-                    continue
-            
-            if records:
-                df = pd.DataFrame(records).set_index('date').sort_index()
-                return df
-            
-            return None
-            
-        except ImportError:
-            logger.warning("requests library not available for NSE fetch")
-            return None
-        except Exception as e:
-            logger.warning(f"NSE fetch failed: {e}")
-            return None
+                        records.append({'date': date, 'fii_net': net_val})
+                
+                if records:
+                    return pd.DataFrame(records).set_index('date').sort_index()
+
+            except Exception as e:
+                logger.debug(f"NSE fetch fail: {e}")
+                time.sleep(1)
+        
+        return None
     
     def generate_synthetic_fii_data(
         self,
@@ -158,38 +177,8 @@ class FIIDataProvider:
         seed: int = 42
     ) -> pd.Series:
         """
-        Generate synthetic FII flow data for backtesting when real data
-        is unavailable. Uses random walk with mean-reversion to simulate
-        realistic FII flow patterns.
-        
-        This is a TEMPORARY solution. Real FII data should be used once
-        the NSE scraper is set up.
-        
-        Returns:
-            pd.Series with FII net values (₹cr), one per trading day.
+        [DEPRECATED] Per Phase 3 Plan, synthetic data is disabled to prevent hallucinated alpha.
+        Returns a zero-filled series to maintain architectural stability.
         """
-        # Get unique dates only
-        dates = pd.Series(index.date).unique()
-        dates = pd.DatetimeIndex(sorted(dates))
-        
-        rng = np.random.RandomState(seed)
-        
-        # FII flows: roughly N(0, 1500) with mean-reversion
-        # Real FII flows range from -5000 to +5000 cr daily
-        n = len(dates)
-        flows = np.zeros(n)
-        flows[0] = rng.normal(0, 500)
-        
-        for i in range(1, n):
-            # Mean-reverting random walk
-            mean_reversion = -0.1 * flows[i-1]
-            innovation = rng.normal(0, 1200)
-            flows[i] = flows[i-1] + mean_reversion + innovation
-        
-        # Clip to realistic range
-        flows = np.clip(flows, -5000, 5000)
-        
-        result = pd.Series(flows, index=dates, name='fii_net')
-        logger.info(f"📊 Generated synthetic FII data: {len(result)} days "
-                    f"(mean={result.mean():.0f}, std={result.std():.0f})")
-        return result
+        logger.warning("🚫 Synthetic FII data requested but DISABLED. Returning zeros.")
+        return pd.Series(0.0, index=index, name='fii_net')

@@ -23,6 +23,8 @@ import logging
 import numpy as np
 from decimal import Decimal
 from dataclasses import dataclass
+from collections import deque
+from typing import Dict, List, Optional, Tuple
 from core.utils.constants import MarketRegime
 
 logger = logging.getLogger("MARK5.PositionSizer")

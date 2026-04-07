@@ -367,12 +367,8 @@ def main():
                 context['nifty_close'] = nifty_df['close']
                 
             fii_series = fp.get_fii_flow(start_date, end_date)
-            if fii_series is not None and len(fii_series) > 200:
-                context['fii_net'] = fii_series
-            elif nifty_df is not None:
-                fii_len = len(fii_series) if fii_series is not None else 0
-                logger.warning(f"⚠️ Insufficient FII data ({fii_len} days). Generating SYNTHETIC flows...")
-                context['fii_net'] = fp.generate_synthetic_fii_data(nifty_df.index)
+            # Per Phase 3 Plan: Real-only. No synthetic fallback.
+            context['fii_net'] = fii_series
                 
             logger.info(f"✅ Context features initialized: {list(context.keys())}")
             if 'nifty_close' in context:

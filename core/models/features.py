@@ -34,7 +34,7 @@ import pandas as pd
 import logging
 from typing import Dict, Optional, Tuple
 
-EXPECTED_FEATURE_COUNT = 10
+EXPECTED_FEATURE_COUNT = 8
 
 FEATURE_COLS = [
     'relative_strength_nifty',  # 1: stock vs NIFTY alpha (20d)
@@ -45,14 +45,14 @@ FEATURE_COLS = [
     'sector_rel_strength',      # 6: stock vs sector ETF alpha (10d)
     'volume_zscore',            # 7: volume surge z-score vs 60d baseline
     'atr_regime',               # 8: ATR14/ATR50 volatility regime ratio
-    'tcn_bull_prob',            # 9: Deep Learning Prediction (Direction)
-    'tcn_expected_vol',         # 10: Deep Learning Prediction (Volatility)
 ]
 
 
 class AdvancedFeatureEngine:
-    def __init__(self):
+    def __init__(self, is_daily: bool = False):
         self.logger = logging.getLogger("MARK5.Features")
+        self.is_daily = is_daily
+        self.w_mult = 1.0 if is_daily else 7.0  # 7 hourly bars per daily bar
         self._warned_features = set()
         self._tcn_cache = {} # Cache for TCN models to prevent redundant loading
 
@@ -194,20 +194,17 @@ class AdvancedFeatureEngine:
     # MAIN FEATURE ENGINE
     # ─────────────────────────────────────────────────────────────────────────
 
-    def engineer_all_features(
-        self,
-        df: pd.DataFrame,
-        ticker: Optional[str] = None,
-        context: Optional[Dict] = None,
-        training_cutoff: Optional[pd.Timestamp] = None,
-    ) -> pd.DataFrame:
+    def engineer_all_features(self, df: pd.DataFrame, ticker: str = "", context: Dict = None, is_daily: bool = None, training_cutoff: pd.Timestamp = None) -> pd.DataFrame:
         """
-        Generates exactly 10 features per Rule 31 (v10.4 Expansion).
-        Feature set is fixed — no additions allowed without IC validation.
+        Main entry point for feature engineering.
+        Strictly complies with Rule 31 (8 core features).
         """
-        if df.empty:
-            return df
-
+        if df is None or len(df) < 50: return pd.DataFrame()
+        
+        # Override is_daily if provided explicitly
+        _is_daily = is_daily if is_daily is not None else self.is_daily
+        _w_mult = 1.0 if _is_daily else 7.0
+        
         df = df.copy()
         context = context or {}
 
@@ -215,75 +212,58 @@ class AdvancedFeatureEngine:
         if df.index.tz is not None:
              df.index = df.index.tz_localize(None)
 
-        # ── TCN Signal Injection (The "Alpha Unlock") ───────────────────────
-        tcn_prob = pd.Series(0.5, index=df.index)
-        tcn_vol = pd.Series(0.01, index=df.index)
-        
-        if ticker:
-            tcn_res = self._add_tcn_signals(ticker, df)
-            if tcn_res is not None:
-                p_s, v_s = tcn_res
-                tcn_prob.update(p_s)
-                tcn_vol.update(v_s)
-        
-        df['tcn_bull_prob'] = tcn_prob
-        df['tcn_expected_vol'] = tcn_vol
+        # ── TCN Signal Injection REMOVED (v12.4 Audit M-01) ─────────────────
+        # Probabilities from TCN-1D are now handled in the ensemble layer,
+        # not injected as features to avoid data leakage and distribution shift.
+        # ───────────────────────────────────────────────────────────────────
 
 
         # ═════════════════════════════════════════════════════════════════════
-        # FEATURE 1: Relative Strength vs NIFTY (140-bar / ~20-day)
+        # FEATURE 1: Relative Strength vs NIFTY (20-day equivalent)
         # ═════════════════════════════════════════════════════════════════════
-        stock_ret_140 = df['close'].pct_change(140)
+        rs_window = int(20 * _w_mult)
+        stock_ret_20 = df['close'].pct_change(rs_window)
         nifty_close  = context.get('nifty_close')
-        if nifty_close is not None and len(nifty_close) > 140:
+        if nifty_close is not None and len(nifty_close) > rs_window:
             if nifty_close.index.tz is not None:
                 nifty_close = nifty_close.copy()
                 nifty_close.index = nifty_close.index.tz_localize(None)
             
-            # Align Nifty hourly close to Stock hourly index
+            # Align Nifty to Stock hourly index
             nifty_aligned = nifty_close.reindex(df.index, method='ffill')
             
             # STRUCTURAL FIX: Shift by 1 to ensure at time T, we only know T-1 index state.
-            # This deletes the 'Day-End' leakage entirely.
-            nifty_ret_140  = nifty_aligned.pct_change(140).shift(1)
-            df['relative_strength_nifty'] = stock_ret_140 - nifty_ret_140
+            nifty_ret_20  = nifty_aligned.pct_change(rs_window).shift(1)
+            df['relative_strength_nifty'] = stock_ret_20 - nifty_ret_20
         else:
-            df['relative_strength_nifty'] = stock_ret_140
+            df['relative_strength_nifty'] = stock_ret_20
 
-        # ── Pre-compute ATR_SHORT (98-bar / ~14-day) ────────────────────────
-        atr_short = self._compute_atr(df, span=98)
+        # ── Pre-compute ATR_SHORT (14-day equivalent) ──────────────
+        atr_window = int(14 * _w_mult)
+        atr_short = self._compute_atr(df, span=atr_window)
         
         # ═════════════════════════════════════════════════════════════════════
-        # FEATURE 2: RSI(98) — RULE 31 MANDATED
-        # Wilder's smoothing, scaled for 60m data (14d * 7 = 98b).
+        # FEATURE 2: RSI(14) — RULE 31 MANDATED
         # ═════════════════════════════════════════════════════════════════════
-        df['rsi_14'] = self._compute_rsi(df['close'], period=98)
+        df['rsi_14'] = self._compute_rsi(df['close'], period=atr_window)
 
         # ═════════════════════════════════════════════════════════════════════
-        # FEATURE 3: Distance from 52-Week High (1764-bar / ~252-day)
+        # FEATURE 3: Distance from 52-Week High (252-day equivalent)
         # ═════════════════════════════════════════════════════════════════════
-        rolling_high_1764 = df['high'].rolling(1764, min_periods=350).max()
+        high_window = int(252 * _w_mult)
+        min_periods = int(350 * _w_mult) if not _is_daily else 126
+        rolling_high_252 = df['high'].rolling(high_window, min_periods=min_periods).max()
         df['dist_52w_high'] = (
-            (rolling_high_1764 - df['close']) / (rolling_high_1764 + 1e-9)
+            (rolling_high_252 - df['close']) / (rolling_high_252 + 1e-9)
         ).clip(0, 1)
 
         # ═════════════════════════════════════════════════════════════════════
         # FEATURE 4: Post-Earnings Drift Flag — RULE 31 MANDATED
-        # Replaces dead amihud_illiquidity (IC=-0.001).
-        # PEAD: price drift continues in direction of earnings gap for 5-20 days.
-        #
-        # Event detection (no earnings calendar needed):
-        #   volume ≥ 1.5× 20d average  → above-normal interest
-        #   |gap| ≥ 0.8× ATR14         → material overnight move
-        # Together they capture most earnings, news, and block-deal events.
-        # Lower thresholds than v12.4a to fire frequently enough for IC signal.
-        #
-        # Drift window = 5 bars (NSE midcap PEAD peaks at 3–7 days).
-        # Encoded: +1 positive drift, -1 negative drift, 0 no event.
-        # T-1 shifted (event observable at close, acted on next morning open).
+        # PEAD window: 5 days
         # ═════════════════════════════════════════════════════════════════════
-        vol_140b_avg = df['volume'].rolling(140, min_periods=70).mean()
-        volume_surge = df['volume'] / (vol_140b_avg + 1e-9)
+        vol_avg_window = int(20 * _w_mult)
+        vol_20d_avg = df['volume'].rolling(vol_avg_window, min_periods=vol_avg_window // 2).mean()
+        volume_surge = df['volume'] / (vol_20d_avg + 1e-9)
 
         gap_raw  = df['open'] - df['close'].shift(1)
         gap_pct  = gap_raw / (df['close'].shift(1) + 1e-9)
@@ -298,8 +278,8 @@ class AdvancedFeatureEngine:
             index=df.index,
         )
 
-        # Forward-fill the signal for 5 bars (PEAD window)
-        drift_window = 35
+        # Forward-fill the signal for 5-day equivalent
+        drift_window = int(5 * _w_mult)
         drift_values = np.zeros(len(df))
         for i, val in enumerate(event_signal.values):
             if val != 0:
@@ -307,7 +287,6 @@ class AdvancedFeatureEngine:
                 drift_values[i:end_i] = val
 
         drift_active = pd.Series(drift_values, index=df.index)
-        # Removed .shift(1) to align event knowledge with EOD state
         df['post_earnings_drift'] = drift_active.fillna(0.0)
 
         # ═════════════════════════════════════════════════════════════════════
@@ -317,51 +296,45 @@ class AdvancedFeatureEngine:
         df['gap_significance'] = (gap / (atr_short + 1e-9)).clip(-3, 3)
 
         # ═════════════════════════════════════════════════════════════════════
-        # FEATURE 6: Sector Relative Strength (70-bar / ~10-day)
+        # FEATURE 6: Sector Relative Strength (10-day equivalent)
         # ═════════════════════════════════════════════════════════════════════
-        stock_ret_70  = df['close'].pct_change(70)
+        sector_window = int(10 * _w_mult)
+        stock_ret_10  = df['close'].pct_change(sector_window)
         sector_close  = context.get('sector_etf_close')
-        if sector_close is not None and len(sector_close) > 70:
+        if sector_close is not None and len(sector_close) > sector_window:
             if sector_close.index.tz is not None:
                 sector_close = sector_close.copy()
                 sector_close.index = sector_close.index.tz_localize(None)
             
-            # Align Sector hourly close to Stock hourly index
+            # Align Sector to Stock hourly index
             sector_aligned = sector_close.reindex(df.index, method='ffill')
             
             # STRUCTURAL FIX: Shift by 1 to ensure at time T, we only know T-1 sector state.
-            sector_ret_70  = sector_aligned.pct_change(70).shift(1)
-            df['sector_rel_strength'] = stock_ret_70 - sector_ret_70
+            sector_ret_10  = sector_aligned.pct_change(sector_window).shift(1)
+            df['sector_rel_strength'] = stock_ret_10 - sector_ret_10
         else:
-            df['sector_rel_strength'] = stock_ret_70
+            df['sector_rel_strength'] = stock_ret_10
 
         # ═════════════════════════════════════════════════════════════════════
-        # FEATURE 7: Volume Z-Score vs 420-bar / ~60-day baseline
+        # FEATURE 7: Volume Z-Score vs 60-day baseline
         # ═════════════════════════════════════════════════════════════════════
-        vol_420b_avg = df['volume'].rolling(420, min_periods=140).mean()   
-        vol_420b_std = df['volume'].rolling(420, min_periods=140).std()
+        vol60_window = int(60 * _w_mult)
+        vol_60d_avg = df['volume'].rolling(vol60_window, min_periods=vol60_window // 3).mean()   
+        vol_60d_std = df['volume'].rolling(vol60_window, min_periods=vol60_window // 3).std()
         
         df['volume_zscore'] = (
-            (df['volume'] - vol_420b_avg) / (vol_420b_std + 1e-9)
+            (df['volume'] - vol_60d_avg) / (vol_60d_std + 1e-9)
         ).clip(-3, 3)
 
         # ═════════════════════════════════════════════════════════════════════
-        # FEATURE 8: ATR Regime (ATR98 / ATR350)
-        # ═════════════════════════════════════════════════════════════════════
-        atr350_series = self._compute_atr(df, span=350)
-        df['atr_regime'] = (atr_short / (atr350_series + 1e-9)).clip(0.2, 5.0)
+        # FEATURE 8: ATR Regime (ATR14 / ATR50)
+        # ══════════════════════════════════════════════════════════════════════
+        atr50_window = int(50 * _w_mult)
+        atr50_series = self._compute_atr(df, span=atr50_window)
+        df['atr_regime'] = (atr_short / (atr50_series + 1e-9)).clip(0.2, 5.0)
 
-        # ═════════════════════════════════════════════════════════════════════
-        # FEATURE 9 & 10: Deep Learning (TCN) Alpha Unlock
-        # ═════════════════════════════════════════════════════════════════════
-        tcn_signals = self._add_tcn_signals(ticker, df)
-        if tcn_signals is not None:
-            prob_series, vol_series = tcn_signals
-            df['tcn_bull_prob'] = prob_series
-            df['tcn_expected_vol'] = vol_series
-        else:
-            df['tcn_bull_prob'] = np.nan
-            df['tcn_expected_vol'] = np.nan
+        # TCN features REMOVED per Rule 31 (Pruning to 8 core features).
+        # Use as individual model in ensemble instead.
 
         # ═════════════════════════════════════════════════════════════════════
         # OUTPUT CONSTRUCTION
