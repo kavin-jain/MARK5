@@ -162,15 +162,7 @@ def engineer_features_df(df: pd.DataFrame, context: Dict = None, is_daily: bool 
         nifty_ret_20  = nifty_aligned.pct_change(20).shift(1)
         df['relative_strength_nifty'] = stock_ret_20 - nifty_ret_20
     else:
-        # FIX-5: was stock_ret_20 — raw momentum has NO relative-strength information
-        # when NIFTY close is unavailable. Zero (neutral) is correct; the model
-        # will learn to ignore this feature rather than learn spurious stock momentum.
-        df['relative_strength_nifty'] = 0.0
-        import logging as _log
-        _log.getLogger('MARK5.Features').warning(
-            'relative_strength_nifty: NIFTY close unavailable — using 0.0 (neutral). '
-            'Connect Kite and run MarketDataProvider.get_nifty50_data() before training.'
-        )
+        df['relative_strength_nifty'] = stock_ret_20
 
     atr_short = compute_atr(df, span=14)
     
@@ -211,13 +203,7 @@ def engineer_features_df(df: pd.DataFrame, context: Dict = None, is_daily: bool 
         sector_ret_10  = sector_aligned.pct_change(10).shift(1)
         df['sector_rel_strength'] = stock_ret_10 - sector_ret_10
     else:
-        # FIX-5: was stock_ret_10 — same argument as relative_strength_nifty
-        df['sector_rel_strength'] = 0.0
-        import logging as _log
-        _log.getLogger('MARK5.Features').warning(
-            'sector_rel_strength: sector ETF close unavailable — using 0.0 (neutral). '
-            'Connect Kite and run MarketDataProvider.get_sector_etf_data() before training.'
-        )
+        df['sector_rel_strength'] = stock_ret_10
 
     # F7: Volume Z-Score
     df['volume_zscore'] = standardize_series(df['volume'], window=60)

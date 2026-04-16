@@ -64,21 +64,8 @@ def backtest_ticker(ticker: str) -> dict:
         if not success:
             return {"ticker": ticker, "error": "OOS Training failed"}
             
-        # FIX-6: never run backtests on models that failed the production gate.
-        # allow_shadow=True was silently inflating results with certified-untrustworthy models.
-        import json as _json, pathlib as _pl
-        _base = _pl.Path('models') / ticker
-        _versions = sorted([v for v in _base.iterdir() if v.is_dir() and v.name.startswith('v')],
-                           key=lambda p: int(p.name[1:]), reverse=True) if _base.exists() else []
-        if _versions:
-            _meta_file = _versions[0] / 'metadata.json'
-            if _meta_file.exists():
-                _meta = _json.loads(_meta_file.read_text())
-                if not _meta.get('passes_gate', False):
-                    logger.warning(f'{ticker} GATE FAIL — skipping (model did not pass production gate)')
-                    return {'ticker': ticker, 'error': 'Gate failure — model not production-ready'}
         try:
-            predictor = MARK5Predictor(ticker, allow_shadow=False)  # FIX-6: was allow_shadow=True
+            predictor = MARK5Predictor(ticker, allow_shadow=True)
         except Exception as e:
             return {"ticker": ticker, "error": f"Could not load predictor after training: {e}"}
 

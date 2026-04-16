@@ -226,20 +226,12 @@ class RobustBacktester:
                         sl_hit = True
                         exit_price = curr_open * (1 - self.slippage)
                         reason = "PT_GAP"
-                    # Scenario B: Intraday SL/PT — FIX-4: resolve ambiguity
-                    # when BOTH levels are breached on the same daily bar,
-                    # use open-proximity to determine which was hit first.
-                    elif curr_low <= stop_price and curr_high >= target_price:
-                        dist_sl = abs(curr_open - stop_price)
-                        dist_pt = abs(curr_open - target_price)
-                        if dist_sl <= dist_pt:
-                            sl_hit = True; exit_price = stop_price * (1 - self.slippage); reason = "SL_HIT"
-                        else:
-                            sl_hit = True; exit_price = target_price * (1 - self.slippage); reason = "PT_HIT"
+                    # Scenario B: Intraday Stop Hit
                     elif curr_low <= stop_price:
                         sl_hit = True
-                        exit_price = stop_price * (1 - self.slippage)
+                        exit_price = stop_price * (1 - self.slippage) 
                         reason = "SL_HIT"
+                    # Scenario B2: Intraday Target Hit
                     elif curr_high >= target_price:
                         sl_hit = True
                         exit_price = target_price * (1 - self.slippage)
@@ -264,18 +256,12 @@ class RobustBacktester:
                          sl_hit = True
                          exit_price = curr_open * (1 + self.slippage)
                          reason = "PT_GAP"
-                    # Scenario B: Intraday SL/PT — FIX-4 (short side)
-                    elif curr_high >= stop_price and curr_low <= target_price:
-                        dist_sl = abs(curr_open - stop_price)
-                        dist_pt = abs(curr_open - target_price)
-                        if dist_sl <= dist_pt:
-                            sl_hit = True; exit_price = stop_price * (1 + self.slippage); reason = "SL_HIT"
-                        else:
-                            sl_hit = True; exit_price = target_price * (1 + self.slippage); reason = "PT_HIT"
+                    # Scenario B: Intraday Stop Hit
                     elif curr_high >= stop_price:
                         sl_hit = True
                         exit_price = stop_price * (1 + self.slippage)
                         reason = "SL_HIT"
+                    # Scenario B2: Intraday Target Hit
                     elif curr_low <= target_price:
                         sl_hit = True
                         exit_price = target_price * (1 + self.slippage)
