@@ -52,16 +52,9 @@ class ResultsAnalyzer:
         max_dd_pct = self.trades['dd_pct'].min() # Negative value
         
         # Sortino Ratio (The Sniper's Metric)
-        # v12.4 Audit FIX H-02: Standard deviation of negative returns (exclusive)
-        avg_return = pnls.mean()
-        downside_returns = pnls[pnls < 0]
-        
-        if len(downside_returns) < 2:
-            # Not enough downside samples to compute volatility
-            sortino = 0.0
-        else:
-            downside_deviation = downside_returns.std(ddof=1)
-            sortino = avg_return / (downside_deviation + 1e-9)
+        target_return = 0.0
+        downside_dev = np.sqrt(((np.minimum(pnls - target_return, 0)) ** 2).mean())
+        sortino = (pnls.mean() - target_return) / downside_dev if downside_dev > 1e-9 else float('inf')
 
         # 2. Streak Analysis (Vectorized)
         # Identify blocks of consecutive Wins/Losses

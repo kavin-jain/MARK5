@@ -294,13 +294,21 @@ class ExecutionEngine:
 
         side = "SELL" if pos.quantity > 0 else "BUY"
         qty  = abs(pos.quantity)
+        
+        # Capture the last known price for reporting if fill data is unavailable
+        # (Though _on_fill will update the actual realized P&L)
+        report_price = float(pos.current_price) if hasattr(pos, 'current_price') else float(pos.average_price)
+        
         success = self.execute_order(symbol, side, qty, order_type="MARKET")
         if success:
+            # Re-fetch position to see if it was fully closed and get the fill price if surfaced
+            # Note: In production systems, the fill price should come from the broker response.
+            # Here we ensure we don't report the *entry* price as the *exit* price.
             return OrderResult(
                 status   = "SUCCESS",
                 symbol   = symbol,
                 quantity = float(qty),
-                price    = float(pos.average_price),
+                price    = report_price,
             )
         return None
 

@@ -196,6 +196,7 @@ class MARK5DatabaseManager:
                 exit_reason      TEXT,
                 status           TEXT NOT NULL,
                 strategy_name    TEXT,
+                mode             TEXT DEFAULT 'LIVE',
                 execution_meta   JSON,
 
                 created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -210,7 +211,57 @@ class MARK5DatabaseManager:
         add_col("trade_journal", "total_net_pnl", "DECIMAL DEFAULT 0")
         add_col("trade_journal", "exit_reason", "TEXT")
         add_col("trade_journal", "fees", "DECIMAL")
+        add_col("trade_journal", "mode", "TEXT DEFAULT 'LIVE'")
+
+        # Performance Indexes (PERF-01)
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_trade_journal_stock ON trade_journal(stock);"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_trade_journal_status ON trade_journal(status);"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_trade_journal_mode ON trade_journal(mode);"
+        )
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_trade_journal_timestamp ON trade_journal(timestamp DESC);"
+        )
+
         conn.commit()
+
+        # ── Backtest Statistics Table ────────────────────────────────────────
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS backtest_stats (
+                backtest_id      TEXT PRIMARY KEY,
+                timestamp        TEXT NOT NULL,
+                strategy_name    TEXT NOT NULL,
+                start_date       TEXT,
+                end_date         TEXT,
+                total_trades     INTEGER,
+                win_rate         REAL,
+                profit_factor    REAL,
+                sharpe_ratio     REAL,
+                max_drawdown     REAL,
+                total_pnl        DECIMAL,
+                metrics_json     JSON,
+                created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
+        # ── Paper Trading Statistics Table ───────────────────────────────────
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS paper_trade_stats (
+                session_id       TEXT PRIMARY KEY,
+                timestamp        TEXT NOT NULL,
+                total_trades     INTEGER,
+                active_trades    INTEGER,
+                daily_pnl        DECIMAL,
+                total_pnl        DECIMAL,
+                win_rate         REAL,
+                metrics_json     JSON,
+                updated_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
 
         conn.execute("""
             CREATE TABLE IF NOT EXISTS risk_configuration (
@@ -322,6 +373,7 @@ class MARK5DatabaseManager:
             ("total_gross_pnl",       "DECIMAL DEFAULT 0"),
             ("total_net_pnl",         "DECIMAL DEFAULT 0"),
             ("exit_reason",           "TEXT"),
+            ("mode",                  "TEXT DEFAULT 'LIVE'"),
         ]
         for col_name, col_type in migrations:
             if col_name not in existing:
@@ -351,8 +403,8 @@ class MARK5DatabaseManager:
                     """
                     INSERT INTO trade_journal
                     (trade_id, timestamp, stock, action,
-                     entry_price, quantity, entry_value, status, strategy_name)
-                    VALUES (?,?,?,?,?,?,?,?,?)
+                     entry_price, quantity, entry_value, status, strategy_name, mode)
+                    VALUES (?,?,?,?,?,?,?,?,?,?)
                     """,
                     (
                         trade_data["trade_id"],
@@ -364,11 +416,82 @@ class MARK5DatabaseManager:
                         value,
                         "OPEN",
                         trade_data.get("strategy", "MANUAL"),
+                        trade_data.get("mode", "LIVE"),
                     ),
                 )
             return True
         except Exception as exc:
             self.logger.critical(f"FAILED TO LOG TRADE ENTRY: {exc}")
+            return False
+
+    def log_backtest_stats(self, stats: Dict) -> bool:
+        """Persist detailed backtest statistics."""
+        conn = self._get_conn()
+        try:
+            with conn:
+                conn.execute(
+                    """
+                    INSERT INTO backtest_stats
+                    (backtest_id, timestamp, strategy_name, start_date, end_date,
+                     total_trades, win_rate, profit_factor, sharpe_ratio, max_drawdown,
+                     total_pnl, metrics_json)
+                    VALUES (?,?,?,?,?,?,?,?,?,?,?,?)
+                    """,
+                    (
+                        stats["backtest_id"],
+                        datetime.now().isoformat(),
+                        stats["strategy_name"],
+                        stats.get("start_date"),
+                        stats.get("end_date"),
+                        stats.get("total_trades"),
+                        stats.get("win_rate"),
+                        stats.get("profit_factor"),
+                        stats.get("sharpe_ratio"),
+                        stats.get("max_drawdown"),
+                        Decimal(str(stats.get("total_pnl", "0.0"))),
+                        json.dumps(stats.get("metrics", {}))
+                    )
+                )
+            return True
+        except Exception as exc:
+            self.logger.error(f"FAILED TO LOG BACKTEST STATS: {exc}")
+            return False
+
+    def log_paper_trade_stats(self, stats: Dict) -> bool:
+        """Persist/Update paper trading session statistics."""
+        conn = self._get_conn()
+        try:
+            with conn:
+                conn.execute(
+                    """
+                    INSERT INTO paper_trade_stats
+                    (session_id, timestamp, total_trades, active_trades, daily_pnl,
+                     total_pnl, win_rate, metrics_json)
+                    VALUES (?,?,?,?,?,?,?,?)
+                    ON CONFLICT(session_id) DO UPDATE SET
+                        timestamp = excluded.timestamp,
+                        total_trades = excluded.total_trades,
+                        active_trades = excluded.active_trades,
+                        daily_pnl = excluded.daily_pnl,
+                        total_pnl = excluded.total_pnl,
+                        win_rate = excluded.win_rate,
+                        metrics_json = excluded.metrics_json,
+                        updated_at = CURRENT_TIMESTAMP
+                    """,
+                    (
+                        stats["session_id"],
+                        datetime.now().isoformat(),
+                        stats.get("total_trades"),
+                        stats.get("active_trades"),
+                        Decimal(str(stats.get("daily_pnl", "0.0"))),
+                        Decimal(str(stats.get("total_pnl", "0.0"))),
+                        stats.get("win_rate"),
+                        json.dumps(stats.get("metrics", {}))
+                    )
+                )
+            return True
+        except Exception as exc:
+            self.logger.error(f"FAILED TO LOG PAPER TRADE STATS: {exc}")
             return False
 
     def log_trade_exit(self, trade_id: str, exit_data: Dict) -> bool:

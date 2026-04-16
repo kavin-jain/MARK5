@@ -1,0 +1,9 @@
+---
+description: Standardize DataFrame column names to lowercase and ensure consistent timezone handling for DatetimeIndex.
+globs: ["core/**/*.py","scripts/**/*.py"]
+alwaysApply: true
+---
+
+# Pandas DataFrame & Datetime Conventions
+
+When working with Pandas DataFrames, always convert column names to lowercase immediately after loading or creating a DataFrame using `df.columns = [c.lower() for c in df.columns]`. For time-series data, ensure the DataFrame index is a `pd.DatetimeIndex`. Be mindful of timezones: either explicitly localize to `pytz.timezone('Asia/Kolkata')` or ensure the index is timezone-naive (`.tz_localize(None)`) consistently across operations, especially when joining or comparing time-series. Handle missing data (NaN) explicitly using `.dropna()` or `.fillna()` with appropriate strategies, rather than relying on default behavior.

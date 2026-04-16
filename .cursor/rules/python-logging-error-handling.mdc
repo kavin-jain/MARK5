@@ -1,0 +1,9 @@
+---
+description: Use structured logging with MARK5.<ComponentName> and handle exceptions explicitly.
+globs: ["core/**/*.py","scripts/**/*.py"]
+alwaysApply: true
+---
+
+# Python Logging & Error Handling
+
+When writing new Python code, always import the `logging` module and obtain a logger instance using `logging.getLogger("MARK5.<ComponentName>")`, where `<ComponentName>` is descriptive of the module (e.g., `MARK5.Trainer`, `MARK5.Features`). Set the logging level appropriately (e.g., `logging.INFO`). Wrap potentially failing operations in `try-except` blocks. For expected failures or warnings, use `logger.warning()`. For critical errors that prevent functionality, use `logger.error()` or `logger.critical()`, often including `exc_info=True` for traceback. Avoid silent failures; every significant issue should be logged.

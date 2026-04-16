@@ -41,7 +41,7 @@ DEFAULT_SYSTEM_CONFIG = {
         "host": "localhost",
         "port": 5432,
         "user": "postgres",
-        "password": "password",
+        "password": "",
         "dbname": "mark5_timescale"
     },
     "redis": {

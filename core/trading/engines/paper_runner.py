@@ -82,21 +82,21 @@ def main():
     
     # 1. Load & Override Config
     config_manager = ConfigManager()
-    config = config_manager.get_config()
+    config = config_manager.get_config().model_dump() # Convert Pydantic to dict
     
     # FORCE PAPER TRADING SETTINGS
+    if 'execution' not in config:
+        config['execution'] = {}
     config['execution']['paper_trading'] = True
     config['execution']['capital'] = 100000  # Reset capital for testing
     
-    # Force Intraday Settings for Paper Trading
-    config['data']['interval'] = '15m'
-    config['data']['lookback_period'] = '60d'  # Increased for training data requirements (>200 rows after feature engineering)
+    # Force Daily Settings for Paper Trading (Matching recalibrated models)
+    if 'data' not in config:
+        config['data'] = {}
+    config['data']['interval'] = '1d'
+    config['data']['lookback_period'] = '600d'
     
-    # Update watchlist for Yahoo Finance (needs .NS suffix if not using Kite)
-    # But Kite uses symbols without suffix. DataCollector handles fallback?
-    # Let's use standard symbols and rely on DataCollector to handle suffix if needed, 
-    # OR explicitly add .NS if we know we are using Yahoo fallback.
-    # For paper trading without Kite, .NS is safer.
+    # Update watchlist for Yahoo Finance
     config['watchlist'] = [
         'COFORGE.NS', 'PERSISTENT.NS', 'KPITTECH.NS', 'HAL.NS', 'POLYCAB.NS'
     ]
@@ -110,6 +110,9 @@ def main():
             from datetime import time as dt_time
             if isinstance(obj, (datetime, dt_time)):
                 return obj.isoformat()
+            # Handle Pydantic SecretStr
+            if hasattr(obj, 'get_secret_value'):
+                return obj.get_secret_value()
             return super().default(obj)
 
     try:
@@ -121,12 +124,31 @@ def main():
         # 🔥 TEST MODE: Monkey-patch MarketStatusChecker to force market open
         if args.test_mode:
             logger.warning("⚠️ TEST MODE ENABLED: Forcing Market Open Status")
-            # Patch the utility function used by AutonomousTrader
-            import core.intraday_utils
-            core.intraday_utils.is_market_open = lambda: True
+            # Patch the utility class used by AutonomousTrader
+            import core.trading.market_utils
+            core.trading.market_utils.MarketStatusChecker.is_market_open = lambda self: True
             
+        # 🔥 CRITICAL: Initialize System Container (BUG-C-09 FIX)
+        from core.system.container import container
+        from types import SimpleNamespace
+        
+        # Convert dict config to SimpleNamespace for dot-notation access
+        def dict_to_sns(d):
+            if isinstance(d, dict):
+                return SimpleNamespace(**{k: dict_to_sns(v) for k, v in d.items()})
+            return d
+            
+        sns_config = dict_to_sns(config)
+        container.register('config', sns_config)
+        container.register('oms', SimpleNamespace(executor=None))
+        
         # Import here to ensure patches are applied BEFORE the class is loaded
-        from core.autonomous_trader import AutonomousTrader
+        from core.trading.autonomous import AutonomousTrader
+        
+        # 🔥 TEST MODE: Force AutonomousTrader internal status
+        if args.test_mode:
+            AutonomousTrader._is_market_open = lambda self: True
+            
         trader = AutonomousTrader(config_path=temp_config_path)
         logger.info(f"🔍 Trader Watchlist: {trader.watchlist}")
         
@@ -134,11 +156,22 @@ def main():
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGTERM, signal_handler)
         
-        trader.start()
-        
-        # Keep main thread alive
-        while trader.running:
-            time.sleep(1)
+        # Force immediate decision cycle in test mode
+        if args.test_mode:
+            logger.info("🧪 Triggering immediate decision cycle for verification...")
+            trader.running.set() # ensure flag is set
+            trader.run_decision_cycle()
+            logger.info("✅ Decision cycle complete")
+        else:
+            trader.start()
+            
+            # Use threading event to keep alive
+            try:
+                while True:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                logger.info("🛑 Interrupt received, shutting down...")
+                trader.stop()
             
     except Exception as e:
         logger.critical(f"❌ Fatal Error: {e}")

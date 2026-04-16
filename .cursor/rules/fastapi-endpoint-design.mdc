@@ -1,0 +1,9 @@
+---
+description: Design FastAPI endpoints to be clear, robust, and return structured JSON responses.
+globs: ["dashboard/routers/*.py"]
+alwaysApply: false
+---
+
+# FastAPI Endpoint Design
+
+When creating new FastAPI endpoints, define clear, descriptive paths. Use Pydantic models for request body validation and response modeling to ensure type safety and automatic documentation. Implement comprehensive error handling within each endpoint, returning appropriate HTTP exceptions (`HTTPException`) with clear detail messages. Ensure that all responses are structured JSON, even for error cases, to maintain consistency for frontend consumption. Log significant events or errors using the configured logger.

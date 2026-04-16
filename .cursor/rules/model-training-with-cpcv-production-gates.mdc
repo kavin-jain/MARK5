@@ -1,0 +1,9 @@
+---
+description: New models must be trained and validated using Combinatorial Purged Cross-Validation (CPCV) and pass defined production gates.
+globs: ["core/models/training/trainer.py","core/models/training/phase0_validation.py"]
+alwaysApply: false
+---
+
+# Model Training with CPCV & Production Gates
+
+When adding or retraining machine learning models, always utilize the `CombinatorialPurgedKFold` for cross-validation. This ensures robust out-of-sample performance evaluation by testing across multiple time-period combinations with proper purging and embargo to prevent data leakage. Models must meet the project's production gate criteria, including minimum Sharpe ratio, worst-5% Sharpe, and feature importance stability, as defined in `trainer.py` (e.g., `PROD_GATE_P_SHARPE`, `PROD_GATE_SHARPE_TARGET`, `PROD_GATE_WORST5PCT`). Implement early stopping for gradient boosting models and use class weighting for imbalanced datasets.

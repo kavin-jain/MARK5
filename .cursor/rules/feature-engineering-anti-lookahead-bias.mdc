@@ -1,0 +1,9 @@
+---
+description: Design features to strictly use past and current data, preventing any future information leakage.
+globs: ["core/models/features.py","core/models/training/financial_engineer.py"]
+alwaysApply: false
+---
+
+# Feature Engineering Anti-Lookahead Bias
+
+When creating new features, rigorously ensure that no future information is inadvertently used. This means: 1. Rolling window calculations (e.g., moving averages, standard deviations) must use `window` and `min_periods` parameters correctly, and be applied with `shift(1)` if they are meant to represent *prior* day's values for a *current* day's decision. 2. Quantile calculations (e.g., `amihud_illiquidity` p99) must be restricted to the training data window or historical data available *up to that point in time*, typically by passing a `training_cutoff` timestamp. 3. Avoid any direct indexing or operations that implicitly access data from `t+1` or later for a feature at time `t`. 4. If a feature relies on external context (e.g., Nifty close), ensure that context is also aligned to prevent lookahead (e.g., `nifty_aligned.pct_change(20).shift(1)`).

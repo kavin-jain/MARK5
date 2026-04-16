@@ -1,0 +1,124 @@
+{
+    "system_name": "MARK5",
+    "version": "6.0.0 (Architect)",
+    "mode": "PAPER",
+    "database": {
+        "path": "database/main/mark5.db",
+        "connection_timeout": 10,
+        "wal_mode": true,
+        "synchronous": "NORMAL"
+    },
+    "timescale": {
+        "enabled": false,
+        "host": "localhost",
+        "port": 5432,
+        "user": "postgres",
+        "password": "password",
+        "dbname": "mark5_timescale",
+        "min_connections": 1,
+        "max_connections": 10
+    },
+    "redis": {
+        "host": "localhost",
+        "port": 6379,
+        "password": null,
+        "socket_timeout": 0.05,
+        "max_connections": 100
+    },
+    "hardware": {
+        "enable_gpu": true,
+        "gpu_memory_fraction": 0.8,
+        "num_worker_threads": 8,
+        "use_quantization": false
+    },
+    "ui": {
+        "enabled": false,
+        "port": 8000,
+        "theme": "dark"
+    },
+    "kite": {
+        "api_key": "",
+        "api_secret": "",
+        "access_token": null
+    },
+    "risk": {
+        "initial_capital": 100000.0,
+        "enable_kelly_sizing": true,
+        "kelly_fraction": 0.5,
+        "max_drawdown_hard_stop": 0.05,
+        "max_daily_loss": 0.02,
+        "max_position_size_pct": 0.1,
+        "default_stop_loss_pct": 0.01,
+        "max_allowed_vix": 35.0
+    },
+    "ml": {
+        "active_models": [
+            "xgboost",
+            "lightgbm"
+        ],
+        "retrain_interval_days": 7,
+        "enable_drift_detection": true,
+        "drift_z_score_threshold": -2.0,
+        "prediction_horizon_bars": 7,
+        "min_confidence_threshold": 0.6
+    },
+    "execution": {
+        "exchange": "NSE",
+        "latency_budget_ms": 50,
+        "max_slippage_tolerance_pct": 0.001,
+        "market_open": "09:15:00",
+        "market_close": "15:30:00",
+        "auto_square_off": "15:15:00",
+        "paper_trading": true,
+        "capital": 100000
+    },
+    "trading": {
+        "watchlist": [
+            "COFORGE",
+            "PERSISTENT",
+            "MPHASIS",
+            "KPITTECH",
+            "LTTS",
+            "HAL",
+            "BEL",
+            "POLYCAB",
+            "DIXON",
+            "ABB",
+            "IDFCFIRSTB",
+            "LICHSGFIN",
+            "MUTHOOTFIN",
+            "CHOLAFIN",
+            "ABCAPITAL",
+            "IRCTC",
+            "JUBLFOOD",
+            "PAGEIND",
+            "MARICO",
+            "COLPAL",
+            "PIIND",
+            "DEEPAKNTR",
+            "AARTIIND",
+            "LAURUSLABS",
+            "GRANULES",
+            "GODREJPROP",
+            "OBEROIRLTY",
+            "PRESTIGE",
+            "CONCOR",
+            "CUMMINSIND"
+        ]
+    },
+    "enable_tax_optimization": true,
+    "models_dir": "/home/lynx/Documents/MARK5/models",
+    "reports_dir": "/home/lynx/Documents/MARK5/reports",
+    "logs_dir": "/home/lynx/Documents/MARK5/logs",
+    "data": {
+        "interval": "1d",
+        "lookback_period": "600d"
+    },
+    "watchlist": [
+        "COFORGE.NS",
+        "PERSISTENT.NS",
+        "KPITTECH.NS",
+        "HAL.NS",
+        "POLYCAB.NS"
+    ]
+}
