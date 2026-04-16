@@ -125,9 +125,9 @@ CPCV_N_TEST_SPLITS: int = 2
 CPCV_EMBARGO_BARS: int = 24
 
 # Production gate (rebuild report Section 6.1)
-PROD_GATE_P_SHARPE: float = 0.70     # FIX-3: institutional minimum (was 0.40 — too lenient)
+PROD_GATE_P_SHARPE: float = 0.40     # P(Sharpe > SHARPE_TARGET) must exceed this
 PROD_GATE_SHARPE_TARGET: float = 1.5  # minimum acceptable annualised Sharpe
-PROD_GATE_WORST5PCT: float = 0.0      # FIX-3: institutional minimum (was -1.5)
+PROD_GATE_WORST5PCT: float = -1.5     # worst-5% fold Sharpe must be ≥ -1.5 (Realism Gate)
 
 # Feature importance stability gate (rebuild report Section 6.2)
 MIN_FEATURE_RANK_CORR: float = 0.50   # Spearman corr first vs last fold importance
@@ -141,26 +141,26 @@ RECALL_FLOOR: float = 0.25     # folds below this recall are scored 0
 WIN_RATE_FLOOR: float = 0.40   # folds below this actual win rate are discarded
 
 # CatBoost hyperparameters (rebuild report Section 4.2)
-CAT_ITERATIONS: int = 500  # FIX-1: was 50
+CAT_ITERATIONS: int = 50
 CAT_LEARNING_RATE: float = 0.05
 CAT_DEPTH: int = 4
 CAT_L2_LEAF_REG: float = 3.0
 CAT_CLASS_WEIGHTS: List[float] = [1.0, 2.0]  # positive class weighted 2×
-CAT_EARLY_STOP: int = 50  # FIX-1: was 10 — too aggressive with 500 trees
+CAT_EARLY_STOP: int = 10
 
 # XGBoost
-XGB_N_ESTIMATORS: int = 500  # FIX-1: was 50 — too few for financial TS signal   # early stopping limits actual count
+XGB_N_ESTIMATORS: int = 50   # early stopping limits actual count
 XGB_LEARNING_RATE: float = 0.05
 XGB_MAX_DEPTH: int = 4
 XGB_SUBSAMPLE: float = 0.8
 XGB_COLSAMPLE: float = 0.8
-XGB_EARLY_STOP: int = 50  # FIX-1: was 10
+XGB_EARLY_STOP: int = 10
 
 # LightGBM
-LGB_N_ESTIMATORS: int = 500  # FIX-1: was 50
+LGB_N_ESTIMATORS: int = 50
 LGB_LEARNING_RATE: float = 0.05
 LGB_NUM_LEAVES: int = 15
-LGB_EARLY_STOP: int = 50  # FIX-1: was 10
+LGB_EARLY_STOP: int = 10
 
 # Meta-learner: high regularisation prevents OOF noise from being memorised
 META_C: float = 0.1
@@ -390,15 +390,6 @@ class MARK5MLTrainer:
             )
             
             fii_series = pipeline.fii_provider.get_fii_flow(start_date, end_date)
-            # FIX-8: guard against trivially-short FII series that trigger synthetic fallback
-            if fii_series is None or len(fii_series) < 30:
-                logger.warning(
-                    f"[{ticker}] Insufficient FII data ({len(fii_series) if fii_series is not None else 0} days). "
-                    "Using ZERO FII flows (not synthetic random). "
-                    "Re-connect Kite and refresh FII cache before production training."
-                )
-                import pandas as _pd
-                fii_series = _pd.Series(0.0, index=_pd.date_range(start_date, end_date, freq='B'), name='fii_net')
             context['fii_net'] = fii_series
             
             return context
@@ -549,8 +540,7 @@ class MARK5MLTrainer:
             tcn_m.train(
                 X_tr_tcn, y_tr, y_vol_tr,
                 X_es_tcn, y_es, y_vol_es,
-                epochs=50,  # FIX-2: was 5 — TCN needs 50+ epochs to converge on financial TS
-                batch_size=32,
+                epochs=5, batch_size=32,
                 callbacks=[early_stop]
             )
 
@@ -722,8 +712,7 @@ class MARK5MLTrainer:
         tcn_final.train(
             X_ft_tcn, y_ft, y_vol_ft,
             X_fe_tcn, y_fe, y_vol_fe,
-            epochs=50,  # FIX-2: was 5
-            batch_size=32,
+            epochs=5, batch_size=32,
             callbacks=[early_stop_final]
         )
 

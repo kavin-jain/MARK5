@@ -124,17 +124,6 @@ class ComparisonBacktester(RobustBacktester):
         return equity_curve, trades
 
 def run_comparison():
-    # FIX-7: IMPORTANT — this comparison is NOT a true intraday vs swing comparison.
-    # Both modes use DAILY OHLCV bars.  The EQUITY_INTRADAY segment flag only
-    # changes the STT rate; execution still enters at open and exits at close of
-    # the SAME DAILY bar.  Real intraday P&L requires 5-minute or 15-minute bars.
-    # Treat the 'Intraday' column as 'same-bar exit (different tax)' not true intraday.
-    import logging as _log
-    _log.getLogger('MARK5.Comparison').warning(
-        'compare_intraday_swing.py uses DAILY bars for both modes. '
-        'The intraday/swing distinction here is TAX REGIME only, not execution timing. '
-        'True intraday comparison requires 5m/15m Kite data.'
-    )
     results = []
     oos_start = pd.Timestamp(OOS_START_DATE)
     
