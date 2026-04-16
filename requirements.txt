@@ -4,7 +4,11 @@
 # Core Data Science Libraries
 numpy>=1.26.0
 pandas>=2.2.0
+polars>=0.20.0
 scipy>=1.12.0
+
+# Signal Processing
+PyWavelets>=1.5.0
 
 # Machine Learning
 scikit-learn>=1.4.0

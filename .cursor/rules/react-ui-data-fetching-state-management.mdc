@@ -1,0 +1,9 @@
+---
+description: Use `fetch` for API interactions and `useState`/`useEffect` for component state and lifecycle.
+globs: ["dashboard-ui/src/pages/*.jsx","dashboard-ui/src/components/*.jsx"]
+alwaysApply: false
+---
+
+# React UI Data Fetching & State Management
+
+When developing new React UI components or pages, use the native `fetch` API for all interactions with the backend (`http://localhost:8000/api/`). Manage component-specific data and UI state using `useState` hooks. For data fetching and side effects that depend on the component's lifecycle, use `useEffect`. Ensure proper cleanup functions in `useEffect` for subscriptions or timers. When displaying dynamic data, provide clear loading states and handle potential errors gracefully in the UI. Use `framer-motion` for animations and `lucide-react` for icons to maintain visual consistency.

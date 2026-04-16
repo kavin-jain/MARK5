@@ -57,7 +57,7 @@ class DataProvider:
         else:
             kite_config = {}
 
-        if kite_config:
+        if kite_config is not None:
             self.logger.info("Initializing Kite Feed Adapter...")
             self.feed = KiteFeedAdapter(kite_config)
         else:
@@ -67,6 +67,17 @@ class DataProvider:
         if self.feed:
             return self.feed.connect()
         return False
+
+    def fetch_stock_data(self, symbol: str, period: str = '5d', interval: str = '1m') -> Optional[pd.DataFrame]:
+        """
+        🔥 BUG FIX: Interface compatibility for AutonomousTrader
+        Maps legacy 'fetch_stock_data' to new 'initialize_symbol' logic.
+        """
+        # Map internal '1m' to DataProvider 'minute' if needed, but initialize_symbol
+        # takes direct interval strings and passes them to feed.fetch_ohlcv.
+        # Kite uses 'minute', 'day', etc. while YFinance uses '1m', '1d'.
+        # Assuming the feed adapter handles the translation.
+        return self.initialize_symbol(symbol, period=period, interval=interval)
 
     def initialize_symbol(self, symbol: str, period: str = '5d', interval: str = 'minute') -> Optional[pd.DataFrame]:
         """
@@ -146,11 +157,16 @@ class DataProvider:
         
         with self._buffer_lock:
             # Filter for this symbol, newer than history end
-            relevant_ticks = [
-                t for t in self._tick_buffer 
-                if t.symbol.endswith(symbol.replace('.NS', '').split(':')[-1])
-                and t.timestamp > last_hist_time
-            ]
+            relevant_ticks = []
+            for t in self._tick_buffer:
+                if t.symbol.endswith(symbol.replace('.NS', '').split(':')[-1]):
+                    # Make tick timestamp aware if it isn't
+                    tick_ts = t.timestamp
+                    if tick_ts.tzinfo is None:
+                        tick_ts = IST.localize(tick_ts)
+                    if tick_ts > last_hist_time:
+                        relevant_ticks.append(t)
+            
             # Clear buffer after extracting
             self._tick_buffer = []
         

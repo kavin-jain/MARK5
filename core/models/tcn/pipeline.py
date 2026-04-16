@@ -5,7 +5,7 @@ Changes:
 1. Removed Duplicate Classes: No more "Shadow" classes at the bottom.
 2. Robust Position Sizing: Added "Half-Kelly" logic and Volatility Floors.
 3. VWAP & Time Features: Added to Feature Engineering injection.
-4. Walk-Forward Leakage Fix: Scalers are now isolated per split.
+4. Self-Standardizing Features: Using rolling windows for zero-leakage normalization.
 """
 
 import numpy as np
@@ -140,36 +140,12 @@ class TCNPipelineOrchestrator:
              
         return True
 
-    def _save_scaler(self, path: str):
-        """Save feature scaler state"""
-        import pickle
-        try:
-            with open(path, 'wb') as f:
-                pickle.dump(self.engineer.scaler, f)
-            logger.info(f"✅ Scaler saved to {path}")
-        except Exception as e:
-            logger.error(f"❌ Failed to save scaler: {e}")
-
     def load_production_model(self, model_path: str):
-        """Load Model AND Scaler for Inference"""
-        import pickle
+        """Load Model for Inference"""
         path_obj = Path(model_path)
-        scaler_path = path_obj.parent / "scaler.pkl"
         
-        # 1. Load Scaler First (Critical for Feature Shape)
-        if not scaler_path.exists():
-            raise FileNotFoundError(f"Scaler not found at {scaler_path}. Cannot replicate training features.")
-            
-        with open(scaler_path, 'rb') as f:
-            self.engineer.scaler = pickle.load(f)
-        self.engineer.is_fitted = True
-        logger.info(f"✅ Scaler loaded from {scaler_path}")
-        
-        # 2. Determine n_features from Scaler (if possible) or need config
-        if hasattr(self.engineer.scaler, 'n_features_in_'):
-             self.n_feat = self.engineer.scaler.n_features_in_ + 4 # OHLC + 9 Scaled
-        else:
-             self.n_feat = 13 # Fallback
+        # Determine n_features from the engineer's feature list
+        self.n_feat = self.engineer.n_features
         
         self.model = TCNTradingModel(self.seq_len, self.n_feat)
         self.model.build_model()
@@ -210,14 +186,10 @@ class TCNPipelineOrchestrator:
         logger.info("🔧 Starting Production Training...")
         
         # 1. Feature Engineering
-        # Use training_mode=True to fit scaler
-        features = self.engineer.generate_features(data, training_mode=True)
+        # Unified engine is self-standardizing, no training_mode needed for scaling
+        features = self.engineer.generate_features(data)
         
         # DYNAMIC FEATURE COUNT DETECTION
-        self.n_feat = features.shape[1] - 4 # Exclude OHLC if they are first 4? 
-        # Wait, generate_features returns [OHLC, Features].
-        # Let's check features.py: "result = pd.concat([data[['close'..., data_scaled], axis=1)"
-        # So it has 4 + N columns.
         self.n_feat = features.shape[1]
         logger.info(f"detected n_features: {self.n_feat}")
 
@@ -248,9 +220,8 @@ class TCNPipelineOrchestrator:
             epochs=50, batch_size=64
         )
         
-        # 5. Save Model AND Scaler
+        # 5. Save Model
         self.model.save(save_path)
-        self._save_scaler(str(Path(save_path).parent / "scaler.pkl"))
         
         logger.info("✅ Production Model Deployed.")
 

@@ -97,13 +97,9 @@ class ISEAdapter:
 
     def fetch_stock(self, ticker: str, force_refresh: bool = False) -> Dict[str, Any]:
         """
-        All-In-One: /stock?name={ticker}
+        1. Get Company Data by Name: /stock?name={ticker}
         Returns: price + technicals + analyst + shareholding + corp actions + news.
-        Cost: 1 token.  Cache: daily (same calendar day reuses cached file).
-
-        Args:
-            ticker:        NSE ticker  (e.g. "RELIANCE", "TCS", "Tata Steel")
-            force_refresh: Bypass cache and fetch fresh from API.
+        Cost: 1 token.  Cache: daily.
         """
         cache_file = self._raw_dir / f"{ticker}_{_DAILY_CACHE_SUFFIX()}.json"
         return self._get_cached_or_fetch(
@@ -114,24 +110,195 @@ class ISEAdapter:
             force_refresh=force_refresh,
         )
 
-    def fetch_corporate_actions(
-        self, ticker: str, force_refresh: bool = False
-    ) -> Union[Dict[str, Any], List]:
+    def fetch_industry_search(self, query: str, force_refresh: bool = False) -> List[Dict[str, Any]]:
         """
-        /corporate_actions?stock_name={ticker}
-        Cost: 1 token.  Cache: weekly (no need to check same event twice).
-
-        Use this for RULE 25 event gate when you need dedicated corporate
-        action data and have NOT already called fetch_stock today.
-        If you already called fetch_stock(), use the cached /stock response —
-        it contains stockCorporateActionData at zero extra cost.
+        2. Industry Search: /industry_search?query={query}
+        Cost: 1 token. Cache: weekly.
         """
-        cache_file = self._raw_dir / f"{ticker}_corp_{_WEEKLY_CACHE_SUFFIX()}.json"
+        cache_file = self._raw_dir / f"industry_search_{query}_{_WEEKLY_CACHE_SUFFIX()}.json"
         return self._get_cached_or_fetch(
-            endpoint="/corporate_actions",
-            params={"stock_name": ticker},
+            endpoint="/industry_search",
+            params={"query": query},
             cache_file=cache_file,
-            label=f"corporate_actions/{ticker}",
+            label=f"industry_search/{query}",
+            force_refresh=force_refresh,
+        )
+
+    def fetch_mutual_fund_search(self, query: str, force_refresh: bool = False) -> List[Dict[str, Any]]:
+        """
+        3. Mutual Fund Search: /mutual_fund_search?query={query}
+        Cost: 1 token. Cache: weekly.
+        """
+        cache_file = self._raw_dir / f"mf_search_{query}_{_WEEKLY_CACHE_SUFFIX()}.json"
+        return self._get_cached_or_fetch(
+            endpoint="/mutual_fund_search",
+            params={"query": query},
+            cache_file=cache_file,
+            label=f"mutual_fund_search/{query}",
+            force_refresh=force_refresh,
+        )
+
+    def fetch_trending(self, force_refresh: bool = False) -> Dict[str, Any]:
+        """
+        4. Trending: /trending
+        Cost: 1 token.  Cache: daily.
+        """
+        cache_file = self._raw_dir / f"trending_{_DAILY_CACHE_SUFFIX()}.json"
+        return self._get_cached_or_fetch(
+            endpoint="/trending",
+            params={},
+            cache_file=cache_file,
+            label="trending",
+            force_refresh=force_refresh,
+        )
+
+    def fetch_52_week_high_low(self, force_refresh: bool = False) -> Dict[str, Any]:
+        """
+        5. Fetch 52 Week High Low Data: /fetch_52_week_high_low_data
+        Cost: 1 token. Cache: daily.
+        """
+        cache_file = self._raw_dir / f"52_week_high_low_{_DAILY_CACHE_SUFFIX()}.json"
+        return self._get_cached_or_fetch(
+            endpoint="/fetch_52_week_high_low_data",
+            params={},
+            cache_file=cache_file,
+            label="52_week_high_low",
+            force_refresh=force_refresh,
+        )
+
+    def fetch_NSE_most_active(self, force_refresh: bool = False) -> List[Dict[str, Any]]:
+        """
+        6. NSE Most Active: /NSE_most_active
+        Cost: 1 token. Cache: daily.
+        """
+        cache_file = self._raw_dir / f"NSE_most_active_{_DAILY_CACHE_SUFFIX()}.json"
+        return self._get_cached_or_fetch(
+            endpoint="/NSE_most_active",
+            params={},
+            cache_file=cache_file,
+            label="NSE_most_active",
+            force_refresh=force_refresh,
+        )
+
+    def fetch_BSE_most_active(self, force_refresh: bool = False) -> List[Dict[str, Any]]:
+        """
+        7. BSE Most Active: /BSE_most_active
+        Cost: 1 token. Cache: daily.
+        """
+        cache_file = self._raw_dir / f"BSE_most_active_{_DAILY_CACHE_SUFFIX()}.json"
+        return self._get_cached_or_fetch(
+            endpoint="/BSE_most_active",
+            params={},
+            cache_file=cache_file,
+            label="BSE_most_active",
+            force_refresh=force_refresh,
+        )
+
+    def fetch_mutual_funds(self, force_refresh: bool = False) -> List[Dict[str, Any]]:
+        """
+        8. Mutual Funds: /mutual_funds
+        Cost: 1 token. Cache: daily.
+        """
+        cache_file = self._raw_dir / f"mutual_funds_{_DAILY_CACHE_SUFFIX()}.json"
+        return self._get_cached_or_fetch(
+            endpoint="/mutual_funds",
+            params={},
+            cache_file=cache_file,
+            label="mutual_funds",
+            force_refresh=force_refresh,
+        )
+
+    def fetch_price_shockers(self, force_refresh: bool = False) -> Dict[str, Any]:
+        """
+        9. Price Shockers: /price_shockers
+        Cost: 1 token. Cache: daily.
+        """
+        cache_file = self._raw_dir / f"price_shockers_{_DAILY_CACHE_SUFFIX()}.json"
+        return self._get_cached_or_fetch(
+            endpoint="/price_shockers",
+            params={},
+            cache_file=cache_file,
+            label="price_shockers",
+            force_refresh=force_refresh,
+        )
+
+    def fetch_commodities(self, force_refresh: bool = False) -> List[Dict[str, Any]]:
+        """
+        10. Commodity Futures: /commodities
+        Cost: 1 token. Cache: daily.
+        """
+        cache_file = self._raw_dir / f"commodities_{_DAILY_CACHE_SUFFIX()}.json"
+        return self._get_cached_or_fetch(
+            endpoint="/commodities",
+            params={},
+            cache_file=cache_file,
+            label="commodities",
+            force_refresh=force_refresh,
+        )
+
+    def fetch_stock_target_price(self, ticker: str, force_refresh: bool = False) -> Dict[str, Any]:
+        """
+        11. Analyst Recommendations: /stock_target_price?stock_id={ticker}
+        Cost: 1 token.  Cache: weekly.
+        """
+        cache_file = self._raw_dir / f"{ticker}_target_{_WEEKLY_CACHE_SUFFIX()}.json"
+        return self._get_cached_or_fetch(
+            endpoint="/stock_target_price",
+            params={"stock_id": ticker},
+            cache_file=cache_file,
+            label=f"stock_target_price/{ticker}",
+            force_refresh=force_refresh,
+        )
+
+    def fetch_stock_forecasts(
+        self, 
+        ticker: str, 
+        measure_code: str = "EPS", 
+        period_type: str = "Annual", 
+        data_type: str = "Actuals", 
+        age: str = "Current",
+        force_refresh: bool = False
+    ) -> Dict[str, Any]:
+        """
+        12. Stock Forecasts: /stock_forecasts?stock_id={ticker}&measure_code={measure_code}&period_type={period_type}&data_type={data_type}&age={age}
+        Cost: 1 token. Cache: weekly.
+        """
+        cache_file = self._raw_dir / f"{ticker}_forecast_{measure_code}_{_WEEKLY_CACHE_SUFFIX()}.json"
+        return self._get_cached_or_fetch(
+            endpoint="/stock_forecasts",
+            params={
+                "stock_id": ticker,
+                "measure_code": measure_code,
+                "period_type": period_type,
+                "data_type": data_type,
+                "age": age
+            },
+            cache_file=cache_file,
+            label=f"stock_forecasts/{ticker}/{measure_code}",
+            force_refresh=force_refresh,
+        )
+
+    def fetch_historical_data(
+        self, 
+        ticker: str, 
+        period: str = "1yr", 
+        filter: str = "default",
+        force_refresh: bool = False
+    ) -> List[Dict[str, Any]]:
+        """
+        13. Historical Data: /historical_data?stock_name={ticker}&period={period}&filter={filter}
+        Cost: 1 token. Cache: daily.
+        """
+        cache_file = self._raw_dir / f"{ticker}_hist_{period}_{_DAILY_CACHE_SUFFIX()}.json"
+        return self._get_cached_or_fetch(
+            endpoint="/historical_data",
+            params={
+                "stock_name": ticker,
+                "period": period,
+                "filter": filter
+            },
+            cache_file=cache_file,
+            label=f"historical_data/{ticker}/{period}",
             force_refresh=force_refresh,
         )
 
@@ -142,12 +309,8 @@ class ISEAdapter:
         force_refresh: bool = False,
     ) -> Dict[str, Any]:
         """
-        /historical_stats?stock_name={ticker}&stats={stats}
+        14. Historical Stats: /historical_stats?stock_name={ticker}&stats={stats}
         Cost: 1 token.  Cache: weekly.
-
-        Valid stats values:
-          quarter_results, yoy_results, balancesheet, cashflow, ratios,
-          shareholding_pattern_quarterly, shareholding_pattern_yearly
         """
         cache_file = self._raw_dir / f"{ticker}_{stats}_{_WEEKLY_CACHE_SUFFIX()}.json"
         return self._get_cached_or_fetch(
@@ -158,11 +321,26 @@ class ISEAdapter:
             force_refresh=force_refresh,
         )
 
-    def fetch_recent_announcements(self, ticker: str) -> Union[Dict, List]:
+    def fetch_corporate_actions(
+        self, ticker: str, force_refresh: bool = False
+    ) -> Union[Dict[str, Any], List]:
+        """
+        /corporate_actions?stock_name={ticker}
+        Cost: 1 token.  Cache: weekly.
+        """
+        cache_file = self._raw_dir / f"{ticker}_corp_{_WEEKLY_CACHE_SUFFIX()}.json"
+        return self._get_cached_or_fetch(
+            endpoint="/corporate_actions",
+            params={"stock_name": ticker},
+            cache_file=cache_file,
+            label=f"corporate_actions/{ticker}",
+            force_refresh=force_refresh,
+        )
+
+    def fetch_recent_announcements(self, ticker: str, force_refresh: bool = False) -> Union[Dict, List]:
         """
         /recent_announcements?stock_name={ticker}
         Cost: 1 token.  Cache: daily.
-        Returns NSE announcements — granular RULE 25 gate input.
         """
         cache_file = self._raw_dir / f"{ticker}_announcements_{_DAILY_CACHE_SUFFIX()}.json"
         return self._get_cached_or_fetch(
@@ -170,36 +348,9 @@ class ISEAdapter:
             params={"stock_name": ticker},
             cache_file=cache_file,
             label=f"recent_announcements/{ticker}",
+            force_refresh=force_refresh,
         )
 
-    def fetch_stock_target_price(self, ticker: str) -> Dict[str, Any]:
-        """
-        /stock_target_price?stock_id={ticker}
-        Cost: 1 token.  Cache: weekly.
-        Returns analyst price targets and recommendation distribution.
-        Richer than what /stock embeds — use when you need full snapshot history.
-        """
-        cache_file = self._raw_dir / f"{ticker}_target_{_WEEKLY_CACHE_SUFFIX()}.json"
-        return self._get_cached_or_fetch(
-            endpoint="/stock_target_price",
-            params={"stock_id": ticker},
-            cache_file=cache_file,
-            label=f"stock_target_price/{ticker}",
-        )
-
-    def fetch_trending(self) -> Dict[str, Any]:
-        """
-        /trending  — top gainers and losers at this moment.
-        Cost: 1 token.  Cache: daily.
-        Use for regime awareness, NOT for signal generation.
-        """
-        cache_file = self._raw_dir / f"trending_{_DAILY_CACHE_SUFFIX()}.json"
-        return self._get_cached_or_fetch(
-            endpoint="/trending",
-            params={},
-            cache_file=cache_file,
-            label="trending",
-        )
 
     def get_budget_status(self) -> Dict[str, int]:
         """Return current token budget: {used, remaining, limit}."""

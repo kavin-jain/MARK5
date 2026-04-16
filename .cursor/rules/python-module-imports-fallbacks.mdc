@@ -1,0 +1,9 @@
+---
+description: Structure imports to support both direct script execution and package imports, with graceful degradation for optional dependencies.
+globs: ["core/**/*.py","scripts/**/*.py"]
+alwaysApply: false
+---
+
+# Python Module Imports & Fallbacks
+
+When creating new Python modules, ensure that imports are robust. For project-internal modules, use relative imports (`from .module import ...`) where appropriate, but also provide a fallback mechanism for direct script execution (e.g., `sys.path.insert(0, PROJECT_ROOT)` and `try-except ImportError` with absolute paths). For external dependencies that are not strictly critical for core functionality, wrap their imports in `try-except ImportError` blocks and provide a `logger.warning()` message, allowing the system to run with graceful degradation if the dependency is missing.

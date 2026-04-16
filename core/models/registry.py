@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 # Constants
 CHUNK_SIZE = 8192
 STATUS_ACTIVE = 'active'
+STATUS_SHADOW = 'shadow'
 STATUS_ARCHIVED = 'archived'
 STATUS_MISSING = 'missing'
 
@@ -207,16 +208,18 @@ class RobustModelRegistry:
         ticker: str,
         model_type: str,
         path: str,
-        metadata: Optional[Dict] = None
+        metadata: Optional[Dict] = None,
+        status: str = STATUS_ACTIVE
     ) -> str:
         """
-        Register a new model, archiving any previous active version.
+        Register a new model, archiving any previous version with the same status.
         
         Args:
             ticker: Ticker symbol
             model_type: Model type identifier
             path: Path to model file
             metadata: Optional metadata dict
+            status: Status for the new model (default: active)
             
         Returns:
             Unique model ID
@@ -240,11 +243,11 @@ class RobustModelRegistry:
             while model_id in self.registry:
                 model_id = self._generate_model_id(normalized_ticker, model_type)
             
-            # Archive previous active models for this ticker/type
+            # Archive previous models with the same status for this ticker/type
             for mid, data in self.registry.items():
                 if (data.get('ticker') == normalized_ticker and 
                     data.get('model_type') == model_type and
-                    data.get('status') == STATUS_ACTIVE):
+                    data.get('status') == status):
                     data['status'] = STATUS_ARCHIVED
                     data['archived_at'] = datetime.now().isoformat()
             
@@ -254,7 +257,7 @@ class RobustModelRegistry:
                 'model_type': model_type,
                 'path': str(validated_path),
                 'metadata': metadata,
-                'status': STATUS_ACTIVE,
+                'status': status,
                 'created_at': datetime.now().isoformat(),
                 'checksum': self._compute_checksum(validated_path)
             }
@@ -262,7 +265,7 @@ class RobustModelRegistry:
             self.registry[model_id] = entry
             self._atomic_save()
             
-            logger.info(f"Registered model {model_id} for {normalized_ticker}/{model_type}")
+            logger.info(f"Registered model {model_id} with status '{status}' for {normalized_ticker}/{model_type}")
             return model_id
     
     def get_production_model(self, ticker: str, model_type: str) -> Optional[Dict]:
@@ -364,6 +367,7 @@ class RobustModelRegistry:
         with self._lock:
             total = len(self.registry)
             active = sum(1 for d in self.registry.values() if d.get('status') == STATUS_ACTIVE)
+            shadow = sum(1 for d in self.registry.values() if d.get('status') == STATUS_SHADOW)
             archived = sum(1 for d in self.registry.values() if d.get('status') == STATUS_ARCHIVED)
             missing = sum(1 for d in self.registry.values() if d.get('status') == STATUS_MISSING)
             
@@ -373,6 +377,7 @@ class RobustModelRegistry:
                 'base_model_dir': str(self.base_model_dir),
                 'total_entries': total,
                 'active': active,
+                'shadow': shadow,
                 'archived': archived,
                 'missing': missing
             }

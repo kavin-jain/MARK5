@@ -55,6 +55,10 @@ class FIIDataProvider:
         Path(self.cache_dir).mkdir(parents=True, exist_ok=True)
         self.cache_file = os.path.join(self.cache_dir, 'fii_dii_historical.csv')
     
+    # In-memory session cache — prevents repeated NSE calls when fetch fails
+    _session_cache: Optional[pd.Series] = None
+    _session_fetched: bool = False
+
     def get_fii_flow(
         self,
         start_date: Optional[str] = None,
@@ -84,20 +88,29 @@ class FIIDataProvider:
                 logger.info(f"📊 Real FII data loaded: {len(df)} days")
                 return df['fii_net']
         
+        # Session-level cache: if we already tried and failed this session, don't retry
+        if FIIDataProvider._session_fetched:
+            return FIIDataProvider._session_cache if FIIDataProvider._session_cache is not None else pd.Series(dtype=float, name='fii_net')
+        
         # No cached data — try fetching fresh from NSE for today
         logger.info("📡 FII cache empty/outdated. Attempting NSE fetch...")
+        FIIDataProvider._session_fetched = True
         fetched = self._fetch_from_nse()
         
         if fetched is not None and not fetched.empty:
             self._save_cache(fetched)
             if query_start:
                 fetched = fetched[fetched.index >= query_start]
-            return fetched['fii_net']
+            result = fetched['fii_net']
+            FIIDataProvider._session_cache = result
+            return result
         
         # Neutral Fallback (REVISED Phase 3): 
         # Return empty but typed series. The feature engine handles reindexing/filling.
         logger.warning("⚠️ FII real data unavailable. Returning empty series (Zero Fallback).")
-        return pd.Series(dtype=float, name='fii_net')
+        FIIDataProvider._session_cache = pd.Series(dtype=float, name='fii_net')
+        return FIIDataProvider._session_cache
+
     
     def _load_cache(self) -> Optional[pd.DataFrame]:
         """Load cached FII/DII data from CSV."""

@@ -1,0 +1,320 @@
+{
+  "nodes": [
+    {
+      "id": "reports_portfolio_dashboard",
+      "label": "Portfolio Dashboard",
+      "file_type": "image",
+      "source_file": "reports/max/validation_2026/portfolio_dashboard.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "reports_cross_stock_heatmap",
+      "label": "Cross-Stock Performance Heatmap",
+      "file_type": "image",
+      "source_file": "reports/max/validation_2026/cross_stock_heatmap.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "reports_portfolio_equity_curve",
+      "label": "Portfolio Equity Curve",
+      "file_type": "image",
+      "source_file": "reports/max/validation_2026/portfolio_equity_curve.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "reports_sector_performance",
+      "label": "Sector Performance Breakdown",
+      "file_type": "image",
+      "source_file": "reports/max/validation_2026/sector_performance.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "reports_stock_rankings",
+      "label": "Stock Rankings by Sharpe Ratio",
+      "file_type": "image",
+      "source_file": "reports/max/validation_2026/stock_rankings.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "reports_itc_chart",
+      "label": "ITC.NS Validation Report",
+      "file_type": "image",
+      "source_file": "reports/max/validation_2026/charts/ITC.NS_comprehensive.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "reports_sbin_chart",
+      "label": "SBIN.NS Validation Report",
+      "file_type": "image",
+      "source_file": "reports/max/validation_2026/charts/SBIN.NS_comprehensive.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "reports_infy_chart",
+      "label": "INFY.NS Validation Report",
+      "file_type": "image",
+      "source_file": "reports/max/validation_2026/charts/INFY.NS_comprehensive.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "reports_bhartiartl_chart",
+      "label": "BHARTIARTL.NS Validation Report",
+      "file_type": "image",
+      "source_file": "reports/max/validation_2026/charts/BHARTIARTL.NS_comprehensive.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "reports_tcs_chart",
+      "label": "TCS.NS Validation Report",
+      "file_type": "image",
+      "source_file": "reports/max/validation_2026/charts/TCS.NS_comprehensive.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "reports_hdfcbank_chart",
+      "label": "HDFCBANK.NS Validation Report",
+      "file_type": "image",
+      "source_file": "reports/max/validation_2026/charts/HDFCBANK.NS_comprehensive.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "reports_icicibank_chart",
+      "label": "ICICIBANK.NS Validation Report",
+      "file_type": "image",
+      "source_file": "reports/max/validation_2026/charts/ICICIBANK.NS_comprehensive.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "reports_kotakbank_chart",
+      "label": "KOTAKBANK.NS Validation Report",
+      "file_type": "image",
+      "source_file": "reports/max/validation_2026/charts/KOTAKBANK.NS_comprehensive.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "reports_reliance_chart",
+      "label": "RELIANCE.NS Validation Report",
+      "file_type": "image",
+      "source_file": "reports/max/validation_2026/charts/RELIANCE.NS_comprehensive.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "reports_hindunilvr_chart",
+      "label": "HINDUNILVR.NS Validation Report",
+      "file_type": "image",
+      "source_file": "reports/max/validation_2026/charts/HINDUNILVR.NS_comprehensive.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ui_favicon",
+      "label": "Dashboard Favicon",
+      "file_type": "image",
+      "source_file": "dashboard-ui/public/favicon.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ui_icons",
+      "label": "UI Icon Sprites",
+      "file_type": "image",
+      "source_file": "dashboard-ui/public/icons.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ui_vite_logo",
+      "label": "Vite Logo",
+      "file_type": "image",
+      "source_file": "dashboard-ui/src/assets/vite.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ui_hero_graphic",
+      "label": "Hero Graphic",
+      "file_type": "image",
+      "source_file": "dashboard-ui/src/assets/hero.png",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    },
+    {
+      "id": "ui_react_logo",
+      "label": "React Logo",
+      "file_type": "image",
+      "source_file": "dashboard-ui/src/assets/react.svg",
+      "source_location": null,
+      "source_url": null,
+      "captured_at": null,
+      "author": null,
+      "contributor": null
+    }
+  ],
+  "edges": [
+    {
+      "source": "reports_cross_stock_heatmap",
+      "target": "reports_reliance_chart",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "reports/max/validation_2026/cross_stock_heatmap.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "reports_stock_rankings",
+      "target": "reports_reliance_chart",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "reports/max/validation_2026/stock_rankings.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "reports_portfolio_equity_curve",
+      "target": "reports_portfolio_dashboard",
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "reports/max/validation_2026/portfolio_equity_curve.png",
+      "source_location": null,
+      "weight": 1.0
+    },
+    {
+      "source": "ui_vite_logo",
+      "target": "ui_react_logo",
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "dashboard-ui/src/assets/vite.svg",
+      "source_location": null,
+      "weight": 1.0
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "aggregate_validation_reports",
+      "label": "Aggregate Validation Reports",
+      "nodes": [
+        "reports_portfolio_dashboard",
+        "reports_cross_stock_heatmap",
+        "reports_portfolio_equity_curve",
+        "reports_sector_performance",
+        "reports_stock_rankings"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": null
+    },
+    {
+      "id": "comprehensive_stock_validation_charts",
+      "label": "Comprehensive Stock Validation Charts",
+      "nodes": [
+        "reports_itc_chart",
+        "reports_sbin_chart",
+        "reports_infy_chart",
+        "reports_bhartiartl_chart",
+        "reports_tcs_chart",
+        "reports_hdfcbank_chart",
+        "reports_icicibank_chart",
+        "reports_kotakbank_chart",
+        "reports_reliance_chart",
+        "reports_hindunilvr_chart"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": null
+    },
+    {
+      "id": "dashboard_ui_assets",
+      "label": "Dashboard UI Assets",
+      "nodes": [
+        "ui_favicon",
+        "ui_icons",
+        "ui_vite_logo",
+        "ui_hero_graphic",
+        "ui_react_logo"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": null
+    }
+  ],
+  "input_tokens": 0,
+  "output_tokens": 0
+}

@@ -107,8 +107,10 @@ class RobustBacktester:
         slippage_pct: float = 0.0005, # 0.05% slippage
         use_atr_stop: bool = True,
         atr_period: int = 14,
-        atr_multiplier: float = 2.0,
-        risk_per_trade: float = 0.02 # Risk 2% of capital per trade
+        atr_multiplier: float = 1.0, # Stop loss at 1.0x ATR
+        pt_multiplier: float = 2.0,  # Profit target at 2.0x ATR (Positive Expectancy)
+        risk_per_trade: float = 0.05, # Increased to 5% risk per trade for higher returns
+        max_hold_days: int = 10,       # Rule 3: Max hold period
     ):
         self.capital = initial_capital
         self.initial_capital = initial_capital
@@ -118,7 +120,9 @@ class RobustBacktester:
         self.use_atr_stop = use_atr_stop
         self.atr_period = atr_period
         self.atr_multiplier = atr_multiplier
+        self.pt_multiplier = pt_multiplier
         self.risk_per_trade = risk_per_trade
+        self.max_hold_days = max_hold_days
         
         # Validation
         if segment == 'EQUITY_DELIVERY':
@@ -138,7 +142,7 @@ class RobustBacktester:
         tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
         return tr.ewm(span=self.atr_period, adjust=False).mean()
 
-    def run_simulation(self, df: pd.DataFrame, signals: pd.Series) -> Tuple[pd.DataFrame, dict]:
+    def run_simulation(self, df: pd.DataFrame, signals: pd.Series, symbol: str = 'UNKNOWN') -> Tuple[pd.DataFrame, dict]:
         """
         The Core Simulation Loop.
         CRITICAL: Executions happen at OPEN of i+1 based on Signal at i.
@@ -169,10 +173,10 @@ class RobustBacktester:
         position = 0 # Quantity
         entry_price = 0.0
         entry_idx = 0
+        cooldown = 0  # Bars to wait after a stop-loss before re-entering
         trades: List[Trade] = []
         
         # Initialize Equity Curve with correct index and initial capital
-        # We will update this as we iterate
         equity_curve = pd.Series(self.capital, index=df.index)
         
         # Iterate
@@ -204,36 +208,64 @@ class RobustBacktester:
                 
                 if position > 0: # Long
                     stop_price = entry_price - (curr_atr * self.atr_multiplier)
+                    target_price = entry_price + (curr_atr * self.pt_multiplier)
+                    hold_duration = i - entry_idx
                     
+                    # Rule 3: Max hold period exit — at open of day after limit
+                    if hold_duration >= self.max_hold_days:
+                        sl_hit = True
+                        exit_price = curr_open * (1 - self.slippage)
+                        reason = "MAX_HOLD"
                     # Scenario A: Gap Down below Stop
-                    if curr_open <= stop_price:
+                    elif curr_open <= stop_price:
                         sl_hit = True
                         exit_price = curr_open * (1 - self.slippage) # Exit at Open if gapped
                         reason = "SL_GAP"
+                    # Scenario A2: Gap Up above Target
+                    elif curr_open >= target_price:
+                        sl_hit = True
+                        exit_price = curr_open * (1 - self.slippage)
+                        reason = "PT_GAP"
                     # Scenario B: Intraday Stop Hit
                     elif curr_low <= stop_price:
                         sl_hit = True
                         exit_price = stop_price * (1 - self.slippage) 
                         reason = "SL_HIT"
-                    # Scenario C: Signal Reversal (Exit at Close)
-                    elif prev_signal == -1:
+                    # Scenario B2: Intraday Target Hit
+                    elif curr_high >= target_price:
                         sl_hit = True
-                        exit_price = curr_close * (1 - self.slippage)
+                        exit_price = target_price * (1 - self.slippage)
+                        reason = "PT_HIT"
+                    # Scenario C: Signal Reversal (DELIVERY: exit at open, not close)
+                    elif prev_signal == -1 and self.segment != 'EQUITY_DELIVERY':
+                        sl_hit = True
+                        exit_price = curr_open * (1 - self.slippage)  # Rule 42: next open
                         reason = "SIGNAL_EXIT"
                         
                 elif position < 0: # Short
                     stop_price = entry_price + (curr_atr * self.atr_multiplier)
+                    target_price = entry_price - (curr_atr * self.pt_multiplier)
                     
                     # Scenario A: Gap Up above Stop
                     if curr_open >= stop_price:
                          sl_hit = True
                          exit_price = curr_open * (1 + self.slippage)
                          reason = "SL_GAP"
+                    # Scenario A2: Gap Down below Target
+                    elif curr_open <= target_price:
+                         sl_hit = True
+                         exit_price = curr_open * (1 + self.slippage)
+                         reason = "PT_GAP"
                     # Scenario B: Intraday Stop Hit
                     elif curr_high >= stop_price:
                         sl_hit = True
                         exit_price = stop_price * (1 + self.slippage)
                         reason = "SL_HIT"
+                    # Scenario B2: Intraday Target Hit
+                    elif curr_low <= target_price:
+                        sl_hit = True
+                        exit_price = target_price * (1 + self.slippage)
+                        reason = "PT_HIT"
                     # Scenario C: Signal Reversal
                     elif prev_signal == 1:
                         sl_hit = True
@@ -257,7 +289,7 @@ class RobustBacktester:
                     trades.append(Trade(
                         entry_date=df.index[entry_idx],
                         exit_date=curr_date,
-                        symbol="NIFTY_MOCK",
+                        symbol=symbol,
                         direction='LONG' if position > 0 else 'SHORT',
                         entry_price=entry_price,
                         exit_price=exit_price,
@@ -271,6 +303,9 @@ class RobustBacktester:
                     
                     position = 0
                     entry_price = 0.0
+                    # Cooldown after hard stops only — prevents immediate re-entry whipsawing
+                    if reason in ('SL_HIT', 'SL_GAP'):
+                        cooldown = 3
             
             # ---------------------------------------------------
             # 2. ENTRY LOGIC (Strict Next-Open Execution)
@@ -282,7 +317,9 @@ class RobustBacktester:
             
             entries_on_this_bar = False
             
-            if position == 0 and prev_signal != 0:
+            if cooldown > 0:
+                cooldown -= 1
+            elif position == 0 and prev_signal != 0:
                 # COMPLIANCE CHECK
                 if self.segment == 'EQUITY_DELIVERY' and prev_signal == -1:
                     pass
@@ -298,7 +335,7 @@ class RobustBacktester:
                         fill_price = fill_price * (1 - self.slippage)
                         direction = -1
                     
-                    # Position Sizing
+                    # Position Sizing (Rule 22 formula)
                     risk_amt = equity * self.risk_per_trade
                     stop_dist = curr_atr * self.atr_multiplier
                     
@@ -307,7 +344,10 @@ class RobustBacktester:
                     else:
                         qty = 0
                     
-                    # Minimum Trade Value check could be added here
+                    # Cap position value at 100% of portfolio (no margin)
+                    max_pos_value = equity * 1.0
+                    if qty > 0 and (qty * fill_price) > max_pos_value:
+                        qty = max(1, int(max_pos_value / fill_price))
                     
                     if qty > 0 and (qty * fill_price) <= equity:
                         position = qty * direction
@@ -358,7 +398,7 @@ class RobustBacktester:
         if not trades:
             logger.warning("❌ No trades generated.")
             # Return valid but empty metrics structure to prevent KeyErrors
-            return equity_curve, {'trades': [], 'Total Return %': 0.0, 'Max Drawdown %': 0.0}
+            return equity_curve, {'trades': [], 'Total Return %': 0.0, 'Max Drawdown %': 0.0, 'Sharpe Ratio': 0.0, 'Total Trades': 0}
 
         trades_df = pd.DataFrame([vars(t) for t in trades])
         

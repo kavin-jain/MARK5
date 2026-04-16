@@ -16,7 +16,6 @@ from tensorflow.keras.layers import (
     LayerNormalization, Reshape, Multiply, Permute
 )
 from tensorflow.keras.optimizers import Adam
-from sklearn.preprocessing import StandardScaler
 from typing import Dict, List, Tuple, Optional
 import logging
 import pickle
@@ -26,7 +25,7 @@ import json
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("VAJRA_MODEL")
 
-def focal_loss(gamma=2.0, alpha=0.25):
+def focal_loss(gamma=2.5, alpha=0.70):
     """
     Precision Loss function for Class Imbalance (Bull/Bear trends are rare).
     """
@@ -41,7 +40,7 @@ def focal_loss(gamma=2.0, alpha=0.25):
 
 class TemporalBlock(tf.keras.layers.Layer):
     """Residual Causal Convolution Block"""
-    def __init__(self, n_filters, kernel_size, dilation_rate, dropout_rate=0.2, **kwargs):
+    def __init__(self, n_filters, kernel_size, dilation_rate, dropout_rate=0.4, **kwargs):
         super().__init__(**kwargs)
         self.n_filters = n_filters
         self.kernel_size = kernel_size
@@ -95,8 +94,6 @@ class TCNTradingModel:
         self.n_features = n_features
         self.learning_rate = learning_rate
         self.model = None
-        self.scaler = StandardScaler()
-        self.vol_scaler = StandardScaler()
         self.history = None
 
     def build_model(self):
@@ -125,12 +122,12 @@ class TCNTradingModel:
         
         # Direction Head (Classification)
         d = Dense(64, activation='relu')(pooled)
-        d = Dropout(0.3)(d)
+        d = Dropout(0.4)(d)
         dir_out = Dense(1, activation='sigmoid', name='direction')(d)
         
         # Volatility Head (Regression)
         v = Dense(64, activation='relu')(pooled)
-        v = Dropout(0.3)(v)
+        v = Dropout(0.4)(v)
         vol_out = Dense(1, activation='softplus', name='volatility')(v)
 
         self.model = Model(inputs=inputs, outputs=[dir_out, vol_out])
@@ -144,44 +141,25 @@ class TCNTradingModel:
         return self.model
 
     def train(self, X_train, y_dir, y_vol, X_val, y_dir_val, y_vol_val, epochs=50, batch_size=32, callbacks=None):
-        # Scale Volatility Targets
-        y_vol_scaled = self.vol_scaler.fit_transform(y_vol.reshape(-1, 1)).flatten()
-        y_vol_val_scaled = self.vol_scaler.transform(y_vol_val.reshape(-1, 1)).flatten()
-        
-        # Scale Features (Training set fits, Val set transforms)
-        N, T, F = X_train.shape
-        X_train_flat = X_train.reshape(-1, F)
-        self.scaler.fit(X_train_flat)
-        X_train_s = self.scaler.transform(X_train_flat).reshape(N, T, F)
-        
-        N_val, _, _ = X_val.shape
-        X_val_s = self.scaler.transform(X_val.reshape(-1, F)).reshape(N_val, T, F)
+        # Features are now self-standardized by the feature engine.
+        # Volatility targets are used raw (annualized volatility is already in a stable range).
         
         self.history = self.model.fit(
-            X_train_s, {'direction': y_dir, 'volatility': y_vol_scaled},
-            validation_data=(X_val_s, {'direction': y_dir_val, 'volatility': y_vol_val_scaled}),
+            X_train, {'direction': y_dir, 'volatility': y_vol},
+            validation_data=(X_val, {'direction': y_dir_val, 'volatility': y_vol_val}),
             epochs=epochs, batch_size=batch_size, callbacks=callbacks, verbose=1
         )
         return self.history
 
     def predict(self, X):
-        N, T, F = X.shape
-        X_s = self.scaler.transform(X.reshape(-1, F)).reshape(N, T, F)
-        pred_dir, pred_vol_scaled = self.model.predict(X_s, verbose=0)
-        pred_vol = self.vol_scaler.inverse_transform(pred_vol_scaled)
+        # Features are now self-standardized by the feature engine.
+        pred_dir, pred_vol = self.model.predict(X, verbose=0)
         return pred_dir, pred_vol
 
     def save(self, path):
         self.model.save(path + ".keras")
-        with open(path + "_scaler.pkl", "wb") as f:
-            pickle.dump(self.scaler, f)
-        with open(path + "_vol_scaler.pkl", "wb") as f:
-            pickle.dump(self.vol_scaler, f)
-        logger.info(f"Model and Scalers saved to {path}")
+        logger.info(f"Model saved to {path}.keras")
 
     def load(self, path):
         self.model = tf.keras.models.load_model(path + ".keras", custom_objects={'loss': focal_loss(), 'TemporalBlock': TemporalBlock})
-        with open(path + "_scaler.pkl", "rb") as f:
-            self.scaler = pickle.load(f)
-        with open(path + "_vol_scaler.pkl", "rb") as f:
-            self.vol_scaler = pickle.load(f)
+        logger.info(f"Model loaded from {path}.keras")

@@ -9,13 +9,63 @@ Revisions:
 import logging
 import pandas as pd
 import numpy as np
+import json
+import os
+from datetime import datetime
 from typing import Dict, List, Optional
 from core.infrastructure.database_manager import MARK5DatabaseManager
+from core.models.registry import RobustModelRegistry, STATUS_ACTIVE, STATUS_SHADOW
+
+class ModelTracker:
+    """Institutional Experiment Tracker (MLflow-lite)"""
+    def __init__(self, log_path: str = "logs/training_experiments.jsonl"):
+        self.log_path = log_path
+        os.makedirs(os.path.dirname(self.log_path), exist_ok=True)
+
+    def log_experiment(self, ticker: str, version: int, metrics: Dict, hyperparams: Dict, status: str):
+        record = {
+            "timestamp": datetime.now().isoformat(),
+            "ticker": ticker,
+            "version": version,
+            "status": status,
+            "metrics": metrics,
+            "hyperparams": hyperparams
+        }
+        with open(self.log_path, "a") as f:
+            f.write(json.dumps(record) + "\n")
 
 class LearningEngine:
     def __init__(self, db_manager: MARK5DatabaseManager):
         self.db = db_manager
         self.logger = logging.getLogger("MARK5.LearningEngine")
+        self.registry = RobustModelRegistry()
+        self.tracker = ModelTracker()
+
+    def deploy_model(self, ticker: str, version: int, metrics: Dict, passes_gate: bool):
+        """Routes model to Active or Shadow deployment based on production gate."""
+        status = STATUS_ACTIVE if passes_gate else STATUS_SHADOW
+        
+        # Log to tracker
+        self.tracker.log_experiment(
+            ticker=ticker,
+            version=version,
+            metrics=metrics,
+            hyperparams={}, # Could be populated from config
+            status=status
+        )
+        
+        # Register in RobustRegistry
+        model_path = f"models/{ticker}/v{version}/metadata.json"
+        self.registry.register_model(
+            ticker=ticker,
+            model_type="ensemble",
+            path=model_path,
+            metadata={**metrics, "deployment_timestamp": datetime.now().isoformat()},
+            status=status
+        )
+        
+        self.logger.info(f"🚀 Model {ticker} v{version} deployed to {status.upper()} mode.")
+        return status
 
     def _get_trade_data(self, limit: int = 500) -> pd.DataFrame:
         conn = None

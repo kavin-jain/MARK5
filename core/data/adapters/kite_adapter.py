@@ -250,8 +250,6 @@ class KiteFeedAdapter(BaseFeed):
         data = kite.generate_session(request_token, api_secret=api_secret)
         access_token = data["access_token"]
         
-        # Persist to .env for this session
-        _update_env_var("KITE_ACCESS_TOKEN", access_token)
         
         return access_token
     
@@ -766,36 +764,3 @@ class KiteFeedAdapter(BaseFeed):
 
 
 # =============================================================================
-# HELPER: Update .env file in-place
-# =============================================================================
-
-def _update_env_var(key: str, value: str, env_path: Optional[str] = None):
-    """Update a single key=value in the .env file, preserving all other lines."""
-    if env_path is None:
-        # Walk up from this file to find project .env
-        current = os.path.dirname(os.path.abspath(__file__))
-        for _ in range(5):
-            candidate = os.path.join(current, '.env')
-            if os.path.exists(candidate):
-                env_path = candidate
-                break
-            current = os.path.dirname(current)
-    
-    if not env_path or not os.path.exists(env_path):
-        return
-    
-    lines = []
-    found = False
-    with open(env_path, 'r') as f:
-        for line in f:
-            if line.strip().startswith(f'{key}='):
-                lines.append(f'{key}={value}\n')
-                found = True
-            else:
-                lines.append(line)
-    
-    if not found:
-        lines.append(f'{key}={value}\n')
-    
-    with open(env_path, 'w') as f:
-        f.writelines(lines)

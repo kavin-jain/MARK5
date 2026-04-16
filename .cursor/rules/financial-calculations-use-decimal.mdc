@@ -1,0 +1,9 @@
+---
+description: Use Python's `Decimal` type for all monetary calculations to prevent floating-point inaccuracies.
+globs: ["core/**/*.py","core/execution/schemas.py","core/trading/risk_manager.py","core/infrastructure/database_manager.py"]
+alwaysApply: false
+---
+
+# Financial Calculations Use Decimal
+
+For any new code involving monetary values, prices, P&L, or fees, always use Python's `Decimal` type instead of `float`. This prevents precision errors inherent in floating-point arithmetic, which are unacceptable in financial systems. Convert `float` inputs to `Decimal` using `Decimal(str(float_value))` to avoid intermediate binary representation issues. Ensure that `Decimal` adapters are registered for database interactions (e.g., SQLite) if not already handled by `database_manager.py`. Quantize `Decimal` values to the appropriate precision (e.g., `Decimal("0.01")` for Indian rupee prices) using `quantize()` with `ROUND_HALF_UP`.

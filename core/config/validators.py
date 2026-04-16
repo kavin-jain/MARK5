@@ -15,6 +15,7 @@ FEATURES:
 ✅ HFT Latency Constraints
 """
 
+import os
 from typing import List, Dict, Optional, Literal
 from pydantic import BaseModel, Field, SecretStr, field_validator, model_validator
 from datetime import time
@@ -112,7 +113,7 @@ class TimescaleConfig(BaseModel):
     user: str = "postgres"
     # SECURITY: Password must be set via config.yaml or environment variable
     # Do not use default password in production
-    password: SecretStr = SecretStr("")  # Requires explicit configuration
+    password: SecretStr = Field(default_factory=lambda: SecretStr(os.getenv("TIMESCALE_PASSWORD", "")))
     dbname: str = "mark5_timescale"
     min_connections: int = 1
     max_connections: int = 10

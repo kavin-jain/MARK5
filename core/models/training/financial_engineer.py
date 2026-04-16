@@ -166,5 +166,112 @@ class FinancialEngineer:
         survived_with_profit = (df_touches['first_touch'] == 't1') & (out['ret'] > events.loc[out.index, 'trgt'] * 1.0)
         
         out.loc[hit_pt | survived_with_profit, 'bin'] = 1 
+
+        return out
+
+    # -------------------------------------------------------------------------
+    # 4. META-LABELING SUPPORT
+    # -------------------------------------------------------------------------
+    def get_primary_signals(self, prices: pd.DataFrame) -> pd.Series:
+        """
+        Refined Institutional Signal Logic: Volatility Breakout (1-Std Bollinger)
+        Designed to capture early momentum shifts and provide sufficient sample density (>50).
+        """
+        close = prices['close']
         
+        # 1. Bollinger Bands (20-period, 1-std for higher frequency)
+        sma = close.rolling(window=20).mean()
+        std = close.rolling(window=20).std()
+        upper_bb = sma + (1.0 * std)
+        lower_bb = sma - (1.0 * std)
+        
+        signals = pd.Series(0, index=prices.index)
+        
+        # Long: Close > upper BB
+        long_condition = (close > upper_bb) & (close.shift(1) <= upper_bb.shift(1))
+        signals[long_condition] = 1
+        
+        # Short: Close < lower BB
+        short_condition = (close < lower_bb) & (close.shift(1) >= lower_bb.shift(1))
+        signals[short_condition] = -1
+        
+        # 3. Apply Cooldown (Rule 42: No entries within 3 bars of previous entry)
+        final_signals = pd.Series(0, index=prices.index)
+        last_entry = -10
+        for i in range(len(signals)):
+            if signals.iloc[i] != 0:
+                if i - last_entry >= 3:
+                    final_signals.iloc[i] = signals.iloc[i]
+                    last_entry = i
+        
+        n_signals = (final_signals != 0).sum()
+        logger.debug(f"Generated {n_signals} primary signals (density optimized).")
+        
+        return final_signals
+
+    def get_meta_labels(self, prices: pd.DataFrame, signals: pd.Series, pt_sl: list = [2.0, 2.0]) -> pd.DataFrame:
+        # Filter non-zero signals
+        events_idx = signals[signals != 0].index
+        if events_idx.empty:
+            return pd.DataFrame(columns=['bin', 'ret', 'trgt'])
+
+        vol = self.get_volatility(prices, span0=self.vol_window)
+        close = prices['close']
+        run_bars = 70 # Hard time limit
+
+        t_idx = close.index.searchsorted(events_idx)
+        t1_idx = np.clip(t_idx + run_bars, 0, len(close.index) - 1)
+        t1_series = pd.Series(close.index[t1_idx], index=events_idx)
+
+        events = pd.DataFrame({
+            't1': t1_series,
+            'trgt': vol.loc[events_idx],
+            'side': signals.loc[events_idx]
+        }).dropna(subset=['trgt'])
+
+        if events.empty:
+            return pd.DataFrame(columns=['bin', 'ret', 'trgt'])
+
+        out = pd.DataFrame(index=events.index)
+        out['trgt'] = events['trgt']
+
+        # Unified Timezone Handling
+        tz = prices.index.tz
+        max_ts = pd.Timestamp('2100-01-01')
+        if tz is not None:
+            max_ts = max_ts.tz_localize(tz)
+
+        for loc, row in events.iterrows():
+            t1 = row['t1']
+            trgt = row['trgt']
+            side = row['side']
+
+            df0 = prices.loc[loc:t1]
+            if df0.empty: continue
+
+            c0 = df0['close'].iloc[0]
+            pt = pt_sl[0] * trgt
+            sl = -pt_sl[1] * trgt
+
+            if side == 1:
+                dh = df0['high'] / c0 - 1
+                dl = df0['low'] / c0 - 1
+                pt_hit = dh[dh >= pt].index.min()
+                sl_hit = dl[dl <= sl].index.min()
+            else:
+                dl = df0['low'] / c0 - 1
+                dh = df0['high'] / c0 - 1
+                pt_hit = dl[dl <= -pt].index.min()
+                sl_hit = dh[dh >= -sl].index.min()
+
+            pt_hit = pt_hit if pd.notna(pt_hit) else max_ts
+            sl_hit = sl_hit if pd.notna(sl_hit) else max_ts
+
+            first_hit = min(t1, pt_hit, sl_hit)
+            p_exit = close.loc[first_hit]
+            ret = side * (p_exit / c0 - 1)
+
+            out.loc[loc, 'ret'] = ret
+            out.loc[loc, 'bin'] = 1 if ret > 0 else 0
+
         return out

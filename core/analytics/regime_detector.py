@@ -342,11 +342,11 @@ class MarketRegimeDetector:
                 overall_regime = MarketRegime.BEAR.value
                 regime_confidence = 0.8 * trend_strength + 0.2 * vol_confidence
             elif volatility_regime == "HIGH_VOLATILITY":
-                overall_regime = MarketRegime.VOLATILE.value
+                overall_regime = "VOLATILE_MARKET"
                 regime_confidence = vol_confidence
-            else:
-                overall_regime = MarketRegime.RANGING.value
-                regime_confidence = 0.5
+            else:  # ← ADD THIS — RANGING is the most common NSE state
+                overall_regime = "SIDEWAYS_MARKET"
+                regime_confidence = 0.6
             # Standardize output to the core.utils.constants.MarketRegime Enum
             if overall_regime == "STRONG_BULL":
                 final_enum = MarketRegime.TRENDING
