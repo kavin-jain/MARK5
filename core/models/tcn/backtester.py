@@ -424,12 +424,29 @@ class RobustBacktester:
         # Returns
         returns = equity_curve.pct_change().dropna()
         
+        # SIGMA FIX: Sharpe must include risk-free rate (6.5%)
         # Safe Sharpe
+        RISK_FREE_RATE = 0.065
         if returns.std() > 1e-9:
-             sharpe = (returns.mean() / returns.std()) * np.sqrt(252) 
+             excess_returns = returns - (RISK_FREE_RATE / 252)
+             sharpe = (excess_returns.mean() / excess_returns.std()) * np.sqrt(252)
+             assert -2 < sharpe < 5, f"Sharpe {sharpe:.2f} outside plausible range — check inputs"
         else:
              sharpe = 0.0
              
+        # SIGMA FIX: Calmar ratio addition
+        # Calmar Ratio
+        years = len(equity_curve) / 252
+        if years > 0:
+            annual_return = (equity_curve.iloc[-1] / equity_curve.iloc[0]) ** (1 / years) - 1
+        else:
+            annual_return = 0.0
+
+        if abs(max_dd) > 1e-9:
+            calmar = annual_return / abs(max_dd)
+        else:
+            calmar = float('inf') if annual_return > 0 else 0.0
+
         # Safe Profit Factor
         gross_wins = trades_df[trades_df['net_pnl'] > 0]['net_pnl'].sum()
         gross_losses = abs(trades_df[trades_df['net_pnl'] < 0]['net_pnl'].sum())
@@ -443,10 +460,12 @@ class RobustBacktester:
         
         metrics = {
             'Total Return %': ((equity - self.initial_capital) / self.initial_capital) * 100,
+            'Annual Return %': annual_return * 100,
             'Win Rate %': (len(trades_df[trades_df['net_pnl'] > 0]) / len(trades_df)) * 100,
             'Profit Factor': prof_factor,
             'Max Drawdown %': max_dd * 100,
             'Sharpe Ratio': sharpe,
+            'Calmar Ratio': calmar,
             'Total Trades': len(trades),
             'Total Taxes Paid': sum(t.taxes['total'] for t in trades),
             'trades': trades # Expose raw trades for reporting

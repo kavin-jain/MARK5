@@ -1,0 +1,29 @@
+{
+  "running": true,
+  "last_update": "2026-05-01T21:51:37.295940",
+  "watchlist": [
+    "COFORGE.NS",
+    "PERSISTENT.NS",
+    "KPITTECH.NS",
+    "HAL.NS",
+    "POLYCAB.NS"
+  ],
+  "active_signals": [],
+  "trades_today": [],
+  "daily_stats": {
+    "mode": {
+      "exchange": "NSE",
+      "latency_budget_ms": 50,
+      "max_slippage_tolerance_pct": 0.001,
+      "market_open": "09:15:00",
+      "market_close": "15:30:00",
+      "auto_square_off": "15:15:00",
+      "paper_trading": true,
+      "capital": 100000
+    },
+    "open_positions": 0,
+    "daily_pnl": 0.0,
+    "capital": 100000.0,
+    "current_portfolio_value": 100000.0
+  }
+}

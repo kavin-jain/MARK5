@@ -74,7 +74,8 @@ class PaperExecutor(BaseExecutor):
             raw = self.redis.client.get(f"md:LTP:{symbol}")
             if raw:
                 return Decimal(str(float(raw)))
-        except Exception:
+        except Exception as e:
+            self.logger.warning(f"Error fetching live price for {symbol}: {e}")
             pass
         return Decimal("0.00")
 
@@ -124,7 +125,8 @@ class PaperExecutor(BaseExecutor):
         symbol = tick.get("symbol")
         try:
             ltp = Decimal(str(tick.get("last_price", 0)))
-        except (TypeError, ValueError, InvalidOperation):
+        except (TypeError, ValueError, InvalidOperation) as e:
+            self.logger.warning(f"Invalid tick data for {symbol}: {e}")
             return
         if ltp <= 0:
             return
