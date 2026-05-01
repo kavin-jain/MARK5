@@ -7,8 +7,6 @@ from pathlib import Path
 from datetime import datetime
 import shutil
 import pandas as pd
-import numpy as np
-from concurrent.futures import ProcessPoolExecutor, as_completed
 
 # Set up logging for the script
 logging.basicConfig(
@@ -18,11 +16,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger("MARK5.Backtest150")
 
-from core.optimization.universe_optimizer import UniverseOptimizer
-from core.data.data_pipeline import DataPipeline
 from core.models.predictor import MARK5Predictor
 from core.models.tcn.backtester import RobustBacktester
-from core.models.registry import RobustModelRegistry
 
 # OOS Configuration
 OOS_START_DATE = "2025-04-01"
@@ -66,14 +61,13 @@ def backtest_ticker(ticker: str) -> dict:
             
         # FIX-6: never run backtests on models that failed the production gate.
         # allow_shadow=True was silently inflating results with certified-untrustworthy models.
-        import json as _json, pathlib as _pl
-        _base = _pl.Path('models') / ticker
+        _base = Path('models') / ticker
         _versions = sorted([v for v in _base.iterdir() if v.is_dir() and v.name.startswith('v')],
                            key=lambda p: int(p.name[1:]), reverse=True) if _base.exists() else []
         if _versions:
             _meta_file = _versions[0] / 'metadata.json'
             if _meta_file.exists():
-                _meta = _json.loads(_meta_file.read_text())
+                _meta = json.loads(_meta_file.read_text())
                 if not _meta.get('passes_gate', False):
                     logger.warning(f'{ticker} GATE FAIL — skipping (model did not pass production gate)')
                     return {'ticker': ticker, 'error': 'Gate failure — model not production-ready'}
