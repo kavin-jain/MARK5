@@ -502,17 +502,27 @@ class AutonomousTrader:
                 self.risk_analyzer.update_correlation_matrix(price_histories)
         
         # 3. Manage Positions (Check SL/TP)
-        # Fetch fresh quotes for open positions
+        # Fetch fresh quotes for open positions in parallel (Rule 18 Optimization)
         open_positions = self.execution_engine.get_positions()
         if open_positions:
             market_data_snapshot = {}
-            for pos in open_positions:
+
+            def _fetch_single_position(pos):
                 try:
                     df = self.collector.fetch_stock_data(pos.symbol, period='1d', interval='1m')
-                    if df is not None and not df.empty:
-                        market_data_snapshot[pos.symbol] = df
+                    return pos.symbol, df
                 except Exception as e:
                     self.logger.warning(f"Failed to fetch position data for {pos.symbol}: {e}")
+                    return pos.symbol, None
+
+            max_workers = self.config.get('max_workers', 10)
+            with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="PosFetch") as executor:
+                futures = {executor.submit(_fetch_single_position, pos): pos for pos in open_positions}
+                for future in as_completed(futures):
+                    symbol, df = future.result()
+                    if df is not None and not df.empty:
+                        market_data_snapshot[symbol] = df
+
             self._manage_positions(market_data_snapshot)
             
         # 4. Risk Checks
