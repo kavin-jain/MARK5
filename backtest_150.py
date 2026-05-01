@@ -187,22 +187,31 @@ def generate_report(results: list, output_path: str):
     avg_drawdown = df.get("Max Drawdown %", pd.Series([0])).mean()
     avg_trades = df.get("Total Trades", pd.Series([0])).mean()
 
+    avg_calmar = df.get("Calmar Ratio", pd.Series([0])).mean()
+
     # Needs assessment
     needs_met = []
-    if avg_return >= 15.0:
-        needs_met.append("✅ Average Return >= 15% target")
+
+    # SIGMA FIX: Validate against required realistic metrics
+    if 0.8 <= avg_sharpe <= 1.6:
+        needs_met.append(f"✅ Sharpe: {avg_sharpe:.2f} [PASS — target 0.8–1.6]")
     else:
-        needs_met.append(f"❌ Average Return < 15% target (Actual: {avg_return:.2f}%)")
-        
-    if avg_sharpe > 0.5:
-        needs_met.append("✅ Average Sharpe Ratio > 0.5 target")
+        needs_met.append(f"❌ Sharpe: {avg_sharpe:.2f} [FAIL — target 0.8–1.6]")
+
+    if avg_drawdown < 20.0:
+        needs_met.append(f"✅ Max DD: {avg_drawdown:.2f}% [PASS — target < 20%]")
     else:
-        needs_met.append(f"❌ Average Sharpe Ratio <= 0.5 target (Actual: {avg_sharpe:.2f})")
-        
-    if avg_win_rate > 0.44:
-        needs_met.append("✅ Average Win Rate > 44% target")
+        needs_met.append(f"❌ Max DD: {avg_drawdown:.2f}% [FAIL — target < 20%]")
+
+    if 40.0 <= avg_win_rate <= 55.0:
+        needs_met.append(f"✅ Win rate: {avg_win_rate:.1f}% [PASS — target 40–55%]")
     else:
-        needs_met.append(f"❌ Average Win Rate <= 44% target (Actual: {avg_win_rate:.2f})")
+        needs_met.append(f"❌ Win rate: {avg_win_rate:.1f}% [FAIL — target 40–55%]")
+
+    if avg_calmar > 0.5:
+        needs_met.append(f"✅ Calmar: {avg_calmar:.2f} [PASS — target > 0.5]")
+    else:
+        needs_met.append(f"❌ Calmar: {avg_calmar:.2f} [FAIL — target > 0.5]")
 
     # Generate Markdown
     md = [
@@ -259,8 +268,48 @@ def generate_report(results: list, output_path: str):
     print("\n" + report_content)
 
 if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser(description='Run MARK5 Backtest 150')
+    parser.add_argument('--validate-metrics', action='store_true', help='Validate and print plausibility metrics')
+    args = parser.parse_args()
+
     logger.info("Starting Systematic 150 Stock Backtest...")
     results = run_150_backtest()
     report_path = "reports/backtest_150_report.md"
     generate_report(results, report_path)
+
+    if args.validate_metrics and results:
+        # Re-compute averages to print plausibility checks to console
+        valid_results = [r for r in results if "error" not in r]
+        if valid_results:
+            df = pd.DataFrame(valid_results)
+            avg_sharpe = df.get("Sharpe Ratio", pd.Series([0])).mean()
+            avg_drawdown = df.get("Max Drawdown %", pd.Series([0])).mean()
+            avg_win_rate = df.get("Win Rate %", pd.Series([0])).mean()
+            avg_calmar = df.get("Calmar Ratio", pd.Series([0])).mean()
+
+            print("\n--- Plausibility Checks ---")
+
+            # SIGMA FIX: Validate against required realistic metrics
+            if 0.8 <= avg_sharpe <= 1.6:
+                print(f"Sharpe:       {avg_sharpe:.2f}  [PASS — target 0.8–1.6]")
+            else:
+                print(f"Sharpe:       {avg_sharpe:.2f}  [FAIL — target 0.8–1.6]")
+
+            if avg_drawdown < 20.0:
+                print(f"Max DD:       {avg_drawdown:.2f}% [PASS — target < 20%]")
+            else:
+                print(f"Max DD:       {avg_drawdown:.2f}% [FAIL — target < 20%]")
+
+            if 40.0 <= avg_win_rate <= 55.0:
+                print(f"Win rate:     {avg_win_rate:.1f}%  [PASS — target 40–55%]")
+            else:
+                print(f"Win rate:     {avg_win_rate:.1f}%  [FAIL — target 40–55%]")
+
+            if avg_calmar > 0.5:
+                print(f"Calmar:       {avg_calmar:.2f}  [PASS — target > 0.5]")
+            else:
+                print(f"Calmar:       {avg_calmar:.2f}  [FAIL — target > 0.5]")
+            print("---------------------------\n")
+
     logger.info("Done.")

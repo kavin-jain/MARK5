@@ -13,7 +13,7 @@
         "host": "localhost",
         "port": 5432,
         "user": "postgres",
-        "password": "password",
+        "password": "",
         "dbname": "mark5_timescale",
         "min_connections": 1,
         "max_connections": 10
@@ -107,9 +107,9 @@
         ]
     },
     "enable_tax_optimization": true,
-    "models_dir": "/home/lynx/Documents/MARK5/models",
-    "reports_dir": "/home/lynx/Documents/MARK5/reports",
-    "logs_dir": "/home/lynx/Documents/MARK5/logs",
+    "models_dir": "/app/models",
+    "reports_dir": "/app/reports",
+    "logs_dir": "/app/logs",
     "data": {
         "interval": "1d",
         "lookback_period": "600d"

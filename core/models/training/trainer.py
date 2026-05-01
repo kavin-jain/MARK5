@@ -1035,8 +1035,14 @@ class MARK5MLTrainer:
         if std < 1e-9:
             return 0.0
 
+        # SIGMA FIX: Sharpe ratio calculation must adjust for risk free rate
         trades_per_year = ANNUAL_FACTOR / self.config.prediction_horizon  # 252/10 = 25.2
-        return float((strategy_returns.mean() / std) * np.sqrt(trades_per_year))
+        RISK_FREE_RATE = 0.065
+        daily_rf = RISK_FREE_RATE / ANNUAL_FACTOR
+        excess_returns = strategy_returns - daily_rf
+
+        sharpe = float((excess_returns.mean() / excess_returns.std(ddof=1)) * np.sqrt(trades_per_year))
+        return sharpe
 
     def _compute_fold_ic_top3(
         self,
@@ -1103,7 +1109,7 @@ class MARK5MLTrainer:
         version: int,
         meta_model: Optional[NonNegativeMetaLearner],
         passes_gate: bool,
-        tcn_model: Optional[TCNTradingModel] = None,
+        tcn_model: Optional["TCNTradingModel"] = None,
     ) -> None:
         """
         Save all training artifacts to models/{ticker}/v{version}/.
