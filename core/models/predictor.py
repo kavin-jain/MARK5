@@ -347,36 +347,62 @@ class MARK5Predictor:
             if not model_probs_class1:
                 return {'signal': 'HOLD', 'reason': 'All models failed'}
 
-            # 5. Ensemble — stacking meta-learner or arithmetic mean fallback
-            stacking_keys = ['xgb', 'lgb', 'cat', 'tcn']
-            
-            if container.meta_model is not None:
-                meta_X = np.array([
-                    model_details.get(m, {}).get('raw', 0.5)
-                    for m in stacking_keys
-                ]).reshape(1, -1)
-                try:
-                    confidence = float(container.meta_model.predict_proba(meta_X)[0, 1])
-                except ValueError:
-                    meta_X_v10 = meta_X[:, :3]
-                    confidence = float(container.meta_model.predict_proba(meta_X_v10)[0, 1])
-                ensemble_method = 'stacking'
+            # 5. Ensemble — Institutional Median Consensus
+            if model_probs_class1:
+                confidence = float(np.median(model_probs_class1))
+                ensemble_method = 'median_consensus'
             else:
-                confidence = float(np.mean(model_probs_class1)) if model_probs_class1 else 0.0
-                ensemble_method = 'arithmetic_mean'
+                confidence = 0.5
+                ensemble_method = 'failed'
             
-            # 6. Signal generation per Rule 21 — LONG-ONLY (delivery, regime-gated above)
-            PROBABILITY_HURDLE = 0.50
+            # 5b. Shannon Entropy Gate (Institutional Consensus)
+            # Measures if the models are seeing the same 'Signal' or just random 'Noise'.
+            # High Entropy (>0.65) = Disagreement = Market Noise = REJECT.
+            probs_array = np.array([1.0 - confidence, confidence])
+            entropy_val = self._calculate_entropy(probs_array)
+            is_noisy = entropy_val > 0.65 # Rule 81: Entropy limit
+
+            # 5c. Institutional Trend Alignment Filter (Rule 84)
+            # We ONLY BUY in uptrends (Price > 200EMA)
+            # We ONLY SHORT in downtrends (Price < 200EMA)
+            trend_aligned = True
+            market_regime = "NEUTRAL"
+            if raw_data is not None and len(raw_data) > 200:
+                ema200 = raw_data['close'].ewm(span=200, adjust=False).mean().iloc[-1]
+                curr_p = raw_data['close'].iloc[-1]
+                if curr_p > ema200:
+                    market_regime = "BULL"
+                    if current_primary_signal == -1: trend_aligned = False
+                else:
+                    market_regime = "BEAR"
+                    if current_primary_signal == 1: trend_aligned = False
             
-            if confidence >= PROBABILITY_HURDLE:
+            # 6. Signal generation with TREND ALIGNMENT & ENTROPY
+            PROBABILITY_HURDLE = 0.48
+            
+            # Institutional Majority: Do at least 2 models agree with the direction?
+            n_models = len(model_probs_class1)
+            n_agree = 0
+            if current_primary_signal == 1:
+                n_agree = sum(1 for p in model_probs_class1 if p >= 0.50)
+            elif current_primary_signal == -1:
+                n_agree = sum(1 for p in model_probs_class1 if p < 0.50)
+            
+            majority_agreement = n_agree >= (n_models / 2.0 + 0.1)
+            
+            if confidence >= PROBABILITY_HURDLE and majority_agreement and not is_noisy and trend_aligned:
                 # Use the primary signal's direction!
                 signal = "BUY" if current_primary_signal == 1 else "SELL"
             else:
                 signal = "HOLD"
-                if confidence > 0.50:
+                if not trend_aligned:
+                    signal = f"HOLD (Trend Mismatch: {market_regime})"
+                elif not majority_agreement:
+                    signal = f"HOLD (Majority Disagreement: {n_agree}/{n_models})"
+                elif is_noisy:
+                    signal = f"HOLD (Entropy {entropy_val:.2f} > 0.65)"
+                elif confidence > 0.50:
                     signal = f"HOLD (Conf {confidence:.0%} < {PROBABILITY_HURDLE:.0%} hurdle)"
-
-            entropy_val = self._calculate_entropy(np.array([1.0 - confidence, confidence]))
 
             return {
                 'status': 'success',

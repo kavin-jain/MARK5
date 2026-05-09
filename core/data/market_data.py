@@ -76,18 +76,28 @@ class MarketDataProvider:
         if os.path.exists(cache_path):
             df = pd.read_parquet(cache_path)
             if not df.empty and 'close' in df.columns:
-                logger.debug(f"📊 NIFTY50 60m loaded from cache: {len(df)} bars")
+                logger.debug(f"📊 NIFTY50 loaded from cache: {len(df)} bars")
+                # Normalize index to dates to match stock data (Rule 42)
+                if hasattr(df.index, 'normalize'):
+                    df.index = df.index.normalize()
+                # Aggregate to ensure unique daily timestamps (Fix for duplicate labels)
+                df = df.groupby(df.index).last()
                 return df
         
         if kite_adapter:
-            logger.info(f"📡 Downloading NIFTY50 index (60m) via Kite ({start_date} to {end_date})...")
-            # FIX: Use '60minute' interval to match stock clock
-            nifty = kite_adapter.fetch_index_data(NIFTY50_KITE, days_back=2000, interval='60minute')
+            logger.info(f"📡 Downloading NIFTY50 index via Kite ({start_date} to {end_date})...")
+            # FIX: Use 'day' interval to match daily stock clock
+            nifty = kite_adapter.fetch_index_data(NIFTY50_KITE, days_back=2000, interval='day')
             if nifty is not None and not nifty.empty:
                 if nifty.index.tz is not None:
                     nifty.index = nifty.index.tz_localize(None)
+                # Normalize index to dates
+                if hasattr(nifty.index, 'normalize'):
+                    nifty.index = nifty.index.normalize()
+                # Aggregate to ensure unique daily timestamps
+                nifty = nifty.groupby(nifty.index).last()
                 nifty.to_parquet(cache_path)
-                logger.info(f"✅ NIFTY50 60m: {len(nifty)} bars cached")
+                logger.info(f"✅ NIFTY50 cached: {len(nifty)} bars")
                 return nifty
 
         logger.warning("⚠️ NIFTY50 data unavailable — relative strength will use stock-only returns")
@@ -119,24 +129,34 @@ class MarketDataProvider:
         if os.path.exists(cache_path):
             df = pd.read_parquet(cache_path)
             if not df.empty and 'close' in df.columns:
+                # Normalize index to dates
+                if hasattr(df.index, 'normalize'):
+                    df.index = df.index.normalize()
+                # Aggregate to ensure unique daily timestamps
+                df = df.groupby(df.index).last()
                 return df['close']
         
         # Kite Primary Download
         if kite_adapter:
             try:
-                # FIX: Use '60minute' interval and correct date arguments
+                # FIX: Use 'day' interval and correct date arguments
                 from_dt = pd.to_datetime(start_date)
                 to_dt = pd.to_datetime(end_date)
                 data = kite_adapter.fetch_ohlcv(
                     etf_symbol, 
                     from_date=from_dt, 
                     to_date=to_dt, 
-                    interval='60minute'
+                    interval='day'
                 )
                 if data is not None and not data.empty:
                     data.columns = [str(c).lower() for c in data.columns]
+                    # Normalize index to dates
+                    if hasattr(data.index, 'normalize'):
+                        data.index = data.index.normalize()
+                    # Aggregate to ensure unique daily timestamps
+                    data = data.groupby(data.index).last()
                     data.to_parquet(cache_path)
-                    logger.info(f"✅ Sector ETF {etf_symbol} (60m): {len(data)} bars cached")
+                    logger.info(f"✅ Sector ETF {etf_symbol}: {len(data)} bars cached")
                     return data['close']
             except Exception as e:
                 logger.warning(f"Sector ETF {etf_symbol} download failed: {e}")
@@ -162,12 +182,12 @@ class MarketDataProvider:
         # NIFTY50 close series
         nifty_df = self.get_nifty50_data(start_date, end_date, kite_adapter=kite_adapter)
         if nifty_df is not None and 'close' in nifty_df.columns:
-            context['nifty_close'] = nifty_df['close']
+            context['nifty_close'] = nifty_df['close'].copy()
         
         # Sector ETF close series
         sector_close = self.get_sector_etf_data(sector, start_date, end_date, kite_adapter=kite_adapter)
         if sector_close is not None:
-            context['sector_etf_close'] = sector_close
+            context['sector_etf_close'] = sector_close.copy() if hasattr(sector_close, 'copy') else sector_close
         
         # FII data (loaded separately by FIIDataProvider)
         # Will be injected by the calling code

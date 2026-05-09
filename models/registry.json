@@ -1,0 +1,895 @@
+{
+  "HDFCBANK.NS_ensemble_20260423_143300_22b8a7d2": {
+    "archived_at": "2026-04-23T14:39:32.598464",
+    "checksum": "ca774d7ed2c9102065c2adfdc536558c5ec6ad67097712df9f6391c417218565",
+    "created_at": "2026-04-23T14:33:00.290352",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:33:00.289909",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK.NS"
+  },
+  "HDFCBANK.NS_ensemble_20260423_143932_4cd00e6e": {
+    "archived_at": "2026-04-23T14:47:38.570123",
+    "checksum": "95c1a6c8cbfdb59c5e93e45b157901a88b8870132d55d1f7bacc596d0b02f955",
+    "created_at": "2026-04-23T14:39:32.598471",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:39:32.598204",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK.NS"
+  },
+  "HDFCBANK.NS_ensemble_20260423_144738_3b732431": {
+    "archived_at": "2026-04-23T14:52:27.240783",
+    "checksum": "ff5f1ccf3abde1bd1c39c39111672e9f10145ff0c0103ecb271918e0b0ff09b7",
+    "created_at": "2026-04-23T14:47:38.570131",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:47:38.569884",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK.NS"
+  },
+  "HDFCBANK.NS_ensemble_20260423_145227_c13cb4c3": {
+    "archived_at": "2026-04-23T14:54:36.037892",
+    "checksum": "72c11c244b2593bd52536818cb35375a05b1e1516bd2aaf9539e1bcd72bf6c40",
+    "created_at": "2026-04-23T14:52:27.240788",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:52:27.240604",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK.NS"
+  },
+  "HDFCBANK.NS_ensemble_20260423_145436_07c5a9f4": {
+    "archived_at": "2026-04-23T14:57:16.615065",
+    "checksum": "d8b4045f5140337e10d33e9ab0cfdef03ee98e5f0c5e009de9b143f1c7d91cf1",
+    "created_at": "2026-04-23T14:54:36.037900",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:54:36.037573",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK.NS"
+  },
+  "HDFCBANK.NS_ensemble_20260423_145716_b858bb2e": {
+    "archived_at": "2026-04-23T15:06:21.209689",
+    "checksum": "7c74a15a32b7733ffce1b36913a66b29f236568c2a9547c5aa2cfe1774f1ad70",
+    "created_at": "2026-04-23T14:57:16.615075",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:57:16.614834",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK.NS"
+  },
+  "HDFCBANK.NS_ensemble_20260423_150621_dd0ade05": {
+    "archived_at": "2026-05-02T16:57:28.605739",
+    "checksum": "35cdd311fc0ae289660e739503bf0d87abaf6a904ad82b6a8ebc8639f354ada1",
+    "created_at": "2026-04-23T15:06:21.209693",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T15:06:21.209544",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK.NS"
+  },
+  "HDFCBANK.NS_ensemble_20260502_165728_e89453de": {
+    "archived_at": "2026-05-02T17:23:22.591966",
+    "checksum": "af7d90a782396c40991dfb5e9cbe4e3a5305d5d968d0cd09a4bd12b67c3c5dd7",
+    "created_at": "2026-05-02T16:57:28.605745",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-02T16:57:28.605569",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK.NS"
+  },
+  "HDFCBANK.NS_ensemble_20260502_172322_121d1277": {
+    "archived_at": "2026-05-02T17:49:00.137810",
+    "checksum": "f2691e8c0f01caea42a31dbbb2c6cdb8aeaecbd7775ad2314c7911ccb2ca0058",
+    "created_at": "2026-05-02T17:23:22.591972",
+    "metadata": {
+      "auc": 0.27530364372469635,
+      "avg_fbeta": 0.0,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-02T17:23:22.591781",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK.NS"
+  },
+  "HDFCBANK.NS_ensemble_20260502_174900_9ba31de0": {
+    "checksum": "9f6aaed7def56e24bfc81df0b9fc8a21e3a238b10cb07a6b0959af2a18348719",
+    "created_at": "2026-05-02T17:49:00.137816",
+    "metadata": {
+      "auc": 0.4713804713804714,
+      "avg_fbeta": 0.0,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-02T17:49:00.137638",
+      "dsr": 0.0,
+      "mean_sharpe": -2.9587545950991103,
+      "worst_5pct_sharpe": -2.9587545950991103
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
+    "status": "shadow",
+    "ticker": "HDFCBANK.NS"
+  },
+  "ICICIBANK.NS_ensemble_20260502_165732_7fcf14c8": {
+    "archived_at": "2026-05-02T17:20:28.372396",
+    "checksum": "f5e331aa7420e722d60916aec60fa58ce5052946d89bd3996989901d82497b81",
+    "created_at": "2026-05-02T16:57:32.416608",
+    "metadata": {
+      "auc": 0.5612244897959183,
+      "avg_fbeta": 0.0,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-02T16:57:32.416471",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "ICICIBANK.NS"
+  },
+  "ICICIBANK.NS_ensemble_20260502_172028_609e1e5a": {
+    "archived_at": "2026-05-02T17:52:17.799411",
+    "checksum": "c841fb98d32cb289bb8088de5ffde9b2e5ab1a52e97540116bdae60ca20dc4cf",
+    "created_at": "2026-05-02T17:20:28.372401",
+    "metadata": {
+      "auc": 0.35000000000000003,
+      "avg_fbeta": 0.0,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-02T17:20:28.372234",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "ICICIBANK.NS"
+  },
+  "ICICIBANK.NS_ensemble_20260502_175217_e6ca952c": {
+    "checksum": "cef764e310812269874b9f14ca4d97da32da1ea203775fb912a3dd86a8927674",
+    "created_at": "2026-05-02T17:52:17.799415",
+    "metadata": {
+      "auc": 0.5123384253819037,
+      "avg_fbeta": 0.1045813335215509,
+      "cpcv_p_sharpe": 0.5,
+      "deployment_timestamp": "2026-05-02T17:52:17.799278",
+      "dsr": 3.091322360027123e-50,
+      "mean_sharpe": -0.39553817095667343,
+      "worst_5pct_sharpe": -3.220103738361207
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK.NS/v2/metadata.json",
+    "status": "shadow",
+    "ticker": "ICICIBANK.NS"
+  },
+  "INFY.NS_ensemble_20260423_143310_133b2ec4": {
+    "archived_at": "2026-04-23T14:39:42.158674",
+    "checksum": "5b4581d3f851cce917eb658b81edf726699c76f45189314fe2590446a8146710",
+    "created_at": "2026-04-23T14:33:10.129858",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:33:10.129536",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "INFY.NS"
+  },
+  "INFY.NS_ensemble_20260423_143942_8771d7ea": {
+    "archived_at": "2026-04-23T14:47:47.053106",
+    "checksum": "668047d19c75f18511de97820b75ae770128d36160b32ce6765d1d1f565397fc",
+    "created_at": "2026-04-23T14:39:42.158678",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:39:42.158526",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "INFY.NS"
+  },
+  "INFY.NS_ensemble_20260423_144747_14c54aae": {
+    "archived_at": "2026-04-23T14:52:35.044708",
+    "checksum": "be20d95dbee0567888235e7b68eed1efe3b3cc54f4da326dfb1bb2ca277bf49d",
+    "created_at": "2026-04-23T14:47:47.053110",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:47:47.052960",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "INFY.NS"
+  },
+  "INFY.NS_ensemble_20260423_145235_452506df": {
+    "archived_at": "2026-04-23T14:54:48.038138",
+    "checksum": "ac1df47b5faad550f0ade1d1296475cb7dba69625116ac1e7347d679b0dc114a",
+    "created_at": "2026-04-23T14:52:35.044712",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:52:35.044553",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "INFY.NS"
+  },
+  "INFY.NS_ensemble_20260423_145448_d9f448d3": {
+    "archived_at": "2026-04-23T14:57:22.860770",
+    "checksum": "8d7520bc46c079a93284a876ad03bbb500a75b732f773f756f966eeeb48fa8e8",
+    "created_at": "2026-04-23T14:54:48.038142",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:54:48.037976",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "INFY.NS"
+  },
+  "INFY.NS_ensemble_20260423_145722_e8b1c794": {
+    "archived_at": "2026-04-23T15:06:53.538949",
+    "checksum": "59f7aa7e8b0b3dda297cdf0b225e56f9205ff92dc18807bdc97c8bb13a599be8",
+    "created_at": "2026-04-23T14:57:22.860774",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:57:22.860612",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "INFY.NS"
+  },
+  "INFY.NS_ensemble_20260423_150653_9a771477": {
+    "archived_at": "2026-05-02T16:57:09.290220",
+    "checksum": "f5c0499ad56124eea80a842d96cacd52768512d5ea0af0fc32a2382e73fbe558",
+    "created_at": "2026-04-23T15:06:53.538953",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T15:06:53.538802",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "INFY.NS"
+  },
+  "INFY.NS_ensemble_20260502_165709_02a28ed1": {
+    "archived_at": "2026-05-02T17:25:12.035883",
+    "checksum": "72666277fc5c9b89fe0ff6f7fa2a4363805f45c89240a176892f3eef3070f30a",
+    "created_at": "2026-05-02T16:57:09.290228",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-02T16:57:09.289969",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "INFY.NS"
+  },
+  "INFY.NS_ensemble_20260502_172512_73b9983f": {
+    "archived_at": "2026-05-02T17:48:34.807796",
+    "checksum": "e431734de10e271a172df3cfd74228a3c8dd33f574a07570492a0cf4bcdf8552",
+    "created_at": "2026-05-02T17:25:12.035887",
+    "metadata": {
+      "auc": 0.34567901234567905,
+      "avg_fbeta": 0.03880070546737214,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-02T17:25:12.035741",
+      "dsr": 0.0,
+      "mean_sharpe": -0.6816736065507837,
+      "worst_5pct_sharpe": -1.7965902852189934
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v2/metadata.json",
+    "status": "archived",
+    "ticker": "INFY.NS"
+  },
+  "INFY.NS_ensemble_20260502_174834_0a0a98cb": {
+    "checksum": "a0449e65ed12fb9b778ce195ebb5e21b000aabc3f7b123e0f5d73f68d37157f3",
+    "created_at": "2026-05-02T17:48:34.807804",
+    "metadata": {
+      "auc": 0.2633744855967078,
+      "avg_fbeta": 0.01838235294117647,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-02T17:48:34.807552",
+      "dsr": 0.0,
+      "mean_sharpe": -1.3035914848145396,
+      "worst_5pct_sharpe": -2.184074230350533
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v2/metadata.json",
+    "status": "shadow",
+    "ticker": "INFY.NS"
+  },
+  "M&M.NS_ensemble_20260423_143317_62306955": {
+    "archived_at": "2026-04-23T14:39:47.787812",
+    "checksum": "d12d2a999b3c4160986fc96c50cc7d75534d17f1dcf5e0782acf9c4c8403fae7",
+    "created_at": "2026-04-23T14:33:17.046683",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:33:17.046504",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/M&M.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "M&M.NS"
+  },
+  "M&M.NS_ensemble_20260423_143947_6956133f": {
+    "archived_at": "2026-04-23T14:47:53.478111",
+    "checksum": "688cbc930c912e1d84cf8ed5d40573f2ba89e07fe9d7c5157e9b5d4b3b79358d",
+    "created_at": "2026-04-23T14:39:47.787815",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:39:47.787674",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/M&M.NS/v2/metadata.json",
+    "status": "archived",
+    "ticker": "M&M.NS"
+  },
+  "M&M.NS_ensemble_20260423_144753_f5ff471a": {
+    "archived_at": "2026-04-23T14:52:46.584935",
+    "checksum": "763bf82b66f32dec32a919c2a5f0c4af486295b25134c3111e297923b8777dbb",
+    "created_at": "2026-04-23T14:47:53.478114",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:47:53.477992",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/M&M.NS/v3/metadata.json",
+    "status": "archived",
+    "ticker": "M&M.NS"
+  },
+  "M&M.NS_ensemble_20260423_145246_acb33466": {
+    "archived_at": "2026-04-23T14:55:00.349817",
+    "checksum": "3ab114b1da0ed18c0ae57283e0017b5caee06135eb45698dcf7d8b83c8c2b856",
+    "created_at": "2026-04-23T14:52:46.584937",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:52:46.584812",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/M&M.NS/v4/metadata.json",
+    "status": "archived",
+    "ticker": "M&M.NS"
+  },
+  "M&M.NS_ensemble_20260423_145500_928cbd74": {
+    "archived_at": "2026-04-23T14:57:36.361281",
+    "checksum": "fe9ef000f552c721f3973d8be058ac3d7b99cc295ee169ca56005030a72db88f",
+    "created_at": "2026-04-23T14:55:00.349820",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:55:00.349694",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/M&M.NS/v5/metadata.json",
+    "status": "archived",
+    "ticker": "M&M.NS"
+  },
+  "M&M.NS_ensemble_20260423_145736_de4123c1": {
+    "archived_at": "2026-04-23T15:06:58.136183",
+    "checksum": "27e398f4b259b714ac0d3262048422ec642e65ed29deff15214338b6713b4bed",
+    "created_at": "2026-04-23T14:57:36.361285",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:57:36.361128",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/M&M.NS/v6/metadata.json",
+    "status": "archived",
+    "ticker": "M&M.NS"
+  },
+  "M&M.NS_ensemble_20260423_150658_606fd1d7": {
+    "checksum": "df7866359ecac6575032c23037cf93b94aebaed12ab6e0c5ca8832a9329deda8",
+    "created_at": "2026-04-23T15:06:58.136188",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T15:06:58.135976",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/M&M.NS/v7/metadata.json",
+    "status": "shadow",
+    "ticker": "M&M.NS"
+  },
+  "RELIANCE.NS_ensemble_20260423_143302_44ef9c15": {
+    "archived_at": "2026-04-23T14:39:34.055895",
+    "checksum": "d0bc8e720d18e0b8cd4c290e8e28e00445e521566827fece42386e587a573461",
+    "created_at": "2026-04-23T14:33:02.825388",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:33:02.822993",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE.NS"
+  },
+  "RELIANCE.NS_ensemble_20260423_143934_46c3eb0d": {
+    "archived_at": "2026-04-23T14:47:39.670674",
+    "checksum": "8301098d9e9853dcc9719b571f01c5aa2dd8e41a72645a5d2864f9b93744f1ff",
+    "created_at": "2026-04-23T14:39:34.055901",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:39:34.055661",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE.NS"
+  },
+  "RELIANCE.NS_ensemble_20260423_144739_77c8af02": {
+    "archived_at": "2026-04-23T14:52:27.304253",
+    "checksum": "9cb4c1eb4ccfcfd19fea4ce5868ec5cbeaf5955bf20edb8dc550fc7f459658af",
+    "created_at": "2026-04-23T14:47:39.670678",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:47:39.670508",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE.NS"
+  },
+  "RELIANCE.NS_ensemble_20260423_145227_b41df676": {
+    "archived_at": "2026-04-23T14:54:38.988088",
+    "checksum": "d3ba2d865887f150bad0535f69ccf807df5a9119178c8c14c9f0a02c541bf153",
+    "created_at": "2026-04-23T14:52:27.304257",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:52:27.304060",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE.NS"
+  },
+  "RELIANCE.NS_ensemble_20260423_145438_5a04ceb2": {
+    "archived_at": "2026-04-23T14:57:16.973594",
+    "checksum": "ffe840594bcc74808727917b79dbbac6d4766d4229840a679503633ec53f26e8",
+    "created_at": "2026-04-23T14:54:38.988091",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:54:38.987938",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE.NS"
+  },
+  "RELIANCE.NS_ensemble_20260423_145716_a1a3574b": {
+    "archived_at": "2026-04-23T15:06:56.890826",
+    "checksum": "af685ad5553c8b8599213ef54a353da5a7de2a429ead1e0771c82795bea9e94c",
+    "created_at": "2026-04-23T14:57:16.973607",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:57:16.972869",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE.NS"
+  },
+  "RELIANCE.NS_ensemble_20260423_150656_92267281": {
+    "archived_at": "2026-05-02T16:57:32.395995",
+    "checksum": "7a0eeeb7ac6bb4ef82f7d54829d5f5cc9dfee9efc0c7aa4fe62181325a51db7e",
+    "created_at": "2026-04-23T15:06:56.890830",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T15:06:56.890647",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE.NS"
+  },
+  "RELIANCE.NS_ensemble_20260502_165732_48c22021": {
+    "archived_at": "2026-05-02T17:22:30.706836",
+    "checksum": "317f859717308e713aaa6079332bdd5f272c3e446770b0ffbfe8e12a31f364a6",
+    "created_at": "2026-05-02T16:57:32.395997",
+    "metadata": {
+      "auc": 0.4930555555555555,
+      "avg_fbeta": 0.0,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-02T16:57:32.395858",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE.NS"
+  },
+  "RELIANCE.NS_ensemble_20260502_172230_d88ced72": {
+    "archived_at": "2026-05-02T17:49:24.552470",
+    "checksum": "b3868fc8c47eecbb952d0847fa462cfc72bf5c07e1025c643998bdc21e0953eb",
+    "created_at": "2026-05-02T17:22:30.706839",
+    "metadata": {
+      "auc": 0.4292929292929293,
+      "avg_fbeta": 0.0,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-02T17:22:30.706678",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE.NS"
+  },
+  "RELIANCE.NS_ensemble_20260502_174924_2aece652": {
+    "checksum": "a375f500e26fc80c9ca6a9a763fcf11397687592204a9b62fce6550257e30703",
+    "created_at": "2026-05-02T17:49:24.552474",
+    "metadata": {
+      "auc": 0.388421052631579,
+      "avg_fbeta": 0.0,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-02T17:49:24.552320",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
+    "status": "shadow",
+    "ticker": "RELIANCE.NS"
+  },
+  "TCS.NS_ensemble_20260423_143316_6f78b2b1": {
+    "archived_at": "2026-04-23T14:39:46.698057",
+    "checksum": "13210474052d1d6850ffe92f943499a8da97abeee15fbbdcaf31a5d03d030a9a",
+    "created_at": "2026-04-23T14:33:16.271314",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:33:16.270708",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "TCS.NS"
+  },
+  "TCS.NS_ensemble_20260423_143946_ace5f8f6": {
+    "archived_at": "2026-04-23T14:47:53.381774",
+    "checksum": "006f08df7b9e70ba42656d27bcadecb16ac135003eab0aae23b16da4d2b55335",
+    "created_at": "2026-04-23T14:39:46.698060",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:39:46.697896",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "TCS.NS"
+  },
+  "TCS.NS_ensemble_20260423_144753_cc73721c": {
+    "archived_at": "2026-04-23T14:52:41.957191",
+    "checksum": "f127f93dfac0fdb3a4cf8df5fb9fc9f22ceea5edd0a952700d3623182d3797e2",
+    "created_at": "2026-04-23T14:47:53.381777",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:47:53.381626",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "TCS.NS"
+  },
+  "TCS.NS_ensemble_20260423_145241_917b0058": {
+    "archived_at": "2026-04-23T14:54:55.859224",
+    "checksum": "238840a0547e1df2b7ec2f4a0cf3ffc38e535d674bbbef043f99b46a0292bae3",
+    "created_at": "2026-04-23T14:52:41.957198",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:52:41.956920",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "TCS.NS"
+  },
+  "TCS.NS_ensemble_20260423_145455_5621bc37": {
+    "archived_at": "2026-04-23T14:57:30.919652",
+    "checksum": "09845162b599264d4cd92d7b9508d9f3da0587936b50d74d375e8239872f09ee",
+    "created_at": "2026-04-23T14:54:55.859230",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:54:55.858973",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "TCS.NS"
+  },
+  "TCS.NS_ensemble_20260423_145730_1dacf9ee": {
+    "archived_at": "2026-04-23T15:06:25.292522",
+    "checksum": "1c67c823d6e2eacaa7824cc0b9b27d210ccfcaa8d264d2ffe91e29bb433caea9",
+    "created_at": "2026-04-23T14:57:30.919655",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T14:57:30.919502",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "TCS.NS"
+  },
+  "TCS.NS_ensemble_20260423_150625_1c2c8872": {
+    "archived_at": "2026-05-02T16:57:38.186704",
+    "checksum": "77ca67a16a135fe7df117751dbe097b721ac90d357f38f20fddd9105daa2ae5e",
+    "created_at": "2026-04-23T15:06:25.292525",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-04-23T15:06:25.292358",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "TCS.NS"
+  },
+  "TCS.NS_ensemble_20260502_165738_ebf0deaf": {
+    "archived_at": "2026-05-02T17:25:21.088687",
+    "checksum": "0149d6119ed711cbfcb5afde8f32c0cdd975d0ed902ce6187cc6c33afe65f88f",
+    "created_at": "2026-05-02T16:57:38.186709",
+    "metadata": {
+      "auc": 0.0,
+      "avg_fbeta": NaN,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-02T16:57:38.186503",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "TCS.NS"
+  },
+  "TCS.NS_ensemble_20260502_172521_66fdb562": {
+    "checksum": "2764601ef1d179670f24106fc828e0b0e99dcef380b806b4c1059b3ce96c9990",
+    "created_at": "2026-05-02T17:25:21.088690",
+    "metadata": {
+      "auc": 0.5078125,
+      "avg_fbeta": 0.0,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-02T17:25:21.088536",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v2/metadata.json",
+    "status": "shadow",
+    "ticker": "TCS.NS"
+  },
+  "TCS.NS_ensemble_20260502_175236_b7da0861": {
+    "checksum": "14a1b305bdb9a78d8cae0073f36acbd0fc463a4636dc415f40706e8eda34eb51",
+    "created_at": "2026-05-02T17:52:36.956735",
+    "metadata": {
+      "auc": 0.6474654377880185,
+      "avg_fbeta": 0.12876926063067368,
+      "cpcv_p_sharpe": 0.2222222222222222,
+      "deployment_timestamp": "2026-05-02T17:52:36.956572",
+      "dsr": 0.014757689030639823,
+      "mean_sharpe": 0.09926327586378557,
+      "worst_5pct_sharpe": -1.9553011514280094
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v3/metadata.json",
+    "status": "active",
+    "ticker": "TCS.NS"
+  }
+}

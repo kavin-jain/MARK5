@@ -103,14 +103,14 @@ class RobustBacktester:
     def __init__(
         self,
         initial_capital: float = 100000.0,
-        segment: str = 'EQUITY_INTRADAY',
+        segment: str = 'FUTURES',
         slippage_pct: float = 0.0005, # 0.05% slippage
         use_atr_stop: bool = True,
         atr_period: int = 14,
-        atr_multiplier: float = 1.0, # Stop loss at 1.0x ATR
-        pt_multiplier: float = 2.0,  # Profit target at 2.0x ATR (Positive Expectancy)
-        risk_per_trade: float = 0.05, # Increased to 5% risk per trade for higher returns
-        max_hold_days: int = 10,       # Rule 3: Max hold period
+        atr_multiplier: float = 2.5, # Wider stop for bear market volatility
+        pt_multiplier: float = 5.0,  # Higher target to capture full trend expansion
+        risk_per_trade: float = 0.05, # Standard 5% risk
+        max_hold_days: int = 15,       # 15 day swing trading
     ):
         self.capital = initial_capital
         self.initial_capital = initial_capital
@@ -124,9 +124,7 @@ class RobustBacktester:
         self.risk_per_trade = risk_per_trade
         self.max_hold_days = max_hold_days
         
-        # Validation
-        if segment == 'EQUITY_DELIVERY':
-            logger.warning("⚠️ MARKET RULE: Short selling disabled for Equity Delivery.")
+        # Validation logic: no longer blocking short selling as we migrated to FUTURES.
 
     def _calculate_atr(self, df: pd.DataFrame) -> pd.Series:
         """True Range calculation handling gaps"""
@@ -226,20 +224,12 @@ class RobustBacktester:
                         sl_hit = True
                         exit_price = curr_open * (1 - self.slippage)
                         reason = "PT_GAP"
-                    # Scenario B: Intraday SL/PT — FIX-4: resolve ambiguity
-                    # when BOTH levels are breached on the same daily bar,
-                    # use open-proximity to determine which was hit first.
-                    elif curr_low <= stop_price and curr_high >= target_price:
-                        dist_sl = abs(curr_open - stop_price)
-                        dist_pt = abs(curr_open - target_price)
-                        if dist_sl <= dist_pt:
-                            sl_hit = True; exit_price = stop_price * (1 - self.slippage); reason = "SL_HIT"
-                        else:
-                            sl_hit = True; exit_price = target_price * (1 - self.slippage); reason = "PT_HIT"
+                    # Scenario B: Intraday Stop Hit
                     elif curr_low <= stop_price:
                         sl_hit = True
-                        exit_price = stop_price * (1 - self.slippage)
+                        exit_price = stop_price * (1 - self.slippage) 
                         reason = "SL_HIT"
+                    # Scenario B2: Intraday Target Hit
                     elif curr_high >= target_price:
                         sl_hit = True
                         exit_price = target_price * (1 - self.slippage)
@@ -264,18 +254,12 @@ class RobustBacktester:
                          sl_hit = True
                          exit_price = curr_open * (1 + self.slippage)
                          reason = "PT_GAP"
-                    # Scenario B: Intraday SL/PT — FIX-4 (short side)
-                    elif curr_high >= stop_price and curr_low <= target_price:
-                        dist_sl = abs(curr_open - stop_price)
-                        dist_pt = abs(curr_open - target_price)
-                        if dist_sl <= dist_pt:
-                            sl_hit = True; exit_price = stop_price * (1 + self.slippage); reason = "SL_HIT"
-                        else:
-                            sl_hit = True; exit_price = target_price * (1 + self.slippage); reason = "PT_HIT"
+                    # Scenario B: Intraday Stop Hit
                     elif curr_high >= stop_price:
                         sl_hit = True
                         exit_price = stop_price * (1 + self.slippage)
                         reason = "SL_HIT"
+                    # Scenario B2: Intraday Target Hit
                     elif curr_low <= target_price:
                         sl_hit = True
                         exit_price = target_price * (1 + self.slippage)
@@ -334,40 +318,37 @@ class RobustBacktester:
             if cooldown > 0:
                 cooldown -= 1
             elif position == 0 and prev_signal != 0:
-                # COMPLIANCE CHECK
-                if self.segment == 'EQUITY_DELIVERY' and prev_signal == -1:
-                    pass
+                # Upgraded to F&O Segment: Short selling is now fully enabled for overnight holds
+                # Execution happens at CURRENT OPEN (since decision was made at prev close)
+                fill_price = curr_open
+                
+                # Apply Slippage
+                if prev_signal == 1:
+                    fill_price = fill_price * (1 + self.slippage)
+                    direction = 1
                 else:
-                    # Execution happens at CURRENT OPEN (since decision was made at prev close)
-                    fill_price = curr_open
+                    fill_price = fill_price * (1 - self.slippage)
+                    direction = -1
+                
+                # Position Sizing (Rule 22 formula)
+                risk_amt = equity * self.risk_per_trade
+                stop_dist = curr_atr * self.atr_multiplier
+                
+                if stop_dist > 0:
+                    qty = int(risk_amt / stop_dist)
+                else:
+                    qty = 0
                     
-                    # Apply Slippage
-                    if prev_signal == 1:
-                        fill_price = fill_price * (1 + self.slippage)
-                        direction = 1
-                    else:
-                        fill_price = fill_price * (1 - self.slippage)
-                        direction = -1
-                    
-                    # Position Sizing (Rule 22 formula)
-                    risk_amt = equity * self.risk_per_trade
-                    stop_dist = curr_atr * self.atr_multiplier
-                    
-                    if stop_dist > 0:
-                        qty = int(risk_amt / stop_dist)
-                    else:
-                        qty = 0
-                    
-                    # Cap position value at 100% of portfolio (no margin)
-                    max_pos_value = equity * 1.0
-                    if qty > 0 and (qty * fill_price) > max_pos_value:
-                        qty = max(1, int(max_pos_value / fill_price))
-                    
-                    if qty > 0 and (qty * fill_price) <= equity:
-                        position = qty * direction
-                        entry_price = fill_price
-                        entry_idx = i
-                        entries_on_this_bar = True
+                # Cap position value at 100% of portfolio (no margin)
+                max_pos_value = equity * 1.0
+                if qty > 0 and (qty * fill_price) > max_pos_value:
+                    qty = max(1, int(max_pos_value / fill_price))
+                
+                if qty > 0 and (qty * fill_price) <= equity:
+                    position = qty * direction
+                    entry_price = fill_price
+                    entry_idx = i
+                    entries_on_this_bar = True
             
             # Update Equity Curve
             equity_curve.iloc[i] = equity

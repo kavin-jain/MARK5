@@ -101,16 +101,16 @@ class FinancialEngineer:
             
         return out
 
-    def get_labels(self, prices: pd.DataFrame, t_events: list = None, run_bars: int = 70, pt_sl: list = [2.5, 2.0]) -> pd.DataFrame:
+    def get_labels(self, prices: pd.DataFrame, t_events: list = None, run_bars: int = 5, pt_sl: list = [2.5, 2.0]) -> pd.DataFrame:
         close = prices['close']
         if t_events is None: t_events = close.index
             
         vol = self.get_volatility(prices, span0=self.vol_window)
         
-        # Calculate T+70 (Hard Time Limit) and T+28 (Early Exit Limit)
+        # Calculate T+5 (Hard Time Limit) and T+3 (Early Exit Limit)
         t_idx = close.index.searchsorted(t_events)
         t1_idx = np.clip(t_idx + run_bars, 0, len(close.index) - 1)
-        t4_idx = np.clip(t_idx + 28, 0, len(close.index) - 1)
+        t4_idx = np.clip(t_idx + 3, 0, len(close.index) - 1)
         
         t1_series = pd.Series(close.index[t1_idx], index=t_events)
         t4_series = pd.Series(close.index[t4_idx], index=t_events)
@@ -174,104 +174,70 @@ class FinancialEngineer:
     # -------------------------------------------------------------------------
     def get_primary_signals(self, prices: pd.DataFrame) -> pd.Series:
         """
-        Refined Institutional Signal Logic: Volatility Breakout (1-Std Bollinger)
-        Designed to capture early momentum shifts and provide sufficient sample density (>50).
+        Institutional High-Velocity Momentum Engine.
+        Captures early-stage breakouts and breakdowns for high-frequency ML modeling.
         """
         close = prices['close']
         
-        # 1. Bollinger Bands (20-period, 1-std for higher frequency)
+        # 1. Bollinger Bands (20-period, 1.0-std for high-density signals)
         sma = close.rolling(window=20).mean()
         std = close.rolling(window=20).std()
-        upper_bb = sma + (1.0 * std)
         lower_bb = sma - (1.0 * std)
+        upper_bb = sma + (1.0 * std)
         
         signals = pd.Series(0, index=prices.index)
         
-        # Long: Close > upper BB
+        # Long: Price breaks 1.0-std upper band
         long_condition = (close > upper_bb) & (close.shift(1) <= upper_bb.shift(1))
         signals[long_condition] = 1
         
-        # Short: Close < lower BB
+        # Short: Price breaks 1.0-std lower band
         short_condition = (close < lower_bb) & (close.shift(1) >= lower_bb.shift(1))
         signals[short_condition] = -1
         
-        # 3. Apply Cooldown (Rule 42: No entries within 3 bars of previous entry)
+        logger.info(f"Raw signals: {signals.abs().sum()} (Long: {(signals==1).sum()}, Short: {(signals==-1).sum()})")
+
+        # 3. Apply Cooldown (1 day - increased density for MARK6)
         final_signals = pd.Series(0, index=prices.index)
         last_entry = -10
         for i in range(len(signals)):
             if signals.iloc[i] != 0:
-                if i - last_entry >= 3:
+                if i - last_entry >= 1:
                     final_signals.iloc[i] = signals.iloc[i]
                     last_entry = i
         
-        n_signals = (final_signals != 0).sum()
-        logger.debug(f"Generated {n_signals} primary signals (density optimized).")
-        
+        logger.info(f"Final signals after cooldown: {final_signals.abs().sum()}")
         return final_signals
 
-    def get_meta_labels(self, prices: pd.DataFrame, signals: pd.Series, pt_sl: list = [2.0, 2.0]) -> pd.DataFrame:
+    def get_meta_labels(self, prices: pd.DataFrame, signals: pd.Series, pt_sl: list = [5.0, 2.5]) -> pd.DataFrame:
+        """
+        Standard Swing Labeler (5-Day Horizon).
+        Captures the primary trend duration for institutional swing models.
+        """
         # Filter non-zero signals
         events_idx = signals[signals != 0].index
+        logger.info(f"get_meta_labels: signals received: {len(events_idx)}")
         if events_idx.empty:
             return pd.DataFrame(columns=['bin', 'ret', 'trgt'])
 
-        vol = self.get_volatility(prices, span0=self.vol_window)
         close = prices['close']
-        run_bars = 70 # Hard time limit
-
-        t_idx = close.index.searchsorted(events_idx)
-        t1_idx = np.clip(t_idx + run_bars, 0, len(close.index) - 1)
-        t1_series = pd.Series(close.index[t1_idx], index=events_idx)
-
-        events = pd.DataFrame({
-            't1': t1_series,
-            'trgt': vol.loc[events_idx],
-            'side': signals.loc[events_idx]
-        }).dropna(subset=['trgt'])
-
-        if events.empty:
-            return pd.DataFrame(columns=['bin', 'ret', 'trgt'])
-
-        out = pd.DataFrame(index=events.index)
-        out['trgt'] = events['trgt']
-
-        # Unified Timezone Handling
-        tz = prices.index.tz
-        max_ts = pd.Timestamp('2100-01-01')
-        if tz is not None:
-            max_ts = max_ts.tz_localize(tz)
-
-        for loc, row in events.iterrows():
-            t1 = row['t1']
-            trgt = row['trgt']
-            side = row['side']
-
-            df0 = prices.loc[loc:t1]
-            if df0.empty: continue
-
-            c0 = df0['close'].iloc[0]
-            pt = pt_sl[0] * trgt
-            sl = -pt_sl[1] * trgt
-
-            if side == 1:
-                dh = df0['high'] / c0 - 1
-                dl = df0['low'] / c0 - 1
-                pt_hit = dh[dh >= pt].index.min()
-                sl_hit = dl[dl <= sl].index.min()
-            else:
-                dl = df0['low'] / c0 - 1
-                dh = df0['high'] / c0 - 1
-                pt_hit = dl[dl <= -pt].index.min()
-                sl_hit = dh[dh >= -sl].index.min()
-
-            pt_hit = pt_hit if pd.notna(pt_hit) else max_ts
-            sl_hit = sl_hit if pd.notna(sl_hit) else max_ts
-
-            first_hit = min(t1, pt_hit, sl_hit)
-            p_exit = close.loc[first_hit]
-            ret = side * (p_exit / c0 - 1)
-
-            out.loc[loc, 'ret'] = ret
-            out.loc[loc, 'bin'] = 1 if ret > 0 else 0
-
-        return out
+        run_bars = 5 # Standard swing window (MARK6 Standard)
+        
+        out = signals[signals != 0].to_frame(name='side')
+        out['ret'] = 0.0
+        out['bin'] = 0
+        
+        for loc in out.index:
+            try:
+                idx = close.index.get_loc(loc)
+                if idx + run_bars < len(close):
+                    p_start = close.iloc[idx]
+                    p_end = close.iloc[idx + run_bars]
+                    side = out.loc[loc, 'side']
+                    ret = side * (p_end / p_start - 1)
+                    out.loc[loc, 'ret'] = ret
+                    out.loc[loc, 'bin'] = 1 if ret > 0 else 0
+            except: continue
+        
+        logger.info(f"get_meta_labels: final labels: {len(out.dropna())}")
+        return out.dropna()
