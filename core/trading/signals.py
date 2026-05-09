@@ -399,18 +399,20 @@ class TradingSignalGenerator:
             logger.debug(f"Event calendar check failed (non-fatal): {e}")
         # --- END EVENT CALENDAR FILTER ---
         
-        # --- REGIME-ADAPTIVE CONFIDENCE (Week 3 Rollout) ---
-        # Instead of static self.min_confidence
+        # --- REGIME-ADAPTIVE CONFIDENCE (Rule 21/23 compliant) ---
+        # NSE Midcap ML ceiling is 55-58% accuracy (GEMINI.md).
+        # Thresholds are calibrated around that ceiling, NOT aspirational numbers.
+        # Rule 21: No trade below 55%. Rule 27: After 3 losses, +5% added at call-site.
         CONFIDENCE_THRESHOLDS = {
-            "STRONG_BULL":    85.0,  # Whitelist only AND high conviction
-            "BULL_MARKET":    78.0,  # Harder to beat B&H, be selective
-            "TRENDING_UP":    75.0,  # Original RULE 20 threshold
-            "TRENDING_DOWN":  70.0,  # Model's sweet spot
-            "SIDEWAYS_MARKET":70.0,  # Model's sweet spot  
-            "BEAR_MARKET":    68.0,  # Model excels here
-            "VOLATILE_MARKET":82.0,  # High noise
-            "CHOPPY":         88.0,  # Almost never trade
-            "UNKNOWN":        80.0,  # Conservative default
+            "STRONG_BULL":    65.0,  # Harder to beat buy-and-hold; be selective
+            "BULL_MARKET":    62.0,  # Momentum works, but so does B&H
+            "TRENDING_UP":    60.0,  # Standard conviction bar
+            "TRENDING_DOWN":  55.0,  # Model excels in distribution tails
+            "SIDEWAYS_MARKET":58.0,  # Mean-reversion signals only
+            "BEAR_MARKET":    55.0,  # Model excels; Rule 23 BEAR gate still applies
+            "VOLATILE_MARKET":63.0,  # Elevated noise — slightly higher bar
+            "CHOPPY":         65.0,  # Near-impossible to model; be very selective
+            "UNKNOWN":        60.0,  # Conservative default
         }
         
         regime_name = self.current_regime.name if hasattr(self.current_regime, 'name') else str(self.current_regime)
