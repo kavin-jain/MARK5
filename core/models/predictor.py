@@ -401,8 +401,7 @@ class MARK5Predictor:
                     signal = f"HOLD (Majority Disagreement: {n_agree}/{n_models})"
                 elif is_noisy:
                     signal = f"HOLD (Entropy {entropy_val:.2f} > 0.65)"
-                elif confidence > 0.50:
-                    signal = f"HOLD (Conf {confidence:.0%} < {PROBABILITY_HURDLE:.0%} hurdle)"
+                # confidence < PROBABILITY_HURDLE is implicit — already handled above
 
             return {
                 'status': 'success',
