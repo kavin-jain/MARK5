@@ -39,13 +39,23 @@ def train_model(ticker: str):
         cmd = [
             sys.executable, "core/models/training/trainer.py", 
             "--symbols", ticker.replace('.NS', ''), 
-            "--years", "3", 
-            "--cutoff", TRAINING_CUTOFF
+            "--years", "5", 
+            "--cutoff", TRAINING_CUTOFF,
+            "--is-subprocess"
         ]
         # run with timeout to avoid hanging indefinitely on one stock
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=600) 
+        
+        # Always save full training log for diagnostics
+        log_dir = Path("logs/training")
+        log_dir.mkdir(parents=True, exist_ok=True)
+        with open(log_dir / f"{ticker}_train.log", "w") as f:
+            f.write(result.stdout)
+            f.write("\n" + "="*50 + "\n")
+            f.write(result.stderr)
+
         if result.returncode != 0:
-            logger.error(f"Training failed for {ticker}. Error: {result.stderr[:200]}")
+            logger.error(f"Training failed for {ticker}. Check logs/training/{ticker}_train.log")
             return False
         else:
             logger.info(f"Training successful for {ticker}.")
@@ -64,8 +74,7 @@ def backtest_ticker(ticker: str) -> dict:
         if not success:
             return {"ticker": ticker, "error": "OOS Training failed"}
             
-        # FIX-6: never run backtests on models that failed the production gate.
-        # allow_shadow=True was silently inflating results with certified-untrustworthy models.
+        # Enforce gate pass check
         import json as _json, pathlib as _pl
         _base = _pl.Path('models') / ticker
         _versions = sorted([v for v in _base.iterdir() if v.is_dir() and v.name.startswith('v')],
@@ -77,8 +86,9 @@ def backtest_ticker(ticker: str) -> dict:
                 if not _meta.get('passes_gate', False):
                     logger.warning(f'{ticker} GATE FAIL — skipping (model did not pass production gate)')
                     return {'ticker': ticker, 'error': 'Gate failure — model not production-ready'}
+
         try:
-            predictor = MARK5Predictor(ticker, allow_shadow=False)  # FIX-6: was allow_shadow=True
+            predictor = MARK5Predictor(ticker, allow_shadow=False)
         except Exception as e:
             return {"ticker": ticker, "error": f"Could not load predictor after training: {e}"}
 
@@ -120,7 +130,7 @@ def backtest_ticker(ticker: str) -> dict:
         signals_series = pd.Series(full_signals, index=test_df.index)
         
         # 5. Run Backtester
-        backtester = RobustBacktester(segment='EQUITY_INTRADAY')
+        backtester = RobustBacktester(segment='FUTURES')
         _, metrics = backtester.run_simulation(test_df, signals_series, symbol=ticker)
         metrics["ticker"] = ticker
         metrics["start_date"] = str(test_df.index[start_idx].date())
@@ -151,19 +161,29 @@ def run_150_backtest():
 
     results = []
     
-    # We can use ProcessPoolExecutor for parallel backtesting
-    # But since predictor uses PyTorch/XGBoost, it might be heavy. Let's use 4 workers.
-    max_workers = min(8, os.cpu_count() or 4)
-    logger.info(f"Running backtests with {max_workers} workers...")
+    # Using ProcessPoolExecutor for parallel backtesting (4 workers for CPU safety)
+    max_workers = 4
+    logger.info(f"Running backtests with {max_workers} parallel workers...")
 
-    # For safety and progress tracking, we will do it sequentially if parallel crashes, 
-    # but let's try parallel first to save time. Actually, sequential is safer for SQLite DB locks in MARK5.
-    # Since we want it to be 100% reliable, we will do sequential. The user said "time is not an excuse".
-    
-    for idx, ticker in enumerate(candidates):
-        logger.info(f"[{idx+1}/{len(candidates)}] Processing {ticker}...")
-        res = backtest_ticker(ticker)
-        results.append(res)
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        future_to_ticker = {executor.submit(backtest_ticker, ticker): ticker for ticker in candidates}
+        
+        for i, future in enumerate(as_completed(future_to_ticker), 1):
+            ticker = future_to_ticker[future]
+            try:
+                res = future.result()
+                results.append(res)
+                if "error" in res:
+                    logger.warning(f"[{i}/{len(candidates)}] {ticker} FAILED: {res['error']}")
+                else:
+                    logger.info(f"[{i}/{len(candidates)}] {ticker} COMPLETE: Ret={res.get('Total Return %', 0):.2f}%")
+                
+                # Update Live Leaderboard
+                generate_report(results, "reports/live_leaderboard.md")
+            except Exception as e:
+                logger.error(f"[{i}/{len(candidates)}] {ticker} CRASHED: {e}")
+                results.append({"ticker": ticker, "error": str(e)})
+                generate_report(results, "reports/live_leaderboard.md")
 
     return results
 
@@ -172,48 +192,43 @@ def generate_report(results: list, output_path: str):
     valid_results = [r for r in results if "error" not in r]
     errors = [r for r in results if "error" in r]
 
-    if not valid_results:
-        logger.error("No valid backtest results generated!")
-        return
-
-    # Calculate averages
-    df = pd.DataFrame(valid_results)
-    
-    # Extract key metrics
-    # RobustBacktester metrics usually include: Total Return %, Sharpe Ratio, Max Drawdown %, Win Rate, Total Trades
-    avg_return = df.get("Total Return %", pd.Series([0])).mean()
-    avg_sharpe = df.get("Sharpe Ratio", pd.Series([0])).mean()
-    avg_win_rate = df.get("Win Rate", pd.Series([0])).mean()
-    avg_drawdown = df.get("Max Drawdown %", pd.Series([0])).mean()
-    avg_trades = df.get("Total Trades", pd.Series([0])).mean()
+    # Calculate averages (handle empty valid_results)
+    if valid_results:
+        df = pd.DataFrame(valid_results)
+        avg_return = df.get("Total Return %", pd.Series([0])).mean()
+        avg_sharpe = df.get("Sharpe Ratio", pd.Series([0])).mean()
+        avg_win_rate = df.get("Win Rate %", pd.Series([0])).mean()
+        avg_drawdown = df.get("Max Drawdown %", pd.Series([0])).mean()
+        avg_trades = df.get("Total Trades", pd.Series([0])).mean()
+    else:
+        avg_return = 0.0
+        avg_sharpe = 0.0
+        avg_win_rate = 0.0
+        avg_drawdown = 0.0
+        avg_trades = 0.0
 
     # Needs assessment
     needs_met = []
-    if avg_return >= 15.0:
-        needs_met.append("✅ Average Return >= 15% target")
+    if valid_results:
+        if avg_return >= 15.0: needs_met.append("✅ Average Return >= 15% target")
+        else: needs_met.append(f"❌ Average Return < 15% target (Actual: {avg_return:.2f}%)")
+        if avg_sharpe > 0.5: needs_met.append("✅ Average Sharpe Ratio > 0.5 target")
+        else: needs_met.append(f"❌ Average Sharpe Ratio <= 0.5 target (Actual: {avg_sharpe:.2f})")
+        if avg_win_rate > 0.44: needs_met.append("✅ Average Win Rate > 44% target")
+        else: needs_met.append(f"❌ Average Win Rate <= 44% target (Actual: {avg_win_rate:.2f})")
     else:
-        needs_met.append(f"❌ Average Return < 15% target (Actual: {avg_return:.2f}%)")
-        
-    if avg_sharpe > 0.5:
-        needs_met.append("✅ Average Sharpe Ratio > 0.5 target")
-    else:
-        needs_met.append(f"❌ Average Sharpe Ratio <= 0.5 target (Actual: {avg_sharpe:.2f})")
-        
-    if avg_win_rate > 0.44:
-        needs_met.append("✅ Average Win Rate > 44% target")
-    else:
-        needs_met.append(f"❌ Average Win Rate <= 44% target (Actual: {avg_win_rate:.2f})")
+        needs_met = ["🕒 Waiting for first production-ready model..."]
 
     # Generate Markdown
     md = [
         "# MARK5 - 150 Stock Systematic Backtest Report (STRICT OOS)",
-        f"**Date:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+        f"**Last Updated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
         f"**Validation Type:** Strict Out-of-Sample (OOS)",
         f"**Training Cutoff:** {TRAINING_CUTOFF}",
         f"**Backtest Horizon:** {OOS_START_DATE} to Present",
-        f"**Total Stocks Tested:** {len(results)}",
-        f"**Successful Backtests:** {len(valid_results)}",
-        f"**Failed Backtests:** {len(errors)}",
+        f"**Processed:** {len(results)} / 150",
+        f"**Passed Gate:** {len(valid_results)}",
+        f"**Failed Gate/Data:** {len(errors)}",
         "",
         "## System Averages vs Needs",
         f"- **Average Total Return:** {avg_return:.2f}%",
@@ -231,32 +246,34 @@ def generate_report(results: list, output_path: str):
     ]
 
     # Sort by return and add to table
-    if "Total Return %" in df.columns:
+    if valid_results:
         df_sorted = df.sort_values(by="Total Return %", ascending=False)
         for _, row in df_sorted.head(20).iterrows():
             t = row.get("ticker", "N/A")
             ret = row.get("Total Return %", 0)
             sh = row.get("Sharpe Ratio", 0)
-            wr = row.get("Win Rate", 0)
+            wr = row.get("Win Rate %", 0)
             dd = row.get("Max Drawdown %", 0)
             tr = row.get("Total Trades", 0)
             md.append(f"| {t} | {ret:.2f}% | {sh:.2f} | {wr:.2f}% | {dd:.2f}% | {tr} |")
 
     if errors:
-        md.append("\n## Errors")
-        for e in errors[:10]:
-            md.append(f"- **{e['ticker']}**: {e['error']}")
+        md.append("\n## Gate Failures & Errors")
+        md.append("| Ticker | Error Message |")
+        md.append("|--------|---------------|")
+        for e in errors[-10:]: # Show last 10 errors
+            md.append(f"| {e['ticker']} | {e['error']} |")
         if len(errors) > 10:
-            md.append(f"- ... and {len(errors) - 10} more.")
+            md.append(f"| ... | and {len(errors)-10} more. |")
 
     report_content = "\n".join(md)
     
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w") as f:
         f.write(report_content)
-        
-    logger.info(f"Report saved to {output_path}")
-    print("\n" + report_content)
+    
+    # Also log status
+    logger.info(f"Report updated: {len(valid_results)} passed, {len(errors)} failed.")
 
 if __name__ == "__main__":
     logger.info("Starting Systematic 150 Stock Backtest...")

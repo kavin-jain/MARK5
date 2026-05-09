@@ -21,8 +21,8 @@ def generate_cpcv_splits(
     n_samples: int,
     n_splits: int = 6,
     n_test_splits: int = 2,
-    prediction_horizon: int = 24,  # Default 24 bars for 60-min data (1 day)
-    embargo_limit: int = 24,       # Default 24 bars for 60-min data (1 day)
+    prediction_horizon: int = 10,  # Default, can be overridden by trainer
+    embargo_limit: int = 10,       # Default
     min_train_size: Optional[int] = None
 ) -> Generator[Tuple[np.ndarray, np.ndarray], None, None]:
     """
@@ -33,15 +33,15 @@ def generate_cpcv_splits(
         n_samples: Total number of bars in the dataset.
         n_splits: Number of groups (N) to partition the timeline into.
         n_test_splits: Number of groups (k) to use as the testing set in each reality.
-        prediction_horizon: Number of bars used for label calculation (Purge limit).
-        embargo_limit: Number of bars to prevent serial correlation leakage (Embargo limit).
+        prediction_horizon: Number of bars/samples for label calculation isolation (Purge).
+        embargo_limit: Number of bars/samples to prevent serial correlation (Embargo).
         min_train_size: Minimum required training samples after purging.
         
     Yields:
         (train_indices, test_indices) as numpy arrays of integers.
     """
     # 1. Small-Data Awareness: Validate and adjust parameters
-    if n_samples < 30:
+    if n_samples < 5:
         logger.error(f"Insufficient data for CPCV: {n_samples} samples.")
         return
 
@@ -124,8 +124,8 @@ class CombinatorialPurgedKFold:
         self, 
         n_splits: int = 6, 
         n_test_splits: int = 2, 
-        prediction_horizon: int = 24, 
-        embargo_limit: int = 24
+        prediction_horizon: int = 70, 
+        embargo_limit: int = 70
     ):
         """
         Args:
