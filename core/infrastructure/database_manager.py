@@ -29,6 +29,7 @@ from decimal import Decimal, getcontext, ROUND_HALF_UP
 from typing import Dict, List, Optional, Any
 
 from core.utils.config_manager import get_database_config
+from core.infrastructure.db_logger import get_db_logger
 
 # Set global precision higher than market requirements
 getcontext().prec = 28
@@ -86,6 +87,7 @@ class MARK5DatabaseManager:
         os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
 
         self.logger = logging.getLogger("MARK5.Vault")
+        self.db_logger = get_db_logger()
         self._local = threading.local()
 
         self.init_database()
@@ -110,6 +112,12 @@ class MARK5DatabaseManager:
             conn.execute("PRAGMA journal_mode=WAL")
             conn.execute("PRAGMA synchronous=NORMAL")
             conn.execute("PRAGMA foreign_keys=ON")
+
+            def trace_callback(query):
+                if not query.strip().upper().startswith(("PRAGMA", "BEGIN", "COMMIT")):
+                    self.db_logger.info(f"[SQLite Vault] {query}")
+            conn.set_trace_callback(trace_callback)
+
             self._local.connection = conn
         return self._local.connection
 
@@ -422,6 +430,7 @@ class MARK5DatabaseManager:
             return True
         except Exception as exc:
             self.logger.critical(f"FAILED TO LOG TRADE ENTRY: {exc}")
+            self.db_logger.error(f"[SQLite Vault] FAILED TO LOG TRADE ENTRY: {exc}")
             return False
 
     def log_backtest_stats(self, stats: Dict) -> bool:
@@ -455,6 +464,7 @@ class MARK5DatabaseManager:
             return True
         except Exception as exc:
             self.logger.error(f"FAILED TO LOG BACKTEST STATS: {exc}")
+            self.db_logger.error(f"[SQLite Vault] FAILED TO LOG BACKTEST STATS: {exc}")
             return False
 
     def log_paper_trade_stats(self, stats: Dict) -> bool:
@@ -492,6 +502,7 @@ class MARK5DatabaseManager:
             return True
         except Exception as exc:
             self.logger.error(f"FAILED TO LOG PAPER TRADE STATS: {exc}")
+            self.db_logger.error(f"[SQLite Vault] FAILED TO LOG PAPER TRADE STATS: {exc}")
             return False
 
     def log_trade_exit(self, trade_id: str, exit_data: Dict) -> bool:
@@ -527,6 +538,7 @@ class MARK5DatabaseManager:
             return True
         except Exception as exc:
             self.logger.critical(f"FAILED TO LOG TRADE EXIT: {exc}")
+            self.db_logger.error(f"[SQLite Vault] FAILED TO LOG TRADE EXIT: {exc}")
             return False
 
     def get_todays_pnl(self) -> Decimal:
@@ -637,6 +649,7 @@ class MARK5DatabaseManager:
             return True
         except Exception as exc:
             self.logger.critical(f"FAILED TO SAVE CHECKPOINT: {exc}")
+            self.db_logger.error(f"[SQLite Vault] FAILED TO SAVE CHECKPOINT: {exc}")
             return False
 
     def restore_checkpoint(self, checkpoint_name: Optional[str] = None) -> Optional[Dict]:
@@ -679,6 +692,7 @@ class MARK5DatabaseManager:
             }
         except Exception as exc:
             self.logger.critical(f"FAILED TO RESTORE CHECKPOINT: {exc}")
+            self.db_logger.error(f"[SQLite Vault] FAILED TO RESTORE CHECKPOINT: {exc}")
             return None
 
     def list_checkpoints(self, limit: int = 20) -> List[Dict]:

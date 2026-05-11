@@ -2,7 +2,7 @@
   "can_trade": false,
   "risk_level": "HALTED",
   "halt_reason": "DD_BREACH",
-  "halted_at": "2026-05-09T06:22:52.079912",
+  "halted_at": "2026-05-09T07:42:46.476162",
   "halted_by": "SYSTEM",
-  "resume_auth_hash": "5ba975894e570e730e86bb0bc26503226ed1ee1e5a04d126089c3a6330d0dae4"
+  "resume_auth_hash": "c43faca4262a7931191a48afc3ed95898fc20b40067141cb0f37aa6f3ee9bef3"
 }

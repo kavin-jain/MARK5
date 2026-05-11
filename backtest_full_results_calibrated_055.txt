@@ -1,0 +1,2640 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1778290562.119461  963207 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1778290562.158132  963207 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1778290563.010547  963207 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2026-05-09 07:06:03,273 | INFO | 
+============================================================
+  PIPELINE: RELIANCE
+============================================================
+2026-05-09 07:06:03,276 | INFO | [RELIANCE] 1235 bars fetched
+2026-05-09 07:06:03,276 | INFO | [RELIANCE] Starting walk-forward backtest...
+2026-05-09 07:06:03,276 | INFO | [RELIANCE] Starting walk-forward backtest 2021-01-01→2025-12-31
+2026-05-09 07:06:03,279 | INFO | [RELIANCE] Loading models from models/RELIANCE.NS/v1
+2026-05-09 07:06:03,294 | INFO | [RELIANCE] 14 walk-forward folds
+2026-05-09 07:06:03,313 | INFO | engineer_features_df: shape before dropna: (371, 10)
+2026-05-09 07:06:03,314 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,329 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:06:03,330 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,333 | INFO | Raw signals: 6 (Long: 3, Short: 3)
+2026-05-09 07:06:03,334 | INFO | Final signals after cooldown: 6
+2026-05-09 07:06:03,334 | WARNING | [RELIANCE] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,334 | WARNING | [RELIANCE] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,335 | WARNING | [RELIANCE] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,335 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:03,343 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:03,343 | INFO | [RELIANCE] Fold 1: Strat=+0.0% | BH=-1.0% | Alpha=+1.0% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:03,357 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:06:03,358 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,373 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:06:03,374 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,376 | INFO | Raw signals: 3 (Long: 1, Short: 2)
+2026-05-09 07:06:03,377 | INFO | Final signals after cooldown: 3
+2026-05-09 07:06:03,377 | WARNING | [RELIANCE] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,377 | WARNING | [RELIANCE] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,378 | WARNING | [RELIANCE] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,378 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:03,386 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:03,386 | INFO | [RELIANCE] Fold 2: Strat=+0.0% | BH=+7.5% | Alpha=-7.5% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:03,400 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:06:03,401 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,416 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:06:03,417 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,419 | INFO | Raw signals: 4 (Long: 1, Short: 3)
+2026-05-09 07:06:03,420 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:03,420 | WARNING | [RELIANCE] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,421 | WARNING | [RELIANCE] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,421 | WARNING | [RELIANCE] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,421 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:03,429 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:03,429 | INFO | [RELIANCE] Fold 3: Strat=+0.0% | BH=-9.5% | Alpha=+9.5% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:03,444 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:06:03,445 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,460 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:06:03,462 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,464 | INFO | Raw signals: 3 (Long: 3, Short: 0)
+2026-05-09 07:06:03,464 | INFO | Final signals after cooldown: 3
+2026-05-09 07:06:03,465 | WARNING | [RELIANCE] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,465 | WARNING | [RELIANCE] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,465 | WARNING | [RELIANCE] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,466 | INFO | 🚀 Starting Simulation on 60 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:03,473 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:03,473 | INFO | [RELIANCE] Fold 4: Strat=+0.0% | BH=+9.4% | Alpha=-9.4% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:03,488 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:06:03,489 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,504 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:06:03,505 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,507 | INFO | Raw signals: 5 (Long: 2, Short: 3)
+2026-05-09 07:06:03,507 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:03,508 | WARNING | [RELIANCE] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,508 | WARNING | [RELIANCE] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,509 | WARNING | [RELIANCE] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,509 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:03,516 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:03,517 | INFO | [RELIANCE] Fold 5: Strat=+0.0% | BH=-2.5% | Alpha=+2.5% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:03,531 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:06:03,532 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,548 | INFO | engineer_features_df: shape before dropna: (742, 10)
+2026-05-09 07:06:03,549 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,551 | INFO | Raw signals: 3 (Long: 3, Short: 0)
+2026-05-09 07:06:03,551 | INFO | Final signals after cooldown: 3
+2026-05-09 07:06:03,552 | WARNING | [RELIANCE] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,552 | WARNING | [RELIANCE] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,553 | WARNING | [RELIANCE] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,553 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:03,560 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:03,561 | INFO | [RELIANCE] Fold 6: Strat=+0.0% | BH=+11.7% | Alpha=-11.7% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:03,575 | INFO | engineer_features_df: shape before dropna: (741, 10)
+2026-05-09 07:06:03,576 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,592 | INFO | engineer_features_df: shape before dropna: (802, 10)
+2026-05-09 07:06:03,593 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,595 | INFO | Raw signals: 4 (Long: 3, Short: 1)
+2026-05-09 07:06:03,596 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:03,596 | WARNING | [RELIANCE] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,597 | WARNING | [RELIANCE] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,597 | WARNING | [RELIANCE] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,597 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:03,605 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:03,605 | INFO | [RELIANCE] Fold 7: Strat=+0.0% | BH=+14.6% | Alpha=-14.6% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:03,619 | INFO | engineer_features_df: shape before dropna: (801, 10)
+2026-05-09 07:06:03,621 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,636 | INFO | engineer_features_df: shape before dropna: (862, 10)
+2026-05-09 07:06:03,637 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,639 | INFO | Raw signals: 5 (Long: 3, Short: 2)
+2026-05-09 07:06:03,639 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:03,640 | WARNING | [RELIANCE] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,640 | WARNING | [RELIANCE] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,640 | WARNING | [RELIANCE] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,641 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:03,648 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:03,648 | INFO | [RELIANCE] Fold 8: Strat=+0.0% | BH=+5.1% | Alpha=-5.1% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:03,663 | INFO | engineer_features_df: shape before dropna: (861, 10)
+2026-05-09 07:06:03,665 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,680 | INFO | engineer_features_df: shape before dropna: (926, 10)
+2026-05-09 07:06:03,681 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,683 | INFO | Raw signals: 9 (Long: 4, Short: 5)
+2026-05-09 07:06:03,684 | INFO | Final signals after cooldown: 9
+2026-05-09 07:06:03,684 | WARNING | [RELIANCE] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,684 | WARNING | [RELIANCE] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,685 | WARNING | [RELIANCE] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,685 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:03,693 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:03,693 | INFO | [RELIANCE] Fold 9: Strat=+0.0% | BH=-5.8% | Alpha=+5.8% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:03,709 | INFO | engineer_features_df: shape before dropna: (925, 10)
+2026-05-09 07:06:03,710 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,725 | INFO | engineer_features_df: shape before dropna: (988, 10)
+2026-05-09 07:06:03,726 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,729 | INFO | Raw signals: 6 (Long: 2, Short: 4)
+2026-05-09 07:06:03,729 | INFO | Final signals after cooldown: 6
+2026-05-09 07:06:03,730 | WARNING | [RELIANCE] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,730 | WARNING | [RELIANCE] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,730 | WARNING | [RELIANCE] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,731 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:03,738 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:03,738 | INFO | [RELIANCE] Fold 10: Strat=+0.0% | BH=-16.6% | Alpha=+16.6% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:03,753 | INFO | engineer_features_df: shape before dropna: (987, 10)
+2026-05-09 07:06:03,755 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,773 | INFO | engineer_features_df: shape before dropna: (1050, 10)
+2026-05-09 07:06:03,774 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,776 | INFO | Raw signals: 6 (Long: 4, Short: 2)
+2026-05-09 07:06:03,777 | INFO | Final signals after cooldown: 6
+2026-05-09 07:06:03,777 | WARNING | [RELIANCE] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,777 | WARNING | [RELIANCE] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,778 | WARNING | [RELIANCE] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,778 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:03,786 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:03,786 | INFO | [RELIANCE] Fold 11: Strat=+0.0% | BH=+2.6% | Alpha=-2.6% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:03,801 | INFO | engineer_features_df: shape before dropna: (1049, 10)
+2026-05-09 07:06:03,802 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,817 | INFO | engineer_features_df: shape before dropna: (1111, 10)
+2026-05-09 07:06:03,819 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,821 | INFO | Raw signals: 5 (Long: 5, Short: 0)
+2026-05-09 07:06:03,821 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:03,822 | WARNING | [RELIANCE] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,822 | WARNING | [RELIANCE] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,822 | WARNING | [RELIANCE] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,823 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:03,830 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:03,830 | INFO | [RELIANCE] Fold 12: Strat=+0.0% | BH=+22.0% | Alpha=-22.0% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:03,845 | INFO | engineer_features_df: shape before dropna: (1110, 10)
+2026-05-09 07:06:03,847 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,862 | INFO | engineer_features_df: shape before dropna: (1175, 10)
+2026-05-09 07:06:03,863 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,865 | INFO | Raw signals: 7 (Long: 2, Short: 5)
+2026-05-09 07:06:03,866 | INFO | Final signals after cooldown: 7
+2026-05-09 07:06:03,866 | WARNING | [RELIANCE] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,867 | WARNING | [RELIANCE] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,867 | WARNING | [RELIANCE] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,868 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:03,875 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:03,876 | INFO | [RELIANCE] Fold 13: Strat=+0.0% | BH=-10.1% | Alpha=+10.1% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:03,891 | INFO | engineer_features_df: shape before dropna: (1174, 10)
+2026-05-09 07:06:03,892 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,907 | INFO | engineer_features_df: shape before dropna: (1235, 10)
+2026-05-09 07:06:03,908 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,911 | INFO | Raw signals: 3 (Long: 3, Short: 0)
+2026-05-09 07:06:03,911 | INFO | Final signals after cooldown: 3
+2026-05-09 07:06:03,912 | WARNING | [RELIANCE] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,912 | WARNING | [RELIANCE] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,912 | WARNING | [RELIANCE] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,913 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:03,920 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:03,920 | INFO | [RELIANCE] Fold 14: Strat=+0.0% | BH=+12.5% | Alpha=-12.5% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:03,922 | INFO | 
+============================================================
+  PIPELINE: ICICIBANK
+============================================================
+2026-05-09 07:06:03,924 | INFO | [ICICIBANK] 1235 bars fetched
+2026-05-09 07:06:03,924 | INFO | [ICICIBANK] Starting walk-forward backtest...
+2026-05-09 07:06:03,924 | INFO | [ICICIBANK] Starting walk-forward backtest 2021-01-01→2025-12-31
+2026-05-09 07:06:03,927 | INFO | [ICICIBANK] Loading models from models/ICICIBANK.NS/v2
+2026-05-09 07:06:03,934 | INFO | [ICICIBANK] 14 walk-forward folds
+2026-05-09 07:06:03,953 | INFO | engineer_features_df: shape before dropna: (371, 10)
+2026-05-09 07:06:03,954 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,970 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:06:03,971 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:03,974 | INFO | Raw signals: 5 (Long: 4, Short: 1)
+2026-05-09 07:06:03,974 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:03,975 | WARNING | [ICICIBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,975 | WARNING | [ICICIBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,975 | WARNING | [ICICIBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:03,976 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:03,983 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:03,983 | INFO | [ICICIBANK] Fold 1: Strat=+0.0% | BH=+23.2% | Alpha=-23.2% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:03,998 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:06:03,999 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,014 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:06:04,016 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,018 | INFO | Raw signals: 4 (Long: 2, Short: 2)
+2026-05-09 07:06:04,018 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:04,019 | WARNING | [ICICIBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,019 | WARNING | [ICICIBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,019 | WARNING | [ICICIBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,020 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,028 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,028 | INFO | [ICICIBANK] Fold 2: Strat=+0.0% | BH=+5.0% | Alpha=-5.0% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:04,043 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:06:04,044 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,059 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:06:04,061 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,063 | INFO | Raw signals: 4 (Long: 2, Short: 2)
+2026-05-09 07:06:04,063 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:04,064 | WARNING | [ICICIBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,064 | WARNING | [ICICIBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,064 | WARNING | [ICICIBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,065 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,072 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,072 | INFO | [ICICIBANK] Fold 3: Strat=+0.0% | BH=-2.8% | Alpha=+2.8% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:04,087 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:06:04,088 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,103 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:06:04,104 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,107 | INFO | Raw signals: 5 (Long: 2, Short: 3)
+2026-05-09 07:06:04,107 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:04,107 | WARNING | [ICICIBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,108 | WARNING | [ICICIBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,108 | WARNING | [ICICIBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,108 | INFO | 🚀 Starting Simulation on 60 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,116 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,116 | INFO | [ICICIBANK] Fold 4: Strat=+0.0% | BH=+5.7% | Alpha=-5.7% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:04,130 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:06:04,132 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,147 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:06:04,148 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,150 | INFO | Raw signals: 3 (Long: 1, Short: 2)
+2026-05-09 07:06:04,150 | INFO | Final signals after cooldown: 3
+2026-05-09 07:06:04,151 | WARNING | [ICICIBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,151 | WARNING | [ICICIBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,151 | WARNING | [ICICIBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,152 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,159 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,160 | INFO | [ICICIBANK] Fold 5: Strat=+0.0% | BH=+1.8% | Alpha=-1.8% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:04,174 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:06:04,175 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,190 | INFO | engineer_features_df: shape before dropna: (742, 10)
+2026-05-09 07:06:04,192 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,194 | INFO | Raw signals: 1 (Long: 1, Short: 0)
+2026-05-09 07:06:04,194 | INFO | Final signals after cooldown: 1
+2026-05-09 07:06:04,195 | WARNING | [ICICIBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,196 | WARNING | [ICICIBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,196 | WARNING | [ICICIBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,196 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,204 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,204 | INFO | [ICICIBANK] Fold 6: Strat=+0.0% | BH=+6.3% | Alpha=-6.3% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:04,219 | INFO | engineer_features_df: shape before dropna: (741, 10)
+2026-05-09 07:06:04,220 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,236 | INFO | engineer_features_df: shape before dropna: (802, 10)
+2026-05-09 07:06:04,237 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,240 | INFO | Raw signals: 4 (Long: 3, Short: 1)
+2026-05-09 07:06:04,240 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:04,240 | WARNING | [ICICIBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,241 | WARNING | [ICICIBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,241 | WARNING | [ICICIBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,241 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,249 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,249 | INFO | [ICICIBANK] Fold 7: Strat=+0.0% | BH=+10.0% | Alpha=-10.0% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:04,264 | INFO | engineer_features_df: shape before dropna: (801, 10)
+2026-05-09 07:06:04,265 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,281 | INFO | engineer_features_df: shape before dropna: (862, 10)
+2026-05-09 07:06:04,282 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,284 | INFO | Raw signals: 4 (Long: 2, Short: 2)
+2026-05-09 07:06:04,284 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:04,285 | WARNING | [ICICIBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,285 | WARNING | [ICICIBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,286 | WARNING | [ICICIBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,286 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,428 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,428 | INFO | [ICICIBANK] Fold 8: Strat=+0.0% | BH=+10.2% | Alpha=-10.2% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:04,444 | INFO | engineer_features_df: shape before dropna: (861, 10)
+2026-05-09 07:06:04,445 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,461 | INFO | engineer_features_df: shape before dropna: (926, 10)
+2026-05-09 07:06:04,462 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,464 | INFO | Raw signals: 5 (Long: 3, Short: 2)
+2026-05-09 07:06:04,465 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:04,465 | WARNING | [ICICIBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,466 | WARNING | [ICICIBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,466 | WARNING | [ICICIBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,466 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,474 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,474 | INFO | [ICICIBANK] Fold 9: Strat=+0.0% | BH=+6.1% | Alpha=-6.1% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:04,490 | INFO | engineer_features_df: shape before dropna: (925, 10)
+2026-05-09 07:06:04,491 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,506 | INFO | engineer_features_df: shape before dropna: (988, 10)
+2026-05-09 07:06:04,508 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,510 | INFO | Raw signals: 6 (Long: 3, Short: 3)
+2026-05-09 07:06:04,510 | INFO | Final signals after cooldown: 6
+2026-05-09 07:06:04,511 | WARNING | [ICICIBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,511 | WARNING | [ICICIBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,512 | WARNING | [ICICIBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,512 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,521 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,521 | INFO | [ICICIBANK] Fold 10: Strat=+0.0% | BH=+0.7% | Alpha=-0.7% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:04,538 | INFO | engineer_features_df: shape before dropna: (987, 10)
+2026-05-09 07:06:04,539 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,557 | INFO | engineer_features_df: shape before dropna: (1050, 10)
+2026-05-09 07:06:04,558 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,561 | INFO | Raw signals: 4 (Long: 2, Short: 2)
+2026-05-09 07:06:04,561 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:04,562 | WARNING | [ICICIBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,562 | WARNING | [ICICIBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,562 | WARNING | [ICICIBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,563 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,571 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,572 | INFO | [ICICIBANK] Fold 11: Strat=+0.0% | BH=+2.7% | Alpha=-2.7% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:04,589 | INFO | engineer_features_df: shape before dropna: (1049, 10)
+2026-05-09 07:06:04,590 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,606 | INFO | engineer_features_df: shape before dropna: (1111, 10)
+2026-05-09 07:06:04,608 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,610 | INFO | Raw signals: 7 (Long: 6, Short: 1)
+2026-05-09 07:06:04,610 | INFO | Final signals after cooldown: 7
+2026-05-09 07:06:04,611 | WARNING | [ICICIBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,611 | WARNING | [ICICIBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,612 | WARNING | [ICICIBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,612 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,620 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,620 | INFO | [ICICIBANK] Fold 12: Strat=+0.0% | BH=+8.6% | Alpha=-8.6% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:04,636 | INFO | engineer_features_df: shape before dropna: (1110, 10)
+2026-05-09 07:06:04,637 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,654 | INFO | engineer_features_df: shape before dropna: (1175, 10)
+2026-05-09 07:06:04,655 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,658 | INFO | Raw signals: 3 (Long: 0, Short: 3)
+2026-05-09 07:06:04,658 | INFO | Final signals after cooldown: 3
+2026-05-09 07:06:04,658 | WARNING | [ICICIBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,659 | WARNING | [ICICIBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,659 | WARNING | [ICICIBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,659 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,668 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,668 | INFO | [ICICIBANK] Fold 13: Strat=+0.0% | BH=-3.5% | Alpha=+3.5% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:04,684 | INFO | engineer_features_df: shape before dropna: (1174, 10)
+2026-05-09 07:06:04,686 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,701 | INFO | engineer_features_df: shape before dropna: (1235, 10)
+2026-05-09 07:06:04,703 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,705 | INFO | Raw signals: 8 (Long: 4, Short: 4)
+2026-05-09 07:06:04,706 | INFO | Final signals after cooldown: 8
+2026-05-09 07:06:04,706 | WARNING | [ICICIBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,706 | WARNING | [ICICIBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,707 | WARNING | [ICICIBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,707 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,715 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,715 | INFO | [ICICIBANK] Fold 14: Strat=+0.0% | BH=-2.2% | Alpha=+2.2% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:04,717 | INFO | 
+============================================================
+  PIPELINE: INFY
+============================================================
+2026-05-09 07:06:04,718 | INFO | [INFY] 1235 bars fetched
+2026-05-09 07:06:04,718 | INFO | [INFY] Starting walk-forward backtest...
+2026-05-09 07:06:04,718 | INFO | [INFY] Starting walk-forward backtest 2021-01-01→2025-12-31
+2026-05-09 07:06:04,721 | INFO | [INFY] Loading models from models/INFY.NS/v3
+2026-05-09 07:06:04,727 | INFO | [INFY] 14 walk-forward folds
+2026-05-09 07:06:04,746 | INFO | engineer_features_df: shape before dropna: (371, 10)
+2026-05-09 07:06:04,747 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,762 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:06:04,763 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,765 | INFO | Raw signals: 3 (Long: 1, Short: 2)
+2026-05-09 07:06:04,766 | INFO | Final signals after cooldown: 3
+2026-05-09 07:06:04,766 | WARNING | [INFY] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,767 | WARNING | [INFY] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,767 | WARNING | [INFY] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,767 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,775 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,775 | INFO | [INFY] Fold 1: Strat=+0.0% | BH=-4.5% | Alpha=+4.5% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:04,790 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:06:04,791 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,806 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:06:04,807 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,809 | INFO | Raw signals: 5 (Long: 3, Short: 2)
+2026-05-09 07:06:04,810 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:04,810 | WARNING | [INFY] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,811 | WARNING | [INFY] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,811 | WARNING | [INFY] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,811 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,819 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,819 | INFO | [INFY] Fold 2: Strat=+0.0% | BH=+9.4% | Alpha=-9.4% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:04,834 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:06:04,835 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,850 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:06:04,851 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,853 | INFO | Raw signals: 4 (Long: 3, Short: 1)
+2026-05-09 07:06:04,854 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:04,854 | WARNING | [INFY] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,855 | WARNING | [INFY] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,855 | WARNING | [INFY] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,855 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,863 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,863 | INFO | [INFY] Fold 3: Strat=+0.0% | BH=-6.3% | Alpha=+6.3% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:04,878 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:06:04,879 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,894 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:06:04,896 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,898 | INFO | Raw signals: 3 (Long: 2, Short: 1)
+2026-05-09 07:06:04,898 | INFO | Final signals after cooldown: 3
+2026-05-09 07:06:04,899 | WARNING | [INFY] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,899 | WARNING | [INFY] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,900 | WARNING | [INFY] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,900 | INFO | 🚀 Starting Simulation on 60 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,907 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,908 | INFO | [INFY] Fold 4: Strat=+0.0% | BH=-4.1% | Alpha=+4.1% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:04,922 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:06:04,924 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,939 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:06:04,940 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,942 | INFO | Raw signals: 4 (Long: 3, Short: 1)
+2026-05-09 07:06:04,943 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:04,943 | WARNING | [INFY] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,944 | WARNING | [INFY] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,944 | WARNING | [INFY] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,944 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,952 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,952 | INFO | [INFY] Fold 5: Strat=+0.0% | BH=+7.6% | Alpha=-7.6% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:04,967 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:06:04,968 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,984 | INFO | engineer_features_df: shape before dropna: (742, 10)
+2026-05-09 07:06:04,985 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:04,987 | INFO | Raw signals: 5 (Long: 5, Short: 0)
+2026-05-09 07:06:04,988 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:04,988 | WARNING | [INFY] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,989 | WARNING | [INFY] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,989 | WARNING | [INFY] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:04,990 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:04,997 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:04,997 | INFO | [INFY] Fold 6: Strat=+0.0% | BH=+9.6% | Alpha=-9.6% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:05,012 | INFO | engineer_features_df: shape before dropna: (741, 10)
+2026-05-09 07:06:05,013 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,029 | INFO | engineer_features_df: shape before dropna: (802, 10)
+2026-05-09 07:06:05,030 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,032 | INFO | Raw signals: 6 (Long: 2, Short: 4)
+2026-05-09 07:06:05,033 | INFO | Final signals after cooldown: 6
+2026-05-09 07:06:05,033 | WARNING | [INFY] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,034 | WARNING | [INFY] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,034 | WARNING | [INFY] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,034 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,042 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,042 | INFO | [INFY] Fold 7: Strat=+0.0% | BH=-3.6% | Alpha=+3.6% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:05,057 | INFO | engineer_features_df: shape before dropna: (801, 10)
+2026-05-09 07:06:05,058 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,074 | INFO | engineer_features_df: shape before dropna: (862, 10)
+2026-05-09 07:06:05,075 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,077 | INFO | Raw signals: 4 (Long: 3, Short: 1)
+2026-05-09 07:06:05,078 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:05,078 | WARNING | [INFY] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,079 | WARNING | [INFY] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,079 | WARNING | [INFY] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,079 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,087 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,087 | INFO | [INFY] Fold 8: Strat=+0.0% | BH=+8.5% | Alpha=-8.5% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:05,102 | INFO | engineer_features_df: shape before dropna: (861, 10)
+2026-05-09 07:06:05,103 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,119 | INFO | engineer_features_df: shape before dropna: (926, 10)
+2026-05-09 07:06:05,120 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,123 | INFO | Raw signals: 5 (Long: 3, Short: 2)
+2026-05-09 07:06:05,123 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:05,123 | WARNING | [INFY] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,124 | WARNING | [INFY] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,124 | WARNING | [INFY] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,125 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,132 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,133 | INFO | [INFY] Fold 9: Strat=+0.0% | BH=+19.7% | Alpha=-19.7% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:05,148 | INFO | engineer_features_df: shape before dropna: (925, 10)
+2026-05-09 07:06:05,149 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,164 | INFO | engineer_features_df: shape before dropna: (988, 10)
+2026-05-09 07:06:05,166 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,168 | INFO | Raw signals: 4 (Long: 3, Short: 1)
+2026-05-09 07:06:05,168 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:05,169 | WARNING | [INFY] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,169 | WARNING | [INFY] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,170 | WARNING | [INFY] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,170 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,178 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,178 | INFO | [INFY] Fold 10: Strat=+0.0% | BH=-0.0% | Alpha=+0.0% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:05,193 | INFO | engineer_features_df: shape before dropna: (987, 10)
+2026-05-09 07:06:05,195 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,223 | INFO | engineer_features_df: shape before dropna: (1050, 10)
+2026-05-09 07:06:05,226 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,230 | INFO | Raw signals: 4 (Long: 0, Short: 4)
+2026-05-09 07:06:05,230 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:05,231 | WARNING | [INFY] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,232 | WARNING | [INFY] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,233 | WARNING | [INFY] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,234 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,243 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,243 | INFO | [INFY] Fold 11: Strat=+0.0% | BH=-18.9% | Alpha=+18.9% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:05,264 | INFO | engineer_features_df: shape before dropna: (1049, 10)
+2026-05-09 07:06:05,265 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,281 | INFO | engineer_features_df: shape before dropna: (1111, 10)
+2026-05-09 07:06:05,283 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,285 | INFO | Raw signals: 1 (Long: 1, Short: 0)
+2026-05-09 07:06:05,285 | INFO | Final signals after cooldown: 1
+2026-05-09 07:06:05,286 | WARNING | [INFY] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,286 | WARNING | [INFY] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,286 | WARNING | [INFY] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,287 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,295 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,295 | INFO | [INFY] Fold 12: Strat=+0.0% | BH=+6.7% | Alpha=-6.7% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:05,311 | INFO | engineer_features_df: shape before dropna: (1110, 10)
+2026-05-09 07:06:05,312 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,328 | INFO | engineer_features_df: shape before dropna: (1175, 10)
+2026-05-09 07:06:05,329 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,331 | INFO | Raw signals: 5 (Long: 4, Short: 1)
+2026-05-09 07:06:05,332 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:05,332 | WARNING | [INFY] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,332 | WARNING | [INFY] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,333 | WARNING | [INFY] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,333 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,341 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,341 | INFO | [INFY] Fold 13: Strat=+0.0% | BH=-10.0% | Alpha=+10.0% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:05,356 | INFO | engineer_features_df: shape before dropna: (1174, 10)
+2026-05-09 07:06:05,358 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,373 | INFO | engineer_features_df: shape before dropna: (1235, 10)
+2026-05-09 07:06:05,374 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,377 | INFO | Raw signals: 6 (Long: 6, Short: 0)
+2026-05-09 07:06:05,377 | INFO | Final signals after cooldown: 6
+2026-05-09 07:06:05,378 | WARNING | [INFY] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,378 | WARNING | [INFY] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,378 | WARNING | [INFY] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,379 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,386 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,386 | INFO | [INFY] Fold 14: Strat=+0.0% | BH=+13.9% | Alpha=-13.9% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:05,387 | INFO | 
+============================================================
+  PIPELINE: TCS
+============================================================
+2026-05-09 07:06:05,389 | INFO | [TCS] 1235 bars fetched
+2026-05-09 07:06:05,389 | INFO | [TCS] Starting walk-forward backtest...
+2026-05-09 07:06:05,389 | INFO | [TCS] Starting walk-forward backtest 2021-01-01→2025-12-31
+2026-05-09 07:06:05,392 | INFO | [TCS] Loading models from models/TCS.NS/v3
+/usr/lib/python3.12/pickle.py:1710: UserWarning: [07:06:05] WARNING: /__w/xgboost/xgboost/src/collective/../data/../common/error_msg.h:83: If you are loading a serialized model (like pickle in Python, RDS in R) or
+configuration generated by an older version of XGBoost, please export the model by calling
+`Booster.save_model` from that version first, then load it back in current version. See:
+
+    https://xgboost.readthedocs.io/en/stable/tutorials/saving_model.html
+
+for more details about differences between saving model and serializing.
+
+  setstate(state)
+/home/lynx/Documents/MARK5/.venv/lib/python3.12/site-packages/sklearn/base.py:463: InconsistentVersionWarning: Trying to unpickle estimator LabelEncoder from version 1.7.2 when using version 1.8.0. This might lead to breaking code or invalid results. Use at your own risk. For more info please refer to:
+https://scikit-learn.org/stable/model_persistence.html#security-maintainability-limitations
+  warnings.warn(
+2026-05-09 07:06:05,397 | INFO | [TCS] 14 walk-forward folds
+2026-05-09 07:06:05,412 | INFO | engineer_features_df: shape before dropna: (371, 10)
+2026-05-09 07:06:05,413 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,428 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:06:05,429 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,432 | INFO | Raw signals: 3 (Long: 0, Short: 3)
+2026-05-09 07:06:05,432 | INFO | Final signals after cooldown: 3
+2026-05-09 07:06:05,433 | WARNING | [TCS] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,433 | WARNING | [TCS] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,433 | WARNING | [TCS] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,434 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,442 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,442 | INFO | [TCS] Fold 1: Strat=+0.0% | BH=-9.1% | Alpha=+9.1% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:05,457 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:06:05,458 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,473 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:06:05,474 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,476 | INFO | Raw signals: 4 (Long: 2, Short: 2)
+2026-05-09 07:06:05,476 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:05,477 | WARNING | [TCS] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,477 | WARNING | [TCS] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,477 | WARNING | [TCS] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,478 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,485 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,485 | INFO | [TCS] Fold 2: Strat=+0.0% | BH=+9.4% | Alpha=-9.4% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:05,500 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:06:05,501 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,516 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:06:05,518 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,520 | INFO | Raw signals: 4 (Long: 2, Short: 2)
+2026-05-09 07:06:05,520 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:05,521 | WARNING | [TCS] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,521 | WARNING | [TCS] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,522 | WARNING | [TCS] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,522 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,529 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,530 | INFO | [TCS] Fold 3: Strat=+0.0% | BH=+0.5% | Alpha=-0.5% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:05,545 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:06:05,546 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,561 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:06:05,562 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,565 | INFO | Raw signals: 8 (Long: 4, Short: 4)
+2026-05-09 07:06:05,565 | INFO | Final signals after cooldown: 8
+2026-05-09 07:06:05,566 | WARNING | [TCS] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,566 | WARNING | [TCS] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,566 | WARNING | [TCS] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,567 | INFO | 🚀 Starting Simulation on 60 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,574 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,575 | INFO | [TCS] Fold 4: Strat=+0.0% | BH=+4.0% | Alpha=-4.0% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:05,589 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:06:05,591 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,606 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:06:05,607 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,609 | INFO | Raw signals: 6 (Long: 2, Short: 4)
+2026-05-09 07:06:05,610 | INFO | Final signals after cooldown: 6
+2026-05-09 07:06:05,610 | WARNING | [TCS] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,611 | WARNING | [TCS] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,611 | WARNING | [TCS] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,611 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,619 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,619 | INFO | [TCS] Fold 5: Strat=+0.0% | BH=+8.1% | Alpha=-8.1% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:05,634 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:06:05,635 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,651 | INFO | engineer_features_df: shape before dropna: (742, 10)
+2026-05-09 07:06:05,652 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,654 | INFO | Raw signals: 5 (Long: 4, Short: 1)
+2026-05-09 07:06:05,655 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:05,655 | WARNING | [TCS] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,655 | WARNING | [TCS] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,656 | WARNING | [TCS] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,656 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,663 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,664 | INFO | [TCS] Fold 6: Strat=+0.0% | BH=+8.7% | Alpha=-8.7% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:05,678 | INFO | engineer_features_df: shape before dropna: (741, 10)
+2026-05-09 07:06:05,680 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,695 | INFO | engineer_features_df: shape before dropna: (802, 10)
+2026-05-09 07:06:05,696 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,699 | INFO | Raw signals: 5 (Long: 3, Short: 2)
+2026-05-09 07:06:05,699 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:05,700 | WARNING | [TCS] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,700 | WARNING | [TCS] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,700 | WARNING | [TCS] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,701 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,708 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,708 | INFO | [TCS] Fold 7: Strat=+0.0% | BH=+3.5% | Alpha=-3.5% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:05,723 | INFO | engineer_features_df: shape before dropna: (801, 10)
+2026-05-09 07:06:05,724 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,741 | INFO | engineer_features_df: shape before dropna: (862, 10)
+2026-05-09 07:06:05,742 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,745 | INFO | Raw signals: 4 (Long: 3, Short: 1)
+2026-05-09 07:06:05,745 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:05,745 | WARNING | [TCS] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,746 | WARNING | [TCS] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,746 | WARNING | [TCS] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,747 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,754 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,754 | INFO | [TCS] Fold 8: Strat=+0.0% | BH=+2.3% | Alpha=-2.3% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:05,769 | INFO | engineer_features_df: shape before dropna: (861, 10)
+2026-05-09 07:06:05,770 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,785 | INFO | engineer_features_df: shape before dropna: (926, 10)
+2026-05-09 07:06:05,786 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,789 | INFO | Raw signals: 3 (Long: 2, Short: 1)
+2026-05-09 07:06:05,789 | INFO | Final signals after cooldown: 3
+2026-05-09 07:06:05,789 | WARNING | [TCS] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,790 | WARNING | [TCS] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,790 | WARNING | [TCS] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,791 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,798 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,798 | INFO | [TCS] Fold 9: Strat=+0.0% | BH=+8.0% | Alpha=-8.0% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:05,813 | INFO | engineer_features_df: shape before dropna: (925, 10)
+2026-05-09 07:06:05,814 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,829 | INFO | engineer_features_df: shape before dropna: (988, 10)
+2026-05-09 07:06:05,831 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,833 | INFO | Raw signals: 5 (Long: 3, Short: 2)
+2026-05-09 07:06:05,833 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:05,834 | WARNING | [TCS] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,834 | WARNING | [TCS] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,835 | WARNING | [TCS] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,835 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,842 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,843 | INFO | [TCS] Fold 10: Strat=+0.0% | BH=-3.9% | Alpha=+3.9% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:05,858 | INFO | engineer_features_df: shape before dropna: (987, 10)
+2026-05-09 07:06:05,859 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,874 | INFO | engineer_features_df: shape before dropna: (1050, 10)
+2026-05-09 07:06:05,876 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,878 | INFO | Raw signals: 3 (Long: 1, Short: 2)
+2026-05-09 07:06:05,878 | INFO | Final signals after cooldown: 3
+2026-05-09 07:06:05,879 | WARNING | [TCS] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,879 | WARNING | [TCS] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,879 | WARNING | [TCS] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,880 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,887 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,888 | INFO | [TCS] Fold 11: Strat=+0.0% | BH=-12.1% | Alpha=+12.1% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:05,903 | INFO | engineer_features_df: shape before dropna: (1049, 10)
+2026-05-09 07:06:05,904 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,920 | INFO | engineer_features_df: shape before dropna: (1111, 10)
+2026-05-09 07:06:05,921 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,923 | INFO | Raw signals: 5 (Long: 3, Short: 2)
+2026-05-09 07:06:05,923 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:05,924 | WARNING | [TCS] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,924 | WARNING | [TCS] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,925 | WARNING | [TCS] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,925 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,932 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,933 | INFO | [TCS] Fold 12: Strat=+0.0% | BH=-2.6% | Alpha=+2.6% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:05,948 | INFO | engineer_features_df: shape before dropna: (1110, 10)
+2026-05-09 07:06:05,949 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,965 | INFO | engineer_features_df: shape before dropna: (1175, 10)
+2026-05-09 07:06:05,966 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:05,968 | INFO | Raw signals: 9 (Long: 5, Short: 4)
+2026-05-09 07:06:05,969 | INFO | Final signals after cooldown: 9
+2026-05-09 07:06:05,969 | WARNING | [TCS] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,969 | WARNING | [TCS] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,970 | WARNING | [TCS] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:05,970 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:05,978 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:05,978 | INFO | [TCS] Fold 13: Strat=+0.0% | BH=-14.7% | Alpha=+14.7% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:05,993 | INFO | engineer_features_df: shape before dropna: (1174, 10)
+2026-05-09 07:06:05,995 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,010 | INFO | engineer_features_df: shape before dropna: (1235, 10)
+2026-05-09 07:06:06,011 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,014 | INFO | Raw signals: 6 (Long: 6, Short: 0)
+2026-05-09 07:06:06,014 | INFO | Final signals after cooldown: 6
+2026-05-09 07:06:06,015 | WARNING | [TCS] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,015 | WARNING | [TCS] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,015 | WARNING | [TCS] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,016 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:06,023 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:06,023 | INFO | [TCS] Fold 14: Strat=+0.0% | BH=+11.8% | Alpha=-11.8% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+
+══════════════════════════════════════════════════════════════════════
+  MARK5 WALK-FORWARD BACKTEST — RELIANCE
+══════════════════════════════════════════════════════════════════════
+  Period    : 2021-01-01 → 2025-12-31
+  Folds     : 14 (18m train / 3m test)
+  Verdict   : ⚠️ NEEDS MORE TUNING
+──────────────────────────────────────────────────────────────────────
+  Beats B&H : 43% of folds
+  Mean Alpha : -2.85%
+  Mean Sharpe: 0.000  (target ≥ 1.0)
+  Mean Strat : +0.00%  vs  BH +2.85%
+  Max DD     : 0.00%  (limit ≤ -18%)
+  Profit Fac : 0.000  (target ≥ 1.5)
+  Win Rate   : 0.0%
+  Total Trades: 0
+──────────────────────────────────────────────────────────────────────
+  Per-fold breakdown:
+  Fold  Test Period               Strat%     BH%   Alpha  Sharpe  Trades
+  ----------------------------------------------------------------
+  1   ✅ 2022-07-01 → 2022-09-30    +0.0    -1.0    +1.0   0.000       0
+  2   ❌ 2022-10-03 → 2022-12-30    +0.0    +7.5    -7.5   0.000       0
+  3   ✅ 2023-01-02 → 2023-03-31    +0.0    -9.5    +9.5   0.000       0
+  4   ❌ 2023-04-03 → 2023-06-30    +0.0    +9.4    -9.4   0.000       0
+  5   ✅ 2023-07-03 → 2023-09-29    +0.0    -2.5    +2.5   0.000       0
+  6   ❌ 2023-10-03 → 2024-01-01    +0.0   +11.7   -11.7   0.000       0
+  7   ❌ 2024-01-01 → 2024-04-01    +0.0   +14.6   -14.6   0.000       0
+  8   ❌ 2024-04-01 → 2024-07-01    +0.0    +5.1    -5.1   0.000       0
+  9   ✅ 2024-07-01 → 2024-10-01    +0.0    -5.8    +5.8   0.000       0
+  10  ✅ 2024-10-01 → 2025-01-01    +0.0   -16.6   +16.6   0.000       0
+  11  ❌ 2025-01-01 → 2025-04-01    +0.0    +2.6    -2.6   0.000       0
+  12  ❌ 2025-04-01 → 2025-07-01    +0.0   +22.0   -22.0   0.000       0
+  13  ✅ 2025-07-01 → 2025-10-01    +0.0   -10.1   +10.1   0.000       0
+  14  ❌ 2025-10-01 → 2025-12-30    +0.0   +12.5   -12.5   0.000       0
+══════════════════════════════════════════════════════════════════════
+
+
+══════════════════════════════════════════════════════════════════════
+  MARK5 WALK-FORWARD BACKTEST — ICICIBANK
+══════════════════════════════════════════════════════════════════════
+  Period    : 2021-01-01 → 2025-12-31
+  Folds     : 14 (18m train / 3m test)
+  Verdict   : ⚠️ NEEDS MORE TUNING
+──────────────────────────────────────────────────────────────────────
+  Beats B&H : 21% of folds
+  Mean Alpha : -5.14%
+  Mean Sharpe: 0.000  (target ≥ 1.0)
+  Mean Strat : +0.00%  vs  BH +5.14%
+  Max DD     : 0.00%  (limit ≤ -18%)
+  Profit Fac : 0.000  (target ≥ 1.5)
+  Win Rate   : 0.0%
+  Total Trades: 0
+──────────────────────────────────────────────────────────────────────
+  Per-fold breakdown:
+  Fold  Test Period               Strat%     BH%   Alpha  Sharpe  Trades
+  ----------------------------------------------------------------
+  1   ❌ 2022-07-01 → 2022-09-30    +0.0   +23.2   -23.2   0.000       0
+  2   ❌ 2022-10-03 → 2022-12-30    +0.0    +5.0    -5.0   0.000       0
+  3   ✅ 2023-01-02 → 2023-03-31    +0.0    -2.8    +2.8   0.000       0
+  4   ❌ 2023-04-03 → 2023-06-30    +0.0    +5.8    -5.8   0.000       0
+  5   ❌ 2023-07-03 → 2023-09-29    +0.0    +1.8    -1.8   0.000       0
+  6   ❌ 2023-10-03 → 2024-01-01    +0.0    +6.3    -6.3   0.000       0
+  7   ❌ 2024-01-01 → 2024-04-01    +0.0   +10.0   -10.0   0.000       0
+  8   ❌ 2024-04-01 → 2024-07-01    +0.0   +10.2   -10.2   0.000       0
+  9   ❌ 2024-07-01 → 2024-10-01    +0.0    +6.1    -6.1   0.000       0
+  10  ❌ 2024-10-01 → 2025-01-01    +0.0    +0.7    -0.7   0.000       0
+  11  ❌ 2025-01-01 → 2025-04-01    +0.0    +2.7    -2.7   0.000       0
+  12  ❌ 2025-04-01 → 2025-07-01    +0.0    +8.6    -8.6   0.000       0
+  13  ✅ 2025-07-01 → 2025-10-01    +0.0    -3.5    +3.5   0.000       0
+  14  ✅ 2025-10-01 → 2025-12-30    +0.0    -2.1    +2.1   0.000       0
+══════════════════════════════════════════════════════════════════════
+
+
+══════════════════════════════════════════════════════════════════════
+  MARK5 WALK-FORWARD BACKTEST — INFY
+══════════════════════════════════════════════════════════════════════
+  Period    : 2021-01-01 → 2025-12-31
+  Folds     : 14 (18m train / 3m test)
+  Verdict   : ⚠️ NEEDS MORE TUNING
+──────────────────────────────────────────────────────────────────────
+  Beats B&H : 50% of folds
+  Mean Alpha : -2.00%
+  Mean Sharpe: 0.000  (target ≥ 1.0)
+  Mean Strat : +0.00%  vs  BH +2.00%
+  Max DD     : 0.00%  (limit ≤ -18%)
+  Profit Fac : 0.000  (target ≥ 1.5)
+  Win Rate   : 0.0%
+  Total Trades: 0
+──────────────────────────────────────────────────────────────────────
+  Per-fold breakdown:
+  Fold  Test Period               Strat%     BH%   Alpha  Sharpe  Trades
+  ----------------------------------------------------------------
+  1   ✅ 2022-07-01 → 2022-09-30    +0.0    -4.5    +4.5   0.000       0
+  2   ❌ 2022-10-03 → 2022-12-30    +0.0    +9.4    -9.4   0.000       0
+  3   ✅ 2023-01-02 → 2023-03-31    +0.0    -6.3    +6.3   0.000       0
+  4   ✅ 2023-04-03 → 2023-06-30    +0.0    -4.1    +4.1   0.000       0
+  5   ❌ 2023-07-03 → 2023-09-29    +0.0    +7.6    -7.6   0.000       0
+  6   ❌ 2023-10-03 → 2024-01-01    +0.0    +9.6    -9.6   0.000       0
+  7   ✅ 2024-01-01 → 2024-04-01    +0.0    -3.6    +3.6   0.000       0
+  8   ❌ 2024-04-01 → 2024-07-01    +0.0    +8.5    -8.5   0.000       0
+  9   ❌ 2024-07-01 → 2024-10-01    +0.0   +19.7   -19.7   0.000       0
+  10  ✅ 2024-10-01 → 2025-01-01    +0.0    -0.0    +0.0   0.000       0
+  11  ✅ 2025-01-01 → 2025-04-01    +0.0   -18.9   +18.9   0.000       0
+  12  ❌ 2025-04-01 → 2025-07-01    +0.0    +6.7    -6.7   0.000       0
+  13  ✅ 2025-07-01 → 2025-10-01    +0.0   -10.0   +10.0   0.000       0
+  14  ❌ 2025-10-01 → 2025-12-30    +0.0   +13.9   -13.9   0.000       0
+══════════════════════════════════════════════════════════════════════
+
+
+══════════════════════════════════════════════════════════════════════2026-05-09 07:06:06,024 | INFO | 
+============================================================
+  PIPELINE: HDFCBANK
+============================================================
+2026-05-09 07:06:06,026 | INFO | [HDFCBANK] 1235 bars fetched
+2026-05-09 07:06:06,026 | INFO | [HDFCBANK] Starting walk-forward backtest...
+2026-05-09 07:06:06,026 | INFO | [HDFCBANK] Starting walk-forward backtest 2021-01-01→2025-12-31
+2026-05-09 07:06:06,029 | INFO | [HDFCBANK] Loading models from models/HDFCBANK.NS/v1
+/home/lynx/Documents/MARK5/.venv/lib/python3.12/site-packages/sklearn/base.py:463: InconsistentVersionWarning: Trying to unpickle estimator LabelEncoder from version 1.7.2 when using version 1.8.0. This might lead to breaking code or invalid results. Use at your own risk. For more info please refer to:
+https://scikit-learn.org/stable/model_persistence.html#security-maintainability-limitations
+  warnings.warn(
+2026-05-09 07:06:06,033 | INFO | [HDFCBANK] 14 walk-forward folds
+2026-05-09 07:06:06,049 | INFO | engineer_features_df: shape before dropna: (371, 10)
+2026-05-09 07:06:06,050 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,065 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:06:06,066 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,069 | INFO | Raw signals: 4 (Long: 3, Short: 1)
+2026-05-09 07:06:06,069 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:06,069 | WARNING | [HDFCBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,070 | WARNING | [HDFCBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,070 | WARNING | [HDFCBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,071 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:06,078 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:06,078 | INFO | [HDFCBANK] Fold 1: Strat=+0.0% | BH=+5.0% | Alpha=-5.0% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:06,092 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:06:06,093 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,108 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:06:06,109 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,112 | INFO | Raw signals: 4 (Long: 3, Short: 1)
+2026-05-09 07:06:06,112 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:06,112 | WARNING | [HDFCBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,113 | WARNING | [HDFCBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,113 | WARNING | [HDFCBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,113 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:06,121 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:06,121 | INFO | [HDFCBANK] Fold 2: Strat=+0.0% | BH=+15.2% | Alpha=-15.2% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:06,136 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:06:06,137 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,152 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:06:06,153 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,155 | INFO | Raw signals: 5 (Long: 2, Short: 3)
+2026-05-09 07:06:06,155 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:06,156 | WARNING | [HDFCBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,156 | WARNING | [HDFCBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,157 | WARNING | [HDFCBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,157 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:06,164 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:06,165 | INFO | [HDFCBANK] Fold 3: Strat=+0.0% | BH=-1.2% | Alpha=+1.2% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:06,179 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:06:06,180 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,196 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:06:06,197 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,199 | INFO | Raw signals: 6 (Long: 1, Short: 5)
+2026-05-09 07:06:06,200 | INFO | Final signals after cooldown: 6
+2026-05-09 07:06:06,200 | WARNING | [HDFCBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,201 | WARNING | [HDFCBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,201 | WARNING | [HDFCBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,201 | INFO | 🚀 Starting Simulation on 60 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:06,209 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:06,209 | INFO | [HDFCBANK] Fold 4: Strat=+0.0% | BH=+6.9% | Alpha=-6.9% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:06,224 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:06:06,225 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,240 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:06:06,241 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,243 | INFO | Raw signals: 5 (Long: 1, Short: 4)
+2026-05-09 07:06:06,244 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:06,244 | WARNING | [HDFCBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,244 | WARNING | [HDFCBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,245 | WARNING | [HDFCBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,245 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:06,253 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:06,254 | INFO | [HDFCBANK] Fold 5: Strat=+0.0% | BH=-11.3% | Alpha=+11.3% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:06,270 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:06:06,271 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,287 | INFO | engineer_features_df: shape before dropna: (742, 10)
+2026-05-09 07:06:06,289 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,291 | INFO | Raw signals: 2 (Long: 2, Short: 0)
+2026-05-09 07:06:06,291 | INFO | Final signals after cooldown: 2
+2026-05-09 07:06:06,292 | WARNING | [HDFCBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,292 | WARNING | [HDFCBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,293 | WARNING | [HDFCBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,293 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:06,300 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:06,300 | INFO | [HDFCBANK] Fold 6: Strat=+0.0% | BH=+12.6% | Alpha=-12.6% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:06,315 | INFO | engineer_features_df: shape before dropna: (741, 10)
+2026-05-09 07:06:06,316 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,331 | INFO | engineer_features_df: shape before dropna: (802, 10)
+2026-05-09 07:06:06,333 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,335 | INFO | Raw signals: 7 (Long: 3, Short: 4)
+2026-05-09 07:06:06,335 | INFO | Final signals after cooldown: 7
+2026-05-09 07:06:06,336 | WARNING | [HDFCBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,336 | WARNING | [HDFCBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,336 | WARNING | [HDFCBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,337 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:06,344 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:06,344 | INFO | [HDFCBANK] Fold 7: Strat=+0.0% | BH=-13.4% | Alpha=+13.4% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:06,359 | INFO | engineer_features_df: shape before dropna: (801, 10)
+2026-05-09 07:06:06,360 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,376 | INFO | engineer_features_df: shape before dropna: (862, 10)
+2026-05-09 07:06:06,377 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,380 | INFO | Raw signals: 5 (Long: 3, Short: 2)
+2026-05-09 07:06:06,380 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:06,380 | WARNING | [HDFCBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,381 | WARNING | [HDFCBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,381 | WARNING | [HDFCBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,382 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:06,389 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:06,389 | INFO | [HDFCBANK] Fold 8: Strat=+0.0% | BH=+17.5% | Alpha=-17.5% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:06,404 | INFO | engineer_features_df: shape before dropna: (861, 10)
+2026-05-09 07:06:06,405 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,421 | INFO | engineer_features_df: shape before dropna: (926, 10)
+2026-05-09 07:06:06,422 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,424 | INFO | Raw signals: 6 (Long: 4, Short: 2)
+2026-05-09 07:06:06,424 | INFO | Final signals after cooldown: 6
+2026-05-09 07:06:06,425 | WARNING | [HDFCBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,425 | WARNING | [HDFCBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,426 | WARNING | [HDFCBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,426 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:06,434 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:06,434 | INFO | [HDFCBANK] Fold 9: Strat=+0.0% | BH=+1.2% | Alpha=-1.2% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:06,449 | INFO | engineer_features_df: shape before dropna: (925, 10)
+2026-05-09 07:06:06,450 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,466 | INFO | engineer_features_df: shape before dropna: (988, 10)
+2026-05-09 07:06:06,467 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,469 | INFO | Raw signals: 8 (Long: 4, Short: 4)
+2026-05-09 07:06:06,470 | INFO | Final signals after cooldown: 8
+2026-05-09 07:06:06,470 | WARNING | [HDFCBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,471 | WARNING | [HDFCBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,471 | WARNING | [HDFCBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,471 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:06,479 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:06,479 | INFO | [HDFCBANK] Fold 10: Strat=+0.0% | BH=+3.3% | Alpha=-3.3% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:06,494 | INFO | engineer_features_df: shape before dropna: (987, 10)
+2026-05-09 07:06:06,495 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,511 | INFO | engineer_features_df: shape before dropna: (1050, 10)
+2026-05-09 07:06:06,512 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,514 | INFO | Raw signals: 5 (Long: 4, Short: 1)
+2026-05-09 07:06:06,515 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:06,515 | WARNING | [HDFCBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,516 | WARNING | [HDFCBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,516 | WARNING | [HDFCBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,516 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:06,524 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:06,524 | INFO | [HDFCBANK] Fold 11: Strat=+0.0% | BH=-0.8% | Alpha=+0.8% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:06,539 | INFO | engineer_features_df: shape before dropna: (1049, 10)
+2026-05-09 07:06:06,540 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,556 | INFO | engineer_features_df: shape before dropna: (1111, 10)
+2026-05-09 07:06:06,557 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,559 | INFO | Raw signals: 6 (Long: 5, Short: 1)
+2026-05-09 07:06:06,559 | INFO | Final signals after cooldown: 6
+2026-05-09 07:06:06,560 | WARNING | [HDFCBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,560 | WARNING | [HDFCBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,560 | WARNING | [HDFCBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,561 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:06,568 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:06,568 | INFO | [HDFCBANK] Fold 12: Strat=+0.0% | BH=+15.1% | Alpha=-15.1% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+2026-05-09 07:06:06,584 | INFO | engineer_features_df: shape before dropna: (1110, 10)
+2026-05-09 07:06:06,585 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,600 | INFO | engineer_features_df: shape before dropna: (1175, 10)
+2026-05-09 07:06:06,602 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,604 | INFO | Raw signals: 5 (Long: 0, Short: 5)
+2026-05-09 07:06:06,604 | INFO | Final signals after cooldown: 5
+2026-05-09 07:06:06,605 | WARNING | [HDFCBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,605 | WARNING | [HDFCBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,605 | WARNING | [HDFCBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,606 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:06,613 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:06,614 | INFO | [HDFCBANK] Fold 13: Strat=+0.0% | BH=-3.8% | Alpha=+3.8% | Sharpe=0.00 | Trades=0 | ✅ BEATS BH
+2026-05-09 07:06:06,629 | INFO | engineer_features_df: shape before dropna: (1174, 10)
+2026-05-09 07:06:06,630 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,646 | INFO | engineer_features_df: shape before dropna: (1235, 10)
+2026-05-09 07:06:06,647 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:06:06,649 | INFO | Raw signals: 4 (Long: 2, Short: 2)
+2026-05-09 07:06:06,649 | INFO | Final signals after cooldown: 4
+2026-05-09 07:06:06,650 | WARNING | [HDFCBANK] xgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,650 | WARNING | [HDFCBANK] lgb_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,651 | WARNING | [HDFCBANK] cat_model predict_proba failed: "['dist_ma200'] not in index"
+2026-05-09 07:06:06,651 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:06:06,658 | WARNING | ❌ No trades generated.
+2026-05-09 07:06:06,659 | INFO | [HDFCBANK] Fold 14: Strat=+0.0% | BH=+2.7% | Alpha=-2.7% | Sharpe=0.00 | Trades=0 | ❌ BELOW BH
+
+  MARK5 WALK-FORWARD BACKTEST — TCS
+══════════════════════════════════════════════════════════════════════
+  Period    : 2021-01-01 → 2025-12-31
+  Folds     : 14 (18m train / 3m test)
+  Verdict   : ⚠️ NEEDS MORE TUNING
+──────────────────────────────────────────────────────────────────────
+  Beats B&H : 36% of folds
+  Mean Alpha : -1.00%
+  Mean Sharpe: 0.000  (target ≥ 1.0)
+  Mean Strat : +0.00%  vs  BH +1.00%
+  Max DD     : 0.00%  (limit ≤ -18%)
+  Profit Fac : 0.000  (target ≥ 1.5)
+  Win Rate   : 0.0%
+  Total Trades: 0
+──────────────────────────────────────────────────────────────────────
+  Per-fold breakdown:
+  Fold  Test Period               Strat%     BH%   Alpha  Sharpe  Trades
+  ----------------------------------------------------------------
+  1   ✅ 2022-07-01 → 2022-09-30    +0.0    -9.1    +9.1   0.000       0
+  2   ❌ 2022-10-03 → 2022-12-30    +0.0    +9.4    -9.4   0.000       0
+  3   ❌ 2023-01-02 → 2023-03-31    +0.0    +0.5    -0.5   0.000       0
+  4   ❌ 2023-04-03 → 2023-06-30    +0.0    +4.0    -4.0   0.000       0
+  5   ❌ 2023-07-03 → 2023-09-29    +0.0    +8.1    -8.1   0.000       0
+  6   ❌ 2023-10-03 → 2024-01-01    +0.0    +8.7    -8.7   0.000       0
+  7   ❌ 2024-01-01 → 2024-04-01    +0.0    +3.5    -3.5   0.000       0
+  8   ❌ 2024-04-01 → 2024-07-01    +0.0    +2.3    -2.3   0.000       0
+  9   ❌ 2024-07-01 → 2024-10-01    +0.0    +8.0    -8.0   0.000       0
+  10  ✅ 2024-10-01 → 2025-01-01    +0.0    -3.9    +3.9   0.000       0
+  11  ✅ 2025-01-01 → 2025-04-01    +0.0   -12.1   +12.1   0.000       0
+  12  ✅ 2025-04-01 → 2025-07-01    +0.0    -2.5    +2.5   0.000       0
+  13  ✅ 2025-07-01 → 2025-10-01    +0.0   -14.7   +14.7   0.000       0
+  14  ❌ 2025-10-01 → 2025-12-30    +0.0   +11.8   -11.8   0.000       0
+══════════════════════════════════════════════════════════════════════
+
+
+══════════════════════════════════════════════════════════════════════
+  MARK5 WALK-FORWARD BACKTEST — HDFCBANK
+══════════════════════════════════════════════════════════════════════
+  Period    : 2021-01-01 → 2025-12-31
+  Folds     : 14 (18m train / 3m test)
+  Verdict   : ⚠️ NEEDS MORE TUNING
+──────────────────────────────────────────────────────────────────────
+  Beats B&H : 36% of folds
+  Mean Alpha : -3.50%
+  Mean Sharpe: 0.000  (target ≥ 1.0)
+  Mean Strat : +0.00%  vs  BH +3.50%
+  Max DD     : 0.00%  (limit ≤ -18%)
+  Profit Fac : 0.000  (target ≥ 1.5)
+  Win Rate   : 0.0%
+  Total Trades: 0
+──────────────────────────────────────────────────────────────────────
+  Per-fold breakdown:
+  Fold  Test Period               Strat%     BH%   Alpha  Sharpe  Trades
+  ----------------------------------------------------------------
+  1   ❌ 2022-07-01 → 2022-09-30    +0.0    +5.0    -5.0   0.000       0
+  2   ❌ 2022-10-03 → 2022-12-30    +0.0   +15.2   -15.2   0.000       0
+  3   ✅ 2023-01-02 → 2023-03-31    +0.0    -1.2    +1.2   0.000       0
+  4   ❌ 2023-04-03 → 2023-06-30    +0.0    +6.8    -6.8   0.000       0
+  5   ✅ 2023-07-03 → 2023-09-29    +0.0   -11.2   +11.2   0.000       0
+  6   ❌ 2023-10-03 → 2024-01-01    +0.0   +12.6   -12.6   0.000       0
+  7   ✅ 2024-01-01 → 2024-04-01    +0.0   -13.4   +13.4   0.000       0
+  8   ❌ 2024-04-01 → 2024-07-01    +0.0   +17.5   -17.5   0.000       0
+  9   ❌ 2024-07-01 → 2024-10-01    +0.0    +1.2    -1.2   0.000       0
+  10  ❌ 2024-10-01 → 2025-01-01    +0.0    +3.3    -3.3   0.000       0
+  11  ✅ 2025-01-01 → 2025-04-01    +0.0    -0.8    +0.8   0.000       0
+  12  ❌ 2025-04-01 → 2025-07-01    +0.0   +15.1   -15.1   0.000       0
+  13  ✅ 2025-07-01 → 2025-10-01    +0.0    -3.8    +3.8   0.000       0
+  14  ❌ 2025-10-01 → 2025-12-30    +0.0    +2.7    -2.7   0.000       0
+══════════════════════════════════════════════════════════════════════
+
+
+══════════════════════════════════════════════════════════════════════
+  MARK5 PIPELINE SUMMARY
+══════════════════════════════════════════════════════════════════════
+  Passed : 5 — ['RELIANCE', 'ICICIBANK', 'INFY', 'TCS', 'HDFCBANK']
+  Failed : 0 — []
+
+  RELIANCE        ⚠️  NOT READY | Alpha= -2.85% | Sharpe=0.0
+  ICICIBANK       ⚠️  NOT READY | Alpha= -5.14% | Sharpe=0.0
+  INFY            ⚠️  NOT READY | Alpha=  -2.0% | Sharpe=0.0
+  TCS             ⚠️  NOT READY | Alpha=  -1.0% | Sharpe=0.0
+  HDFCBANK        ⚠️  NOT READY | Alpha=  -3.5% | Sharpe=0.0
+══════════════════════════════════════════════════════════════════════
+

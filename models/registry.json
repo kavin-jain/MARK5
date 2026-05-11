@@ -1,895 +1,2737 @@
 {
-  "HDFCBANK.NS_ensemble_20260423_143300_22b8a7d2": {
-    "archived_at": "2026-04-23T14:39:32.598464",
-    "checksum": "ca774d7ed2c9102065c2adfdc536558c5ec6ad67097712df9f6391c417218565",
-    "created_at": "2026-04-23T14:33:00.290352",
+  "ASIANPAINT_ensemble_20260509_085210_20f551af": {
+    "archived_at": "2026-05-09T11:30:21.183528",
+    "checksum": "c2d78346dae8cc60561a63c2dae470e608c02c2ee9d369bee0c7be24f5bf5090",
+    "created_at": "2026-05-09T08:52:10.383244",
     "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:33:00.289909",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
+      "auc": 0.4930555555555556,
+      "avg_fbeta": 0.10088288571262563,
+      "cpcv_p_sharpe": 0.5833333333333334,
+      "deployment_timestamp": "2026-05-09T08:52:10.383002",
+      "dsr": 2.2609305222930166e-40,
+      "mean_sharpe": 0.7723372708412208,
+      "worst_5pct_sharpe": -1.2462308044554007
     },
     "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
+    "path": "/home/lynx/Documents/MARK5/models/ASIANPAINT/v1/metadata.json",
     "status": "archived",
-    "ticker": "HDFCBANK.NS"
+    "ticker": "ASIANPAINT"
   },
-  "HDFCBANK.NS_ensemble_20260423_143932_4cd00e6e": {
-    "archived_at": "2026-04-23T14:47:38.570123",
-    "checksum": "95c1a6c8cbfdb59c5e93e45b157901a88b8870132d55d1f7bacc596d0b02f955",
-    "created_at": "2026-04-23T14:39:32.598471",
+  "ASIANPAINT_ensemble_20260509_113021_a053d292": {
+    "archived_at": "2026-05-09T11:41:35.395283",
+    "checksum": "43edc4d2f8e9ad37ca57babfb60ee0f635e867213b4ebf6007ad561606b7ce0f",
+    "created_at": "2026-05-09T11:30:21.183542",
     "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
+      "auc": 0.37280701754385964,
+      "avg_fbeta": 0.008305647840531562,
       "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:39:32.598204",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
+      "deployment_timestamp": "2026-05-09T11:30:21.183400",
+      "dsr": 1.0642159252982984e-23,
+      "mean_sharpe": -1.437529905334743,
+      "worst_5pct_sharpe": -1.5143031056463512
     },
     "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
+    "path": "/home/lynx/Documents/MARK5/models/ASIANPAINT/v1/metadata.json",
     "status": "archived",
-    "ticker": "HDFCBANK.NS"
+    "ticker": "ASIANPAINT"
   },
-  "HDFCBANK.NS_ensemble_20260423_144738_3b732431": {
-    "archived_at": "2026-04-23T14:52:27.240783",
-    "checksum": "ff5f1ccf3abde1bd1c39c39111672e9f10145ff0c0103ecb271918e0b0ff09b7",
-    "created_at": "2026-04-23T14:47:38.570131",
+  "ASIANPAINT_ensemble_20260509_114135_06e7f2ee": {
+    "checksum": "a7c9e8f18e93bdacf42dfd22bc2f9e784669426a4c753576b8db9340443c3498",
+    "created_at": "2026-05-09T11:41:35.395299",
     "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
+      "auc": 0.37280701754385964,
+      "avg_fbeta": 0.008305647840531562,
       "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:47:38.569884",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
+      "deployment_timestamp": "2026-05-09T11:41:35.395055",
+      "dsr": 1.0642159252982984e-23,
+      "mean_sharpe": -1.437529905334743,
+      "worst_5pct_sharpe": -1.5143031056463512
     },
     "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "HDFCBANK.NS"
-  },
-  "HDFCBANK.NS_ensemble_20260423_145227_c13cb4c3": {
-    "archived_at": "2026-04-23T14:54:36.037892",
-    "checksum": "72c11c244b2593bd52536818cb35375a05b1e1516bd2aaf9539e1bcd72bf6c40",
-    "created_at": "2026-04-23T14:52:27.240788",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:52:27.240604",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "HDFCBANK.NS"
-  },
-  "HDFCBANK.NS_ensemble_20260423_145436_07c5a9f4": {
-    "archived_at": "2026-04-23T14:57:16.615065",
-    "checksum": "d8b4045f5140337e10d33e9ab0cfdef03ee98e5f0c5e009de9b143f1c7d91cf1",
-    "created_at": "2026-04-23T14:54:36.037900",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:54:36.037573",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "HDFCBANK.NS"
-  },
-  "HDFCBANK.NS_ensemble_20260423_145716_b858bb2e": {
-    "archived_at": "2026-04-23T15:06:21.209689",
-    "checksum": "7c74a15a32b7733ffce1b36913a66b29f236568c2a9547c5aa2cfe1774f1ad70",
-    "created_at": "2026-04-23T14:57:16.615075",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:57:16.614834",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "HDFCBANK.NS"
-  },
-  "HDFCBANK.NS_ensemble_20260423_150621_dd0ade05": {
-    "archived_at": "2026-05-02T16:57:28.605739",
-    "checksum": "35cdd311fc0ae289660e739503bf0d87abaf6a904ad82b6a8ebc8639f354ada1",
-    "created_at": "2026-04-23T15:06:21.209693",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T15:06:21.209544",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "HDFCBANK.NS"
-  },
-  "HDFCBANK.NS_ensemble_20260502_165728_e89453de": {
-    "archived_at": "2026-05-02T17:23:22.591966",
-    "checksum": "af7d90a782396c40991dfb5e9cbe4e3a5305d5d968d0cd09a4bd12b67c3c5dd7",
-    "created_at": "2026-05-02T16:57:28.605745",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-05-02T16:57:28.605569",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "HDFCBANK.NS"
-  },
-  "HDFCBANK.NS_ensemble_20260502_172322_121d1277": {
-    "archived_at": "2026-05-02T17:49:00.137810",
-    "checksum": "f2691e8c0f01caea42a31dbbb2c6cdb8aeaecbd7775ad2314c7911ccb2ca0058",
-    "created_at": "2026-05-02T17:23:22.591972",
-    "metadata": {
-      "auc": 0.27530364372469635,
-      "avg_fbeta": 0.0,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-05-02T17:23:22.591781",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "HDFCBANK.NS"
-  },
-  "HDFCBANK.NS_ensemble_20260502_174900_9ba31de0": {
-    "checksum": "9f6aaed7def56e24bfc81df0b9fc8a21e3a238b10cb07a6b0959af2a18348719",
-    "created_at": "2026-05-02T17:49:00.137816",
-    "metadata": {
-      "auc": 0.4713804713804714,
-      "avg_fbeta": 0.0,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-05-02T17:49:00.137638",
-      "dsr": 0.0,
-      "mean_sharpe": -2.9587545950991103,
-      "worst_5pct_sharpe": -2.9587545950991103
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK.NS/v1/metadata.json",
+    "path": "/home/lynx/Documents/MARK5/models/ASIANPAINT/v1/metadata.json",
     "status": "shadow",
-    "ticker": "HDFCBANK.NS"
+    "ticker": "ASIANPAINT"
   },
-  "ICICIBANK.NS_ensemble_20260502_165732_7fcf14c8": {
-    "archived_at": "2026-05-02T17:20:28.372396",
-    "checksum": "f5e331aa7420e722d60916aec60fa58ce5052946d89bd3996989901d82497b81",
-    "created_at": "2026-05-02T16:57:32.416608",
+  "AUBANK_ensemble_20260509_090044_397021e8": {
+    "checksum": "2c60fec6535b113edec0b6aa70e8f20f146814c0cc14b369074481bdbdb1fe3f",
+    "created_at": "2026-05-09T09:00:44.430737",
     "metadata": {
-      "auc": 0.5612244897959183,
-      "avg_fbeta": 0.0,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-05-02T16:57:32.416471",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
+      "auc": 0.4936263736263737,
+      "avg_fbeta": 0.15839900385453284,
+      "cpcv_p_sharpe": 0.5454545454545454,
+      "deployment_timestamp": "2026-05-09T09:00:44.430595",
+      "dsr": 4.6752359744203586e-77,
+      "mean_sharpe": 0.4984412621613492,
+      "worst_5pct_sharpe": -0.9240237583173092
     },
     "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "ICICIBANK.NS"
-  },
-  "ICICIBANK.NS_ensemble_20260502_172028_609e1e5a": {
-    "archived_at": "2026-05-02T17:52:17.799411",
-    "checksum": "c841fb98d32cb289bb8088de5ffde9b2e5ab1a52e97540116bdae60ca20dc4cf",
-    "created_at": "2026-05-02T17:20:28.372401",
-    "metadata": {
-      "auc": 0.35000000000000003,
-      "avg_fbeta": 0.0,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-05-02T17:20:28.372234",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "ICICIBANK.NS"
-  },
-  "ICICIBANK.NS_ensemble_20260502_175217_e6ca952c": {
-    "checksum": "cef764e310812269874b9f14ca4d97da32da1ea203775fb912a3dd86a8927674",
-    "created_at": "2026-05-02T17:52:17.799415",
-    "metadata": {
-      "auc": 0.5123384253819037,
-      "avg_fbeta": 0.1045813335215509,
-      "cpcv_p_sharpe": 0.5,
-      "deployment_timestamp": "2026-05-02T17:52:17.799278",
-      "dsr": 3.091322360027123e-50,
-      "mean_sharpe": -0.39553817095667343,
-      "worst_5pct_sharpe": -3.220103738361207
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK.NS/v2/metadata.json",
-    "status": "shadow",
-    "ticker": "ICICIBANK.NS"
-  },
-  "INFY.NS_ensemble_20260423_143310_133b2ec4": {
-    "archived_at": "2026-04-23T14:39:42.158674",
-    "checksum": "5b4581d3f851cce917eb658b81edf726699c76f45189314fe2590446a8146710",
-    "created_at": "2026-04-23T14:33:10.129858",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:33:10.129536",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "INFY.NS"
-  },
-  "INFY.NS_ensemble_20260423_143942_8771d7ea": {
-    "archived_at": "2026-04-23T14:47:47.053106",
-    "checksum": "668047d19c75f18511de97820b75ae770128d36160b32ce6765d1d1f565397fc",
-    "created_at": "2026-04-23T14:39:42.158678",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:39:42.158526",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "INFY.NS"
-  },
-  "INFY.NS_ensemble_20260423_144747_14c54aae": {
-    "archived_at": "2026-04-23T14:52:35.044708",
-    "checksum": "be20d95dbee0567888235e7b68eed1efe3b3cc54f4da326dfb1bb2ca277bf49d",
-    "created_at": "2026-04-23T14:47:47.053110",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:47:47.052960",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "INFY.NS"
-  },
-  "INFY.NS_ensemble_20260423_145235_452506df": {
-    "archived_at": "2026-04-23T14:54:48.038138",
-    "checksum": "ac1df47b5faad550f0ade1d1296475cb7dba69625116ac1e7347d679b0dc114a",
-    "created_at": "2026-04-23T14:52:35.044712",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:52:35.044553",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "INFY.NS"
-  },
-  "INFY.NS_ensemble_20260423_145448_d9f448d3": {
-    "archived_at": "2026-04-23T14:57:22.860770",
-    "checksum": "8d7520bc46c079a93284a876ad03bbb500a75b732f773f756f966eeeb48fa8e8",
-    "created_at": "2026-04-23T14:54:48.038142",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:54:48.037976",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "INFY.NS"
-  },
-  "INFY.NS_ensemble_20260423_145722_e8b1c794": {
-    "archived_at": "2026-04-23T15:06:53.538949",
-    "checksum": "59f7aa7e8b0b3dda297cdf0b225e56f9205ff92dc18807bdc97c8bb13a599be8",
-    "created_at": "2026-04-23T14:57:22.860774",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:57:22.860612",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "INFY.NS"
-  },
-  "INFY.NS_ensemble_20260423_150653_9a771477": {
-    "archived_at": "2026-05-02T16:57:09.290220",
-    "checksum": "f5c0499ad56124eea80a842d96cacd52768512d5ea0af0fc32a2382e73fbe558",
-    "created_at": "2026-04-23T15:06:53.538953",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T15:06:53.538802",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "INFY.NS"
-  },
-  "INFY.NS_ensemble_20260502_165709_02a28ed1": {
-    "archived_at": "2026-05-02T17:25:12.035883",
-    "checksum": "72666277fc5c9b89fe0ff6f7fa2a4363805f45c89240a176892f3eef3070f30a",
-    "created_at": "2026-05-02T16:57:09.290228",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-05-02T16:57:09.289969",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "INFY.NS"
-  },
-  "INFY.NS_ensemble_20260502_172512_73b9983f": {
-    "archived_at": "2026-05-02T17:48:34.807796",
-    "checksum": "e431734de10e271a172df3cfd74228a3c8dd33f574a07570492a0cf4bcdf8552",
-    "created_at": "2026-05-02T17:25:12.035887",
-    "metadata": {
-      "auc": 0.34567901234567905,
-      "avg_fbeta": 0.03880070546737214,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-05-02T17:25:12.035741",
-      "dsr": 0.0,
-      "mean_sharpe": -0.6816736065507837,
-      "worst_5pct_sharpe": -1.7965902852189934
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v2/metadata.json",
-    "status": "archived",
-    "ticker": "INFY.NS"
-  },
-  "INFY.NS_ensemble_20260502_174834_0a0a98cb": {
-    "checksum": "a0449e65ed12fb9b778ce195ebb5e21b000aabc3f7b123e0f5d73f68d37157f3",
-    "created_at": "2026-05-02T17:48:34.807804",
-    "metadata": {
-      "auc": 0.2633744855967078,
-      "avg_fbeta": 0.01838235294117647,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-05-02T17:48:34.807552",
-      "dsr": 0.0,
-      "mean_sharpe": -1.3035914848145396,
-      "worst_5pct_sharpe": -2.184074230350533
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/INFY.NS/v2/metadata.json",
-    "status": "shadow",
-    "ticker": "INFY.NS"
-  },
-  "M&M.NS_ensemble_20260423_143317_62306955": {
-    "archived_at": "2026-04-23T14:39:47.787812",
-    "checksum": "d12d2a999b3c4160986fc96c50cc7d75534d17f1dcf5e0782acf9c4c8403fae7",
-    "created_at": "2026-04-23T14:33:17.046683",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:33:17.046504",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/M&M.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "M&M.NS"
-  },
-  "M&M.NS_ensemble_20260423_143947_6956133f": {
-    "archived_at": "2026-04-23T14:47:53.478111",
-    "checksum": "688cbc930c912e1d84cf8ed5d40573f2ba89e07fe9d7c5157e9b5d4b3b79358d",
-    "created_at": "2026-04-23T14:39:47.787815",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:39:47.787674",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/M&M.NS/v2/metadata.json",
-    "status": "archived",
-    "ticker": "M&M.NS"
-  },
-  "M&M.NS_ensemble_20260423_144753_f5ff471a": {
-    "archived_at": "2026-04-23T14:52:46.584935",
-    "checksum": "763bf82b66f32dec32a919c2a5f0c4af486295b25134c3111e297923b8777dbb",
-    "created_at": "2026-04-23T14:47:53.478114",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:47:53.477992",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/M&M.NS/v3/metadata.json",
-    "status": "archived",
-    "ticker": "M&M.NS"
-  },
-  "M&M.NS_ensemble_20260423_145246_acb33466": {
-    "archived_at": "2026-04-23T14:55:00.349817",
-    "checksum": "3ab114b1da0ed18c0ae57283e0017b5caee06135eb45698dcf7d8b83c8c2b856",
-    "created_at": "2026-04-23T14:52:46.584937",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:52:46.584812",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/M&M.NS/v4/metadata.json",
-    "status": "archived",
-    "ticker": "M&M.NS"
-  },
-  "M&M.NS_ensemble_20260423_145500_928cbd74": {
-    "archived_at": "2026-04-23T14:57:36.361281",
-    "checksum": "fe9ef000f552c721f3973d8be058ac3d7b99cc295ee169ca56005030a72db88f",
-    "created_at": "2026-04-23T14:55:00.349820",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:55:00.349694",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/M&M.NS/v5/metadata.json",
-    "status": "archived",
-    "ticker": "M&M.NS"
-  },
-  "M&M.NS_ensemble_20260423_145736_de4123c1": {
-    "archived_at": "2026-04-23T15:06:58.136183",
-    "checksum": "27e398f4b259b714ac0d3262048422ec642e65ed29deff15214338b6713b4bed",
-    "created_at": "2026-04-23T14:57:36.361285",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:57:36.361128",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/M&M.NS/v6/metadata.json",
-    "status": "archived",
-    "ticker": "M&M.NS"
-  },
-  "M&M.NS_ensemble_20260423_150658_606fd1d7": {
-    "checksum": "df7866359ecac6575032c23037cf93b94aebaed12ab6e0c5ca8832a9329deda8",
-    "created_at": "2026-04-23T15:06:58.136188",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T15:06:58.135976",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/M&M.NS/v7/metadata.json",
-    "status": "shadow",
-    "ticker": "M&M.NS"
-  },
-  "RELIANCE.NS_ensemble_20260423_143302_44ef9c15": {
-    "archived_at": "2026-04-23T14:39:34.055895",
-    "checksum": "d0bc8e720d18e0b8cd4c290e8e28e00445e521566827fece42386e587a573461",
-    "created_at": "2026-04-23T14:33:02.825388",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:33:02.822993",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "RELIANCE.NS"
-  },
-  "RELIANCE.NS_ensemble_20260423_143934_46c3eb0d": {
-    "archived_at": "2026-04-23T14:47:39.670674",
-    "checksum": "8301098d9e9853dcc9719b571f01c5aa2dd8e41a72645a5d2864f9b93744f1ff",
-    "created_at": "2026-04-23T14:39:34.055901",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:39:34.055661",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "RELIANCE.NS"
-  },
-  "RELIANCE.NS_ensemble_20260423_144739_77c8af02": {
-    "archived_at": "2026-04-23T14:52:27.304253",
-    "checksum": "9cb4c1eb4ccfcfd19fea4ce5868ec5cbeaf5955bf20edb8dc550fc7f459658af",
-    "created_at": "2026-04-23T14:47:39.670678",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:47:39.670508",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "RELIANCE.NS"
-  },
-  "RELIANCE.NS_ensemble_20260423_145227_b41df676": {
-    "archived_at": "2026-04-23T14:54:38.988088",
-    "checksum": "d3ba2d865887f150bad0535f69ccf807df5a9119178c8c14c9f0a02c541bf153",
-    "created_at": "2026-04-23T14:52:27.304257",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:52:27.304060",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "RELIANCE.NS"
-  },
-  "RELIANCE.NS_ensemble_20260423_145438_5a04ceb2": {
-    "archived_at": "2026-04-23T14:57:16.973594",
-    "checksum": "ffe840594bcc74808727917b79dbbac6d4766d4229840a679503633ec53f26e8",
-    "created_at": "2026-04-23T14:54:38.988091",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:54:38.987938",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "RELIANCE.NS"
-  },
-  "RELIANCE.NS_ensemble_20260423_145716_a1a3574b": {
-    "archived_at": "2026-04-23T15:06:56.890826",
-    "checksum": "af685ad5553c8b8599213ef54a353da5a7de2a429ead1e0771c82795bea9e94c",
-    "created_at": "2026-04-23T14:57:16.973607",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:57:16.972869",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "RELIANCE.NS"
-  },
-  "RELIANCE.NS_ensemble_20260423_150656_92267281": {
-    "archived_at": "2026-05-02T16:57:32.395995",
-    "checksum": "7a0eeeb7ac6bb4ef82f7d54829d5f5cc9dfee9efc0c7aa4fe62181325a51db7e",
-    "created_at": "2026-04-23T15:06:56.890830",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T15:06:56.890647",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "RELIANCE.NS"
-  },
-  "RELIANCE.NS_ensemble_20260502_165732_48c22021": {
-    "archived_at": "2026-05-02T17:22:30.706836",
-    "checksum": "317f859717308e713aaa6079332bdd5f272c3e446770b0ffbfe8e12a31f364a6",
-    "created_at": "2026-05-02T16:57:32.395997",
-    "metadata": {
-      "auc": 0.4930555555555555,
-      "avg_fbeta": 0.0,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-05-02T16:57:32.395858",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "RELIANCE.NS"
-  },
-  "RELIANCE.NS_ensemble_20260502_172230_d88ced72": {
-    "archived_at": "2026-05-02T17:49:24.552470",
-    "checksum": "b3868fc8c47eecbb952d0847fa462cfc72bf5c07e1025c643998bdc21e0953eb",
-    "created_at": "2026-05-02T17:22:30.706839",
-    "metadata": {
-      "auc": 0.4292929292929293,
-      "avg_fbeta": 0.0,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-05-02T17:22:30.706678",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "RELIANCE.NS"
-  },
-  "RELIANCE.NS_ensemble_20260502_174924_2aece652": {
-    "checksum": "a375f500e26fc80c9ca6a9a763fcf11397687592204a9b62fce6550257e30703",
-    "created_at": "2026-05-02T17:49:24.552474",
-    "metadata": {
-      "auc": 0.388421052631579,
-      "avg_fbeta": 0.0,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-05-02T17:49:24.552320",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/RELIANCE.NS/v1/metadata.json",
-    "status": "shadow",
-    "ticker": "RELIANCE.NS"
-  },
-  "TCS.NS_ensemble_20260423_143316_6f78b2b1": {
-    "archived_at": "2026-04-23T14:39:46.698057",
-    "checksum": "13210474052d1d6850ffe92f943499a8da97abeee15fbbdcaf31a5d03d030a9a",
-    "created_at": "2026-04-23T14:33:16.271314",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:33:16.270708",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "TCS.NS"
-  },
-  "TCS.NS_ensemble_20260423_143946_ace5f8f6": {
-    "archived_at": "2026-04-23T14:47:53.381774",
-    "checksum": "006f08df7b9e70ba42656d27bcadecb16ac135003eab0aae23b16da4d2b55335",
-    "created_at": "2026-04-23T14:39:46.698060",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:39:46.697896",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "TCS.NS"
-  },
-  "TCS.NS_ensemble_20260423_144753_cc73721c": {
-    "archived_at": "2026-04-23T14:52:41.957191",
-    "checksum": "f127f93dfac0fdb3a4cf8df5fb9fc9f22ceea5edd0a952700d3623182d3797e2",
-    "created_at": "2026-04-23T14:47:53.381777",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:47:53.381626",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "TCS.NS"
-  },
-  "TCS.NS_ensemble_20260423_145241_917b0058": {
-    "archived_at": "2026-04-23T14:54:55.859224",
-    "checksum": "238840a0547e1df2b7ec2f4a0cf3ffc38e535d674bbbef043f99b46a0292bae3",
-    "created_at": "2026-04-23T14:52:41.957198",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:52:41.956920",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "TCS.NS"
-  },
-  "TCS.NS_ensemble_20260423_145455_5621bc37": {
-    "archived_at": "2026-04-23T14:57:30.919652",
-    "checksum": "09845162b599264d4cd92d7b9508d9f3da0587936b50d74d375e8239872f09ee",
-    "created_at": "2026-04-23T14:54:55.859230",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:54:55.858973",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "TCS.NS"
-  },
-  "TCS.NS_ensemble_20260423_145730_1dacf9ee": {
-    "archived_at": "2026-04-23T15:06:25.292522",
-    "checksum": "1c67c823d6e2eacaa7824cc0b9b27d210ccfcaa8d264d2ffe91e29bb433caea9",
-    "created_at": "2026-04-23T14:57:30.919655",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T14:57:30.919502",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "TCS.NS"
-  },
-  "TCS.NS_ensemble_20260423_150625_1c2c8872": {
-    "archived_at": "2026-05-02T16:57:38.186704",
-    "checksum": "77ca67a16a135fe7df117751dbe097b721ac90d357f38f20fddd9105daa2ae5e",
-    "created_at": "2026-04-23T15:06:25.292525",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-04-23T15:06:25.292358",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "TCS.NS"
-  },
-  "TCS.NS_ensemble_20260502_165738_ebf0deaf": {
-    "archived_at": "2026-05-02T17:25:21.088687",
-    "checksum": "0149d6119ed711cbfcb5afde8f32c0cdd975d0ed902ce6187cc6c33afe65f88f",
-    "created_at": "2026-05-02T16:57:38.186709",
-    "metadata": {
-      "auc": 0.0,
-      "avg_fbeta": NaN,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-05-02T16:57:38.186503",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v1/metadata.json",
-    "status": "archived",
-    "ticker": "TCS.NS"
-  },
-  "TCS.NS_ensemble_20260502_172521_66fdb562": {
-    "checksum": "2764601ef1d179670f24106fc828e0b0e99dcef380b806b4c1059b3ce96c9990",
-    "created_at": "2026-05-02T17:25:21.088690",
-    "metadata": {
-      "auc": 0.5078125,
-      "avg_fbeta": 0.0,
-      "cpcv_p_sharpe": 0.0,
-      "deployment_timestamp": "2026-05-02T17:25:21.088536",
-      "dsr": 0.0,
-      "mean_sharpe": -99.0,
-      "worst_5pct_sharpe": -99.0
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v2/metadata.json",
-    "status": "shadow",
-    "ticker": "TCS.NS"
-  },
-  "TCS.NS_ensemble_20260502_175236_b7da0861": {
-    "checksum": "14a1b305bdb9a78d8cae0073f36acbd0fc463a4636dc415f40706e8eda34eb51",
-    "created_at": "2026-05-02T17:52:36.956735",
-    "metadata": {
-      "auc": 0.6474654377880185,
-      "avg_fbeta": 0.12876926063067368,
-      "cpcv_p_sharpe": 0.2222222222222222,
-      "deployment_timestamp": "2026-05-02T17:52:36.956572",
-      "dsr": 0.014757689030639823,
-      "mean_sharpe": 0.09926327586378557,
-      "worst_5pct_sharpe": -1.9553011514280094
-    },
-    "model_type": "ensemble",
-    "path": "/home/lynx/Documents/MARK5/models/TCS.NS/v3/metadata.json",
+    "path": "/home/lynx/Documents/MARK5/models/AUBANK/v1/metadata.json",
     "status": "active",
-    "ticker": "TCS.NS"
+    "ticker": "AUBANK"
+  },
+  "BAJFINANCE_ensemble_20260509_084945_37d8cb09": {
+    "archived_at": "2026-05-09T09:31:49.363730",
+    "checksum": "fb2455da96fe41baf1609e5a724fdc7d58fbd80b1d3fb5b9609d81b0512a52e7",
+    "created_at": "2026-05-09T08:49:45.795714",
+    "metadata": {
+      "auc": 0.4015179563124768,
+      "avg_fbeta": 0.207642737126449,
+      "cpcv_p_sharpe": 0.2631578947368421,
+      "deployment_timestamp": "2026-05-09T08:49:45.795506",
+      "dsr": 4.653155542914403e-116,
+      "mean_sharpe": -0.28853966566155564,
+      "worst_5pct_sharpe": -2.6782841019220145
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/BAJFINANCE/v1/metadata.json",
+    "status": "archived",
+    "ticker": "BAJFINANCE"
+  },
+  "BAJFINANCE_ensemble_20260509_093149_0506e213": {
+    "archived_at": "2026-05-09T11:28:21.141265",
+    "checksum": "2a140058a5f30821aba170a5cc1e4691b8f5025536de17544aae430cd932f328",
+    "created_at": "2026-05-09T09:31:49.363737",
+    "metadata": {
+      "auc": 0.38818955942243605,
+      "avg_fbeta": 0.1887351741012389,
+      "cpcv_p_sharpe": 0.21052631578947367,
+      "deployment_timestamp": "2026-05-09T09:31:49.363524",
+      "dsr": 1.8458821024171647e-120,
+      "mean_sharpe": -0.37047505701178757,
+      "worst_5pct_sharpe": -2.6782841019220145
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/BAJFINANCE/v1/metadata.json",
+    "status": "archived",
+    "ticker": "BAJFINANCE"
+  },
+  "BAJFINANCE_ensemble_20260509_112821_666fcd01": {
+    "archived_at": "2026-05-09T11:40:06.765350",
+    "checksum": "9207f01b326aa593589cc6c2c127d1e5530120bacb9a184e05097dd255c37872",
+    "created_at": "2026-05-09T11:28:21.141278",
+    "metadata": {
+      "auc": 0.3941391941391942,
+      "avg_fbeta": 0.3338645271585755,
+      "cpcv_p_sharpe": 0.30434782608695654,
+      "deployment_timestamp": "2026-05-09T11:28:21.141118",
+      "dsr": 3.677913779906419e-74,
+      "mean_sharpe": -0.3674291531797752,
+      "worst_5pct_sharpe": -2.307489470728553
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/BAJFINANCE/v2/metadata.json",
+    "status": "archived",
+    "ticker": "BAJFINANCE"
+  },
+  "BAJFINANCE_ensemble_20260509_114006_35630473": {
+    "checksum": "b8b7d9a7929dbd3729118ce6e2cdf60297ba7c27ae482ce537fc9caa7daa150e",
+    "created_at": "2026-05-09T11:40:06.765366",
+    "metadata": {
+      "auc": 0.3941391941391942,
+      "avg_fbeta": 0.3338645271585755,
+      "cpcv_p_sharpe": 0.30434782608695654,
+      "deployment_timestamp": "2026-05-09T11:40:06.765181",
+      "dsr": 3.677913779906419e-74,
+      "mean_sharpe": -0.3674291531797752,
+      "worst_5pct_sharpe": -2.307489470728553
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/BAJFINANCE/v3/metadata.json",
+    "status": "shadow",
+    "ticker": "BAJFINANCE"
+  },
+  "BANDHANBNK_ensemble_20260509_090524_1550de54": {
+    "checksum": "deedd468921337f61fee579daf413fc9a67c769ff951b3bbce0e8024e3ccd8fe",
+    "created_at": "2026-05-09T09:05:24.981952",
+    "metadata": {
+      "auc": 0.32758620689655177,
+      "avg_fbeta": 0.11429954509627992,
+      "cpcv_p_sharpe": 0.15384615384615385,
+      "deployment_timestamp": "2026-05-09T09:05:24.981693",
+      "dsr": 1.0872831729888642e-54,
+      "mean_sharpe": -0.7700216626073692,
+      "worst_5pct_sharpe": -2.1733759097786374
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/BANDHANBNK/v1/metadata.json",
+    "status": "shadow",
+    "ticker": "BANDHANBNK"
+  },
+  "BEL_ensemble_20260509_085430_404d3867": {
+    "checksum": "0f79bb3090bef999695148903a10d17b186db7290f56cab608a963bb27a2d848",
+    "created_at": "2026-05-09T08:54:30.511850",
+    "metadata": {
+      "auc": 0.513859275053305,
+      "avg_fbeta": 0.42052516822333047,
+      "cpcv_p_sharpe": 0.391304347826087,
+      "deployment_timestamp": "2026-05-09T08:54:30.511683",
+      "dsr": 1.0141752537051694e-66,
+      "mean_sharpe": 0.23228768086309043,
+      "worst_5pct_sharpe": -0.9303013137467611
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/BEL/v1/metadata.json",
+    "status": "active",
+    "ticker": "BEL"
+  },
+  "BEL_ensemble_20260509_114437_2cd35e1c": {
+    "checksum": "5ddbce1caf185704e9c7bbcae2f4960f93f1a0b064a04d52fa948e637b7bf6f5",
+    "created_at": "2026-05-09T11:44:37.413222",
+    "metadata": {
+      "auc": 0.37019969278033793,
+      "avg_fbeta": 0.5331696631418487,
+      "cpcv_p_sharpe": 0.48148148148148145,
+      "deployment_timestamp": "2026-05-09T11:44:37.413086",
+      "dsr": 9.860811754155283e-07,
+      "mean_sharpe": 0.5658987464637968,
+      "worst_5pct_sharpe": -2.545560218539873
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/BEL/v1/metadata.json",
+    "status": "shadow",
+    "ticker": "BEL"
+  },
+  "BHARTIARTL_ensemble_20260509_084659_bfc3c813": {
+    "archived_at": "2026-05-09T09:27:59.241216",
+    "checksum": "42a865b2683eeed3f774bfbaecb4a12be748d124af76e54f16830378ebebac30",
+    "created_at": "2026-05-09T08:46:59.250557",
+    "metadata": {
+      "auc": 0.5085638998682477,
+      "avg_fbeta": 0.33608139470731946,
+      "cpcv_p_sharpe": 0.34615384615384615,
+      "deployment_timestamp": "2026-05-09T08:46:59.250422",
+      "dsr": 3.5416417192572433e-31,
+      "mean_sharpe": 0.1567966165483554,
+      "worst_5pct_sharpe": -1.4367908742711544
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/BHARTIARTL/v1/metadata.json",
+    "status": "archived",
+    "ticker": "BHARTIARTL"
+  },
+  "BHARTIARTL_ensemble_20260509_092759_7dbb9ab1": {
+    "archived_at": "2026-05-09T09:50:40.184916",
+    "checksum": "6e7019a04647cd688272ba8dcd055924a6fcde3d3c8245ec0d0558e473c94032",
+    "created_at": "2026-05-09T09:27:59.241227",
+    "metadata": {
+      "auc": 0.5127799736495389,
+      "avg_fbeta": 0.3530038326492225,
+      "cpcv_p_sharpe": 0.34615384615384615,
+      "deployment_timestamp": "2026-05-09T09:27:59.240906",
+      "dsr": 1.5360823233738368e-27,
+      "mean_sharpe": 0.1939502835243346,
+      "worst_5pct_sharpe": -1.7840014647085198
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/BHARTIARTL/v1/metadata.json",
+    "status": "archived",
+    "ticker": "BHARTIARTL"
+  },
+  "BHARTIARTL_ensemble_20260509_095040_72f96274": {
+    "archived_at": "2026-05-09T11:10:24.839149",
+    "checksum": "88f2e935450477ba417a949ca80b03f78053e1586a445827192fa66923f09205",
+    "created_at": "2026-05-09T09:50:40.184926",
+    "metadata": {
+      "auc": 0.5085638998682477,
+      "avg_fbeta": 0.33608139470731946,
+      "cpcv_p_sharpe": 0.34615384615384615,
+      "deployment_timestamp": "2026-05-09T09:50:40.184791",
+      "dsr": 3.5416417192572433e-31,
+      "mean_sharpe": 0.1567966165483554,
+      "worst_5pct_sharpe": -1.4367908742711544
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/BHARTIARTL/v1/metadata.json",
+    "status": "archived",
+    "ticker": "BHARTIARTL"
+  },
+  "BHARTIARTL_ensemble_20260509_111024_2a5bbcb4": {
+    "archived_at": "2026-05-09T11:25:35.410622",
+    "checksum": "3d301a10da8ab7c35a9bc964ced2091511cbb95abf58a12684f91a02b9432c9f",
+    "created_at": "2026-05-09T11:10:24.839160",
+    "metadata": {
+      "auc": 0.5085638998682477,
+      "avg_fbeta": 0.33608139470731946,
+      "cpcv_p_sharpe": 0.34615384615384615,
+      "deployment_timestamp": "2026-05-09T11:10:24.839005",
+      "dsr": 3.5416417192572433e-31,
+      "mean_sharpe": 0.1567966165483554,
+      "worst_5pct_sharpe": -1.4367908742711544
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/BHARTIARTL/v1/metadata.json",
+    "status": "archived",
+    "ticker": "BHARTIARTL"
+  },
+  "BHARTIARTL_ensemble_20260509_112535_6f27ea90": {
+    "archived_at": "2026-05-09T11:38:16.951393",
+    "checksum": "49386a9f8ec6fe6a48d6567b1513915886f0e5ff452b18e6feb90b3884d28543",
+    "created_at": "2026-05-09T11:25:35.410635",
+    "metadata": {
+      "auc": 0.40118577075098816,
+      "avg_fbeta": 0.620057277378672,
+      "cpcv_p_sharpe": 0.75,
+      "deployment_timestamp": "2026-05-09T11:25:35.410467",
+      "dsr": 0.3995244825565883,
+      "mean_sharpe": 1.5384871986141984,
+      "worst_5pct_sharpe": -1.3519448579522466
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/BHARTIARTL/v1/metadata.json",
+    "status": "archived",
+    "ticker": "BHARTIARTL"
+  },
+  "BHARTIARTL_ensemble_20260509_113816_3f7d7349": {
+    "checksum": "0a7e8fd7a325d109d7755e84905d7e4317dd0a03883e94911131089096457411",
+    "created_at": "2026-05-09T11:38:16.951407",
+    "metadata": {
+      "auc": 0.40118577075098816,
+      "avg_fbeta": 0.620057277378672,
+      "cpcv_p_sharpe": 0.75,
+      "deployment_timestamp": "2026-05-09T11:38:16.951263",
+      "dsr": 0.3995244825565883,
+      "mean_sharpe": 1.5384871986141984,
+      "worst_5pct_sharpe": -1.3519448579522466
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/BHARTIARTL/v1/metadata.json",
+    "status": "shadow",
+    "ticker": "BHARTIARTL"
+  },
+  "COFORGE_ensemble_20260509_085635_ba88f79a": {
+    "checksum": "e33d2672698af70249d0679930f22729885b46ac4db7e218950a6ff2c7a1fcd3",
+    "created_at": "2026-05-09T08:56:35.223483",
+    "metadata": {
+      "auc": 0.4615600448933782,
+      "avg_fbeta": 0.37194836380336105,
+      "cpcv_p_sharpe": 0.6190476190476191,
+      "deployment_timestamp": "2026-05-09T08:56:35.223326",
+      "dsr": 1.6505229605056628e-37,
+      "mean_sharpe": 0.8969392618262207,
+      "worst_5pct_sharpe": -1.139297579605089
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/COFORGE/v1/metadata.json",
+    "status": "shadow",
+    "ticker": "COFORGE"
+  },
+  "HAL_ensemble_20260509_085437_aab2a0da": {
+    "archived_at": "2026-05-09T11:43:37.554818",
+    "checksum": "f9b2efc2a98625222638fbf799bca2246b3bbbee363566a286d8513f3b2547a5",
+    "created_at": "2026-05-09T08:54:37.360029",
+    "metadata": {
+      "auc": 0.5222069597069597,
+      "avg_fbeta": 0.12119294811161543,
+      "cpcv_p_sharpe": 0.14285714285714285,
+      "deployment_timestamp": "2026-05-09T08:54:37.359781",
+      "dsr": 1.954452395185879e-98,
+      "mean_sharpe": -0.4943140873357194,
+      "worst_5pct_sharpe": -1.5173322281517274
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HAL/v1/metadata.json",
+    "status": "archived",
+    "ticker": "HAL"
+  },
+  "HAL_ensemble_20260509_114337_1ed27f45": {
+    "checksum": "05092b17c7ffc51048ca180aedfb8d505a75edc8cd48f03920adc07fde001e9c",
+    "created_at": "2026-05-09T11:43:37.554837",
+    "metadata": {
+      "auc": 0.40604575163398693,
+      "avg_fbeta": 0.42051151526801467,
+      "cpcv_p_sharpe": 0.28,
+      "deployment_timestamp": "2026-05-09T11:43:37.554630",
+      "dsr": 1.538272855037674e-67,
+      "mean_sharpe": 0.1339380226491434,
+      "worst_5pct_sharpe": -1.1160140686318156
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HAL/v2/metadata.json",
+    "status": "shadow",
+    "ticker": "HAL"
+  },
+  "HDFCBANK_ensemble_20260509_073623_857c203e": {
+    "archived_at": "2026-05-09T07:47:07.739251",
+    "checksum": "223d5dab25e7a2072537195df92f3d7d7b30e7f33486be828b908b916ca97491",
+    "created_at": "2026-05-09T07:36:23.076238",
+    "metadata": {
+      "auc": 0.6146331738437002,
+      "avg_fbeta": 0.5255109527934066,
+      "cpcv_p_sharpe": 0.2222222222222222,
+      "deployment_timestamp": "2026-05-09T07:36:23.076005",
+      "dsr": 3.1401183907043554e-83,
+      "mean_sharpe": 0.04320532603537606,
+      "worst_5pct_sharpe": -1.5142068095483783
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK/v1/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK"
+  },
+  "HDFCBANK_ensemble_20260509_074707_fa190fc2": {
+    "archived_at": "2026-05-09T11:21:10.995315",
+    "checksum": "ba3a30a8f23e9351ac6e01c0f058489c149b547b88c0f2f85157ace347735074",
+    "created_at": "2026-05-09T07:47:07.739256",
+    "metadata": {
+      "auc": 0.504059829059829,
+      "avg_fbeta": 0.182325276915529,
+      "cpcv_p_sharpe": 0.2777777777777778,
+      "deployment_timestamp": "2026-05-09T07:47:07.739111",
+      "dsr": 3.657841783362184e-72,
+      "mean_sharpe": 0.007264307982075334,
+      "worst_5pct_sharpe": -1.779723832850878
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK/v2/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK"
+  },
+  "HDFCBANK_ensemble_20260509_075219_246874fe": {
+    "archived_at": "2026-05-09T08:00:10.329959",
+    "checksum": "a9b8b68877b7622b8ee59d430e61c08f16c5d68bb565071e6cd79c97010de768",
+    "created_at": "2026-05-09T07:52:19.090375",
+    "metadata": {
+      "auc": 0.547275641025641,
+      "avg_fbeta": 0.34818840613241464,
+      "cpcv_p_sharpe": 0.4782608695652174,
+      "deployment_timestamp": "2026-05-09T07:52:19.090235",
+      "dsr": 9.644772642134565e-26,
+      "mean_sharpe": 0.6065310210239383,
+      "worst_5pct_sharpe": -0.7428461419270233
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK/v3/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK"
+  },
+  "HDFCBANK_ensemble_20260509_080010_56ecd3a5": {
+    "archived_at": "2026-05-09T08:13:12.170871",
+    "checksum": "358293d394d38c216447d1f87447c2e9066eccd1b17a520a09e2fc9b2dceec83",
+    "created_at": "2026-05-09T08:00:10.329966",
+    "metadata": {
+      "auc": 0.547275641025641,
+      "avg_fbeta": 0.34818840613241464,
+      "cpcv_p_sharpe": 0.4782608695652174,
+      "deployment_timestamp": "2026-05-09T08:00:10.329744",
+      "dsr": 9.644772642134565e-26,
+      "mean_sharpe": 0.6065310210239383,
+      "worst_5pct_sharpe": -0.7428461419270233
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK/v4/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK"
+  },
+  "HDFCBANK_ensemble_20260509_081312_5e1d18fa": {
+    "archived_at": "2026-05-09T08:17:27.952899",
+    "checksum": "3f201e525d78aea7161e6304914c2f2e2eefe8e5ae163d7f634b6e9b24e5e32a",
+    "created_at": "2026-05-09T08:13:12.170876",
+    "metadata": {
+      "auc": 0.547275641025641,
+      "avg_fbeta": 0.34818840613241464,
+      "cpcv_p_sharpe": 0.4782608695652174,
+      "deployment_timestamp": "2026-05-09T08:13:12.170698",
+      "dsr": 9.644772642134565e-26,
+      "mean_sharpe": 0.6065310210239383,
+      "worst_5pct_sharpe": -0.7428461419270233
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK/v5/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK"
+  },
+  "HDFCBANK_ensemble_20260509_081727_0b5b9c76": {
+    "archived_at": "2026-05-09T08:31:03.636256",
+    "checksum": "a00ef556afa7502417cee937638cecb8dd662b2d0b19c155e50fe3471c58df2a",
+    "created_at": "2026-05-09T08:17:27.952907",
+    "metadata": {
+      "auc": 0.547275641025641,
+      "avg_fbeta": 0.34818840613241464,
+      "cpcv_p_sharpe": 0.4782608695652174,
+      "deployment_timestamp": "2026-05-09T08:17:27.952716",
+      "dsr": 9.644772642134565e-26,
+      "mean_sharpe": 0.6065310210239383,
+      "worst_5pct_sharpe": -0.7428461419270233
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK/v6/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK"
+  },
+  "HDFCBANK_ensemble_20260509_083103_a6f9bbdb": {
+    "archived_at": "2026-05-09T08:44:28.865801",
+    "checksum": "71b73c8cbfa5e48739d0bf2eec4c0d1dbea9db1e04f572373d6eb7037e86b069",
+    "created_at": "2026-05-09T08:31:03.636263",
+    "metadata": {
+      "auc": 0.5578421578421578,
+      "avg_fbeta": 0.3893349594462423,
+      "cpcv_p_sharpe": 0.52,
+      "deployment_timestamp": "2026-05-09T08:31:03.636099",
+      "dsr": 2.3570407250300615e-26,
+      "mean_sharpe": 0.7025148423149503,
+      "worst_5pct_sharpe": -0.7526981187042865
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK/v7/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK"
+  },
+  "HDFCBANK_ensemble_20260509_084428_7b9ca6a3": {
+    "archived_at": "2026-05-09T09:23:00.856243",
+    "checksum": "1ffe3bc33586d30d8f809c634d791578d1e6081393e028f65894c014e20729e6",
+    "created_at": "2026-05-09T08:44:28.865809",
+    "metadata": {
+      "auc": 0.5578421578421578,
+      "avg_fbeta": 0.38434471548502663,
+      "cpcv_p_sharpe": 0.48,
+      "deployment_timestamp": "2026-05-09T08:44:28.865628",
+      "dsr": 2.3570407250300615e-26,
+      "mean_sharpe": 0.6000087265928102,
+      "worst_5pct_sharpe": -0.7526981187042865
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK/v8/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK"
+  },
+  "HDFCBANK_ensemble_20260509_092300_1d275693": {
+    "archived_at": "2026-05-09T09:36:53.820141",
+    "checksum": "e3090ad47badbae00a811a36d33130c9b7e5f31865b6c6db3bfb81eb30d70f31",
+    "created_at": "2026-05-09T09:23:00.856251",
+    "metadata": {
+      "auc": 0.5578421578421578,
+      "avg_fbeta": 0.3893349594462423,
+      "cpcv_p_sharpe": 0.52,
+      "deployment_timestamp": "2026-05-09T09:23:00.855969",
+      "dsr": 2.3570407250300615e-26,
+      "mean_sharpe": 0.7025148423149503,
+      "worst_5pct_sharpe": -0.7526981187042865
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK/v8/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK"
+  },
+  "HDFCBANK_ensemble_20260509_093653_f76d7f69": {
+    "archived_at": "2026-05-09T09:46:21.852304",
+    "checksum": "56d6f3833b3bafea4f0a47d15ead4e0f5ffffa2e2f1f569e7eec1fe6feaa8e94",
+    "created_at": "2026-05-09T09:36:53.820153",
+    "metadata": {
+      "auc": 0.5578421578421578,
+      "avg_fbeta": 0.38434471548502663,
+      "cpcv_p_sharpe": 0.48,
+      "deployment_timestamp": "2026-05-09T09:36:53.819881",
+      "dsr": 2.3570407250300615e-26,
+      "mean_sharpe": 0.6000087265928102,
+      "worst_5pct_sharpe": -0.7526981187042865
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK/v8/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK"
+  },
+  "HDFCBANK_ensemble_20260509_094621_5f558f69": {
+    "archived_at": "2026-05-09T11:06:19.713176",
+    "checksum": "43ea0f5b2463db4538863ce0dee63997d7b9f0de389b7af06eb202589d827221",
+    "created_at": "2026-05-09T09:46:21.852314",
+    "metadata": {
+      "auc": 0.5578421578421578,
+      "avg_fbeta": 0.38434471548502663,
+      "cpcv_p_sharpe": 0.48,
+      "deployment_timestamp": "2026-05-09T09:46:21.852140",
+      "dsr": 2.3570407250300615e-26,
+      "mean_sharpe": 0.6000087265928102,
+      "worst_5pct_sharpe": -0.7526981187042865
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK/v9/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK"
+  },
+  "HDFCBANK_ensemble_20260509_110619_e3d04399": {
+    "checksum": "dcb0b5d01d9a3265073a03247e306063ef9d2698460475a834b6e47dfbb3ec29",
+    "created_at": "2026-05-09T11:06:19.713187",
+    "metadata": {
+      "auc": 0.5578421578421578,
+      "avg_fbeta": 0.38434471548502663,
+      "cpcv_p_sharpe": 0.48,
+      "deployment_timestamp": "2026-05-09T11:06:19.713020",
+      "dsr": 2.3570407250300615e-26,
+      "mean_sharpe": 0.6000087265928102,
+      "worst_5pct_sharpe": -0.7526981187042865
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK/v9/metadata.json",
+    "status": "active",
+    "ticker": "HDFCBANK"
+  },
+  "HDFCBANK_ensemble_20260509_112110_6f88d3c4": {
+    "archived_at": "2026-05-09T11:36:32.881287",
+    "checksum": "0d6cd9262dad435c6d8df569a4e4ff81783b1d05f46c34a800f6a73fb66082b9",
+    "created_at": "2026-05-09T11:21:10.995327",
+    "metadata": {
+      "auc": 0.43015521064301554,
+      "avg_fbeta": 0.5808140405963619,
+      "cpcv_p_sharpe": 0.75,
+      "deployment_timestamp": "2026-05-09T11:21:10.995153",
+      "dsr": 0.06344771033495605,
+      "mean_sharpe": 1.2839779149442663,
+      "worst_5pct_sharpe": -1.289271485376576
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK/v9/metadata.json",
+    "status": "archived",
+    "ticker": "HDFCBANK"
+  },
+  "HDFCBANK_ensemble_20260509_113632_c3d8903c": {
+    "checksum": "657e62eb302acde8ceaa1ecafaae93382215ea438be23663517ff1ae17ee734b",
+    "created_at": "2026-05-09T11:36:32.881301",
+    "metadata": {
+      "auc": 0.43015521064301554,
+      "avg_fbeta": 0.5808140405963619,
+      "cpcv_p_sharpe": 0.75,
+      "deployment_timestamp": "2026-05-09T11:36:32.881043",
+      "dsr": 0.06344771033495605,
+      "mean_sharpe": 1.2839779149442663,
+      "worst_5pct_sharpe": -1.289271485376576
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HDFCBANK/v10/metadata.json",
+    "status": "shadow",
+    "ticker": "HDFCBANK"
+  },
+  "HINDUNILVR_ensemble_20260509_084950_f66b2a3c": {
+    "archived_at": "2026-05-09T09:31:34.089094",
+    "checksum": "73cf75c6d2759cc307e0856da0703a5d97e443f355afcf5e71712624fd027572",
+    "created_at": "2026-05-09T08:49:50.433296",
+    "metadata": {
+      "auc": 0.3457407407407408,
+      "avg_fbeta": 0.1807883842365152,
+      "cpcv_p_sharpe": 0.047619047619047616,
+      "deployment_timestamp": "2026-05-09T08:49:50.433134",
+      "dsr": 3.0250687651229187e-132,
+      "mean_sharpe": -0.7993549742340433,
+      "worst_5pct_sharpe": -2.0737857344019965
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HINDUNILVR/v1/metadata.json",
+    "status": "archived",
+    "ticker": "HINDUNILVR"
+  },
+  "HINDUNILVR_ensemble_20260509_093134_3ee2912f": {
+    "archived_at": "2026-05-09T11:28:18.041620",
+    "checksum": "c151cefdabf258e5576562b304068208f7c266611d70dd570e2b807e456498bb",
+    "created_at": "2026-05-09T09:31:34.089101",
+    "metadata": {
+      "auc": 0.3457407407407408,
+      "avg_fbeta": 0.1807883842365152,
+      "cpcv_p_sharpe": 0.047619047619047616,
+      "deployment_timestamp": "2026-05-09T09:31:34.088886",
+      "dsr": 3.0250687651229187e-132,
+      "mean_sharpe": -0.7993549742340433,
+      "worst_5pct_sharpe": -2.0737857344019965
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HINDUNILVR/v1/metadata.json",
+    "status": "archived",
+    "ticker": "HINDUNILVR"
+  },
+  "HINDUNILVR_ensemble_20260509_112818_9b07bc0e": {
+    "archived_at": "2026-05-09T11:40:04.414001",
+    "checksum": "13f18863ee208e17b33dc06eda815579f61ae289c33d62c895ae38f7ccdd9be2",
+    "created_at": "2026-05-09T11:28:18.041633",
+    "metadata": {
+      "auc": 0.32352941176470584,
+      "avg_fbeta": 0.10217828105467712,
+      "cpcv_p_sharpe": 0.08333333333333333,
+      "deployment_timestamp": "2026-05-09T11:28:18.041389",
+      "dsr": 1.623941818856854e-57,
+      "mean_sharpe": -1.5763662694137173,
+      "worst_5pct_sharpe": -3.8515461760394216
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HINDUNILVR/v1/metadata.json",
+    "status": "archived",
+    "ticker": "HINDUNILVR"
+  },
+  "HINDUNILVR_ensemble_20260509_114004_bfd1b69c": {
+    "checksum": "7e57dc0cf66772828f6e83807c5ed8ac5bdebffa8480a917ac5170ec804a2a52",
+    "created_at": "2026-05-09T11:40:04.414013",
+    "metadata": {
+      "auc": 0.32352941176470584,
+      "avg_fbeta": 0.10217828105467712,
+      "cpcv_p_sharpe": 0.08333333333333333,
+      "deployment_timestamp": "2026-05-09T11:40:04.413844",
+      "dsr": 1.623941818856854e-57,
+      "mean_sharpe": -1.5763662694137173,
+      "worst_5pct_sharpe": -3.8515461760394216
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/HINDUNILVR/v1/metadata.json",
+    "status": "shadow",
+    "ticker": "HINDUNILVR"
+  },
+  "ICICIBANK_ensemble_20260509_073649_090845ea": {
+    "archived_at": "2026-05-09T07:47:57.184834",
+    "checksum": "16f1ff370cc1b3431633da6160b8548a89801fc75df950f0a881b0a49689722d",
+    "created_at": "2026-05-09T07:36:49.747058",
+    "metadata": {
+      "auc": 0.5095281306715064,
+      "avg_fbeta": 0.10572553287612414,
+      "cpcv_p_sharpe": 0.36363636363636365,
+      "deployment_timestamp": "2026-05-09T07:36:49.746937",
+      "dsr": 7.652154596854386e-69,
+      "mean_sharpe": 0.2929060958187697,
+      "worst_5pct_sharpe": -1.1829076417652677
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK/v1/metadata.json",
+    "status": "archived",
+    "ticker": "ICICIBANK"
+  },
+  "ICICIBANK_ensemble_20260509_074757_37035211": {
+    "archived_at": "2026-05-09T07:52:47.987870",
+    "checksum": "0564729baa8c284aecc017502049d7cfba4640c6a0608ff03bf09dc8bdf71e57",
+    "created_at": "2026-05-09T07:47:57.184849",
+    "metadata": {
+      "auc": 0.4712121212121212,
+      "avg_fbeta": 0.01787700619736215,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-09T07:47:57.183623",
+      "dsr": 0.0017058583463646477,
+      "mean_sharpe": -0.17057412444506947,
+      "worst_5pct_sharpe": -0.39574949050106034
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK/v2/metadata.json",
+    "status": "archived",
+    "ticker": "ICICIBANK"
+  },
+  "ICICIBANK_ensemble_20260509_075247_3e878dd6": {
+    "archived_at": "2026-05-09T08:00:40.914565",
+    "checksum": "f389a021875f2f01d7aefed74d4e0822d1bfb7b54ae60e40a638aa0e9f2469f7",
+    "created_at": "2026-05-09T07:52:47.987873",
+    "metadata": {
+      "auc": 0.4722419088117175,
+      "avg_fbeta": 0.11619308383892178,
+      "cpcv_p_sharpe": 0.16666666666666666,
+      "deployment_timestamp": "2026-05-09T07:52:47.987734",
+      "dsr": 2.6922225736943867e-81,
+      "mean_sharpe": -0.7483257268881666,
+      "worst_5pct_sharpe": -2.5244818106431732
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK/v3/metadata.json",
+    "status": "archived",
+    "ticker": "ICICIBANK"
+  },
+  "ICICIBANK_ensemble_20260509_080040_eabece08": {
+    "archived_at": "2026-05-09T08:13:39.860015",
+    "checksum": "9baaa318457338e1d25c229fe4cb444b6334493385ed9a7d1202638be656d975",
+    "created_at": "2026-05-09T08:00:40.914569",
+    "metadata": {
+      "auc": 0.4722419088117175,
+      "avg_fbeta": 0.11619308383892178,
+      "cpcv_p_sharpe": 0.16666666666666666,
+      "deployment_timestamp": "2026-05-09T08:00:40.914415",
+      "dsr": 2.6922225736943867e-81,
+      "mean_sharpe": -0.7483257268881666,
+      "worst_5pct_sharpe": -2.5244818106431732
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK/v4/metadata.json",
+    "status": "archived",
+    "ticker": "ICICIBANK"
+  },
+  "ICICIBANK_ensemble_20260509_081339_101cad09": {
+    "archived_at": "2026-05-09T08:17:58.929603",
+    "checksum": "3d8a77a40cf0982ed6d9a8e9f999c28c8c9af4fa25dddec0c2615541a0dc5d98",
+    "created_at": "2026-05-09T08:13:39.860020",
+    "metadata": {
+      "auc": 0.4722419088117175,
+      "avg_fbeta": 0.11619308383892178,
+      "cpcv_p_sharpe": 0.16666666666666666,
+      "deployment_timestamp": "2026-05-09T08:13:39.859839",
+      "dsr": 2.6922225736943867e-81,
+      "mean_sharpe": -0.7483257268881666,
+      "worst_5pct_sharpe": -2.5244818106431732
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK/v5/metadata.json",
+    "status": "archived",
+    "ticker": "ICICIBANK"
+  },
+  "ICICIBANK_ensemble_20260509_081758_e83f874a": {
+    "archived_at": "2026-05-09T08:31:32.353005",
+    "checksum": "4adda7d0d6fdade6e942838fe5c58cc814f475c2ae7f000622e6a543f6214e93",
+    "created_at": "2026-05-09T08:17:58.929606",
+    "metadata": {
+      "auc": 0.4722419088117175,
+      "avg_fbeta": 0.11619308383892178,
+      "cpcv_p_sharpe": 0.16666666666666666,
+      "deployment_timestamp": "2026-05-09T08:17:58.929481",
+      "dsr": 2.6922225736943867e-81,
+      "mean_sharpe": -0.7483257268881666,
+      "worst_5pct_sharpe": -2.5244818106431732
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK/v6/metadata.json",
+    "status": "archived",
+    "ticker": "ICICIBANK"
+  },
+  "ICICIBANK_ensemble_20260509_083132_1ff9ee1f": {
+    "archived_at": "2026-05-09T08:44:20.035573",
+    "checksum": "79cc87ea72fd8a66fb677812c071bc342759080a10391adc2a01b4afafcf63fd",
+    "created_at": "2026-05-09T08:31:32.353014",
+    "metadata": {
+      "auc": 0.49542124542124544,
+      "avg_fbeta": 0.1718698494058621,
+      "cpcv_p_sharpe": 0.3157894736842105,
+      "deployment_timestamp": "2026-05-09T08:31:32.352687",
+      "dsr": 1.4336345630950738e-80,
+      "mean_sharpe": -0.6191174850607514,
+      "worst_5pct_sharpe": -2.4848191898794503
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK/v7/metadata.json",
+    "status": "archived",
+    "ticker": "ICICIBANK"
+  },
+  "ICICIBANK_ensemble_20260509_084420_6812426e": {
+    "archived_at": "2026-05-09T09:23:12.553039",
+    "checksum": "80102b3d66ecb01c0fe17b7fe618641b4f232c82e08e14d35319f21f92c6cf54",
+    "created_at": "2026-05-09T08:44:20.035578",
+    "metadata": {
+      "auc": 0.49473443223443225,
+      "avg_fbeta": 0.1718698494058621,
+      "cpcv_p_sharpe": 0.3157894736842105,
+      "deployment_timestamp": "2026-05-09T08:44:20.035441",
+      "dsr": 1.4336345630950738e-80,
+      "mean_sharpe": -0.6191174850607514,
+      "worst_5pct_sharpe": -2.4848191898794503
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK/v8/metadata.json",
+    "status": "archived",
+    "ticker": "ICICIBANK"
+  },
+  "ICICIBANK_ensemble_20260509_092312_60116064": {
+    "archived_at": "2026-05-09T09:36:52.055301",
+    "checksum": "d031ab6ad56eca5d338104fccf8ea1b58e59db6f93c3f70caeb78874afb08d81",
+    "created_at": "2026-05-09T09:23:12.553048",
+    "metadata": {
+      "auc": 0.49542124542124544,
+      "avg_fbeta": 0.1718698494058621,
+      "cpcv_p_sharpe": 0.3157894736842105,
+      "deployment_timestamp": "2026-05-09T09:23:12.552878",
+      "dsr": 1.4336345630950738e-80,
+      "mean_sharpe": -0.6191174850607514,
+      "worst_5pct_sharpe": -2.4848191898794503
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK/v8/metadata.json",
+    "status": "archived",
+    "ticker": "ICICIBANK"
+  },
+  "ICICIBANK_ensemble_20260509_093652_4e3569ab": {
+    "archived_at": "2026-05-09T09:46:26.237266",
+    "checksum": "18cbe14c6276efd1d890b979e55eb089ab49503aca9267343acb6ced66ce544e",
+    "created_at": "2026-05-09T09:36:52.055314",
+    "metadata": {
+      "auc": 0.49473443223443225,
+      "avg_fbeta": 0.1718698494058621,
+      "cpcv_p_sharpe": 0.3157894736842105,
+      "deployment_timestamp": "2026-05-09T09:36:52.055104",
+      "dsr": 1.4336345630950738e-80,
+      "mean_sharpe": -0.6191174850607514,
+      "worst_5pct_sharpe": -2.4848191898794503
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK/v9/metadata.json",
+    "status": "archived",
+    "ticker": "ICICIBANK"
+  },
+  "ICICIBANK_ensemble_20260509_094626_db54df4c": {
+    "archived_at": "2026-05-09T11:06:18.585742",
+    "checksum": "d9929b42be6006d250af50b44c3919b7c20d531abd5add2d5e19ee5bf81036a5",
+    "created_at": "2026-05-09T09:46:26.237273",
+    "metadata": {
+      "auc": 0.49473443223443225,
+      "avg_fbeta": 0.1718698494058621,
+      "cpcv_p_sharpe": 0.3157894736842105,
+      "deployment_timestamp": "2026-05-09T09:46:26.237094",
+      "dsr": 1.4336345630950738e-80,
+      "mean_sharpe": -0.6191174850607514,
+      "worst_5pct_sharpe": -2.4848191898794503
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK/v9/metadata.json",
+    "status": "archived",
+    "ticker": "ICICIBANK"
+  },
+  "ICICIBANK_ensemble_20260509_110618_4d1feeba": {
+    "archived_at": "2026-05-09T11:21:10.614700",
+    "checksum": "f92e213af9772492cb718c53ee44a56d4c82fc7fb9800ae6b7f1c1d672ee602e",
+    "created_at": "2026-05-09T11:06:18.585750",
+    "metadata": {
+      "auc": 0.49473443223443225,
+      "avg_fbeta": 0.1718698494058621,
+      "cpcv_p_sharpe": 0.3157894736842105,
+      "deployment_timestamp": "2026-05-09T11:06:18.585580",
+      "dsr": 1.4336345630950738e-80,
+      "mean_sharpe": -0.6191174850607514,
+      "worst_5pct_sharpe": -2.4848191898794503
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK/v10/metadata.json",
+    "status": "archived",
+    "ticker": "ICICIBANK"
+  },
+  "ICICIBANK_ensemble_20260509_112110_7ae58fdf": {
+    "archived_at": "2026-05-09T11:36:32.536926",
+    "checksum": "45f9a4587de4941c3fbbf0f78130152803e88aa2a262f71cc310d2c75945a562",
+    "created_at": "2026-05-09T11:21:10.614714",
+    "metadata": {
+      "auc": 0.42743221690590116,
+      "avg_fbeta": 0.41594304775987884,
+      "cpcv_p_sharpe": 0.20833333333333334,
+      "deployment_timestamp": "2026-05-09T11:21:10.614521",
+      "dsr": 6.243424924958005e-47,
+      "mean_sharpe": -0.07326712786997816,
+      "worst_5pct_sharpe": -1.7690569088505173
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK/v11/metadata.json",
+    "status": "archived",
+    "ticker": "ICICIBANK"
+  },
+  "ICICIBANK_ensemble_20260509_113632_dfec323f": {
+    "checksum": "7df15a995e91539d146ca0ab0897ca786a33a2c3ee4924548c7a64ff4f907a94",
+    "created_at": "2026-05-09T11:36:32.536938",
+    "metadata": {
+      "auc": 0.42743221690590116,
+      "avg_fbeta": 0.41594304775987884,
+      "cpcv_p_sharpe": 0.20833333333333334,
+      "deployment_timestamp": "2026-05-09T11:36:32.536667",
+      "dsr": 6.243424924958005e-47,
+      "mean_sharpe": -0.07326712786997816,
+      "worst_5pct_sharpe": -1.7690569088505173
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ICICIBANK/v11/metadata.json",
+    "status": "shadow",
+    "ticker": "ICICIBANK"
+  },
+  "IDEA_ensemble_20260509_090529_3c1bba63": {
+    "checksum": "897a23a21d2951be7b4b2caf08523134aedbc09b7e9419b452771c57517d7fcc",
+    "created_at": "2026-05-09T09:05:29.218850",
+    "metadata": {
+      "auc": 0.2622065727699531,
+      "avg_fbeta": 0.014637002341920375,
+      "cpcv_p_sharpe": 0.1111111111111111,
+      "deployment_timestamp": "2026-05-09T09:05:29.218634",
+      "dsr": 5.0625519577306895e-28,
+      "mean_sharpe": -1.2731478891071035,
+      "worst_5pct_sharpe": -2.573733920952911
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/IDEA/v1/metadata.json",
+    "status": "shadow",
+    "ticker": "IDEA"
+  },
+  "IDFCFIRSTB_ensemble_20260509_090255_4f891871": {
+    "checksum": "05eae40de045ac938fd45e3c97d80d736fe99df3b6fa87c58ce4f3a22bf66d7b",
+    "created_at": "2026-05-09T09:02:55.077388",
+    "metadata": {
+      "auc": 0.3652445369406868,
+      "avg_fbeta": 0.11329228424671925,
+      "cpcv_p_sharpe": 0.5714285714285714,
+      "deployment_timestamp": "2026-05-09T09:02:55.077234",
+      "dsr": 4.539843939324044e-16,
+      "mean_sharpe": 0.6597079042577508,
+      "worst_5pct_sharpe": -1.3957257256410018
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/IDFCFIRSTB/v1/metadata.json",
+    "status": "shadow",
+    "ticker": "IDFCFIRSTB"
+  },
+  "INFY_ensemble_20260509_073454_ea831ae4": {
+    "checksum": "ad8fad5b6812470ecfaf8fd3225f20fb7591e67ac22630d767aab844b3ea8266",
+    "created_at": "2026-05-09T07:34:54.621178",
+    "metadata": {
+      "auc": 0.46581920903954804,
+      "avg_fbeta": 0.17879122648615794,
+      "cpcv_p_sharpe": 0.5714285714285714,
+      "deployment_timestamp": "2026-05-09T07:34:54.621061",
+      "dsr": 7.606386013930528e-45,
+      "mean_sharpe": 0.532890459141056,
+      "worst_5pct_sharpe": -0.7333690438102487
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY/v1/metadata.json",
+    "status": "active",
+    "ticker": "INFY"
+  },
+  "INFY_ensemble_20260509_074454_97c1799a": {
+    "archived_at": "2026-05-09T07:50:46.050812",
+    "checksum": "9ae63d4985fb818afc6f56f6ca695ca664587956ff1869943cf01e8130141af7",
+    "created_at": "2026-05-09T07:44:54.245592",
+    "metadata": {
+      "auc": 0.43536231884057974,
+      "avg_fbeta": 0.16084421029414678,
+      "cpcv_p_sharpe": 0.10526315789473684,
+      "deployment_timestamp": "2026-05-09T07:44:54.245455",
+      "dsr": 5.739640262835345e-38,
+      "mean_sharpe": -0.6447134685978856,
+      "worst_5pct_sharpe": -2.4014232782364067
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY/v2/metadata.json",
+    "status": "archived",
+    "ticker": "INFY"
+  },
+  "INFY_ensemble_20260509_075046_977ab124": {
+    "archived_at": "2026-05-09T07:58:44.750752",
+    "checksum": "5b2e6cc3fcf3a61044ca48e2400927c9e15f684ef3c23749ad8a9779a30d04f6",
+    "created_at": "2026-05-09T07:50:46.050821",
+    "metadata": {
+      "auc": 0.42670454545454545,
+      "avg_fbeta": 0.10558455576616331,
+      "cpcv_p_sharpe": 0.125,
+      "deployment_timestamp": "2026-05-09T07:50:46.050447",
+      "dsr": 3.763722861246691e-51,
+      "mean_sharpe": -0.40694113926299635,
+      "worst_5pct_sharpe": -1.6765337958691113
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY/v3/metadata.json",
+    "status": "archived",
+    "ticker": "INFY"
+  },
+  "INFY_ensemble_20260509_075844_9c269f13": {
+    "archived_at": "2026-05-09T08:11:42.711494",
+    "checksum": "986c34e33fee235b6325ff7d951f9318b16b28d62b35fb4df4a81ee8e09e198e",
+    "created_at": "2026-05-09T07:58:44.750755",
+    "metadata": {
+      "auc": 0.42670454545454545,
+      "avg_fbeta": 0.10558455576616331,
+      "cpcv_p_sharpe": 0.125,
+      "deployment_timestamp": "2026-05-09T07:58:44.750610",
+      "dsr": 3.763722861246691e-51,
+      "mean_sharpe": -0.40694113926299635,
+      "worst_5pct_sharpe": -1.6765337958691113
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY/v4/metadata.json",
+    "status": "archived",
+    "ticker": "INFY"
+  },
+  "INFY_ensemble_20260509_081142_b7bbffc3": {
+    "archived_at": "2026-05-09T08:16:02.569118",
+    "checksum": "295e0c0157aa6ec0a2177f58706c604c6f0dd364a657543369835910ee053f5e",
+    "created_at": "2026-05-09T08:11:42.711498",
+    "metadata": {
+      "auc": 0.42670454545454545,
+      "avg_fbeta": 0.10558455576616331,
+      "cpcv_p_sharpe": 0.125,
+      "deployment_timestamp": "2026-05-09T08:11:42.711351",
+      "dsr": 3.763722861246691e-51,
+      "mean_sharpe": -0.40694113926299635,
+      "worst_5pct_sharpe": -1.6765337958691113
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY/v5/metadata.json",
+    "status": "archived",
+    "ticker": "INFY"
+  },
+  "INFY_ensemble_20260509_081602_6dcf0c4b": {
+    "archived_at": "2026-05-09T08:29:45.081970",
+    "checksum": "26b47d97e7fc547af0be264f761d6151cb80d776a21be720ab4026ab56eb8aae",
+    "created_at": "2026-05-09T08:16:02.569121",
+    "metadata": {
+      "auc": 0.42670454545454545,
+      "avg_fbeta": 0.10558455576616331,
+      "cpcv_p_sharpe": 0.125,
+      "deployment_timestamp": "2026-05-09T08:16:02.568971",
+      "dsr": 3.763722861246691e-51,
+      "mean_sharpe": -0.40694113926299635,
+      "worst_5pct_sharpe": -1.6765337958691113
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY/v6/metadata.json",
+    "status": "archived",
+    "ticker": "INFY"
+  },
+  "INFY_ensemble_20260509_082945_485061d1": {
+    "archived_at": "2026-05-09T08:41:56.597467",
+    "checksum": "63f472254206c0dd338ec02f495b50a205981fec0af67d74280637c9b29a05e1",
+    "created_at": "2026-05-09T08:29:45.081979",
+    "metadata": {
+      "auc": 0.4453973699256718,
+      "avg_fbeta": 0.04591362743536657,
+      "cpcv_p_sharpe": 0.14285714285714285,
+      "deployment_timestamp": "2026-05-09T08:29:45.081450",
+      "dsr": 2.0324283258344497e-46,
+      "mean_sharpe": -0.8316956046661297,
+      "worst_5pct_sharpe": -2.2225431838510907
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY/v7/metadata.json",
+    "status": "archived",
+    "ticker": "INFY"
+  },
+  "INFY_ensemble_20260509_084156_543a3cec": {
+    "archived_at": "2026-05-09T09:20:02.471120",
+    "checksum": "a17814f6c7b27c5cd9bb757b7e9bded814b8fbfe1babee1ff92b663afbaaa647",
+    "created_at": "2026-05-09T08:41:56.597472",
+    "metadata": {
+      "auc": 0.4453973699256718,
+      "avg_fbeta": 0.04591362743536657,
+      "cpcv_p_sharpe": 0.14285714285714285,
+      "deployment_timestamp": "2026-05-09T08:41:56.597323",
+      "dsr": 2.0324283258344497e-46,
+      "mean_sharpe": -0.8316956046661297,
+      "worst_5pct_sharpe": -2.2225431838510907
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY/v8/metadata.json",
+    "status": "archived",
+    "ticker": "INFY"
+  },
+  "INFY_ensemble_20260509_092002_a67a5b43": {
+    "archived_at": "2026-05-09T09:34:29.157951",
+    "checksum": "c39a1fa09619d72cd9249d2aed5fa7534d0a835d51882d85d3fc80a920d765f5",
+    "created_at": "2026-05-09T09:20:02.471126",
+    "metadata": {
+      "auc": 0.4453973699256718,
+      "avg_fbeta": 0.04591362743536657,
+      "cpcv_p_sharpe": 0.14285714285714285,
+      "deployment_timestamp": "2026-05-09T09:20:02.470954",
+      "dsr": 2.0324283258344497e-46,
+      "mean_sharpe": -0.8316956046661297,
+      "worst_5pct_sharpe": -2.2225431838510907
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY/v9/metadata.json",
+    "status": "archived",
+    "ticker": "INFY"
+  },
+  "INFY_ensemble_20260509_093429_175df670": {
+    "archived_at": "2026-05-09T09:42:14.858875",
+    "checksum": "c1ca0aebccf5f18a5eb3592e30d92146d2896c9e138c291bbebb8f1a0184d5fc",
+    "created_at": "2026-05-09T09:34:29.157956",
+    "metadata": {
+      "auc": 0.4453973699256718,
+      "avg_fbeta": 0.04591362743536657,
+      "cpcv_p_sharpe": 0.14285714285714285,
+      "deployment_timestamp": "2026-05-09T09:34:29.157807",
+      "dsr": 2.0324283258344497e-46,
+      "mean_sharpe": -0.8316956046661297,
+      "worst_5pct_sharpe": -2.2225431838510907
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY/v10/metadata.json",
+    "status": "archived",
+    "ticker": "INFY"
+  },
+  "INFY_ensemble_20260509_094214_ba58365e": {
+    "archived_at": "2026-05-09T11:03:37.819308",
+    "checksum": "9d54da0ac1d147faa2ac9666314d6b3f3b76c975f2f4425deba9861c560db6e3",
+    "created_at": "2026-05-09T09:42:14.858881",
+    "metadata": {
+      "auc": 0.4453973699256718,
+      "avg_fbeta": 0.04591362743536657,
+      "cpcv_p_sharpe": 0.14285714285714285,
+      "deployment_timestamp": "2026-05-09T09:42:14.858700",
+      "dsr": 2.0324283258344497e-46,
+      "mean_sharpe": -0.8316956046661297,
+      "worst_5pct_sharpe": -2.2225431838510907
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY/v11/metadata.json",
+    "status": "archived",
+    "ticker": "INFY"
+  },
+  "INFY_ensemble_20260509_110337_445ca1c6": {
+    "archived_at": "2026-05-09T11:16:27.376652",
+    "checksum": "ed72d530f771816499628b41ea28270791b30123d170bdb4902cc5dab899cefb",
+    "created_at": "2026-05-09T11:03:37.819315",
+    "metadata": {
+      "auc": 0.4453973699256718,
+      "avg_fbeta": 0.04591362743536657,
+      "cpcv_p_sharpe": 0.14285714285714285,
+      "deployment_timestamp": "2026-05-09T11:03:37.819147",
+      "dsr": 2.0324283258344497e-46,
+      "mean_sharpe": -0.8316956046661297,
+      "worst_5pct_sharpe": -2.2225431838510907
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY/v11/metadata.json",
+    "status": "archived",
+    "ticker": "INFY"
+  },
+  "INFY_ensemble_20260509_111627_4042144d": {
+    "archived_at": "2026-05-09T11:19:41.556860",
+    "checksum": "8cd2fb5cc90ceb504ad4bee484731a5532bd8ee52dc4c54479fc6ed27f026782",
+    "created_at": "2026-05-09T11:16:27.376658",
+    "metadata": {
+      "auc": 0.4453973699256718,
+      "avg_fbeta": 0.04591362743536657,
+      "cpcv_p_sharpe": 0.14285714285714285,
+      "deployment_timestamp": "2026-05-09T11:16:27.376507",
+      "dsr": 2.0324283258344497e-46,
+      "mean_sharpe": -0.8316956046661297,
+      "worst_5pct_sharpe": -2.2225431838510907
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY/v11/metadata.json",
+    "status": "archived",
+    "ticker": "INFY"
+  },
+  "INFY_ensemble_20260509_111941_1ba671e2": {
+    "archived_at": "2026-05-09T11:34:49.971178",
+    "checksum": "95825722109685c43624e736aff8d99e0bb5c2159a7956218090643ce44358be",
+    "created_at": "2026-05-09T11:19:41.556868",
+    "metadata": {
+      "auc": 0.4507168458781362,
+      "avg_fbeta": 0.049028822055137845,
+      "cpcv_p_sharpe": 0.25,
+      "deployment_timestamp": "2026-05-09T11:19:41.556696",
+      "dsr": 0.0,
+      "mean_sharpe": -1.4876025425875907,
+      "worst_5pct_sharpe": -4.535875158408658
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY/v12/metadata.json",
+    "status": "archived",
+    "ticker": "INFY"
+  },
+  "INFY_ensemble_20260509_113449_91062196": {
+    "checksum": "7e2c9591ef056868b207f84d2dcd3375ada7d3ebe7d669f2277435b9a6b4f602",
+    "created_at": "2026-05-09T11:34:49.971185",
+    "metadata": {
+      "auc": 0.4507168458781362,
+      "avg_fbeta": 0.049028822055137845,
+      "cpcv_p_sharpe": 0.25,
+      "deployment_timestamp": "2026-05-09T11:34:49.971031",
+      "dsr": 0.0,
+      "mean_sharpe": -1.4876025425875907,
+      "worst_5pct_sharpe": -4.535875158408658
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/INFY/v13/metadata.json",
+    "status": "shadow",
+    "ticker": "INFY"
+  },
+  "ITC_ensemble_20260509_082020_fc8c3ae5": {
+    "archived_at": "2026-05-09T08:33:59.087634",
+    "checksum": "df06c5b61b9c1f4d8bd074173c44f064c1bc36f94203161106a450a6068d4d79",
+    "created_at": "2026-05-09T08:20:20.105903",
+    "metadata": {
+      "auc": 0.37228070175438593,
+      "avg_fbeta": 0.034454236239950524,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-09T08:20:20.105746",
+      "dsr": 8.602468028177767e-99,
+      "mean_sharpe": -1.2721469772298024,
+      "worst_5pct_sharpe": -3.1927932334507663
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ITC/v1/metadata.json",
+    "status": "archived",
+    "ticker": "ITC"
+  },
+  "ITC_ensemble_20260509_083359_36a867eb": {
+    "archived_at": "2026-05-09T08:46:58.615082",
+    "checksum": "3d3e5fcc422dc112ae541c6be65e2350878314ea389199273ebbd1f6ea99c941",
+    "created_at": "2026-05-09T08:33:59.087639",
+    "metadata": {
+      "auc": 0.35385964912280704,
+      "avg_fbeta": 0.050863756022706395,
+      "cpcv_p_sharpe": 0.13333333333333333,
+      "deployment_timestamp": "2026-05-09T08:33:59.087462",
+      "dsr": 1.3277951604192122e-85,
+      "mean_sharpe": -0.9817437882639536,
+      "worst_5pct_sharpe": -2.6883422185269272
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ITC/v2/metadata.json",
+    "status": "archived",
+    "ticker": "ITC"
+  },
+  "ITC_ensemble_20260509_084658_9fc74e9f": {
+    "archived_at": "2026-05-09T09:29:13.661730",
+    "checksum": "174763e5cb70b0f91f4bc1fd4d610f336ef0a63870c6bf35a426157853c3ee60",
+    "created_at": "2026-05-09T08:46:58.615087",
+    "metadata": {
+      "auc": 0.35456140350877197,
+      "avg_fbeta": 0.034017394836722566,
+      "cpcv_p_sharpe": 0.13333333333333333,
+      "deployment_timestamp": "2026-05-09T08:46:58.614932",
+      "dsr": 1.3277951604192122e-85,
+      "mean_sharpe": -0.9559802618107432,
+      "worst_5pct_sharpe": -2.6883422185269272
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ITC/v3/metadata.json",
+    "status": "archived",
+    "ticker": "ITC"
+  },
+  "ITC_ensemble_20260509_092913_4a7f14b3": {
+    "archived_at": "2026-05-09T09:50:44.507699",
+    "checksum": "49421084547162567d80b5e6ae2b905bfdd00933ec9df01764b7ccf94711f09a",
+    "created_at": "2026-05-09T09:29:13.661735",
+    "metadata": {
+      "auc": 0.35385964912280704,
+      "avg_fbeta": 0.050863756022706395,
+      "cpcv_p_sharpe": 0.13333333333333333,
+      "deployment_timestamp": "2026-05-09T09:29:13.661496",
+      "dsr": 1.3277951604192122e-85,
+      "mean_sharpe": -0.9817437882639536,
+      "worst_5pct_sharpe": -2.6883422185269272
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ITC/v3/metadata.json",
+    "status": "archived",
+    "ticker": "ITC"
+  },
+  "ITC_ensemble_20260509_095044_190f8fe9": {
+    "archived_at": "2026-05-09T11:10:26.760905",
+    "checksum": "092719624478d9f93a90cc432b023888e516077d526228c7c0c360b351797008",
+    "created_at": "2026-05-09T09:50:44.507709",
+    "metadata": {
+      "auc": 0.35456140350877197,
+      "avg_fbeta": 0.034017394836722566,
+      "cpcv_p_sharpe": 0.13333333333333333,
+      "deployment_timestamp": "2026-05-09T09:50:44.507484",
+      "dsr": 1.3277951604192122e-85,
+      "mean_sharpe": -0.9559802618107432,
+      "worst_5pct_sharpe": -2.6883422185269272
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ITC/v4/metadata.json",
+    "status": "archived",
+    "ticker": "ITC"
+  },
+  "ITC_ensemble_20260509_111026_c9d7d713": {
+    "archived_at": "2026-05-09T11:25:51.405349",
+    "checksum": "291ac05542b8779008ca296b9f1701661ca3556e48ecd777ff7dd4ebfbb2ef20",
+    "created_at": "2026-05-09T11:10:26.760916",
+    "metadata": {
+      "auc": 0.35456140350877197,
+      "avg_fbeta": 0.034017394836722566,
+      "cpcv_p_sharpe": 0.13333333333333333,
+      "deployment_timestamp": "2026-05-09T11:10:26.760709",
+      "dsr": 1.3277951604192122e-85,
+      "mean_sharpe": -0.9559802618107432,
+      "worst_5pct_sharpe": -2.6883422185269272
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ITC/v5/metadata.json",
+    "status": "archived",
+    "ticker": "ITC"
+  },
+  "ITC_ensemble_20260509_112551_c4f2e4c7": {
+    "archived_at": "2026-05-09T11:38:21.645167",
+    "checksum": "1b9d59de0bc3614ab6a34fdc38698867ecbeebeb050e1b25a535db2602d6f0ef",
+    "created_at": "2026-05-09T11:25:51.405357",
+    "metadata": {
+      "auc": 0.34454358270418667,
+      "avg_fbeta": 0.10144972763253383,
+      "cpcv_p_sharpe": 0.08333333333333333,
+      "deployment_timestamp": "2026-05-09T11:25:51.405179",
+      "dsr": 5.431778351262673e-37,
+      "mean_sharpe": -1.6936120246284299,
+      "worst_5pct_sharpe": -3.888329154667962
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ITC/v5/metadata.json",
+    "status": "archived",
+    "ticker": "ITC"
+  },
+  "ITC_ensemble_20260509_113821_dfaf56cd": {
+    "checksum": "a914d9487bf853bf4004b7f8d7d997c1b4950054063c0521bd5276456e5b1816",
+    "created_at": "2026-05-09T11:38:21.645173",
+    "metadata": {
+      "auc": 0.34454358270418667,
+      "avg_fbeta": 0.10144972763253383,
+      "cpcv_p_sharpe": 0.08333333333333333,
+      "deployment_timestamp": "2026-05-09T11:38:21.645032",
+      "dsr": 5.431778351262673e-37,
+      "mean_sharpe": -1.6936120246284299,
+      "worst_5pct_sharpe": -3.888329154667962
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/ITC/v6/metadata.json",
+    "status": "shadow",
+    "ticker": "ITC"
+  },
+  "KOTAKBANK_ensemble_20260509_084925_00dae0ca": {
+    "archived_at": "2026-05-09T09:31:31.984461",
+    "checksum": "c6f92e66c26f4ddf2defa4a8cca857affdbdf7051cd0caba61d2905a83bfff28",
+    "created_at": "2026-05-09T08:49:25.083216",
+    "metadata": {
+      "auc": 0.4249378466245936,
+      "avg_fbeta": 0.058336676554496536,
+      "cpcv_p_sharpe": 0.25,
+      "deployment_timestamp": "2026-05-09T08:49:25.082969",
+      "dsr": 0.0028216507996298677,
+      "mean_sharpe": -0.5671086105800198,
+      "worst_5pct_sharpe": -1.7540933165191743
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/KOTAKBANK/v1/metadata.json",
+    "status": "archived",
+    "ticker": "KOTAKBANK"
+  },
+  "KOTAKBANK_ensemble_20260509_093131_abf2538f": {
+    "archived_at": "2026-05-09T11:28:16.183933",
+    "checksum": "f1a765b130d4de53d475d48055b3c5b55d0599535a30e6bfd3da152b0d10a1e5",
+    "created_at": "2026-05-09T09:31:31.984465",
+    "metadata": {
+      "auc": 0.413463377318799,
+      "avg_fbeta": 0.06779293547315833,
+      "cpcv_p_sharpe": 0.25,
+      "deployment_timestamp": "2026-05-09T09:31:31.984254",
+      "dsr": 9.130677195079104e-146,
+      "mean_sharpe": -0.6703198151142986,
+      "worst_5pct_sharpe": -1.7123943645698216
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/KOTAKBANK/v2/metadata.json",
+    "status": "archived",
+    "ticker": "KOTAKBANK"
+  },
+  "KOTAKBANK_ensemble_20260509_112816_8725644a": {
+    "archived_at": "2026-05-09T11:39:45.610278",
+    "checksum": "ce2709c8bc14cf3669ae3429e5b08fa290d588ce399b8f76a031d5e455546e82",
+    "created_at": "2026-05-09T11:28:16.183939",
+    "metadata": {
+      "auc": 0.5575880758807589,
+      "avg_fbeta": 0.18131438588182322,
+      "cpcv_p_sharpe": 0.3333333333333333,
+      "deployment_timestamp": "2026-05-09T11:28:16.183800",
+      "dsr": 1.5468972097060016e-70,
+      "mean_sharpe": 0.3485817003046421,
+      "worst_5pct_sharpe": -1.0037159285728445
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/KOTAKBANK/v2/metadata.json",
+    "status": "archived",
+    "ticker": "KOTAKBANK"
+  },
+  "KOTAKBANK_ensemble_20260509_113945_41f59967": {
+    "checksum": "a5cc829ad5671ddd956bd07698b6b0945ecfe23e97616647d8454617e0ada7ba",
+    "created_at": "2026-05-09T11:39:45.610287",
+    "metadata": {
+      "auc": 0.5575880758807589,
+      "avg_fbeta": 0.18131438588182322,
+      "cpcv_p_sharpe": 0.3333333333333333,
+      "deployment_timestamp": "2026-05-09T11:39:45.610120",
+      "dsr": 1.5468972097060016e-70,
+      "mean_sharpe": 0.3485817003046421,
+      "worst_5pct_sharpe": -1.0037159285728445
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/KOTAKBANK/v2/metadata.json",
+    "status": "shadow",
+    "ticker": "KOTAKBANK"
+  },
+  "LT_ensemble_20260509_084652_f88cc13a": {
+    "archived_at": "2026-05-09T09:28:19.583595",
+    "checksum": "d18000bfbc53cd171748f41119e3623ea9fcc022e952bc97b5e31a1a8181b085",
+    "created_at": "2026-05-09T08:46:52.613327",
+    "metadata": {
+      "auc": 0.592679794520548,
+      "avg_fbeta": 0.5679551439008922,
+      "cpcv_p_sharpe": 0.8148148148148148,
+      "deployment_timestamp": "2026-05-09T08:46:52.613135",
+      "dsr": 0.10423911766345662,
+      "mean_sharpe": 1.233352639975362,
+      "worst_5pct_sharpe": -0.10989582123614755
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/LT/v1/metadata.json",
+    "status": "archived",
+    "ticker": "LT"
+  },
+  "LT_ensemble_20260509_092819_abee63e3": {
+    "archived_at": "2026-05-09T09:50:42.161470",
+    "checksum": "7e2780e08ef82bb9df4f73d660eb27a4adcb6a8806ff9f18c3f13f3e56ad5943",
+    "created_at": "2026-05-09T09:28:19.583600",
+    "metadata": {
+      "auc": 0.5931078767123287,
+      "avg_fbeta": 0.5679551439008922,
+      "cpcv_p_sharpe": 0.8148148148148148,
+      "deployment_timestamp": "2026-05-09T09:28:19.583458",
+      "dsr": 0.10423911766345662,
+      "mean_sharpe": 1.233352639975362,
+      "worst_5pct_sharpe": -0.10989582123614755
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/LT/v2/metadata.json",
+    "status": "archived",
+    "ticker": "LT"
+  },
+  "LT_ensemble_20260509_095042_b8be03c6": {
+    "archived_at": "2026-05-09T11:10:43.863367",
+    "checksum": "575078983b5d84b4f43ca25be118d5035be411751af4c2733a06e7a0cfe61602",
+    "created_at": "2026-05-09T09:50:42.161479",
+    "metadata": {
+      "auc": 0.592679794520548,
+      "avg_fbeta": 0.5679551439008922,
+      "cpcv_p_sharpe": 0.8148148148148148,
+      "deployment_timestamp": "2026-05-09T09:50:42.161221",
+      "dsr": 0.10423911766345662,
+      "mean_sharpe": 1.233352639975362,
+      "worst_5pct_sharpe": -0.10989582123614755
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/LT/v2/metadata.json",
+    "status": "archived",
+    "ticker": "LT"
+  },
+  "LT_ensemble_20260509_111043_4d55bd6e": {
+    "archived_at": "2026-05-09T11:25:29.063180",
+    "checksum": "a15ec029065426d18abecee8c84e985e6209866cebdac4847c70ef89415e705b",
+    "created_at": "2026-05-09T11:10:43.863374",
+    "metadata": {
+      "auc": 0.592679794520548,
+      "avg_fbeta": 0.5679551439008922,
+      "cpcv_p_sharpe": 0.8148148148148148,
+      "deployment_timestamp": "2026-05-09T11:10:43.863214",
+      "dsr": 0.10423911766345662,
+      "mean_sharpe": 1.233352639975362,
+      "worst_5pct_sharpe": -0.10989582123614755
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/LT/v2/metadata.json",
+    "status": "archived",
+    "ticker": "LT"
+  },
+  "LT_ensemble_20260509_112529_d3cfdaf9": {
+    "archived_at": "2026-05-09T11:38:10.708580",
+    "checksum": "aaf485dc22f4b88ac9865101737b4ad0dfe851b8e551954e333774ddf4b9452f",
+    "created_at": "2026-05-09T11:25:29.063190",
+    "metadata": {
+      "auc": 0.3232142857142857,
+      "avg_fbeta": 0.7251765957379182,
+      "cpcv_p_sharpe": 0.8214285714285714,
+      "deployment_timestamp": "2026-05-09T11:25:29.062956",
+      "dsr": 0.9999938294565054,
+      "mean_sharpe": 2.7470415613725736,
+      "worst_5pct_sharpe": -0.23585450160989313
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/LT/v3/metadata.json",
+    "status": "archived",
+    "ticker": "LT"
+  },
+  "LT_ensemble_20260509_113810_44feadca": {
+    "checksum": "800631b59f27fa3713ed596ee06067a2b0b68000845cdc4d29fde2feb316c61a",
+    "created_at": "2026-05-09T11:38:10.708587",
+    "metadata": {
+      "auc": 0.3232142857142857,
+      "avg_fbeta": 0.7251765957379182,
+      "cpcv_p_sharpe": 0.8214285714285714,
+      "deployment_timestamp": "2026-05-09T11:38:10.708423",
+      "dsr": 0.9999938294565054,
+      "mean_sharpe": 2.7470415613725736,
+      "worst_5pct_sharpe": -0.23585450160989313
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/LT/v3/metadata.json",
+    "status": "active",
+    "ticker": "LT"
+  },
+  "LUPIN_ensemble_20260509_090240_203940cf": {
+    "checksum": "6e52616cca3e365df660093710b2f6fba2e979aa5d43230b788c3855f28b7d75",
+    "created_at": "2026-05-09T09:02:40.945167",
+    "metadata": {
+      "auc": 0.5794991263832265,
+      "avg_fbeta": 0.022862918752406623,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-09T09:02:40.944910",
+      "dsr": 2.2857266333335215e-22,
+      "mean_sharpe": -1.515976404377271,
+      "worst_5pct_sharpe": -2.414199807385528
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/LUPIN/v1/metadata.json",
+    "status": "shadow",
+    "ticker": "LUPIN"
+  },
+  "MARUTI_ensemble_20260509_081924_49ef0814": {
+    "archived_at": "2026-05-09T08:33:00.724519",
+    "checksum": "c84c3050ccbc68ed5caa197bd5bee8701d29347c620ebe49d4b273cb2f6ebbac",
+    "created_at": "2026-05-09T08:19:24.589143",
+    "metadata": {
+      "auc": 0.46996245306633294,
+      "avg_fbeta": 0.012458471760797342,
+      "cpcv_p_sharpe": 0.2,
+      "deployment_timestamp": "2026-05-09T08:19:24.588993",
+      "dsr": 0.0,
+      "mean_sharpe": -0.8893677620977833,
+      "worst_5pct_sharpe": -2.140953153575162
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/MARUTI/v1/metadata.json",
+    "status": "archived",
+    "ticker": "MARUTI"
+  },
+  "MARUTI_ensemble_20260509_083300_8db2e0ba": {
+    "checksum": "75818388bc5cd7bad530af1ce08cbf736ad2254fe00fafa8898c27f6ede3ba35",
+    "created_at": "2026-05-09T08:33:00.724524",
+    "metadata": {
+      "auc": 0.4882133995037221,
+      "avg_fbeta": 0.013227513227513227,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-09T08:33:00.724395",
+      "dsr": 0.0,
+      "mean_sharpe": -0.9032390252394245,
+      "worst_5pct_sharpe": -2.2366916796569996
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/MARUTI/v2/metadata.json",
+    "status": "shadow",
+    "ticker": "MARUTI"
+  },
+  "MOTHERSON_ensemble_20260509_090534_b70b82a8": {
+    "checksum": "47208ae1491cbdcd995c8e0c70ac456f249c964b555c382811cd639bd254d4ed",
+    "created_at": "2026-05-09T09:05:34.297217",
+    "metadata": {
+      "auc": 0.45177530471648114,
+      "avg_fbeta": 0.12996625678154153,
+      "cpcv_p_sharpe": 0.3333333333333333,
+      "deployment_timestamp": "2026-05-09T09:05:34.297065",
+      "dsr": 2.050077328847099e-86,
+      "mean_sharpe": 0.18008501606389857,
+      "worst_5pct_sharpe": -1.0658621768922265
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/MOTHERSON/v1/metadata.json",
+    "status": "shadow",
+    "ticker": "MOTHERSON"
+  },
+  "PERSISTENT_ensemble_20260509_090045_67e0171f": {
+    "checksum": "7a9b3caaa52216961f0e906d5c189740b5fc1ab0d3102bd94c684b386dbd4e7e",
+    "created_at": "2026-05-09T09:00:45.602942",
+    "metadata": {
+      "auc": 0.3988290398126464,
+      "avg_fbeta": 0.2995988832664987,
+      "cpcv_p_sharpe": 0.6521739130434783,
+      "deployment_timestamp": "2026-05-09T09:00:45.602701",
+      "dsr": 2.6596719670581046e-07,
+      "mean_sharpe": 0.9360997510634712,
+      "worst_5pct_sharpe": -0.49463426368355495
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/PERSISTENT/v1/metadata.json",
+    "status": "active",
+    "ticker": "PERSISTENT"
+  },
+  "PNB_ensemble_20260509_085627_884e1969": {
+    "archived_at": "2026-05-09T11:45:30.729477",
+    "checksum": "34c75bab3adfb2c4eb263c3bb0f51b987973d4fc6fe6557cbc6d7446e4a9d117",
+    "created_at": "2026-05-09T08:56:27.991941",
+    "metadata": {
+      "auc": 0.4667571234735414,
+      "avg_fbeta": 0.3807510631682159,
+      "cpcv_p_sharpe": 0.6153846153846154,
+      "deployment_timestamp": "2026-05-09T08:56:27.991810",
+      "dsr": 1.0326508843190272e-48,
+      "mean_sharpe": 0.6584889334486113,
+      "worst_5pct_sharpe": -0.6375534532441325
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/PNB/v1/metadata.json",
+    "status": "archived",
+    "ticker": "PNB"
+  },
+  "PNB_ensemble_20260509_114530_9fd27ff0": {
+    "checksum": "0be581259ea7bd273383b8b33fcc4a1f82de963eb4cd5f6b0777295bbebc5041",
+    "created_at": "2026-05-09T11:45:30.729489",
+    "metadata": {
+      "auc": 0.37456140350877193,
+      "avg_fbeta": 0.5304072513299783,
+      "cpcv_p_sharpe": 0.5925925925925926,
+      "deployment_timestamp": "2026-05-09T11:45:30.729281",
+      "dsr": 7.185217744297334e-14,
+      "mean_sharpe": 0.7979742378506635,
+      "worst_5pct_sharpe": -0.579909535111339
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/PNB/v1/metadata.json",
+    "status": "active",
+    "ticker": "PNB"
+  },
+  "RELIANCE_ensemble_20260509_072327_28a1ee4b": {
+    "archived_at": "2026-05-09T07:35:50.595910",
+    "checksum": "f746ddc38336f63007d51cbdd01706e29d0716ed793e50d73b8faec80fe3f20c",
+    "created_at": "2026-05-09T07:23:27.014748",
+    "metadata": {
+      "auc": 0.24814814814814815,
+      "avg_fbeta": 0.0,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-09T07:23:27.014629",
+      "dsr": 0.0,
+      "mean_sharpe": -99.0,
+      "worst_5pct_sharpe": -99.0
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v1/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_073550_76df384c": {
+    "archived_at": "2026-05-09T07:46:27.283998",
+    "checksum": "f511754e80ff1648a2ca23c820998b440c40cfb26227040309bf273ac17f27ec",
+    "created_at": "2026-05-09T07:35:50.595918",
+    "metadata": {
+      "auc": 0.5177787532923617,
+      "avg_fbeta": 0.16554300085341597,
+      "cpcv_p_sharpe": 0.3333333333333333,
+      "deployment_timestamp": "2026-05-09T07:35:50.595555",
+      "dsr": 1.2973876643680914e-116,
+      "mean_sharpe": 0.010894174400772035,
+      "worst_5pct_sharpe": -1.941427525445911
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v2/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_074627_34b3798b": {
+    "archived_at": "2026-05-09T07:51:49.448355",
+    "checksum": "c34a0190ef9e31e4b2084c2926b3b90637331ca9399b9c7413996c49e75697c1",
+    "created_at": "2026-05-09T07:46:27.284002",
+    "metadata": {
+      "auc": 0.3562472010747873,
+      "avg_fbeta": 0.1435179194324841,
+      "cpcv_p_sharpe": 0.23809523809523808,
+      "deployment_timestamp": "2026-05-09T07:46:27.283853",
+      "dsr": 3.9174016176585426e-71,
+      "mean_sharpe": -0.7070411702305832,
+      "worst_5pct_sharpe": -2.398829539204899
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v3/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_075149_4aad5189": {
+    "archived_at": "2026-05-09T07:59:40.283996",
+    "checksum": "8dcfc66092fb89f64bc332a355f31c28b5d43516b962b6f031f751febdb798a2",
+    "created_at": "2026-05-09T07:51:49.448359",
+    "metadata": {
+      "auc": 0.3615384615384616,
+      "avg_fbeta": 0.14957744222011657,
+      "cpcv_p_sharpe": 0.1111111111111111,
+      "deployment_timestamp": "2026-05-09T07:51:49.448187",
+      "dsr": 6.674962249309411e-117,
+      "mean_sharpe": -0.8158236693650687,
+      "worst_5pct_sharpe": -2.1506121813302457
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v4/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_075940_3454dc14": {
+    "archived_at": "2026-05-09T08:12:41.342000",
+    "checksum": "f8d5a30a7f56f65d6206064d34901bdea5b65ebc5f2571090a1f9040bed7b62f",
+    "created_at": "2026-05-09T07:59:40.283998",
+    "metadata": {
+      "auc": 0.3615384615384616,
+      "avg_fbeta": 0.14957744222011657,
+      "cpcv_p_sharpe": 0.1111111111111111,
+      "deployment_timestamp": "2026-05-09T07:59:40.283877",
+      "dsr": 6.674962249309411e-117,
+      "mean_sharpe": -0.8158236693650687,
+      "worst_5pct_sharpe": -2.1506121813302457
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v5/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_081241_57e15daf": {
+    "archived_at": "2026-05-09T08:17:00.405682",
+    "checksum": "0c94d32c4951cc393f18c9416c121f5ec468a83d30848c682325795e54ca6483",
+    "created_at": "2026-05-09T08:12:41.342003",
+    "metadata": {
+      "auc": 0.3615384615384616,
+      "avg_fbeta": 0.14957744222011657,
+      "cpcv_p_sharpe": 0.1111111111111111,
+      "deployment_timestamp": "2026-05-09T08:12:41.341851",
+      "dsr": 6.674962249309411e-117,
+      "mean_sharpe": -0.8158236693650687,
+      "worst_5pct_sharpe": -2.1506121813302457
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v6/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_081700_071310b3": {
+    "archived_at": "2026-05-09T08:30:36.345846",
+    "checksum": "326b673ad66824d9599fa913829d956562350dda4951a5e0a939e496b34b83b6",
+    "created_at": "2026-05-09T08:17:00.405688",
+    "metadata": {
+      "auc": 0.3615384615384616,
+      "avg_fbeta": 0.14957744222011657,
+      "cpcv_p_sharpe": 0.1111111111111111,
+      "deployment_timestamp": "2026-05-09T08:17:00.405443",
+      "dsr": 6.674962249309411e-117,
+      "mean_sharpe": -0.8158236693650687,
+      "worst_5pct_sharpe": -2.1506121813302457
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v7/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_083036_52ca2229": {
+    "archived_at": "2026-05-09T08:42:33.233511",
+    "checksum": "47950c5df73055e04a0ff7354dc0e39f8241e1f38ecc55d9ea4e5d560b4ea77d",
+    "created_at": "2026-05-09T08:30:36.345849",
+    "metadata": {
+      "auc": 0.3572683355292051,
+      "avg_fbeta": 0.12205847349216489,
+      "cpcv_p_sharpe": 0.1111111111111111,
+      "deployment_timestamp": "2026-05-09T08:30:36.345691",
+      "dsr": 4.814880727405403e-94,
+      "mean_sharpe": -1.0417916327465762,
+      "worst_5pct_sharpe": -2.319573250237105
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v8/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_084233_715212f6": {
+    "archived_at": "2026-05-09T09:20:02.330996",
+    "checksum": "fa5f22ded747bd2ae3d5743ec67e7b881ec4a97947cf2ace90e6feec8c9628d3",
+    "created_at": "2026-05-09T08:42:33.233518",
+    "metadata": {
+      "auc": 0.35792709705753184,
+      "avg_fbeta": 0.13915573792985486,
+      "cpcv_p_sharpe": 0.1111111111111111,
+      "deployment_timestamp": "2026-05-09T08:42:33.233270",
+      "dsr": 6.528372810183061e-97,
+      "mean_sharpe": -1.0072073504914363,
+      "worst_5pct_sharpe": -2.319573250237105
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v9/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_092002_eb70e7d5": {
+    "archived_at": "2026-05-09T09:34:29.145656",
+    "checksum": "709160c672dd578d6a585bb1f9721e0d8d55febb8f93f0d3e9c01de7a8f3cfbd",
+    "created_at": "2026-05-09T09:20:02.331002",
+    "metadata": {
+      "auc": 0.3572683355292051,
+      "avg_fbeta": 0.12205847349216489,
+      "cpcv_p_sharpe": 0.1111111111111111,
+      "deployment_timestamp": "2026-05-09T09:20:02.330792",
+      "dsr": 4.814880727405403e-94,
+      "mean_sharpe": -1.0417916327465762,
+      "worst_5pct_sharpe": -2.319573250237105
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v9/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_093429_17dff7ca": {
+    "archived_at": "2026-05-09T09:42:14.388596",
+    "checksum": "ef6fb1d6b76cde74e6776ece79aa9b3d4359c4ce970cf284b1c1cd690e275768",
+    "created_at": "2026-05-09T09:34:29.145660",
+    "metadata": {
+      "auc": 0.35792709705753184,
+      "avg_fbeta": 0.13915573792985486,
+      "cpcv_p_sharpe": 0.1111111111111111,
+      "deployment_timestamp": "2026-05-09T09:34:29.145507",
+      "dsr": 6.528372810183061e-97,
+      "mean_sharpe": -1.0072073504914363,
+      "worst_5pct_sharpe": -2.319573250237105
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v9/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_094214_769e0482": {
+    "archived_at": "2026-05-09T10:57:12.197480",
+    "checksum": "82ea982de7929e559112b2746fbc0ea55350d77ccf20439e6b7bea16aa0fca8a",
+    "created_at": "2026-05-09T09:42:14.388600",
+    "metadata": {
+      "auc": 0.35792709705753184,
+      "avg_fbeta": 0.13915573792985486,
+      "cpcv_p_sharpe": 0.1111111111111111,
+      "deployment_timestamp": "2026-05-09T09:42:14.388450",
+      "dsr": 6.528372810183061e-97,
+      "mean_sharpe": -1.0072073504914363,
+      "worst_5pct_sharpe": -2.319573250237105
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v9/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_105712_bea683af": {
+    "archived_at": "2026-05-09T11:03:37.550923",
+    "checksum": "8d9ccfb266fa24bd06721f80bae9d39d0889d5a217e431ce76de326bb94a74e1",
+    "created_at": "2026-05-09T10:57:12.197484",
+    "metadata": {
+      "auc": 0.35792709705753184,
+      "avg_fbeta": 0.13915573792985486,
+      "cpcv_p_sharpe": 0.1111111111111111,
+      "deployment_timestamp": "2026-05-09T10:57:12.197322",
+      "dsr": 6.528372810183061e-97,
+      "mean_sharpe": -1.0072073504914363,
+      "worst_5pct_sharpe": -2.319573250237105
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v9/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_110337_50a39b88": {
+    "archived_at": "2026-05-09T11:16:24.284375",
+    "checksum": "506124cdd9e002d54156813091840177bd33ba8f0930f517ac5cd816aeeac579",
+    "created_at": "2026-05-09T11:03:37.550928",
+    "metadata": {
+      "auc": 0.35792709705753184,
+      "avg_fbeta": 0.13915573792985486,
+      "cpcv_p_sharpe": 0.1111111111111111,
+      "deployment_timestamp": "2026-05-09T11:03:37.550777",
+      "dsr": 6.528372810183061e-97,
+      "mean_sharpe": -1.0072073504914363,
+      "worst_5pct_sharpe": -2.319573250237105
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v10/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_111624_b9004ff3": {
+    "archived_at": "2026-05-09T11:19:41.510352",
+    "checksum": "f65c9b2925d4295788fe8967724ce104624fd1acbd3898d5eb055659c7799bb2",
+    "created_at": "2026-05-09T11:16:24.284379",
+    "metadata": {
+      "auc": 0.35792709705753184,
+      "avg_fbeta": 0.13915573792985486,
+      "cpcv_p_sharpe": 0.1111111111111111,
+      "deployment_timestamp": "2026-05-09T11:16:24.284217",
+      "dsr": 6.528372810183061e-97,
+      "mean_sharpe": -1.0072073504914363,
+      "worst_5pct_sharpe": -2.319573250237105
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v10/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_111941_9837171a": {
+    "archived_at": "2026-05-09T11:34:55.189332",
+    "checksum": "2dd517b657cadc1580868c258e1aff68ecaab709d4b2d01f8c197f28ecf71683",
+    "created_at": "2026-05-09T11:19:41.510356",
+    "metadata": {
+      "auc": 0.30047694753577103,
+      "avg_fbeta": 0.17146904289896298,
+      "cpcv_p_sharpe": 0.21428571428571427,
+      "deployment_timestamp": "2026-05-09T11:19:41.510206",
+      "dsr": 4.272486639399974e-48,
+      "mean_sharpe": -1.4283906273867935,
+      "worst_5pct_sharpe": -4.3307577433976565
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v10/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_113455_15af747d": {
+    "archived_at": "2026-05-09T12:01:47.682249",
+    "checksum": "1995d73b19e50a0ed17a6641d61a9f0fd25c968e7b898d80bf848742a7e044f8",
+    "created_at": "2026-05-09T11:34:55.189336",
+    "metadata": {
+      "auc": 0.30047694753577103,
+      "avg_fbeta": 0.17146904289896298,
+      "cpcv_p_sharpe": 0.21428571428571427,
+      "deployment_timestamp": "2026-05-09T11:34:55.189188",
+      "dsr": 4.272486639399974e-48,
+      "mean_sharpe": -1.4283906273867935,
+      "worst_5pct_sharpe": -4.3307577433976565
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v10/metadata.json",
+    "status": "archived",
+    "ticker": "RELIANCE"
+  },
+  "RELIANCE_ensemble_20260509_120147_95db7a96": {
+    "checksum": "18a907ea72287a1e1574e8dc3359cbf07d5d797f2500776f96f05c8c2d43314b",
+    "created_at": "2026-05-09T12:01:47.682265",
+    "metadata": {
+      "auc": 0.30047694753577103,
+      "avg_fbeta": 0.17146904289896298,
+      "cpcv_p_sharpe": 0.21428571428571427,
+      "deployment_timestamp": "2026-05-09T12:01:47.681893",
+      "dsr": 4.272486639399974e-48,
+      "mean_sharpe": -1.4283906273867935,
+      "worst_5pct_sharpe": -4.3307577433976565
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/RELIANCE/v11/metadata.json",
+    "status": "shadow",
+    "ticker": "RELIANCE"
+  },
+  "SBIN_ensemble_20260509_081855_c5f69c5f": {
+    "archived_at": "2026-05-09T08:32:30.633092",
+    "checksum": "c314bbdd59129d9bd6363d248f2db363fa2824f73001982d6bf3d0f5584db881",
+    "created_at": "2026-05-09T08:18:55.836365",
+    "metadata": {
+      "auc": 0.5076888285843509,
+      "avg_fbeta": 0.288230503849689,
+      "cpcv_p_sharpe": 0.5416666666666666,
+      "deployment_timestamp": "2026-05-09T08:18:55.836140",
+      "dsr": 7.210296856863618e-13,
+      "mean_sharpe": 0.5315311361760015,
+      "worst_5pct_sharpe": -1.3958036965026535
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/SBIN/v1/metadata.json",
+    "status": "archived",
+    "ticker": "SBIN"
+  },
+  "SBIN_ensemble_20260509_083230_6bb1c4b7": {
+    "archived_at": "2026-05-09T08:44:18.547817",
+    "checksum": "6dffa34b8319073b0e1cb623dfdec9dbe4bb13e6cb760c04957d88a26edb0298",
+    "created_at": "2026-05-09T08:32:30.633097",
+    "metadata": {
+      "auc": 0.507688828584351,
+      "avg_fbeta": 0.2605459808444618,
+      "cpcv_p_sharpe": 0.5,
+      "deployment_timestamp": "2026-05-09T08:32:30.632907",
+      "dsr": 1.3873931874766529e-14,
+      "mean_sharpe": 0.4218462714470275,
+      "worst_5pct_sharpe": -1.3769083047056
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/SBIN/v2/metadata.json",
+    "status": "archived",
+    "ticker": "SBIN"
+  },
+  "SBIN_ensemble_20260509_084418_8cfa0947": {
+    "archived_at": "2026-05-09T09:23:00.959985",
+    "checksum": "e4aaa1ed80a63def433a3686fb362962ae99937f3e4cc9dde3f4b093dc0eb40e",
+    "created_at": "2026-05-09T08:44:18.547822",
+    "metadata": {
+      "auc": 0.49909543193125283,
+      "avg_fbeta": 0.2617772664330332,
+      "cpcv_p_sharpe": 0.36363636363636365,
+      "deployment_timestamp": "2026-05-09T08:44:18.547649",
+      "dsr": 3.3250208435644257e-09,
+      "mean_sharpe": 0.3436353971689947,
+      "worst_5pct_sharpe": -1.3769083047056
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/SBIN/v3/metadata.json",
+    "status": "archived",
+    "ticker": "SBIN"
+  },
+  "SBIN_ensemble_20260509_092300_0ecd9e27": {
+    "archived_at": "2026-05-09T09:36:50.678633",
+    "checksum": "42479ebe0ac9f3c6024a659e39515a6c8322f3772c5ef0ed83e1b3c4282c3dcc",
+    "created_at": "2026-05-09T09:23:00.959990",
+    "metadata": {
+      "auc": 0.507688828584351,
+      "avg_fbeta": 0.2605459808444618,
+      "cpcv_p_sharpe": 0.5,
+      "deployment_timestamp": "2026-05-09T09:23:00.959796",
+      "dsr": 1.3873931874766529e-14,
+      "mean_sharpe": 0.4218462714470275,
+      "worst_5pct_sharpe": -1.3769083047056
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/SBIN/v4/metadata.json",
+    "status": "archived",
+    "ticker": "SBIN"
+  },
+  "SBIN_ensemble_20260509_093650_1362802b": {
+    "archived_at": "2026-05-09T09:46:25.005499",
+    "checksum": "6a9a5560cdf6449ee35853e02d8b5cc7ddb84ce9c943f7fbfa4a75a75abc8722",
+    "created_at": "2026-05-09T09:36:50.678639",
+    "metadata": {
+      "auc": 0.49909543193125283,
+      "avg_fbeta": 0.2617772664330332,
+      "cpcv_p_sharpe": 0.36363636363636365,
+      "deployment_timestamp": "2026-05-09T09:36:50.678429",
+      "dsr": 3.3250208435644257e-09,
+      "mean_sharpe": 0.3436353971689947,
+      "worst_5pct_sharpe": -1.3769083047056
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/SBIN/v4/metadata.json",
+    "status": "archived",
+    "ticker": "SBIN"
+  },
+  "SBIN_ensemble_20260509_094625_295fb384": {
+    "archived_at": "2026-05-09T11:06:18.279711",
+    "checksum": "ce28e551bbf7c7cd02a76f2ad99bb52388b3aa7e10b6c9620517eb11c3242948",
+    "created_at": "2026-05-09T09:46:25.005504",
+    "metadata": {
+      "auc": 0.49909543193125283,
+      "avg_fbeta": 0.2617772664330332,
+      "cpcv_p_sharpe": 0.36363636363636365,
+      "deployment_timestamp": "2026-05-09T09:46:25.005340",
+      "dsr": 3.3250208435644257e-09,
+      "mean_sharpe": 0.3436353971689947,
+      "worst_5pct_sharpe": -1.3769083047056
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/SBIN/v4/metadata.json",
+    "status": "archived",
+    "ticker": "SBIN"
+  },
+  "SBIN_ensemble_20260509_110618_e708a065": {
+    "archived_at": "2026-05-09T11:21:09.698405",
+    "checksum": "760492d95973f1771bc888d4bda193c0e895a312cb97cd8bf9adbebd9af51b52",
+    "created_at": "2026-05-09T11:06:18.279719",
+    "metadata": {
+      "auc": 0.49909543193125283,
+      "avg_fbeta": 0.2617772664330332,
+      "cpcv_p_sharpe": 0.36363636363636365,
+      "deployment_timestamp": "2026-05-09T11:06:18.279446",
+      "dsr": 3.3250208435644257e-09,
+      "mean_sharpe": 0.3436353971689947,
+      "worst_5pct_sharpe": -1.3769083047056
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/SBIN/v4/metadata.json",
+    "status": "archived",
+    "ticker": "SBIN"
+  },
+  "SBIN_ensemble_20260509_112109_183d6b40": {
+    "archived_at": "2026-05-09T11:36:13.363989",
+    "checksum": "cf024df949b48a8584d3e05252ba141536beeda2827fa90cd69893de723ca482",
+    "created_at": "2026-05-09T11:21:09.698412",
+    "metadata": {
+      "auc": 0.3475177304964539,
+      "avg_fbeta": 0.6619041686354777,
+      "cpcv_p_sharpe": 0.75,
+      "deployment_timestamp": "2026-05-09T11:21:09.698163",
+      "dsr": 0.992340006416967,
+      "mean_sharpe": 1.9154961707480027,
+      "worst_5pct_sharpe": -1.2314265551543901
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/SBIN/v4/metadata.json",
+    "status": "archived",
+    "ticker": "SBIN"
+  },
+  "SBIN_ensemble_20260509_113613_b2a256ae": {
+    "checksum": "7be3fb30f50f92239c0beade8e929325c7b2a66e4427965a5fae7e30989baa87",
+    "created_at": "2026-05-09T11:36:13.363997",
+    "metadata": {
+      "auc": 0.3475177304964539,
+      "avg_fbeta": 0.6619041686354777,
+      "cpcv_p_sharpe": 0.75,
+      "deployment_timestamp": "2026-05-09T11:36:13.363821",
+      "dsr": 0.992340006416967,
+      "mean_sharpe": 1.9154961707480027,
+      "worst_5pct_sharpe": -1.2314265551543901
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/SBIN/v4/metadata.json",
+    "status": "shadow",
+    "ticker": "SBIN"
+  },
+  "SUNPHARMA_ensemble_20260509_081954_1234da08": {
+    "archived_at": "2026-05-09T08:33:28.835423",
+    "checksum": "4dcea77f259f841e8b2d3412549a6986418569831b066d7e1040b44f55d32fa1",
+    "created_at": "2026-05-09T08:19:54.696363",
+    "metadata": {
+      "auc": 0.554186228482003,
+      "avg_fbeta": 0.5027724163837901,
+      "cpcv_p_sharpe": 0.4642857142857143,
+      "deployment_timestamp": "2026-05-09T08:19:54.696186",
+      "dsr": 2.1325700808625548e-35,
+      "mean_sharpe": 0.665446857042075,
+      "worst_5pct_sharpe": -0.8321532527196445
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/SUNPHARMA/v1/metadata.json",
+    "status": "archived",
+    "ticker": "SUNPHARMA"
+  },
+  "SUNPHARMA_ensemble_20260509_083328_fbacf8ca": {
+    "archived_at": "2026-05-09T08:52:08.882972",
+    "checksum": "292dc5553c5ca5d16c98f100fb097145cd15c18837278b99572bfa82a2500817",
+    "created_at": "2026-05-09T08:33:28.835429",
+    "metadata": {
+      "auc": 0.5642381511946729,
+      "avg_fbeta": 0.5039781240524329,
+      "cpcv_p_sharpe": 0.5185185185185185,
+      "deployment_timestamp": "2026-05-09T08:33:28.835185",
+      "dsr": 2.157656520898209e-43,
+      "mean_sharpe": 0.6049109181323464,
+      "worst_5pct_sharpe": -0.8752480062748529
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/SUNPHARMA/v2/metadata.json",
+    "status": "archived",
+    "ticker": "SUNPHARMA"
+  },
+  "SUNPHARMA_ensemble_20260509_085208_ff54fd1a": {
+    "archived_at": "2026-05-09T11:30:18.728799",
+    "checksum": "8801a0c2ca85228c87f49efb812831373e6961ce214650e406cc52fcfeeebd9a",
+    "created_at": "2026-05-09T08:52:08.882979",
+    "metadata": {
+      "auc": 0.5642381511946729,
+      "avg_fbeta": 0.5039781240524329,
+      "cpcv_p_sharpe": 0.5185185185185185,
+      "deployment_timestamp": "2026-05-09T08:52:08.882706",
+      "dsr": 2.157656520898209e-43,
+      "mean_sharpe": 0.6049109181323464,
+      "worst_5pct_sharpe": -0.8752480062748529
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/SUNPHARMA/v3/metadata.json",
+    "status": "archived",
+    "ticker": "SUNPHARMA"
+  },
+  "SUNPHARMA_ensemble_20260509_113018_b5867e7d": {
+    "archived_at": "2026-05-09T11:41:26.080719",
+    "checksum": "f1a27e92656104ad75d1ad8fc3777517abcef551ffdbd6a282ad389bc560ef44",
+    "created_at": "2026-05-09T11:30:18.728804",
+    "metadata": {
+      "auc": 0.4381377551020407,
+      "avg_fbeta": 0.6319989077167308,
+      "cpcv_p_sharpe": 0.7407407407407407,
+      "deployment_timestamp": "2026-05-09T11:30:18.728633",
+      "dsr": 3.7707555616993127e-14,
+      "mean_sharpe": 0.9607978686952307,
+      "worst_5pct_sharpe": -0.6691528875417148
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/SUNPHARMA/v4/metadata.json",
+    "status": "archived",
+    "ticker": "SUNPHARMA"
+  },
+  "SUNPHARMA_ensemble_20260509_114126_8b08a611": {
+    "checksum": "a0b0bbecc9e58c112997649996f08d6a480338655ef8e4ec291763898dbcbbf7",
+    "created_at": "2026-05-09T11:41:26.080725",
+    "metadata": {
+      "auc": 0.4381377551020407,
+      "avg_fbeta": 0.6319989077167308,
+      "cpcv_p_sharpe": 0.7407407407407407,
+      "deployment_timestamp": "2026-05-09T11:41:26.080543",
+      "dsr": 3.7707555616993127e-14,
+      "mean_sharpe": 0.9607978686952307,
+      "worst_5pct_sharpe": -0.6691528875417148
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/SUNPHARMA/v4/metadata.json",
+    "status": "active",
+    "ticker": "SUNPHARMA"
+  },
+  "TATAELXSI_ensemble_20260509_085631_3ffc3c00": {
+    "checksum": "26a9be299ae4e8e17384046cd3b9735bf63e7cc332d8b3c400280b013ecbb966",
+    "created_at": "2026-05-09T08:56:31.096903",
+    "metadata": {
+      "auc": 0.34578901983328547,
+      "avg_fbeta": 0.594407357827372,
+      "cpcv_p_sharpe": 0.75,
+      "deployment_timestamp": "2026-05-09T08:56:31.096751",
+      "dsr": 0.9999998995016194,
+      "mean_sharpe": 2.1295716639766256,
+      "worst_5pct_sharpe": -0.340885130265606
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TATAELXSI/v1/metadata.json",
+    "status": "active",
+    "ticker": "TATAELXSI"
+  },
+  "TATAELXSI_ensemble_20260509_114521_73881f05": {
+    "checksum": "62270bcd02a565a1b936a5197a62fff061f6084061a5ace554965defa15488c6",
+    "created_at": "2026-05-09T11:45:21.948890",
+    "metadata": {
+      "auc": 0.33228840125391845,
+      "avg_fbeta": 0.4135966792307952,
+      "cpcv_p_sharpe": 0.25,
+      "deployment_timestamp": "2026-05-09T11:45:21.948698",
+      "dsr": 4.011717654072497e-07,
+      "mean_sharpe": -1.2430058280474536,
+      "worst_5pct_sharpe": -3.5351045591015415
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TATAELXSI/v2/metadata.json",
+    "status": "shadow",
+    "ticker": "TATAELXSI"
+  },
+  "TATASTEEL_ensemble_20260509_081824_80f88899": {
+    "archived_at": "2026-05-09T08:32:02.751254",
+    "checksum": "df697421d9c2d8757fb72ce80c6b6e55df08ca19e76a1696689c41a4827aa564",
+    "created_at": "2026-05-09T08:18:24.370229",
+    "metadata": {
+      "auc": 0.43734145104008115,
+      "avg_fbeta": 0.014172335600907028,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-09T08:18:24.370043",
+      "dsr": 0.0,
+      "mean_sharpe": -0.25281210878165405,
+      "worst_5pct_sharpe": -0.25281210878165405
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TATASTEEL/v1/metadata.json",
+    "status": "archived",
+    "ticker": "TATASTEEL"
+  },
+  "TATASTEEL_ensemble_20260509_083202_33015b31": {
+    "checksum": "08e3ce194b73d0151f46e6b06f5b3e6ffd3160c76a3cc11eee4bdcb07ed2306f",
+    "created_at": "2026-05-09T08:32:02.751257",
+    "metadata": {
+      "auc": 0.44033656297807244,
+      "avg_fbeta": 0.015664160401002505,
+      "cpcv_p_sharpe": 0.0,
+      "deployment_timestamp": "2026-05-09T08:32:02.751124",
+      "dsr": 0.0,
+      "mean_sharpe": -1.0471526678327792,
+      "worst_5pct_sharpe": -1.5415285159425975
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TATASTEEL/v2/metadata.json",
+    "status": "shadow",
+    "ticker": "TATASTEEL"
+  },
+  "TCS_ensemble_20260509_073520_e2d67352": {
+    "checksum": "f895179b6d91aed2cc4a35017094bb08f857e94b5efaccb78fd94e4203276b5e",
+    "created_at": "2026-05-09T07:35:20.706032",
+    "metadata": {
+      "auc": 0.5486835568802781,
+      "avg_fbeta": 0.28326969520046524,
+      "cpcv_p_sharpe": 0.36363636363636365,
+      "deployment_timestamp": "2026-05-09T07:35:20.705861",
+      "dsr": 1.384256622919294e-69,
+      "mean_sharpe": 0.27452770522077474,
+      "worst_5pct_sharpe": -0.948356433663608
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS/v1/metadata.json",
+    "status": "active",
+    "ticker": "TCS"
+  },
+  "TCS_ensemble_20260509_074540_432de17d": {
+    "archived_at": "2026-05-09T07:51:20.859097",
+    "checksum": "38b0f9627894468cc7ea8722ca95c5e8a0c4246afec25764f555db2f5dc43519",
+    "created_at": "2026-05-09T07:45:40.822850",
+    "metadata": {
+      "auc": 0.4857142857142857,
+      "avg_fbeta": 0.13830567347925699,
+      "cpcv_p_sharpe": 0.25,
+      "deployment_timestamp": "2026-05-09T07:45:40.822679",
+      "dsr": 7.794825642674342e-55,
+      "mean_sharpe": -0.393435778813943,
+      "worst_5pct_sharpe": -2.1698947624673957
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS/v2/metadata.json",
+    "status": "archived",
+    "ticker": "TCS"
+  },
+  "TCS_ensemble_20260509_075120_3947b2b0": {
+    "archived_at": "2026-05-09T07:59:14.137905",
+    "checksum": "958ae037f7d92937f2d32755492883c06d4c5703eca7a8b18bb3293122366591",
+    "created_at": "2026-05-09T07:51:20.859100",
+    "metadata": {
+      "auc": 0.507496251874063,
+      "avg_fbeta": 0.17928369942678354,
+      "cpcv_p_sharpe": 0.26666666666666666,
+      "deployment_timestamp": "2026-05-09T07:51:20.858901",
+      "dsr": 1.1728375323636187e-80,
+      "mean_sharpe": -0.040450173591030605,
+      "worst_5pct_sharpe": -1.3486274502814168
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS/v3/metadata.json",
+    "status": "archived",
+    "ticker": "TCS"
+  },
+  "TCS_ensemble_20260509_075914_de7ebf5b": {
+    "archived_at": "2026-05-09T08:12:11.050285",
+    "checksum": "ae7b691a4fafedc821fccc78510927d997fda82a07a731ba98aefafeecebcb06",
+    "created_at": "2026-05-09T07:59:14.137908",
+    "metadata": {
+      "auc": 0.507496251874063,
+      "avg_fbeta": 0.17928369942678354,
+      "cpcv_p_sharpe": 0.26666666666666666,
+      "deployment_timestamp": "2026-05-09T07:59:14.137746",
+      "dsr": 1.1728375323636187e-80,
+      "mean_sharpe": -0.040450173591030605,
+      "worst_5pct_sharpe": -1.3486274502814168
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS/v4/metadata.json",
+    "status": "archived",
+    "ticker": "TCS"
+  },
+  "TCS_ensemble_20260509_081211_b55c9ac1": {
+    "archived_at": "2026-05-09T08:16:28.787351",
+    "checksum": "23e8f270f8b57e94094288cbb4e06b9fed63f83e6f1bd2c9d2989dfe50ba1b8f",
+    "created_at": "2026-05-09T08:12:11.050288",
+    "metadata": {
+      "auc": 0.507496251874063,
+      "avg_fbeta": 0.17928369942678354,
+      "cpcv_p_sharpe": 0.26666666666666666,
+      "deployment_timestamp": "2026-05-09T08:12:11.050125",
+      "dsr": 1.1728375323636187e-80,
+      "mean_sharpe": -0.040450173591030605,
+      "worst_5pct_sharpe": -1.3486274502814168
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS/v5/metadata.json",
+    "status": "archived",
+    "ticker": "TCS"
+  },
+  "TCS_ensemble_20260509_081628_114951bc": {
+    "archived_at": "2026-05-09T08:30:11.330263",
+    "checksum": "455ad2d305cd12dbe2de52a095e023d47f01f405bfe44192c00c43f0acd01d52",
+    "created_at": "2026-05-09T08:16:28.787355",
+    "metadata": {
+      "auc": 0.507496251874063,
+      "avg_fbeta": 0.17928369942678354,
+      "cpcv_p_sharpe": 0.26666666666666666,
+      "deployment_timestamp": "2026-05-09T08:16:28.787170",
+      "dsr": 1.1728375323636187e-80,
+      "mean_sharpe": -0.040450173591030605,
+      "worst_5pct_sharpe": -1.3486274502814168
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS/v6/metadata.json",
+    "status": "archived",
+    "ticker": "TCS"
+  },
+  "TCS_ensemble_20260509_083011_85360d32": {
+    "archived_at": "2026-05-09T08:41:56.379474",
+    "checksum": "1893811aa3f2a5db0fec1b8b80577af817350cdd4ee876fdc00eb28abe2e99a1",
+    "created_at": "2026-05-09T08:30:11.330267",
+    "metadata": {
+      "auc": 0.5256729810568295,
+      "avg_fbeta": 0.1540805224621263,
+      "cpcv_p_sharpe": 0.3125,
+      "deployment_timestamp": "2026-05-09T08:30:11.330106",
+      "dsr": 5.079003799691194e-74,
+      "mean_sharpe": 0.1280570958778769,
+      "worst_5pct_sharpe": -1.6066573646747546
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS/v7/metadata.json",
+    "status": "archived",
+    "ticker": "TCS"
+  },
+  "TCS_ensemble_20260509_084156_f016c5ae": {
+    "archived_at": "2026-05-09T09:20:02.406077",
+    "checksum": "00487ec9ffdea335c76ccf7775dc45fc7048869358f7e986c087906e459f5c78",
+    "created_at": "2026-05-09T08:41:56.379477",
+    "metadata": {
+      "auc": 0.5194416749750748,
+      "avg_fbeta": 0.1385525721515673,
+      "cpcv_p_sharpe": 0.3125,
+      "deployment_timestamp": "2026-05-09T08:41:56.379326",
+      "dsr": 4.30138261940986e-61,
+      "mean_sharpe": 0.13507157687416468,
+      "worst_5pct_sharpe": -1.6066573646747546
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS/v8/metadata.json",
+    "status": "archived",
+    "ticker": "TCS"
+  },
+  "TCS_ensemble_20260509_092002_8c18e1c1": {
+    "archived_at": "2026-05-09T09:34:29.151390",
+    "checksum": "2773d4a42b02373ccb378e0263e4983163f58a6005a5425fefb5b4478c1c3cd5",
+    "created_at": "2026-05-09T09:20:02.406080",
+    "metadata": {
+      "auc": 0.5256729810568295,
+      "avg_fbeta": 0.1540805224621263,
+      "cpcv_p_sharpe": 0.3125,
+      "deployment_timestamp": "2026-05-09T09:20:02.405915",
+      "dsr": 5.079003799691194e-74,
+      "mean_sharpe": 0.1280570958778769,
+      "worst_5pct_sharpe": -1.6066573646747546
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS/v8/metadata.json",
+    "status": "archived",
+    "ticker": "TCS"
+  },
+  "TCS_ensemble_20260509_093429_fe0bd7d4": {
+    "archived_at": "2026-05-09T09:42:15.087571",
+    "checksum": "727dfbac5728de2b20143a06fbd3e8d9c349e3ceba5a391fb6bfa56197e69308",
+    "created_at": "2026-05-09T09:34:29.151394",
+    "metadata": {
+      "auc": 0.5194416749750748,
+      "avg_fbeta": 0.1385525721515673,
+      "cpcv_p_sharpe": 0.3125,
+      "deployment_timestamp": "2026-05-09T09:34:29.151254",
+      "dsr": 4.30138261940986e-61,
+      "mean_sharpe": 0.13507157687416468,
+      "worst_5pct_sharpe": -1.6066573646747546
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS/v8/metadata.json",
+    "status": "archived",
+    "ticker": "TCS"
+  },
+  "TCS_ensemble_20260509_094215_e1c83a12": {
+    "archived_at": "2026-05-09T10:57:10.264151",
+    "checksum": "bb586805bea398ed98e0bf81a563567db167ca84f00f646c632b9ff6a6df1ee6",
+    "created_at": "2026-05-09T09:42:15.087575",
+    "metadata": {
+      "auc": 0.5194416749750748,
+      "avg_fbeta": 0.1385525721515673,
+      "cpcv_p_sharpe": 0.3125,
+      "deployment_timestamp": "2026-05-09T09:42:15.087426",
+      "dsr": 4.30138261940986e-61,
+      "mean_sharpe": 0.13507157687416468,
+      "worst_5pct_sharpe": -1.6066573646747546
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS/v8/metadata.json",
+    "status": "archived",
+    "ticker": "TCS"
+  },
+  "TCS_ensemble_20260509_105710_1ef31875": {
+    "archived_at": "2026-05-09T11:03:35.753481",
+    "checksum": "6149fe3057e3bc138ae5b89d65230704972bdc71540629660f429c654c136808",
+    "created_at": "2026-05-09T10:57:10.264154",
+    "metadata": {
+      "auc": 0.5194416749750748,
+      "avg_fbeta": 0.1385525721515673,
+      "cpcv_p_sharpe": 0.3125,
+      "deployment_timestamp": "2026-05-09T10:57:10.264005",
+      "dsr": 4.30138261940986e-61,
+      "mean_sharpe": 0.13507157687416468,
+      "worst_5pct_sharpe": -1.6066573646747546
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS/v9/metadata.json",
+    "status": "archived",
+    "ticker": "TCS"
+  },
+  "TCS_ensemble_20260509_110335_faddea02": {
+    "archived_at": "2026-05-09T11:16:24.320051",
+    "checksum": "98f3753ff786bf83d747d7ccea8fee07c2720104af7f2c1fda036a19796add27",
+    "created_at": "2026-05-09T11:03:35.753484",
+    "metadata": {
+      "auc": 0.5194416749750748,
+      "avg_fbeta": 0.1385525721515673,
+      "cpcv_p_sharpe": 0.3125,
+      "deployment_timestamp": "2026-05-09T11:03:35.753353",
+      "dsr": 4.30138261940986e-61,
+      "mean_sharpe": 0.13507157687416468,
+      "worst_5pct_sharpe": -1.6066573646747546
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS/v9/metadata.json",
+    "status": "archived",
+    "ticker": "TCS"
+  },
+  "TCS_ensemble_20260509_111624_eca6abbd": {
+    "archived_at": "2026-05-09T11:19:38.951374",
+    "checksum": "a198018693b38292a9b792abcc6ab5304e23ad05b7e9fbe5e6f698e0195707e1",
+    "created_at": "2026-05-09T11:16:24.320055",
+    "metadata": {
+      "auc": 0.5194416749750748,
+      "avg_fbeta": 0.1385525721515673,
+      "cpcv_p_sharpe": 0.3125,
+      "deployment_timestamp": "2026-05-09T11:16:24.319893",
+      "dsr": 4.30138261940986e-61,
+      "mean_sharpe": 0.13507157687416468,
+      "worst_5pct_sharpe": -1.6066573646747546
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS/v10/metadata.json",
+    "status": "archived",
+    "ticker": "TCS"
+  },
+  "TCS_ensemble_20260509_111938_f6ded90f": {
+    "archived_at": "2026-05-09T11:34:54.280662",
+    "checksum": "d2ceef82cf954f2ea8dd0cd788a16b27278064205160ea7664952b2a0b26e8c3",
+    "created_at": "2026-05-09T11:19:38.951378",
+    "metadata": {
+      "auc": 0.32341269841269843,
+      "avg_fbeta": 0.28695180483530985,
+      "cpcv_p_sharpe": 0.25,
+      "deployment_timestamp": "2026-05-09T11:19:38.951191",
+      "dsr": 1.286869034088802e-80,
+      "mean_sharpe": -0.9014156130652342,
+      "worst_5pct_sharpe": -3.180553688153093
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS/v10/metadata.json",
+    "status": "archived",
+    "ticker": "TCS"
+  },
+  "TCS_ensemble_20260509_113454_7eac347a": {
+    "checksum": "07f286b10279e05dbb22e134de68291ffb5264b68e5b2ee9dbdd2ddbd028a68a",
+    "created_at": "2026-05-09T11:34:54.280665",
+    "metadata": {
+      "auc": 0.32341269841269843,
+      "avg_fbeta": 0.28695180483530985,
+      "cpcv_p_sharpe": 0.25,
+      "deployment_timestamp": "2026-05-09T11:34:54.280522",
+      "dsr": 1.286869034088802e-80,
+      "mean_sharpe": -0.9014156130652342,
+      "worst_5pct_sharpe": -3.180553688153093
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TCS/v10/metadata.json",
+    "status": "shadow",
+    "ticker": "TCS"
+  },
+  "TITAN_ensemble_20260509_085205_64f8b76d": {
+    "archived_at": "2026-05-09T11:30:25.385336",
+    "checksum": "d117cd034f83f2f075ae5b653d83cbdae25c568537d1005c0fd8c5b333989173",
+    "created_at": "2026-05-09T08:52:05.612756",
+    "metadata": {
+      "auc": 0.42223623371164354,
+      "avg_fbeta": 0.027636054421768707,
+      "cpcv_p_sharpe": 0.2222222222222222,
+      "deployment_timestamp": "2026-05-09T08:52:05.609563",
+      "dsr": 9.95244315934575e-50,
+      "mean_sharpe": -0.6059421615356441,
+      "worst_5pct_sharpe": -2.4221069913750464
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TITAN/v1/metadata.json",
+    "status": "archived",
+    "ticker": "TITAN"
+  },
+  "TITAN_ensemble_20260509_113025_d3f1e9f0": {
+    "archived_at": "2026-05-09T11:41:38.387803",
+    "checksum": "3319e08b0dd2264a5e0488b2e51f48161ae9befb7bb9f96aaa628fa217a51998",
+    "created_at": "2026-05-09T11:30:25.385339",
+    "metadata": {
+      "auc": 0.3880803880803881,
+      "avg_fbeta": 0.10831411322079139,
+      "cpcv_p_sharpe": 0.13333333333333333,
+      "deployment_timestamp": "2026-05-09T11:30:25.385164",
+      "dsr": 5.731712700228596e-53,
+      "mean_sharpe": -1.7532092964221302,
+      "worst_5pct_sharpe": -2.899631093321906
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TITAN/v1/metadata.json",
+    "status": "archived",
+    "ticker": "TITAN"
+  },
+  "TITAN_ensemble_20260509_114138_12908a21": {
+    "checksum": "9118c9738e4a74e13f7ba256d482e861c905a8d4acd70b5ae54a034817cd18eb",
+    "created_at": "2026-05-09T11:41:38.387805",
+    "metadata": {
+      "auc": 0.3880803880803881,
+      "avg_fbeta": 0.10831411322079139,
+      "cpcv_p_sharpe": 0.13333333333333333,
+      "deployment_timestamp": "2026-05-09T11:41:38.387656",
+      "dsr": 5.731712700228596e-53,
+      "mean_sharpe": -1.7532092964221302,
+      "worst_5pct_sharpe": -2.899631093321906
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TITAN/v2/metadata.json",
+    "status": "shadow",
+    "ticker": "TITAN"
+  },
+  "TRENT_ensemble_20260509_085437_aa3c0fdf": {
+    "archived_at": "2026-05-09T11:44:35.194849",
+    "checksum": "63ccf862387e8ce563f527941a92dfefd4f09f1b3657136bbc26f2793d1f0390",
+    "created_at": "2026-05-09T08:54:37.343684",
+    "metadata": {
+      "auc": 0.5063137445361826,
+      "avg_fbeta": 0.05172204349720184,
+      "cpcv_p_sharpe": 0.14285714285714285,
+      "deployment_timestamp": "2026-05-09T08:54:37.343553",
+      "dsr": 3.6142861804974558e-65,
+      "mean_sharpe": -0.3361582527911698,
+      "worst_5pct_sharpe": -2.1084120191331035
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TRENT/v1/metadata.json",
+    "status": "archived",
+    "ticker": "TRENT"
+  },
+  "TRENT_ensemble_20260509_114435_c9602e17": {
+    "checksum": "20c8b0389592281b4d9866213d308f155b8ac5f968faf8e4cb9e9a006dcb3f2e",
+    "created_at": "2026-05-09T11:44:35.194852",
+    "metadata": {
+      "auc": 0.34607778510217535,
+      "avg_fbeta": 0.21530933455981932,
+      "cpcv_p_sharpe": 0.42857142857142855,
+      "deployment_timestamp": "2026-05-09T11:44:35.194673",
+      "dsr": 7.236108199618245e-50,
+      "mean_sharpe": 0.1189329981046068,
+      "worst_5pct_sharpe": -2.0907869416920954
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/TRENT/v1/metadata.json",
+    "status": "shadow",
+    "ticker": "TRENT"
+  },
+  "VOLTAS_ensemble_20260509_090038_a3e68da2": {
+    "archived_at": "2026-05-09T11:45:22.627930",
+    "checksum": "ed1e7990dd5cf4a836892a995be295cc78dc2a51bdbe72124d05c9a012a160a0",
+    "created_at": "2026-05-09T09:00:38.280793",
+    "metadata": {
+      "auc": 0.3499536178107607,
+      "avg_fbeta": 0.021258503401360544,
+      "cpcv_p_sharpe": 0.4,
+      "deployment_timestamp": "2026-05-09T09:00:38.280653",
+      "dsr": 0.0,
+      "mean_sharpe": 0.21406201893628524,
+      "worst_5pct_sharpe": -1.0540421363388677
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/VOLTAS/v1/metadata.json",
+    "status": "archived",
+    "ticker": "VOLTAS"
+  },
+  "VOLTAS_ensemble_20260509_114522_8b18ece4": {
+    "checksum": "cae41e08e94c8ea10ddc34072cdad50191e57e7298299c06285aeb57493a5dea",
+    "created_at": "2026-05-09T11:45:22.627935",
+    "metadata": {
+      "auc": 0.3946220930232558,
+      "avg_fbeta": 0.04583780880773362,
+      "cpcv_p_sharpe": 0.14285714285714285,
+      "deployment_timestamp": "2026-05-09T11:45:22.627687",
+      "dsr": 1.060668674215592e-51,
+      "mean_sharpe": -1.3695370624458187,
+      "worst_5pct_sharpe": -3.2971509374951484
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/VOLTAS/v1/metadata.json",
+    "status": "shadow",
+    "ticker": "VOLTAS"
+  },
+  "YESBANK_ensemble_20260509_090240_b6fc7002": {
+    "checksum": "8e5b6ad31222be2ceddf4b6147c17cd97528800598d15d87c292553844b0c801",
+    "created_at": "2026-05-09T09:02:40.838586",
+    "metadata": {
+      "auc": 0.5601478494623656,
+      "avg_fbeta": 0.29393615575956866,
+      "cpcv_p_sharpe": 0.36,
+      "deployment_timestamp": "2026-05-09T09:02:40.838432",
+      "dsr": 1.997900066394135e-59,
+      "mean_sharpe": 0.0883421278401946,
+      "worst_5pct_sharpe": -1.4629084824613154
+    },
+    "model_type": "ensemble",
+    "path": "/home/lynx/Documents/MARK5/models/YESBANK/v1/metadata.json",
+    "status": "shadow",
+    "ticker": "YESBANK"
   }
 }

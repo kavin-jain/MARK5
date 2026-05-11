@@ -24,18 +24,12 @@ FEATURE_COLS = [
     'range_z',          # 2: IC +0.0840
     'bb_width',         # 3: IC +0.0589
     'atr_vol',          # 4: IC +0.0537
-    'dist_ma200',       # 5: IC -0.0492
+    'rsi_14',           # 5: RSI 14-period
     'gap_sig',          # 6: IC +0.0378
     'vol_adj_mom',      # 7: NEW - IC +0.0342
     'mfi_div',          # 8: NEW - IC +0.0278
     'rel_strength',     # 9: NEW - IC +0.0209
     'tii_60',           # 10: NEW - IC -0.0161 (Mean reversion signal)
-]
-
-TCN_FEATURE_COLS = [
-    'close', 'open', 'high', 'low',
-    'log_ret', 'log_ret_5', 'dist_sma_20', 'rvol', 
-    'high_low_ratio', 'natr', 'rsi_14', 'mfi_14', 'force_proxy'
 ]
 
 EXPECTED_FEATURE_COUNT = 10
@@ -139,9 +133,8 @@ def engineer_features_df(df: pd.DataFrame, context: Dict = None, is_daily: bool 
     # 4. ATR Vol (Institutional Normalization)
     df['atr_vol'] = compute_atr(df, 14) / (c + epsilon)
 
-    # 5. Dist MA200 (Long-term Mean Reversion)
-    ma_200 = c.rolling(200).mean()
-    df['dist_ma200'] = (c - ma_200) / (ma_200 + epsilon)
+    # 5. RSI 14-period
+    df['rsi_14'] = compute_rsi(c, period=14)
 
     # 6. Gap Significance (Overnight Footprint)
     df['gap_sig'] = (df['open'] - c.shift(1)) / (c.shift(1) + epsilon)

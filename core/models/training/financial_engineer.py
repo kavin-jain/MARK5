@@ -175,29 +175,28 @@ class FinancialEngineer:
     def get_primary_signals(self, prices: pd.DataFrame) -> pd.Series:
         """
         Institutional High-Velocity Momentum Engine.
-        Captures early-stage breakouts and breakdowns for high-frequency ML modeling.
+        LONG-ONLY: Captures breakouts above upper Bollinger Band.
+        Short signals are disabled — Indian equity bias is bullish.
         """
         close = prices['close']
         
-        # 1. Bollinger Bands (20-period, 1.0-std for high-density signals)
+        # Bollinger Bands (20-period, 1.0-std for high-density signals)
         sma = close.rolling(window=20).mean()
         std = close.rolling(window=20).std()
-        lower_bb = sma - (1.0 * std)
         upper_bb = sma + (1.0 * std)
         
         signals = pd.Series(0, index=prices.index)
         
-        # Long: Price breaks 1.0-std upper band
+        # LONG ONLY: Price breaks 1.0-std upper band (momentum breakout)
         long_condition = (close > upper_bb) & (close.shift(1) <= upper_bb.shift(1))
         signals[long_condition] = 1
         
-        # Short: Price breaks 1.0-std lower band
-        short_condition = (close < lower_bb) & (close.shift(1) >= lower_bb.shift(1))
-        signals[short_condition] = -1
+        # SHORT SIGNALS DISABLED: Indian equities have strong bull-market bias
+        # Shorting against secular bull trends destroys Alpha
         
-        logger.info(f"Raw signals: {signals.abs().sum()} (Long: {(signals==1).sum()}, Short: {(signals==-1).sum()})")
+        logger.info(f"Raw signals: {signals.abs().sum()} (Long: {(signals==1).sum()}, Short: 0 [disabled])")
 
-        # 3. Apply Cooldown (1 day - increased density for MARK6)
+        # Apply Cooldown (1 day minimum between signals)
         final_signals = pd.Series(0, index=prices.index)
         last_entry = -10
         for i in range(len(signals)):
@@ -209,19 +208,29 @@ class FinancialEngineer:
         logger.info(f"Final signals after cooldown: {final_signals.abs().sum()}")
         return final_signals
 
-    def get_meta_labels(self, prices: pd.DataFrame, signals: pd.Series, pt_sl: list = [5.0, 2.5]) -> pd.DataFrame:
+    def get_meta_labels(self, prices: pd.DataFrame, signals: pd.Series, pt_sl: list = [1.5, 1.5]) -> pd.DataFrame:
         """
-        Standard Swing Labeler (5-Day Horizon).
-        Captures the primary trend duration for institutional swing models.
+        True Triple Barrier Method (10-Day Horizon, ATR-based PT/SL).
+        Includes minimum return hurdle for transaction costs.
         """
-        # Filter non-zero signals
         events_idx = signals[signals != 0].index
         logger.info(f"get_meta_labels: signals received: {len(events_idx)}")
         if events_idx.empty:
             return pd.DataFrame(columns=['bin', 'ret', 'trgt'])
 
         close = prices['close']
-        run_bars = 5 # Standard swing window (MARK6 Standard)
+        high = prices['high']
+        low = prices['low']
+        
+        # Compute ATR(14)
+        tr1 = high - low
+        tr2 = (high - close.shift(1)).abs()
+        tr3 = (low - close.shift(1)).abs()
+        tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
+        atr = tr.rolling(window=14).mean()
+
+        run_bars = 10 # Rule 4: Time=10 bars
+        min_cost = 0.002 # 0.20% combined cost + slippage
         
         out = signals[signals != 0].to_frame(name='side')
         out['ret'] = 0.0
@@ -230,14 +239,72 @@ class FinancialEngineer:
         for loc in out.index:
             try:
                 idx = close.index.get_loc(loc)
-                if idx + run_bars < len(close):
-                    p_start = close.iloc[idx]
-                    p_end = close.iloc[idx + run_bars]
-                    side = out.loc[loc, 'side']
-                    ret = side * (p_end / p_start - 1)
-                    out.loc[loc, 'ret'] = ret
-                    out.loc[loc, 'bin'] = 1 if ret > 0 else 0
-            except: continue
+                if idx + 1 >= len(close): continue # Need at least next day open
+                
+                side = out.loc[loc, 'side']
+                
+                # Assume entry at next day open
+                entry_price = prices['open'].iloc[idx + 1]
+                if pd.isna(entry_price): continue
+                
+                # Add slippage
+                entry_price = entry_price * (1.0005 if side == 1 else 0.9995)
+
+                current_atr = atr.iloc[idx]
+                if pd.isna(current_atr) or current_atr <= 0: continue
+
+                # Calculate absolute barriers
+                pt_dist = current_atr * pt_sl[0]
+                sl_dist = current_atr * pt_sl[1]
+
+                if side == 1:
+                    pt_price = entry_price + pt_dist
+                    sl_price = entry_price - sl_dist
+                else:
+                    pt_price = entry_price - pt_dist
+                    sl_price = entry_price + sl_dist
+
+                # Path dependency check
+                hit_pt = False
+                hit_sl = False
+                exit_price = 0.0
+                
+                max_i = min(idx + 1 + run_bars, len(close))
+                for i in range(idx + 1, max_i):
+                    c_h = high.iloc[i]
+                    c_l = low.iloc[i]
+                    c_o = prices['open'].iloc[i]
+                    
+                    if side == 1:
+                        if c_o <= sl_price: hit_sl = True; exit_price = c_o * 0.9995
+                        elif c_o >= pt_price: hit_pt = True; exit_price = c_o * 0.9995
+                        elif c_l <= sl_price: hit_sl = True; exit_price = sl_price * 0.9995
+                        elif c_h >= pt_price: hit_pt = True; exit_price = pt_price * 0.9995
+                    else:
+                        if c_o >= sl_price: hit_sl = True; exit_price = c_o * 1.0005
+                        elif c_o <= pt_price: hit_pt = True; exit_price = c_o * 1.0005
+                        elif c_h >= sl_price: hit_sl = True; exit_price = sl_price * 1.0005
+                        elif c_l <= pt_price: hit_pt = True; exit_price = pt_price * 1.0005
+                        
+                    if hit_sl or hit_pt:
+                        break
+
+                if not (hit_sl or hit_pt):
+                    # Time stop: Exit at the open of the next day after limit
+                    # If max_i is within bounds, use open of max_i, else close of max_i-1
+                    if max_i < len(close):
+                        exit_price = prices['open'].iloc[max_i]
+                    else:
+                        exit_price = close.iloc[max_i - 1]
+                    exit_price = exit_price * (0.9995 if side == 1 else 1.0005)
+
+                ret = side * (exit_price / entry_price - 1)
+                out.loc[loc, 'ret'] = ret
+                
+                # Target Bin: 1 if hit PT or time stop profit > min_cost, 0 otherwise
+                out.loc[loc, 'bin'] = 1 if ret > min_cost else 0
+            except Exception as e:
+                pass
         
         logger.info(f"get_meta_labels: final labels: {len(out.dropna())}")
         return out.dropna()
