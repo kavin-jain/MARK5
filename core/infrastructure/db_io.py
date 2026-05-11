@@ -7,6 +7,7 @@ from psycopg2.extras import execute_values
 from typing import Dict, Any, List
 from datetime import datetime
 from core.utils.config_manager import get_config
+from core.infrastructure.db_logger import get_db_logger
 
 """
 MARK5 TIMESCALE DB MANAGER v8.0 - PRODUCTION GRADE
@@ -45,6 +46,7 @@ class TimescaleManager:
             return
             
         self.logger = logging.getLogger("MARK5.TimescaleManager")
+        self.db_logger = get_db_logger()
         self.config = get_config().timescale
         
         # The Buffer Queue
@@ -76,6 +78,7 @@ class TimescaleManager:
             return conn
         except Exception as e:
             self.logger.error(f"DB Connection Failed: {e}")
+            self.db_logger.error(f"[Timescale] Connection Failed: {e}")
             return None
 
     def insert_tick(self, ticker: str, price: float, volume: int, timestamp: datetime):
@@ -93,6 +96,7 @@ class TimescaleManager:
             })
         except queue.Full:
             self.logger.error("DB Queue Full! Dropping Tick Data to preserve Strategy Latency.")
+            self.db_logger.error("[Timescale] Queue Full! Dropping Tick Data.")
 
     def _worker_loop(self):
         """Background thread handles IO"""
@@ -128,10 +132,12 @@ class TimescaleManager:
                         # Here we clear to prevent memory leak if DB is dead for hours.
                         if len(batch) > 5000:
                             self.logger.critical("DB Down. Dumping batch to prevent memory overflow.")
+                            self.db_logger.error(f"[Timescale] DB Down. Dumping batch of {len(batch)} records.")
                             batch = [] 
 
             except Exception as e:
                 self.logger.error(f"Worker Loop Error: {e}")
+                self.db_logger.error(f"[Timescale] Worker Loop Error: {e}")
                 time.sleep(1)
 
     def _flush_batch(self, conn, batch: List[Dict]):
@@ -144,11 +150,14 @@ class TimescaleManager:
         values = [(x['time'], x['ticker'], x['price'], x['volume']) for x in batch]
         
         try:
+            start_time = time.time()
             with conn.cursor() as cur:
                 execute_values(cur, query, values)
-            # self.logger.debug(f"Flushed {len(batch)} records")
+            duration = time.time() - start_time
+            self.db_logger.info(f"[Timescale] Batch inserted {len(batch)} records in {duration:.4f}s")
         except Exception as e:
             self.logger.error(f"Batch Insert Failed: {e}")
+            self.db_logger.error(f"[Timescale] Batch Insert Failed: {e}")
             # Optional: Retry logic or Dead Letter Queue
 
     def get_ohlcv(self, ticker: str, interval: str, limit: int = 100):

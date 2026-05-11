@@ -1,0 +1,2345 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1778291060.435724  969679 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+I0000 00:00:1778291060.474228  969679 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX_VNNI FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1778291061.354145  969679 port.cc:153] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2026-05-09 07:14:21,676 | INFO | 
+============================================================
+  PIPELINE: RELIANCE
+============================================================
+2026-05-09 07:14:21,680 | INFO | [RELIANCE] 1235 bars fetched
+2026-05-09 07:14:21,680 | INFO | [RELIANCE] Starting walk-forward backtest...
+2026-05-09 07:14:21,680 | INFO | [RELIANCE] Starting walk-forward backtest 2021-01-01→2025-12-31
+2026-05-09 07:14:21,684 | WARNING | [RELIANCE] No model directory in models (tried: ['RELIANCE', 'RELIANCE.NS'])
+2026-05-09 07:14:21,686 | INFO | [RELIANCE] 14 walk-forward folds
+2026-05-09 07:14:21,704 | INFO | engineer_features_df: shape before dropna: (371, 10)
+2026-05-09 07:14:21,705 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:21,721 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:14:21,722 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:21,723 | INFO | [RELIANCE] Fold 1: no models loaded, using momentum baseline
+2026-05-09 07:14:21,724 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:21,734 | INFO | ✅ Simulation Complete. Final Equity: ₹50,038,506.62
+2026-05-09 07:14:21,735 | INFO | [RELIANCE] Fold 1: Strat=+0.1% | BH=-1.0% | Alpha=+1.0% | Sharpe=0.35 | Trades=4 | ✅ BEATS BH
+2026-05-09 07:14:21,750 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:14:21,751 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:21,766 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:14:21,767 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:21,768 | INFO | [RELIANCE] Fold 2: no models loaded, using momentum baseline
+2026-05-09 07:14:21,769 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:21,779 | INFO | ✅ Simulation Complete. Final Equity: ₹50,152,200.62
+2026-05-09 07:14:21,779 | INFO | [RELIANCE] Fold 2: Strat=+0.3% | BH=+7.5% | Alpha=-7.2% | Sharpe=1.23 | Trades=4 | ❌ BELOW BH
+2026-05-09 07:14:21,794 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:14:21,795 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:21,810 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:14:21,811 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:21,812 | INFO | [RELIANCE] Fold 3: no models loaded, using momentum baseline
+2026-05-09 07:14:21,813 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:21,823 | INFO | ✅ Simulation Complete. Final Equity: ₹49,583,736.53
+2026-05-09 07:14:21,823 | INFO | [RELIANCE] Fold 3: Strat=-0.8% | BH=-9.5% | Alpha=+8.7% | Sharpe=-3.88 | Trades=5 | ✅ BEATS BH
+2026-05-09 07:14:21,837 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:14:21,839 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:21,854 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:14:21,855 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:21,857 | INFO | [RELIANCE] Fold 4: no models loaded, using momentum baseline
+2026-05-09 07:14:21,857 | INFO | 🚀 Starting Simulation on 60 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:21,867 | INFO | ✅ Simulation Complete. Final Equity: ₹50,113,140.75
+2026-05-09 07:14:21,867 | INFO | [RELIANCE] Fold 4: Strat=+0.2% | BH=+9.4% | Alpha=-9.2% | Sharpe=1.07 | Trades=7 | ❌ BELOW BH
+2026-05-09 07:14:21,882 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:14:21,884 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:21,899 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:14:21,900 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:21,901 | INFO | [RELIANCE] Fold 5: no models loaded, using momentum baseline
+2026-05-09 07:14:21,902 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:21,911 | INFO | ✅ Simulation Complete. Final Equity: ₹49,604,407.51
+2026-05-09 07:14:21,912 | INFO | [RELIANCE] Fold 5: Strat=-0.8% | BH=-2.5% | Alpha=+1.7% | Sharpe=-4.07 | Trades=4 | ✅ BEATS BH
+2026-05-09 07:14:21,926 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:14:21,928 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:21,943 | INFO | engineer_features_df: shape before dropna: (742, 10)
+2026-05-09 07:14:21,945 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:21,946 | INFO | [RELIANCE] Fold 6: no models loaded, using momentum baseline
+2026-05-09 07:14:21,946 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:21,956 | INFO | ✅ Simulation Complete. Final Equity: ₹50,189,211.61
+2026-05-09 07:14:21,957 | INFO | [RELIANCE] Fold 6: Strat=+0.4% | BH=+11.7% | Alpha=-11.4% | Sharpe=1.88 | Trades=7 | ❌ BELOW BH
+2026-05-09 07:14:21,971 | INFO | engineer_features_df: shape before dropna: (741, 10)
+2026-05-09 07:14:21,972 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:21,988 | INFO | engineer_features_df: shape before dropna: (802, 10)
+2026-05-09 07:14:21,989 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:21,990 | INFO | [RELIANCE] Fold 7: no models loaded, using momentum baseline
+2026-05-09 07:14:21,991 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,000 | INFO | ✅ Simulation Complete. Final Equity: ₹50,124,378.28
+2026-05-09 07:14:22,001 | INFO | [RELIANCE] Fold 7: Strat=+0.2% | BH=+14.6% | Alpha=-14.4% | Sharpe=1.17 | Trades=6 | ❌ BELOW BH
+2026-05-09 07:14:22,015 | INFO | engineer_features_df: shape before dropna: (801, 10)
+2026-05-09 07:14:22,016 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,032 | INFO | engineer_features_df: shape before dropna: (862, 10)
+2026-05-09 07:14:22,033 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,034 | INFO | [RELIANCE] Fold 8: no models loaded, using momentum baseline
+2026-05-09 07:14:22,035 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,044 | INFO | ✅ Simulation Complete. Final Equity: ₹49,681,997.66
+2026-05-09 07:14:22,045 | INFO | [RELIANCE] Fold 8: Strat=-0.6% | BH=+5.1% | Alpha=-5.7% | Sharpe=-1.96 | Trades=7 | ❌ BELOW BH
+2026-05-09 07:14:22,060 | INFO | engineer_features_df: shape before dropna: (861, 10)
+2026-05-09 07:14:22,061 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,076 | INFO | engineer_features_df: shape before dropna: (926, 10)
+2026-05-09 07:14:22,078 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,079 | INFO | [RELIANCE] Fold 9: no models loaded, using momentum baseline
+2026-05-09 07:14:22,079 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,089 | INFO | ✅ Simulation Complete. Final Equity: ₹49,865,028.55
+2026-05-09 07:14:22,090 | INFO | [RELIANCE] Fold 9: Strat=-0.3% | BH=-5.8% | Alpha=+5.5% | Sharpe=-1.07 | Trades=6 | ✅ BEATS BH
+2026-05-09 07:14:22,104 | INFO | engineer_features_df: shape before dropna: (925, 10)
+2026-05-09 07:14:22,106 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,121 | INFO | engineer_features_df: shape before dropna: (988, 10)
+2026-05-09 07:14:22,123 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,124 | INFO | [RELIANCE] Fold 10: no models loaded, using momentum baseline
+2026-05-09 07:14:22,124 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,135 | INFO | ✅ Simulation Complete. Final Equity: ₹49,722,595.99
+2026-05-09 07:14:22,135 | INFO | [RELIANCE] Fold 10: Strat=-0.6% | BH=-16.6% | Alpha=+16.1% | Sharpe=-2.92 | Trades=5 | ✅ BEATS BH
+2026-05-09 07:14:22,150 | INFO | engineer_features_df: shape before dropna: (987, 10)
+2026-05-09 07:14:22,151 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,167 | INFO | engineer_features_df: shape before dropna: (1050, 10)
+2026-05-09 07:14:22,168 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,169 | INFO | [RELIANCE] Fold 11: no models loaded, using momentum baseline
+2026-05-09 07:14:22,170 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,180 | INFO | ✅ Simulation Complete. Final Equity: ₹49,600,269.10
+2026-05-09 07:14:22,180 | INFO | [RELIANCE] Fold 11: Strat=-0.8% | BH=+2.6% | Alpha=-3.4% | Sharpe=-2.85 | Trades=6 | ❌ BELOW BH
+2026-05-09 07:14:22,195 | INFO | engineer_features_df: shape before dropna: (1049, 10)
+2026-05-09 07:14:22,197 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,212 | INFO | engineer_features_df: shape before dropna: (1111, 10)
+2026-05-09 07:14:22,213 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,214 | INFO | [RELIANCE] Fold 12: no models loaded, using momentum baseline
+2026-05-09 07:14:22,215 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,225 | INFO | ✅ Simulation Complete. Final Equity: ₹50,731,108.82
+2026-05-09 07:14:22,225 | INFO | [RELIANCE] Fold 12: Strat=+1.5% | BH=+22.0% | Alpha=-20.6% | Sharpe=4.00 | Trades=7 | ❌ BELOW BH
+2026-05-09 07:14:22,240 | INFO | engineer_features_df: shape before dropna: (1110, 10)
+2026-05-09 07:14:22,241 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,257 | INFO | engineer_features_df: shape before dropna: (1175, 10)
+2026-05-09 07:14:22,258 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,259 | INFO | [RELIANCE] Fold 13: no models loaded, using momentum baseline
+2026-05-09 07:14:22,260 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,270 | INFO | ✅ Simulation Complete. Final Equity: ₹49,711,634.66
+2026-05-09 07:14:22,270 | INFO | [RELIANCE] Fold 13: Strat=-0.6% | BH=-10.1% | Alpha=+9.5% | Sharpe=-2.67 | Trades=5 | ✅ BEATS BH
+2026-05-09 07:14:22,286 | INFO | engineer_features_df: shape before dropna: (1174, 10)
+2026-05-09 07:14:22,287 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,303 | INFO | engineer_features_df: shape before dropna: (1235, 10)
+2026-05-09 07:14:22,304 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,305 | INFO | [RELIANCE] Fold 14: no models loaded, using momentum baseline
+2026-05-09 07:14:22,306 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,315 | INFO | ✅ Simulation Complete. Final Equity: ₹50,432,500.13
+2026-05-09 07:14:22,316 | INFO | [RELIANCE] Fold 14: Strat=+0.9% | BH=+12.5% | Alpha=-11.6% | Sharpe=3.60 | Trades=8 | ❌ BELOW BH
+2026-05-09 07:14:22,317 | INFO | 
+============================================================
+  PIPELINE: ICICIBANK
+============================================================
+2026-05-09 07:14:22,319 | INFO | [ICICIBANK] 1235 bars fetched
+2026-05-09 07:14:22,319 | INFO | [ICICIBANK] Starting walk-forward backtest...
+2026-05-09 07:14:22,319 | INFO | [ICICIBANK] Starting walk-forward backtest 2021-01-01→2025-12-31
+2026-05-09 07:14:22,321 | WARNING | [ICICIBANK] No model directory in models (tried: ['ICICIBANK', 'ICICIBANK.NS'])
+2026-05-09 07:14:22,323 | INFO | [ICICIBANK] 14 walk-forward folds
+2026-05-09 07:14:22,338 | INFO | engineer_features_df: shape before dropna: (371, 10)
+2026-05-09 07:14:22,339 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,354 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:14:22,355 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,356 | INFO | [ICICIBANK] Fold 1: no models loaded, using momentum baseline
+2026-05-09 07:14:22,357 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,367 | INFO | ✅ Simulation Complete. Final Equity: ₹50,643,665.76
+2026-05-09 07:14:22,367 | INFO | [ICICIBANK] Fold 1: Strat=+1.3% | BH=+23.2% | Alpha=-21.9% | Sharpe=3.49 | Trades=7 | ❌ BELOW BH
+2026-05-09 07:14:22,382 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:14:22,383 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,398 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:14:22,399 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,401 | INFO | [ICICIBANK] Fold 2: no models loaded, using momentum baseline
+2026-05-09 07:14:22,401 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,411 | INFO | ✅ Simulation Complete. Final Equity: ₹49,946,370.51
+2026-05-09 07:14:22,411 | INFO | [ICICIBANK] Fold 2: Strat=-0.1% | BH=+5.0% | Alpha=-5.1% | Sharpe=-0.32 | Trades=7 | ❌ BELOW BH
+2026-05-09 07:14:22,425 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:14:22,427 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,442 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:14:22,443 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,444 | INFO | [ICICIBANK] Fold 3: no models loaded, using momentum baseline
+2026-05-09 07:14:22,445 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,455 | INFO | ✅ Simulation Complete. Final Equity: ₹49,815,154.21
+2026-05-09 07:14:22,455 | INFO | [ICICIBANK] Fold 3: Strat=-0.4% | BH=-2.8% | Alpha=+2.4% | Sharpe=-1.53 | Trades=5 | ✅ BEATS BH
+2026-05-09 07:14:22,469 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:14:22,471 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,486 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:14:22,487 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,488 | INFO | [ICICIBANK] Fold 4: no models loaded, using momentum baseline
+2026-05-09 07:14:22,489 | INFO | 🚀 Starting Simulation on 60 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,499 | INFO | ✅ Simulation Complete. Final Equity: ₹50,050,681.52
+2026-05-09 07:14:22,499 | INFO | [ICICIBANK] Fold 4: Strat=+0.1% | BH=+5.7% | Alpha=-5.6% | Sharpe=0.58 | Trades=6 | ❌ BELOW BH
+2026-05-09 07:14:22,513 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:14:22,514 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,530 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:14:22,531 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,533 | INFO | [ICICIBANK] Fold 5: no models loaded, using momentum baseline
+2026-05-09 07:14:22,533 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,543 | INFO | ✅ Simulation Complete. Final Equity: ₹49,922,176.99
+2026-05-09 07:14:22,543 | INFO | [ICICIBANK] Fold 5: Strat=-0.2% | BH=+1.8% | Alpha=-2.0% | Sharpe=-0.71 | Trades=6 | ❌ BELOW BH
+2026-05-09 07:14:22,558 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:14:22,560 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,575 | INFO | engineer_features_df: shape before dropna: (742, 10)
+2026-05-09 07:14:22,577 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,578 | INFO | [ICICIBANK] Fold 6: no models loaded, using momentum baseline
+2026-05-09 07:14:22,578 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,588 | INFO | ✅ Simulation Complete. Final Equity: ₹50,100,620.18
+2026-05-09 07:14:22,589 | INFO | [ICICIBANK] Fold 6: Strat=+0.2% | BH=+6.3% | Alpha=-6.1% | Sharpe=0.78 | Trades=6 | ❌ BELOW BH
+2026-05-09 07:14:22,604 | INFO | engineer_features_df: shape before dropna: (741, 10)
+2026-05-09 07:14:22,606 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,625 | INFO | engineer_features_df: shape before dropna: (802, 10)
+2026-05-09 07:14:22,627 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,628 | INFO | [ICICIBANK] Fold 7: no models loaded, using momentum baseline
+2026-05-09 07:14:22,629 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,640 | INFO | ✅ Simulation Complete. Final Equity: ₹49,790,764.61
+2026-05-09 07:14:22,640 | INFO | [ICICIBANK] Fold 7: Strat=-0.4% | BH=+10.0% | Alpha=-10.4% | Sharpe=-2.01 | Trades=6 | ❌ BELOW BH
+2026-05-09 07:14:22,656 | INFO | engineer_features_df: shape before dropna: (801, 10)
+2026-05-09 07:14:22,657 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,674 | INFO | engineer_features_df: shape before dropna: (862, 10)
+2026-05-09 07:14:22,675 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,677 | INFO | [ICICIBANK] Fold 8: no models loaded, using momentum baseline
+2026-05-09 07:14:22,677 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,688 | INFO | ✅ Simulation Complete. Final Equity: ₹49,927,227.40
+2026-05-09 07:14:22,688 | INFO | [ICICIBANK] Fold 8: Strat=-0.1% | BH=+10.2% | Alpha=-10.3% | Sharpe=-0.36 | Trades=8 | ❌ BELOW BH
+2026-05-09 07:14:22,704 | INFO | engineer_features_df: shape before dropna: (861, 10)
+2026-05-09 07:14:22,706 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,723 | INFO | engineer_features_df: shape before dropna: (926, 10)
+2026-05-09 07:14:22,724 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,726 | INFO | [ICICIBANK] Fold 9: no models loaded, using momentum baseline
+2026-05-09 07:14:22,726 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,886 | INFO | ✅ Simulation Complete. Final Equity: ₹50,232,115.33
+2026-05-09 07:14:22,886 | INFO | [ICICIBANK] Fold 9: Strat=+0.5% | BH=+6.1% | Alpha=-5.6% | Sharpe=1.58 | Trades=7 | ❌ BELOW BH
+2026-05-09 07:14:22,902 | INFO | engineer_features_df: shape before dropna: (925, 10)
+2026-05-09 07:14:22,903 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,919 | INFO | engineer_features_df: shape before dropna: (988, 10)
+2026-05-09 07:14:22,920 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,922 | INFO | [ICICIBANK] Fold 10: no models loaded, using momentum baseline
+2026-05-09 07:14:22,922 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,932 | INFO | ✅ Simulation Complete. Final Equity: ₹49,907,750.79
+2026-05-09 07:14:22,932 | INFO | [ICICIBANK] Fold 10: Strat=-0.2% | BH=+0.7% | Alpha=-0.9% | Sharpe=-0.62 | Trades=5 | ❌ BELOW BH
+2026-05-09 07:14:22,948 | INFO | engineer_features_df: shape before dropna: (987, 10)
+2026-05-09 07:14:22,949 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,966 | INFO | engineer_features_df: shape before dropna: (1050, 10)
+2026-05-09 07:14:22,968 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:22,969 | INFO | [ICICIBANK] Fold 11: no models loaded, using momentum baseline
+2026-05-09 07:14:22,969 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:22,980 | INFO | ✅ Simulation Complete. Final Equity: ₹50,046,246.30
+2026-05-09 07:14:22,980 | INFO | [ICICIBANK] Fold 11: Strat=+0.1% | BH=+2.7% | Alpha=-2.6% | Sharpe=0.30 | Trades=7 | ❌ BELOW BH
+2026-05-09 07:14:22,998 | INFO | engineer_features_df: shape before dropna: (1049, 10)
+2026-05-09 07:14:22,999 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,016 | INFO | engineer_features_df: shape before dropna: (1111, 10)
+2026-05-09 07:14:23,017 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,018 | INFO | [ICICIBANK] Fold 12: no models loaded, using momentum baseline
+2026-05-09 07:14:23,019 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,029 | INFO | ✅ Simulation Complete. Final Equity: ₹49,961,295.53
+2026-05-09 07:14:23,029 | INFO | [ICICIBANK] Fold 12: Strat=-0.1% | BH=+8.6% | Alpha=-8.7% | Sharpe=-0.27 | Trades=7 | ❌ BELOW BH
+2026-05-09 07:14:23,046 | INFO | engineer_features_df: shape before dropna: (1110, 10)
+2026-05-09 07:14:23,047 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,064 | INFO | engineer_features_df: shape before dropna: (1175, 10)
+2026-05-09 07:14:23,065 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,067 | INFO | [ICICIBANK] Fold 13: no models loaded, using momentum baseline
+2026-05-09 07:14:23,067 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,078 | INFO | ✅ Simulation Complete. Final Equity: ₹49,698,388.02
+2026-05-09 07:14:23,078 | INFO | [ICICIBANK] Fold 13: Strat=-0.6% | BH=-3.5% | Alpha=+2.8% | Sharpe=-4.07 | Trades=5 | ✅ BEATS BH
+2026-05-09 07:14:23,094 | INFO | engineer_features_df: shape before dropna: (1174, 10)
+2026-05-09 07:14:23,096 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,113 | INFO | engineer_features_df: shape before dropna: (1235, 10)
+2026-05-09 07:14:23,114 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,116 | INFO | [ICICIBANK] Fold 14: no models loaded, using momentum baseline
+2026-05-09 07:14:23,116 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,126 | INFO | ✅ Simulation Complete. Final Equity: ₹49,890,128.44
+2026-05-09 07:14:23,127 | INFO | [ICICIBANK] Fold 14: Strat=-0.2% | BH=-2.2% | Alpha=+1.9% | Sharpe=-1.13 | Trades=5 | ✅ BEATS BH
+2026-05-09 07:14:23,128 | INFO | 
+============================================================
+  PIPELINE: INFY
+============================================================
+2026-05-09 07:14:23,130 | INFO | [INFY] 1235 bars fetched
+2026-05-09 07:14:23,130 | INFO | [INFY] Starting walk-forward backtest...
+2026-05-09 07:14:23,130 | INFO | [INFY] Starting walk-forward backtest 2021-01-01→2025-12-31
+2026-05-09 07:14:23,133 | WARNING | [INFY] No model directory in models (tried: ['INFY', 'INFY.NS'])
+2026-05-09 07:14:23,136 | INFO | [INFY] 14 walk-forward folds
+2026-05-09 07:14:23,152 | INFO | engineer_features_df: shape before dropna: (371, 10)
+2026-05-09 07:14:23,154 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,170 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:14:23,171 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,173 | INFO | [INFY] Fold 1: no models loaded, using momentum baseline
+2026-05-09 07:14:23,173 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,185 | INFO | ✅ Simulation Complete. Final Equity: ₹50,028,948.70
+2026-05-09 07:14:23,185 | INFO | [INFY] Fold 1: Strat=+0.1% | BH=-4.5% | Alpha=+4.5% | Sharpe=0.17 | Trades=6 | ✅ BEATS BH
+2026-05-09 07:14:23,201 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:14:23,202 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,219 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:14:23,221 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,222 | INFO | [INFY] Fold 2: no models loaded, using momentum baseline
+2026-05-09 07:14:23,223 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,233 | INFO | ✅ Simulation Complete. Final Equity: ₹50,226,232.57
+2026-05-09 07:14:23,233 | INFO | [INFY] Fold 2: Strat=+0.5% | BH=+9.4% | Alpha=-8.9% | Sharpe=1.45 | Trades=6 | ❌ BELOW BH
+2026-05-09 07:14:23,250 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:14:23,251 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,267 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:14:23,268 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,270 | INFO | [INFY] Fold 3: no models loaded, using momentum baseline
+2026-05-09 07:14:23,270 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,280 | INFO | ✅ Simulation Complete. Final Equity: ₹50,049,485.44
+2026-05-09 07:14:23,280 | INFO | [INFY] Fold 3: Strat=+0.1% | BH=-6.3% | Alpha=+6.4% | Sharpe=0.43 | Trades=5 | ✅ BEATS BH
+2026-05-09 07:14:23,296 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:14:23,297 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,312 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:14:23,313 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,315 | INFO | [INFY] Fold 4: no models loaded, using momentum baseline
+2026-05-09 07:14:23,315 | INFO | 🚀 Starting Simulation on 60 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,325 | INFO | ✅ Simulation Complete. Final Equity: ₹49,519,811.79
+2026-05-09 07:14:23,326 | INFO | [INFY] Fold 4: Strat=-1.0% | BH=-4.1% | Alpha=+3.1% | Sharpe=-2.05 | Trades=5 | ✅ BEATS BH
+2026-05-09 07:14:23,341 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:14:23,342 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,358 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:14:23,359 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,360 | INFO | [INFY] Fold 5: no models loaded, using momentum baseline
+2026-05-09 07:14:23,361 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,371 | INFO | ✅ Simulation Complete. Final Equity: ₹50,228,726.68
+2026-05-09 07:14:23,372 | INFO | [INFY] Fold 5: Strat=+0.5% | BH=+7.6% | Alpha=-7.2% | Sharpe=1.12 | Trades=8 | ❌ BELOW BH
+2026-05-09 07:14:23,389 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:14:23,390 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,407 | INFO | engineer_features_df: shape before dropna: (742, 10)
+2026-05-09 07:14:23,409 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,410 | INFO | [INFY] Fold 6: no models loaded, using momentum baseline
+2026-05-09 07:14:23,411 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,422 | INFO | ✅ Simulation Complete. Final Equity: ₹50,348,582.31
+2026-05-09 07:14:23,422 | INFO | [INFY] Fold 6: Strat=+0.7% | BH=+9.6% | Alpha=-8.9% | Sharpe=2.69 | Trades=6 | ❌ BELOW BH
+2026-05-09 07:14:23,437 | INFO | engineer_features_df: shape before dropna: (741, 10)
+2026-05-09 07:14:23,438 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,454 | INFO | engineer_features_df: shape before dropna: (802, 10)
+2026-05-09 07:14:23,456 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,457 | INFO | [INFY] Fold 7: no models loaded, using momentum baseline
+2026-05-09 07:14:23,457 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,468 | INFO | ✅ Simulation Complete. Final Equity: ₹49,823,333.66
+2026-05-09 07:14:23,468 | INFO | [INFY] Fold 7: Strat=-0.4% | BH=-3.6% | Alpha=+3.2% | Sharpe=-1.35 | Trades=6 | ✅ BEATS BH
+2026-05-09 07:14:23,483 | INFO | engineer_features_df: shape before dropna: (801, 10)
+2026-05-09 07:14:23,484 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,501 | INFO | engineer_features_df: shape before dropna: (862, 10)
+2026-05-09 07:14:23,502 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,503 | INFO | [INFY] Fold 8: no models loaded, using momentum baseline
+2026-05-09 07:14:23,504 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,515 | INFO | ✅ Simulation Complete. Final Equity: ₹50,325,098.01
+2026-05-09 07:14:23,515 | INFO | [INFY] Fold 8: Strat=+0.7% | BH=+8.5% | Alpha=-7.9% | Sharpe=2.04 | Trades=7 | ❌ BELOW BH
+2026-05-09 07:14:23,531 | INFO | engineer_features_df: shape before dropna: (861, 10)
+2026-05-09 07:14:23,532 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,550 | INFO | engineer_features_df: shape before dropna: (926, 10)
+2026-05-09 07:14:23,551 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,552 | INFO | [INFY] Fold 9: no models loaded, using momentum baseline
+2026-05-09 07:14:23,553 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,563 | INFO | ✅ Simulation Complete. Final Equity: ₹50,375,419.91
+2026-05-09 07:14:23,564 | INFO | [INFY] Fold 9: Strat=+0.8% | BH=+19.7% | Alpha=-19.0% | Sharpe=1.73 | Trades=9 | ❌ BELOW BH
+2026-05-09 07:14:23,579 | INFO | engineer_features_df: shape before dropna: (925, 10)
+2026-05-09 07:14:23,581 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,598 | INFO | engineer_features_df: shape before dropna: (988, 10)
+2026-05-09 07:14:23,600 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,601 | INFO | [INFY] Fold 10: no models loaded, using momentum baseline
+2026-05-09 07:14:23,601 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,611 | INFO | ✅ Simulation Complete. Final Equity: ₹49,855,428.42
+2026-05-09 07:14:23,612 | INFO | [INFY] Fold 10: Strat=-0.3% | BH=-0.0% | Alpha=-0.3% | Sharpe=-0.91 | Trades=5 | ❌ BELOW BH
+2026-05-09 07:14:23,627 | INFO | engineer_features_df: shape before dropna: (987, 10)
+2026-05-09 07:14:23,628 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,644 | INFO | engineer_features_df: shape before dropna: (1050, 10)
+2026-05-09 07:14:23,646 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,647 | INFO | [INFY] Fold 11: no models loaded, using momentum baseline
+2026-05-09 07:14:23,647 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,657 | INFO | ✅ Simulation Complete. Final Equity: ₹49,695,800.94
+2026-05-09 07:14:23,658 | INFO | [INFY] Fold 11: Strat=-0.6% | BH=-18.9% | Alpha=+18.3% | Sharpe=-2.17 | Trades=4 | ✅ BEATS BH
+2026-05-09 07:14:23,673 | INFO | engineer_features_df: shape before dropna: (1049, 10)
+2026-05-09 07:14:23,674 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,690 | INFO | engineer_features_df: shape before dropna: (1111, 10)
+2026-05-09 07:14:23,691 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,692 | INFO | [INFY] Fold 12: no models loaded, using momentum baseline
+2026-05-09 07:14:23,693 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,703 | INFO | ✅ Simulation Complete. Final Equity: ₹50,540,932.02
+2026-05-09 07:14:23,704 | INFO | [INFY] Fold 12: Strat=+1.1% | BH=+6.7% | Alpha=-5.7% | Sharpe=3.47 | Trades=6 | ❌ BELOW BH
+2026-05-09 07:14:23,719 | INFO | engineer_features_df: shape before dropna: (1110, 10)
+2026-05-09 07:14:23,721 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,737 | INFO | engineer_features_df: shape before dropna: (1175, 10)
+2026-05-09 07:14:23,738 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,739 | INFO | [INFY] Fold 13: no models loaded, using momentum baseline
+2026-05-09 07:14:23,740 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,751 | INFO | ✅ Simulation Complete. Final Equity: ₹49,703,625.85
+2026-05-09 07:14:23,751 | INFO | [INFY] Fold 13: Strat=-0.6% | BH=-10.0% | Alpha=+9.4% | Sharpe=-2.01 | Trades=5 | ✅ BEATS BH
+2026-05-09 07:14:23,766 | INFO | engineer_features_df: shape before dropna: (1174, 10)
+2026-05-09 07:14:23,767 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,785 | INFO | engineer_features_df: shape before dropna: (1235, 10)
+2026-05-09 07:14:23,786 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,788 | INFO | [INFY] Fold 14: no models loaded, using momentum baseline
+2026-05-09 07:14:23,788 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,798 | INFO | ✅ Simulation Complete. Final Equity: ₹49,976,851.89
+2026-05-09 07:14:23,799 | INFO | [INFY] Fold 14: Strat=-0.0% | BH=+13.9% | Alpha=-13.9% | Sharpe=-0.19 | Trades=6 | ❌ BELOW BH
+2026-05-09 07:14:23,800 | INFO | 
+============================================================
+  PIPELINE: TCS
+============================================================
+2026-05-09 07:14:23,801 | INFO | [TCS] 1235 bars fetched
+2026-05-09 07:14:23,801 | INFO | [TCS] Starting walk-forward backtest...
+2026-05-09 07:14:23,802 | INFO | [TCS] Starting walk-forward backtest 2021-01-01→2025-12-31
+2026-05-09 07:14:23,804 | WARNING | [TCS] No model directory in models (tried: ['TCS', 'TCS.NS'])
+2026-05-09 07:14:23,806 | INFO | [TCS] 14 walk-forward folds
+2026-05-09 07:14:23,821 | INFO | engineer_features_df: shape before dropna: (371, 10)
+2026-05-09 07:14:23,822 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,837 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:14:23,839 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,840 | INFO | [TCS] Fold 1: no models loaded, using momentum baseline
+2026-05-09 07:14:23,841 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,850 | INFO | ✅ Simulation Complete. Final Equity: ₹49,985,980.10
+2026-05-09 07:14:23,851 | INFO | [TCS] Fold 1: Strat=-0.0% | BH=-9.1% | Alpha=+9.1% | Sharpe=-0.09 | Trades=5 | ✅ BEATS BH
+2026-05-09 07:14:23,865 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:14:23,867 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,882 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:14:23,883 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,884 | INFO | [TCS] Fold 2: no models loaded, using momentum baseline
+2026-05-09 07:14:23,885 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,895 | INFO | ✅ Simulation Complete. Final Equity: ₹50,107,308.16
+2026-05-09 07:14:23,895 | INFO | [TCS] Fold 2: Strat=+0.2% | BH=+9.4% | Alpha=-9.2% | Sharpe=1.21 | Trades=5 | ❌ BELOW BH
+2026-05-09 07:14:23,910 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:14:23,911 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,926 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:14:23,928 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,929 | INFO | [TCS] Fold 3: no models loaded, using momentum baseline
+2026-05-09 07:14:23,929 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,939 | INFO | ✅ Simulation Complete. Final Equity: ₹50,183,425.85
+2026-05-09 07:14:23,939 | INFO | [TCS] Fold 3: Strat=+0.4% | BH=+0.5% | Alpha=-0.2% | Sharpe=1.19 | Trades=7 | ❌ BELOW BH
+2026-05-09 07:14:23,954 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:14:23,956 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,971 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:14:23,972 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:23,973 | INFO | [TCS] Fold 4: no models loaded, using momentum baseline
+2026-05-09 07:14:23,974 | INFO | 🚀 Starting Simulation on 60 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:23,983 | INFO | ✅ Simulation Complete. Final Equity: ₹49,829,568.99
+2026-05-09 07:14:23,984 | INFO | [TCS] Fold 4: Strat=-0.3% | BH=+4.0% | Alpha=-4.3% | Sharpe=-1.68 | Trades=6 | ❌ BELOW BH
+2026-05-09 07:14:23,999 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:14:24,000 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,016 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:14:24,017 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,018 | INFO | [TCS] Fold 5: no models loaded, using momentum baseline
+2026-05-09 07:14:24,019 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,029 | INFO | ✅ Simulation Complete. Final Equity: ₹50,304,213.67
+2026-05-09 07:14:24,029 | INFO | [TCS] Fold 5: Strat=+0.6% | BH=+8.1% | Alpha=-7.5% | Sharpe=2.16 | Trades=7 | ❌ BELOW BH
+2026-05-09 07:14:24,044 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:14:24,046 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,061 | INFO | engineer_features_df: shape before dropna: (742, 10)
+2026-05-09 07:14:24,063 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,064 | INFO | [TCS] Fold 6: no models loaded, using momentum baseline
+2026-05-09 07:14:24,064 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,074 | INFO | ✅ Simulation Complete. Final Equity: ₹50,040,302.77
+2026-05-09 07:14:24,074 | INFO | [TCS] Fold 6: Strat=+0.1% | BH=+8.7% | Alpha=-8.7% | Sharpe=0.37 | Trades=6 | ❌ BELOW BH
+2026-05-09 07:14:24,090 | INFO | engineer_features_df: shape before dropna: (741, 10)
+2026-05-09 07:14:24,091 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,106 | INFO | engineer_features_df: shape before dropna: (802, 10)
+2026-05-09 07:14:24,107 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,109 | INFO | [TCS] Fold 7: no models loaded, using momentum baseline
+2026-05-09 07:14:24,109 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,119 | INFO | ✅ Simulation Complete. Final Equity: ₹50,049,023.07
+2026-05-09 07:14:24,119 | INFO | [TCS] Fold 7: Strat=+0.1% | BH=+3.5% | Alpha=-3.4% | Sharpe=0.31 | Trades=6 | ❌ BELOW BH
+2026-05-09 07:14:24,134 | INFO | engineer_features_df: shape before dropna: (801, 10)
+2026-05-09 07:14:24,135 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,151 | INFO | engineer_features_df: shape before dropna: (862, 10)
+2026-05-09 07:14:24,152 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,153 | INFO | [TCS] Fold 8: no models loaded, using momentum baseline
+2026-05-09 07:14:24,154 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,164 | INFO | ✅ Simulation Complete. Final Equity: ₹49,858,139.17
+2026-05-09 07:14:24,164 | INFO | [TCS] Fold 8: Strat=-0.3% | BH=+2.3% | Alpha=-2.6% | Sharpe=-1.39 | Trades=5 | ❌ BELOW BH
+2026-05-09 07:14:24,179 | INFO | engineer_features_df: shape before dropna: (861, 10)
+2026-05-09 07:14:24,181 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,196 | INFO | engineer_features_df: shape before dropna: (926, 10)
+2026-05-09 07:14:24,197 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,198 | INFO | [TCS] Fold 9: no models loaded, using momentum baseline
+2026-05-09 07:14:24,198 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,209 | INFO | ✅ Simulation Complete. Final Equity: ₹50,281,905.08
+2026-05-09 07:14:24,209 | INFO | [TCS] Fold 9: Strat=+0.6% | BH=+8.0% | Alpha=-7.5% | Sharpe=1.52 | Trades=8 | ❌ BELOW BH
+2026-05-09 07:14:24,224 | INFO | engineer_features_df: shape before dropna: (925, 10)
+2026-05-09 07:14:24,225 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,240 | INFO | engineer_features_df: shape before dropna: (988, 10)
+2026-05-09 07:14:24,241 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,243 | INFO | [TCS] Fold 10: no models loaded, using momentum baseline
+2026-05-09 07:14:24,243 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,253 | INFO | ✅ Simulation Complete. Final Equity: ₹49,779,977.85
+2026-05-09 07:14:24,253 | INFO | [TCS] Fold 10: Strat=-0.4% | BH=-3.9% | Alpha=+3.4% | Sharpe=-1.95 | Trades=4 | ✅ BEATS BH
+2026-05-09 07:14:24,269 | INFO | engineer_features_df: shape before dropna: (987, 10)
+2026-05-09 07:14:24,270 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,287 | INFO | engineer_features_df: shape before dropna: (1050, 10)
+2026-05-09 07:14:24,288 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,289 | INFO | [TCS] Fold 11: no models loaded, using momentum baseline
+2026-05-09 07:14:24,290 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,300 | INFO | ✅ Simulation Complete. Final Equity: ₹49,807,759.41
+2026-05-09 07:14:24,300 | INFO | [TCS] Fold 11: Strat=-0.4% | BH=-12.1% | Alpha=+11.7% | Sharpe=-1.35 | Trades=5 | ✅ BEATS BH
+2026-05-09 07:14:24,315 | INFO | engineer_features_df: shape before dropna: (1049, 10)
+2026-05-09 07:14:24,317 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,333 | INFO | engineer_features_df: shape before dropna: (1111, 10)
+2026-05-09 07:14:24,334 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,335 | INFO | [TCS] Fold 12: no models loaded, using momentum baseline
+2026-05-09 07:14:24,336 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,345 | INFO | ✅ Simulation Complete. Final Equity: ₹50,113,549.73
+2026-05-09 07:14:24,346 | INFO | [TCS] Fold 12: Strat=+0.2% | BH=-2.6% | Alpha=+2.8% | Sharpe=0.95 | Trades=6 | ✅ BEATS BH
+2026-05-09 07:14:24,360 | INFO | engineer_features_df: shape before dropna: (1110, 10)
+2026-05-09 07:14:24,362 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,378 | INFO | engineer_features_df: shape before dropna: (1175, 10)
+2026-05-09 07:14:24,379 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,380 | INFO | [TCS] Fold 13: no models loaded, using momentum baseline
+2026-05-09 07:14:24,381 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,390 | INFO | ✅ Simulation Complete. Final Equity: ₹49,631,055.52
+2026-05-09 07:14:24,391 | INFO | [TCS] Fold 13: Strat=-0.7% | BH=-14.7% | Alpha=+14.0% | Sharpe=-4.06 | Trades=4 | ✅ BEATS BH
+2026-05-09 07:14:24,406 | INFO | engineer_features_df: shape before dropna: (1174, 10)
+2026-05-09 07:14:24,407 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,423 | INFO | engineer_features_df: shape before dropna: (1235, 10)
+2026-05-09 07:14:24,424 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,425 | INFO | [TCS] Fold 14: no models loaded, using momentum baseline
+2026-05-09 07:14:24,425 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,435 | INFO | ✅ Simulation Complete. Final Equity: ₹49,932,530.91
+2026-05-09 07:14:24,435 | INFO | [TCS] Fold 14: Strat=-0.1% | BH=+11.8% | Alpha=-12.0% | Sharpe=-0.62 | Trades=6 | ❌ BELOW BH
+
+══════════════════════════════════════════════════════════════════════
+  MARK5 WALK-FORWARD BACKTEST — RELIANCE
+══════════════════════════════════════════════════════════════════════
+  Period    : 2021-01-01 → 2025-12-31
+  Folds     : 14 (18m train / 3m test)
+  Verdict   : ⚠️ NEEDS MORE TUNING
+──────────────────────────────────────────────────────────────────────
+  Beats B&H : 43% of folds
+  Mean Alpha : -2.92%
+  Mean Sharpe: -0.438  (target ≥ 1.0)
+  Mean Strat : -0.06%  vs  BH +2.85%
+  Max DD     : -0.93%  (limit ≤ -18%)
+  Profit Fac : 2.314  (target ≥ 1.5)
+  Win Rate   : 41.8%
+  Total Trades: 81
+──────────────────────────────────────────────────────────────────────
+  Per-fold breakdown:
+  Fold  Test Period               Strat%     BH%   Alpha  Sharpe  Trades
+  ----------------------------------------------------------------
+  1   ✅ 2022-07-01 → 2022-09-30    +0.1    -1.0    +1.0   0.353       4
+  2   ❌ 2022-10-03 → 2022-12-30    +0.3    +7.5    -7.2   1.226       4
+  3   ✅ 2023-01-02 → 2023-03-31    -0.8    -9.5    +8.7  -3.884       5
+  4   ❌ 2023-04-03 → 2023-06-30    +0.2    +9.4    -9.2   1.066       7
+  5   ✅ 2023-07-03 → 2023-09-29    -0.8    -2.5    +1.7  -4.065       4
+  6   ❌ 2023-10-03 → 2024-01-01    +0.4   +11.7   -11.4   1.876       7
+  7   ❌ 2024-01-01 → 2024-04-01    +0.2   +14.6   -14.4   1.173       6
+  8   ❌ 2024-04-01 → 2024-07-01    -0.6    +5.1    -5.7  -1.955       7
+  9   ✅ 2024-07-01 → 2024-10-01    -0.3    -5.8    +5.5  -1.071       6
+  10  ✅ 2024-10-01 → 2025-01-01    -0.6   -16.6   +16.1  -2.920       5
+  11  ❌ 2025-01-01 → 2025-04-01    -0.8    +2.6    -3.4  -2.853       6
+  12  ❌ 2025-04-01 → 2025-07-01    +1.5   +22.0   -20.6   4.004       7
+  13  ✅ 2025-07-01 → 2025-10-01    -0.6   -10.1    +9.5  -2.674       5
+  14  ❌ 2025-10-01 → 2025-12-30    +0.9   +12.5   -11.6   3.597       8
+══════════════════════════════════════════════════════════════════════
+
+
+══════════════════════════════════════════════════════════════════════
+  MARK5 WALK-FORWARD BACKTEST — ICICIBANK
+══════════════════════════════════════════════════════════════════════
+  Period    : 2021-01-01 → 2025-12-31
+  Folds     : 14 (18m train / 3m test)
+  Verdict   : ⚠️ NEEDS MORE TUNING
+──────────────────────────────────────────────────────────────────────
+  Beats B&H : 21% of folds
+  Mean Alpha : -5.15%
+  Mean Sharpe: -0.306  (target ≥ 1.0)
+  Mean Strat : -0.01%  vs  BH +5.14%
+  Max DD     : -0.94%  (limit ≤ -18%)
+  Profit Fac : 1.165  (target ≥ 1.5)
+  Win Rate   : 42.4%
+  Total Trades: 87
+──────────────────────────────────────────────────────────────────────
+  Per-fold breakdown:
+  Fold  Test Period               Strat%     BH%   Alpha  Sharpe  Trades
+  ----------------------------------------------------------------
+  1   ❌ 2022-07-01 → 2022-09-30    +1.3   +23.2   -21.9   3.486       7
+  2   ❌ 2022-10-03 → 2022-12-30    -0.1    +5.0    -5.1  -0.315       7
+  3   ✅ 2023-01-02 → 2023-03-31    -0.4    -2.8    +2.4  -1.532       5
+  4   ❌ 2023-04-03 → 2023-06-30    +0.1    +5.8    -5.7   0.578       6
+  5   ❌ 2023-07-03 → 2023-09-29    -0.2    +1.8    -2.0  -0.715       6
+  6   ❌ 2023-10-03 → 2024-01-01    +0.2    +6.3    -6.1   0.785       6
+  7   ❌ 2024-01-01 → 2024-04-01    -0.4   +10.0   -10.4  -2.010       6
+  8   ❌ 2024-04-01 → 2024-07-01    -0.1   +10.2   -10.3  -0.358       8
+  9   ❌ 2024-07-01 → 2024-10-01    +0.5    +6.1    -5.6   1.584       7
+  10  ❌ 2024-10-01 → 2025-01-01    -0.2    +0.7    -0.9  -0.617       5
+  11  ❌ 2025-01-01 → 2025-04-01    +0.1    +2.7    -2.6   0.297       7
+  12  ❌ 2025-04-01 → 2025-07-01    -0.1    +8.6    -8.7  -0.271       7
+  13  ✅ 2025-07-01 → 2025-10-01    -0.6    -3.5    +2.9  -4.075       5
+  14  ✅ 2025-10-01 → 2025-12-30    -0.2    -2.1    +1.9  -1.127       5
+══════════════════════════════════════════════════════════════════════
+
+
+══════════════════════════════════════════════════════════════════════
+  MARK5 WALK-FORWARD BACKTEST — INFY
+══════════════════════════════════════════════════════════════════════
+  Period    : 2021-01-01 → 2025-12-31
+  Folds     : 14 (18m train / 3m test)
+  Verdict   : ⚠️ NEEDS MORE TUNING
+──────────────────────────────────────────────────────────────────────
+  Beats B&H : 43% of folds
+  Mean Alpha : -1.90%
+  Mean Sharpe: 0.315  (target ≥ 1.0)
+  Mean Strat : +0.10%  vs  BH +2.00%
+  Max DD     : -0.96%  (limit ≤ -18%)
+  Profit Fac : 3.458  (target ≥ 1.5)
+  Win Rate   : 51.2%
+  Total Trades: 84
+──────────────────────────────────────────────────────────────────────
+  Per-fold breakdown:
+  Fold  Test Period               Strat%     BH%   Alpha  Sharpe  Trades
+  ----------------------------------------------------------------
+  1   ✅ 2022-07-01 → 2022-09-30    +0.1    -4.5    +4.5   0.167       6
+  2   ❌ 2022-10-03 → 2022-12-30    +0.5    +9.4    -8.9   1.454       6
+  3   ✅ 2023-01-02 → 2023-03-31    +0.1    -6.3    +6.4   0.431       5
+  4   ✅ 2023-04-03 → 2023-06-30    -1.0    -4.1    +3.1  -2.055       5
+  5   ❌ 2023-07-03 → 2023-09-29    +0.5    +7.6    -7.2   1.122       8
+  6   ❌ 2023-10-03 → 2024-01-01    +0.7    +9.6    -8.9   2.690       6
+  7   ✅ 2024-01-01 → 2024-04-01    -0.3    -3.6    +3.2  -1.350       6
+  8   ❌ 2024-04-01 → 2024-07-01    +0.7    +8.5    -7.8   2.041       7
+  9   ❌ 2024-07-01 → 2024-10-01    +0.8   +19.7   -19.0   1.729       9
+  10  ❌ 2024-10-01 → 2025-01-01    -0.3    -0.0    -0.3  -0.913       5
+  11  ✅ 2025-01-01 → 2025-04-01    -0.6   -18.9   +18.3  -2.169       4
+  12  ❌ 2025-04-01 → 2025-07-01    +1.1    +6.7    -5.7   3.466       6
+  13  ✅ 2025-07-01 → 2025-10-01    -0.6   -10.0    +9.4  -2.014       5
+  14  ❌ 2025-10-01 → 2025-12-30    -0.1   +13.9   -13.9  -0.187       6
+══════════════════════════════════════════════════════════════════════
+
+
+══════════════════════════════════════════════════════════════════════2026-05-09 07:14:24,436 | INFO | 
+============================================================
+  PIPELINE: HDFCBANK
+============================================================
+2026-05-09 07:14:24,438 | INFO | [HDFCBANK] 1235 bars fetched
+2026-05-09 07:14:24,438 | INFO | [HDFCBANK] Starting walk-forward backtest...
+2026-05-09 07:14:24,438 | INFO | [HDFCBANK] Starting walk-forward backtest 2021-01-01→2025-12-31
+2026-05-09 07:14:24,441 | WARNING | [HDFCBANK] No model directory in models (tried: ['HDFCBANK', 'HDFCBANK.NS'])
+2026-05-09 07:14:24,443 | INFO | [HDFCBANK] 14 walk-forward folds
+2026-05-09 07:14:24,458 | INFO | engineer_features_df: shape before dropna: (371, 10)
+2026-05-09 07:14:24,459 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,474 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:14:24,475 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,476 | INFO | [HDFCBANK] Fold 1: no models loaded, using momentum baseline
+2026-05-09 07:14:24,477 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,487 | INFO | ✅ Simulation Complete. Final Equity: ₹50,118,147.38
+2026-05-09 07:14:24,487 | INFO | [HDFCBANK] Fold 1: Strat=+0.2% | BH=+5.0% | Alpha=-4.8% | Sharpe=0.75 | Trades=6 | ❌ BELOW BH
+2026-05-09 07:14:24,502 | INFO | engineer_features_df: shape before dropna: (434, 10)
+2026-05-09 07:14:24,503 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,518 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:14:24,520 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,521 | INFO | [HDFCBANK] Fold 2: no models loaded, using momentum baseline
+2026-05-09 07:14:24,521 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,531 | INFO | ✅ Simulation Complete. Final Equity: ₹50,435,129.15
+2026-05-09 07:14:24,531 | INFO | [HDFCBANK] Fold 2: Strat=+0.9% | BH=+15.2% | Alpha=-14.3% | Sharpe=2.71 | Trades=7 | ❌ BELOW BH
+2026-05-09 07:14:24,546 | INFO | engineer_features_df: shape before dropna: (496, 10)
+2026-05-09 07:14:24,548 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,563 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:14:24,564 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,565 | INFO | [HDFCBANK] Fold 3: no models loaded, using momentum baseline
+2026-05-09 07:14:24,566 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,576 | INFO | ✅ Simulation Complete. Final Equity: ₹49,955,534.04
+2026-05-09 07:14:24,576 | INFO | [HDFCBANK] Fold 3: Strat=-0.1% | BH=-1.2% | Alpha=+1.1% | Sharpe=-0.40 | Trades=5 | ✅ BEATS BH
+2026-05-09 07:14:24,591 | INFO | engineer_features_df: shape before dropna: (558, 10)
+2026-05-09 07:14:24,592 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,607 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:14:24,608 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,610 | INFO | [HDFCBANK] Fold 4: no models loaded, using momentum baseline
+2026-05-09 07:14:24,610 | INFO | 🚀 Starting Simulation on 60 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,620 | INFO | ✅ Simulation Complete. Final Equity: ₹49,955,356.72
+2026-05-09 07:14:24,620 | INFO | [HDFCBANK] Fold 4: Strat=-0.1% | BH=+6.9% | Alpha=-6.9% | Sharpe=-0.34 | Trades=8 | ❌ BELOW BH
+2026-05-09 07:14:24,635 | INFO | engineer_features_df: shape before dropna: (618, 10)
+2026-05-09 07:14:24,637 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,652 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:14:24,653 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,654 | INFO | [HDFCBANK] Fold 5: no models loaded, using momentum baseline
+2026-05-09 07:14:24,655 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,665 | INFO | ✅ Simulation Complete. Final Equity: ₹49,728,510.01
+2026-05-09 07:14:24,665 | INFO | [HDFCBANK] Fold 5: Strat=-0.5% | BH=-11.3% | Alpha=+10.7% | Sharpe=-2.50 | Trades=5 | ✅ BEATS BH
+2026-05-09 07:14:24,680 | INFO | engineer_features_df: shape before dropna: (681, 10)
+2026-05-09 07:14:24,681 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,696 | INFO | engineer_features_df: shape before dropna: (742, 10)
+2026-05-09 07:14:24,698 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,699 | INFO | [HDFCBANK] Fold 6: no models loaded, using momentum baseline
+2026-05-09 07:14:24,699 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,710 | INFO | ✅ Simulation Complete. Final Equity: ₹50,469,767.09
+2026-05-09 07:14:24,710 | INFO | [HDFCBANK] Fold 6: Strat=+0.9% | BH=+12.6% | Alpha=-11.7% | Sharpe=3.56 | Trades=8 | ❌ BELOW BH
+2026-05-09 07:14:24,725 | INFO | engineer_features_df: shape before dropna: (741, 10)
+2026-05-09 07:14:24,727 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,742 | INFO | engineer_features_df: shape before dropna: (802, 10)
+2026-05-09 07:14:24,743 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,745 | INFO | [HDFCBANK] Fold 7: no models loaded, using momentum baseline
+2026-05-09 07:14:24,746 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,756 | INFO | ✅ Simulation Complete. Final Equity: ₹49,617,136.32
+2026-05-09 07:14:24,757 | INFO | [HDFCBANK] Fold 7: Strat=-0.8% | BH=-13.4% | Alpha=+12.6% | Sharpe=-2.62 | Trades=5 | ✅ BEATS BH
+2026-05-09 07:14:24,773 | INFO | engineer_features_df: shape before dropna: (801, 10)
+2026-05-09 07:14:24,774 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,789 | INFO | engineer_features_df: shape before dropna: (862, 10)
+2026-05-09 07:14:24,790 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,792 | INFO | [HDFCBANK] Fold 8: no models loaded, using momentum baseline
+2026-05-09 07:14:24,792 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,802 | INFO | ✅ Simulation Complete. Final Equity: ₹50,486,665.65
+2026-05-09 07:14:24,802 | INFO | [HDFCBANK] Fold 8: Strat=+1.0% | BH=+17.5% | Alpha=-16.6% | Sharpe=2.29 | Trades=8 | ❌ BELOW BH
+2026-05-09 07:14:24,816 | INFO | engineer_features_df: shape before dropna: (861, 10)
+2026-05-09 07:14:24,817 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,833 | INFO | engineer_features_df: shape before dropna: (926, 10)
+2026-05-09 07:14:24,834 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,835 | INFO | [HDFCBANK] Fold 9: no models loaded, using momentum baseline
+2026-05-09 07:14:24,835 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,845 | INFO | ✅ Simulation Complete. Final Equity: ₹50,174,771.09
+2026-05-09 07:14:24,845 | INFO | [HDFCBANK] Fold 9: Strat=+0.3% | BH=+1.2% | Alpha=-0.9% | Sharpe=1.47 | Trades=8 | ❌ BELOW BH
+2026-05-09 07:14:24,860 | INFO | engineer_features_df: shape before dropna: (925, 10)
+2026-05-09 07:14:24,861 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,877 | INFO | engineer_features_df: shape before dropna: (988, 10)
+2026-05-09 07:14:24,878 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,880 | INFO | [HDFCBANK] Fold 10: no models loaded, using momentum baseline
+2026-05-09 07:14:24,880 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,890 | INFO | ✅ Simulation Complete. Final Equity: ₹50,211,231.96
+2026-05-09 07:14:24,890 | INFO | [HDFCBANK] Fold 10: Strat=+0.4% | BH=+3.3% | Alpha=-2.9% | Sharpe=1.68 | Trades=6 | ❌ BELOW BH
+2026-05-09 07:14:24,906 | INFO | engineer_features_df: shape before dropna: (987, 10)
+2026-05-09 07:14:24,907 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,923 | INFO | engineer_features_df: shape before dropna: (1050, 10)
+2026-05-09 07:14:24,925 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,926 | INFO | [HDFCBANK] Fold 11: no models loaded, using momentum baseline
+2026-05-09 07:14:24,926 | INFO | 🚀 Starting Simulation on 63 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,936 | INFO | ✅ Simulation Complete. Final Equity: ₹49,924,369.40
+2026-05-09 07:14:24,937 | INFO | [HDFCBANK] Fold 11: Strat=-0.2% | BH=-0.8% | Alpha=+0.7% | Sharpe=-0.53 | Trades=7 | ✅ BEATS BH
+2026-05-09 07:14:24,952 | INFO | engineer_features_df: shape before dropna: (1049, 10)
+2026-05-09 07:14:24,954 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,970 | INFO | engineer_features_df: shape before dropna: (1111, 10)
+2026-05-09 07:14:24,972 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:24,973 | INFO | [HDFCBANK] Fold 12: no models loaded, using momentum baseline
+2026-05-09 07:14:24,973 | INFO | 🚀 Starting Simulation on 62 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:24,983 | INFO | ✅ Simulation Complete. Final Equity: ₹50,420,113.37
+2026-05-09 07:14:24,984 | INFO | [HDFCBANK] Fold 12: Strat=+0.8% | BH=+15.1% | Alpha=-14.2% | Sharpe=2.33 | Trades=8 | ❌ BELOW BH
+2026-05-09 07:14:24,999 | INFO | engineer_features_df: shape before dropna: (1110, 10)
+2026-05-09 07:14:25,000 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:25,016 | INFO | engineer_features_df: shape before dropna: (1175, 10)
+2026-05-09 07:14:25,017 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:25,019 | INFO | [HDFCBANK] Fold 13: no models loaded, using momentum baseline
+2026-05-09 07:14:25,019 | INFO | 🚀 Starting Simulation on 65 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:25,028 | INFO | ✅ Simulation Complete. Final Equity: ₹49,742,146.77
+2026-05-09 07:14:25,029 | INFO | [HDFCBANK] Fold 13: Strat=-0.5% | BH=-3.8% | Alpha=+3.3% | Sharpe=-3.79 | Trades=5 | ✅ BEATS BH
+2026-05-09 07:14:25,044 | INFO | engineer_features_df: shape before dropna: (1174, 10)
+2026-05-09 07:14:25,045 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:25,061 | INFO | engineer_features_df: shape before dropna: (1235, 10)
+2026-05-09 07:14:25,062 | INFO | engineer_features_df: NaNs per column:
+amihud_ratio      79
+range_z           59
+bb_width          78
+atr_vol           59
+dist_52w_high    310
+gap_sig           60
+vol_adj_mom       79
+mfi_div           86
+rel_strength      59
+tii_60            59
+dtype: int64
+2026-05-09 07:14:25,063 | INFO | [HDFCBANK] Fold 14: no models loaded, using momentum baseline
+2026-05-09 07:14:25,064 | INFO | 🚀 Starting Simulation on 61 bars. Segment: EQUITY_DELIVERY
+2026-05-09 07:14:25,073 | INFO | ✅ Simulation Complete. Final Equity: ₹49,837,236.82
+2026-05-09 07:14:25,073 | INFO | [HDFCBANK] Fold 14: Strat=-0.3% | BH=+2.7% | Alpha=-3.0% | Sharpe=-1.45 | Trades=7 | ❌ BELOW BH
+
+  MARK5 WALK-FORWARD BACKTEST — TCS
+══════════════════════════════════════════════════════════════════════
+  Period    : 2021-01-01 → 2025-12-31
+  Folds     : 14 (18m train / 3m test)
+  Verdict   : ⚠️ NEEDS MORE TUNING
+──────────────────────────────────────────────────────────────────────
+  Beats B&H : 36% of folds
+  Mean Alpha : -1.02%
+  Mean Sharpe: -0.245  (target ≥ 1.0)
+  Mean Strat : -0.01%  vs  BH +1.00%
+  Max DD     : -0.74%  (limit ≤ -18%)
+  Profit Fac : 1.101  (target ≥ 1.5)
+  Win Rate   : 42.6%
+  Total Trades: 80
+──────────────────────────────────────────────────────────────────────
+  Per-fold breakdown:
+  Fold  Test Period               Strat%     BH%   Alpha  Sharpe  Trades
+  ----------------------------------------------------------------
+  1   ✅ 2022-07-01 → 2022-09-30    -0.0    -9.1    +9.1  -0.087       5
+  2   ❌ 2022-10-03 → 2022-12-30    +0.2    +9.4    -9.2   1.211       5
+  3   ❌ 2023-01-02 → 2023-03-31    +0.4    +0.5    -0.2   1.190       7
+  4   ❌ 2023-04-03 → 2023-06-30    -0.3    +4.0    -4.3  -1.681       6
+  5   ❌ 2023-07-03 → 2023-09-29    +0.6    +8.1    -7.5   2.156       7
+  6   ❌ 2023-10-03 → 2024-01-01    +0.1    +8.7    -8.7   0.368       6
+  7   ❌ 2024-01-01 → 2024-04-01    +0.1    +3.5    -3.4   0.313       6
+  8   ❌ 2024-04-01 → 2024-07-01    -0.3    +2.3    -2.6  -1.394       5
+  9   ❌ 2024-07-01 → 2024-10-01    +0.6    +8.0    -7.5   1.518       8
+  10  ✅ 2024-10-01 → 2025-01-01    -0.4    -3.9    +3.4  -1.953       4
+  11  ✅ 2025-01-01 → 2025-04-01    -0.4   -12.1   +11.7  -1.351       5
+  12  ✅ 2025-04-01 → 2025-07-01    +0.2    -2.5    +2.8   0.953       6
+  13  ✅ 2025-07-01 → 2025-10-01    -0.7   -14.7   +14.0  -4.061       4
+  14  ❌ 2025-10-01 → 2025-12-30    -0.1   +11.8   -12.0  -0.617       6
+══════════════════════════════════════════════════════════════════════
+
+
+══════════════════════════════════════════════════════════════════════
+  MARK5 WALK-FORWARD BACKTEST — HDFCBANK
+══════════════════════════════════════════════════════════════════════
+  Period    : 2021-01-01 → 2025-12-31
+  Folds     : 14 (18m train / 3m test)
+  Verdict   : ⚠️ NEEDS MORE TUNING
+──────────────────────────────────────────────────────────────────────
+  Beats B&H : 36% of folds
+  Mean Alpha : -3.34%
+  Mean Sharpe: 0.225  (target ≥ 1.0)
+  Mean Strat : +0.15%  vs  BH +3.50%
+  Max DD     : -0.92%  (limit ≤ -18%)
+  Profit Fac : 1.616  (target ≥ 1.5)
+  Win Rate   : 47.1%
+  Total Trades: 93
+──────────────────────────────────────────────────────────────────────
+  Per-fold breakdown:
+  Fold  Test Period               Strat%     BH%   Alpha  Sharpe  Trades
+  ----------------------------------------------------------------
+  1   ❌ 2022-07-01 → 2022-09-30    +0.2    +5.0    -4.8   0.750       6
+  2   ❌ 2022-10-03 → 2022-12-30    +0.9   +15.2   -14.3   2.709       7
+  3   ✅ 2023-01-02 → 2023-03-31    -0.1    -1.2    +1.1  -0.402       5
+  4   ❌ 2023-04-03 → 2023-06-30    -0.1    +6.8    -6.9  -0.345       8
+  5   ✅ 2023-07-03 → 2023-09-29    -0.5   -11.2   +10.7  -2.505       5
+  6   ❌ 2023-10-03 → 2024-01-01    +0.9   +12.6   -11.7   3.565       8
+  7   ✅ 2024-01-01 → 2024-04-01    -0.8   -13.4   +12.6  -2.621       5
+  8   ❌ 2024-04-01 → 2024-07-01    +1.0   +17.5   -16.6   2.288       8
+  9   ❌ 2024-07-01 → 2024-10-01    +0.3    +1.2    -0.9   1.468       8
+  10  ❌ 2024-10-01 → 2025-01-01    +0.4    +3.3    -2.9   1.680       6
+  11  ✅ 2025-01-01 → 2025-04-01    -0.1    -0.8    +0.7  -0.531       7
+  12  ❌ 2025-04-01 → 2025-07-01    +0.8   +15.1   -14.2   2.327       8
+  13  ✅ 2025-07-01 → 2025-10-01    -0.5    -3.8    +3.3  -3.789       5
+  14  ❌ 2025-10-01 → 2025-12-30    -0.3    +2.7    -3.0  -1.450       7
+══════════════════════════════════════════════════════════════════════
+
+
+══════════════════════════════════════════════════════════════════════
+  MARK5 PIPELINE SUMMARY
+══════════════════════════════════════════════════════════════════════
+  Passed : 5 — ['RELIANCE', 'ICICIBANK', 'INFY', 'TCS', 'HDFCBANK']
+  Failed : 0 — []
+
+  RELIANCE        ⚠️  NOT READY | Alpha= -2.92% | Sharpe=-0.438
+  ICICIBANK       ⚠️  NOT READY | Alpha= -5.15% | Sharpe=-0.306
+  INFY            ⚠️  NOT READY | Alpha=  -1.9% | Sharpe=0.315
+  TCS             ⚠️  NOT READY | Alpha= -1.02% | Sharpe=-0.245
+  HDFCBANK        ⚠️  NOT READY | Alpha= -3.34% | Sharpe=0.225
+══════════════════════════════════════════════════════════════════════
+

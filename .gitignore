@@ -204,3 +204,4 @@ dmypy.json
 .pyre/
 .pytype/
 .env
+node_modules/

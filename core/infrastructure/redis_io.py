@@ -21,6 +21,7 @@ import msgpack
 import time
 from typing import Optional, Dict, Any, Union
 from core.utils.config_manager import get_config
+from core.infrastructure.db_logger import get_db_logger
 
 # LUA SCRIPT: Atomic Risk Check
 # Keys: [daily_loss_key, trade_count_key]
@@ -59,6 +60,7 @@ class RedisManager:
         if self._initialized: return
             
         self.logger = logging.getLogger("MARK5.Redis")
+        self.db_logger = get_db_logger()
         config = get_config().redis
         
         self._pool = redis.ConnectionPool(
@@ -79,6 +81,7 @@ class RedisManager:
             self._risk_script_sha = self.client.script_load(LUA_RISK_CHECK)
         except Exception as e:
             self.logger.warning(f"Redis Script Load Failed (Redis offline?): {e}")
+            self.db_logger.error(f"[Redis] Script Load Failed: {e}")
             self._risk_script_sha = None
         
         self._initialized = True
@@ -87,19 +90,24 @@ class RedisManager:
     def set(self, key: str, value: Any, ttl: int = None) -> bool:
         try:
             payload = msgpack.packb(value, use_bin_type=True)
-            return self.client.set(key, payload, ex=ttl)
+            res = self.client.set(key, payload, ex=ttl)
+            self.db_logger.info(f"[Redis] SET key={key} ttl={ttl}")
+            return res
         except Exception as e:
             self.logger.error(f"Redis SET Error: {e}")
+            self.db_logger.error(f"[Redis] SET Error for key={key}: {e}")
             return False
             
     def get(self, key: str) -> Any:
         try:
             payload = self.client.get(key)
+            self.db_logger.info(f"[Redis] GET key={key} (Found: {payload is not None})")
             if payload:
                 return msgpack.unpackb(payload, raw=False)
             return None
         except Exception as e:
             self.logger.error(f"Redis GET Error: {e}")
+            self.db_logger.error(f"[Redis] GET Error for key={key}: {e}")
             return None
 
     def check_risk_atomic(self, account_id: str, potential_loss: float, max_loss: float, max_trades: int) -> bool:
@@ -125,9 +133,11 @@ class RedisManager:
             return result == 1
         except redis.exceptions.ConnectionError as e:
             self.logger.critical(f"🛑 RISK CHECK BLOCKED: Redis connection lost - {e}")
+            self.db_logger.error(f"[Redis] Atomic Risk Check connection lost: {e}")
             return False  # Fail closed - block trading
         except Exception as e:
             self.logger.error(f"Atomic Risk Check Failed: {e}")
+            self.db_logger.error(f"[Redis] Atomic Risk Check Failed: {e}")
             # Fail closed (Safe) - if DB fails, do not trade.
             return False
 
@@ -144,9 +154,11 @@ class RedisManager:
             
             # Update Total Net PnL
             self.client.incrbyfloat(f"stats:{account_id}:net_pnl", realized_pnl)
+            self.db_logger.info(f"[Redis] Updated PNL atomic for {account_id}: {realized_pnl}")
             
         except Exception as e:
             self.logger.error(f"Atomic PnL Update Failed: {e}")
+            self.db_logger.error(f"[Redis] Atomic PnL Update Failed: {e}")
 
 # Global Accessor
 def get_redis_manager() -> RedisManager:
