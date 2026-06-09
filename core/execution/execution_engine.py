@@ -56,7 +56,44 @@ class OrderResult:
 class ExecutionEngine:
     def __init__(self, mode: str = "paper"):
         self.logger = logging.getLogger("MARK5.Exec")
+
+        # ── PAPER MODE SAFETY LOCK ──────────────────────────────────────────────
+        # MARK5 is ALWAYS PAPER mode. Live trading requires explicit opt-in via
+        # MARK5_LIVE_TRADING_ENABLED=true environment variable.
+        # This is a hard lock — not a config option — to prevent accidental live orders.
+        import os as _os
+        _LIVE_ENABLED = _os.getenv("MARK5_LIVE_TRADING_ENABLED", "false").lower() == "true"
+
+        if mode == "live" and not _LIVE_ENABLED:
+            self.logger.critical(
+                "LIVE TRADING BLOCKED: Set MARK5_LIVE_TRADING_ENABLED=true "
+                "environment variable to enable live mode. Defaulting to PAPER."
+            )
+            mode = "paper"  # Force back to paper
+
         self.mode = mode
+        self.logger.info(f"Execution mode: {self.mode.upper()}")
+
+        # Credential validation: warn if default/insecure values detected
+        try:
+            from core.utils.config_manager import get_config as _gc
+            _cfg = _gc()
+            _ts = getattr(_cfg, 'timescale', None)
+            if _ts:
+                _pw = getattr(_ts, 'password', None)
+                if _pw:
+                    try:
+                        _pw_str = _pw.get_secret_value() if hasattr(_pw, 'get_secret_value') else str(_pw)
+                    except Exception:
+                        _pw_str = str(_pw)
+                    if _pw_str in ('password', 'postgres', '123456', 'admin', ''):
+                        self.logger.warning(
+                            "SECURITY: Default/weak TimescaleDB password detected. "
+                            "Set MARK5_TIMESCALE_PASSWORD environment variable."
+                        )
+        except Exception:
+            pass  # Config validation is best-effort — don't fail execution init
+
         self.oms = container.oms
 
         try:
@@ -67,8 +104,18 @@ class ExecutionEngine:
                 "Risk Manager not found in container. Risk checks disabled."
             )
 
+        # Resolve configured capital first so max_order_value scales with it
+        try:
+            _configured_capital = float(container.config.risk.initial_capital)
+        except (AttributeError, TypeError):
+            _configured_capital = 50_000_000.0  # ₹5 crore default
+
+        # Max single-order value = 26% of capital (one full position)
+        # At ₹5cr this is ₹13L — prevents the ₹1L ghost limit blocking real trades
+        _max_order_val = _configured_capital * 0.26
+
         self.validator = OrderValidator({
-            "max_order_value": 100_000.0,
+            "max_order_value": _max_order_val,
             "max_quantity":    500,
             "price_deviation_pct": 0.10,
         })
@@ -80,8 +127,8 @@ class ExecutionEngine:
         try:
             self.capital = Decimal(str(container.config.risk.initial_capital))
         except (AttributeError, TypeError):
-            self.capital = Decimal("100000.00")
-            self.logger.warning("Using default capital: ₹100,000")
+            self.capital = Decimal("50000000.00")  # ₹5 crore (NOT ₹1L)
+            self.logger.warning("Using default capital: ₹5,00,00,000 (₹5 crore)")
 
         self._setup_adapter()
 
@@ -314,24 +361,3 @@ class ExecutionEngine:
 
     def stop(self) -> None:
         self.logger.info("Execution engine stopped.")
-
-
-class OrderResult:
-    """Lightweight result object for position close calls."""
-    __slots__ = ("status", "price", "quantity", "symbol", "timestamp", "commission")
-
-    def __init__(
-        self,
-        status: str,
-        price: float = 0.0,
-        quantity: float = 0.0,
-        symbol: str = "",
-        timestamp=None,
-        commission: float = 0.0,
-    ):
-        self.status     = status
-        self.price      = price
-        self.quantity   = quantity
-        self.symbol     = symbol
-        self.timestamp  = timestamp or datetime.utcnow()
-        self.commission = commission

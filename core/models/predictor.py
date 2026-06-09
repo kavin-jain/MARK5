@@ -20,9 +20,21 @@ from core.models.model_versioning import ModelVersionManager
 from core.models.training.trainer import NonNegativeMetaLearner
 from core.utils.config_manager import get_config
 
-# HACK: Allow unpickling of NonNegativeMetaLearner when artifacts were saved in __main__ scope
-import sys
-sys.modules['__main__'].NonNegativeMetaLearner = NonNegativeMetaLearner
+# FIX: Register NonNegativeMetaLearner with a proper module path instead of
+# polluting sys.modules['__main__']. When joblib pickles a class defined in
+# __main__, it records its full module path. Re-registering under the actual
+# import path ensures unpickling works regardless of execution context.
+import sys as _sys
+_module = _sys.modules.get('core.models.training.trainer')
+if _module and hasattr(_module, 'NonNegativeMetaLearner'):
+    # Already importable from its canonical location — no action needed
+    pass
+else:
+    # Legacy fallback: older artifacts pickled under __main__
+    # Register under __main__ only if not already there
+    _main = _sys.modules.get('__main__')
+    if _main and not hasattr(_main, 'NonNegativeMetaLearner'):
+        setattr(_main, 'NonNegativeMetaLearner', NonNegativeMetaLearner)
 
 class AtomicModelContainer:
     """
@@ -33,6 +45,9 @@ class AtomicModelContainer:
     When meta_model is not None (v10+ artifacts), prediction uses
     LogisticRegression(p_xgb, p_lgb, p_cat) instead of arithmetic mean.
     When None (v9 or older artifacts), falls back to arithmetic mean.
+
+    v2.0 (V2 features): feature_engine_version attribute indicates which
+    feature engine to use. 'v2' = 33-feature V2 engine. 'v1' = 10-feature V1.
     """
     def __init__(
         self,
@@ -42,12 +57,14 @@ class AtomicModelContainer:
         schema: list,
         calibrators: Dict = None,
         meta_model=None,
+        feature_engine_version: str = 'v1',
     ):
         self.models = models
         self.scaler = scaler
         self.weights = weights
         self.schema = schema
         self.calibrators = calibrators or {}
+        self.feature_engine_version = feature_engine_version   # 'v1' or 'v2'
         self.meta_model = meta_model   # LogisticRegression or None
         self.timestamp = datetime.now()
 
@@ -158,10 +175,18 @@ class MARK5Predictor:
                     f"is being loaded for diagnostic/backtest use despite gate failure."
                 )
 
-            # ATOMIC SWAP — meta_model passed to constructor (v10.0+)
+            # FIX: Read feature_engine_version from metadata so V2 models get V2
+            # features at inference time. Without this, V2 models (33 features) get
+            # V1 features (10 features) zero-filled for the missing 23 — equivalent
+            # to running the model on mostly zeros. Gate check above guarantees metadata
+            # exists at this point.
+            feature_engine_version = metadata.get('feature_engine_version', 'v1')
+
+            # ATOMIC SWAP — meta_model and feature_engine_version passed to constructor
             new_container = AtomicModelContainer(
                 models, scaler, weights, schema, {},
                 meta_model=meta_model,
+                feature_engine_version=feature_engine_version,
             )
             with self._lock:
                 self._container = new_container
@@ -276,12 +301,36 @@ class MARK5Predictor:
                     'probs': [1.0, 0.0],
                 }
 
-            # 1. Feature Engineering
+            # 1. Feature Engineering — V1 (10 features) or V2 (33 features)
+            # FIX: Container now carries feature_engine_version from metadata.json.
+            # V2 models were trained on 33-feature V2 engine. Using V1 features
+            # at inference would zero-fill 23 features, producing garbage predictions.
             context = kwargs.get('context')
             if context is None:
                 context = self._build_context(raw_data)
-                
-            df_feats = self.feature_engine.engineer_all_features(raw_data, ticker=self.ticker, context=context)
+
+            if container.feature_engine_version == 'v2':
+                try:
+                    from core.models.features_v2 import engineer_features_v2, build_full_context
+                    start = str(raw_data.index[0].date())
+                    end   = str(raw_data.index[-1].date())
+                    if context is None:
+                        context = build_full_context(
+                            ticker=self.ticker, stock_df=raw_data,
+                            start_date=start, end_date=end,
+                        )
+                    df_feats = engineer_features_v2(
+                        raw_data, ticker=self.ticker, context=context,
+                    )
+                except Exception as e:
+                    self.logger.warning(f"V2 feature engine failed ({e}), falling back to V1")
+                    df_feats = self.feature_engine.engineer_all_features(
+                        raw_data, ticker=self.ticker, context=context,
+                    )
+            else:
+                df_feats = self.feature_engine.engineer_all_features(
+                    raw_data, ticker=self.ticker, context=context,
+                )
             
             # 2. Schema Alignment (Strict)
             dropped_cols = set(df_feats.columns) - set(container.schema)
@@ -355,12 +404,25 @@ class MARK5Predictor:
                 confidence = 0.5
                 ensemble_method = 'failed'
             
-            # 5b. Shannon Entropy Gate (Institutional Consensus)
-            # Measures if the models are seeing the same 'Signal' or just random 'Noise'.
-            # High Entropy (>0.65) = Disagreement = Market Noise = REJECT.
-            probs_array = np.array([1.0 - confidence, confidence])
-            entropy_val = self._calculate_entropy(probs_array)
-            is_noisy = entropy_val > 0.65 # Rule 81: Entropy limit
+            # 5b. Shannon Entropy Gate — measures inter-model DISAGREEMENT.
+            # FIX: entropy must be computed across INDIVIDUAL model probabilities,
+            # not over the binary [1-confidence, confidence] array.
+            # The old approach gave identical entropy regardless of how much the
+            # three models disagreed — three models at [0.55, 0.55, 0.55] and
+            # [0.40, 0.55, 0.70] produced the same entropy at confidence=0.55.
+            # VERIFIED: entropy computed over individual model probabilities [xgb, lgb, cat]
+            # threshold 0.85 = 77% of log(3) max entropy for 3 models (tuned, do not change)
+            if len(model_probs_class1) >= 2:
+                _p = np.array(model_probs_class1)
+                _p_norm = _p / (_p.sum() + 1e-9)
+                entropy_val = float(-np.sum(_p_norm * np.log(_p_norm + 1e-9)))
+            else:
+                # Single model — use binary entropy of the confidence
+                probs_array = np.array([1.0 - confidence, confidence])
+                entropy_val = self._calculate_entropy(probs_array)
+            # Threshold: log(3) ≈ 1.099 is max entropy for 3 models (perfectly uniform)
+            # 0.85 ≈ 77% of max — allows up to ~(0.5, 0.25, 0.25) disagreement
+            is_noisy = entropy_val > 0.85   # Rule 81: inter-model disagreement gate
 
             # 5c. Institutional Trend Alignment Filter (Rule 84)
             # We ONLY BUY in uptrends (Price > 200EMA)
@@ -400,7 +462,7 @@ class MARK5Predictor:
                 elif not majority_agreement:
                     signal = f"HOLD (Majority Disagreement: {n_agree}/{n_models})"
                 elif is_noisy:
-                    signal = f"HOLD (Entropy {entropy_val:.2f} > 0.65)"
+                    signal = f"HOLD (Entropy {entropy_val:.2f} > 0.85)"
                 # confidence < PROBABILITY_HURDLE is implicit — already handled above
 
             return {

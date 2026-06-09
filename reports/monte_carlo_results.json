@@ -1,0 +1,63 @@
+{
+  "n_simulations": 2000,
+  "original": {
+    "net_cagr": 12.13,
+    "max_dd": -20.96,
+    "sharpe": 0.824,
+    "calmar": 0.579
+  },
+  "bootstrap_daily": {
+    "cagr": {
+      "p5": -1.43,
+      "p25": 7.91,
+      "p50": 15.25,
+      "p75": 23.4,
+      "p95": 34.37
+    },
+    "max_dd": {
+      "p5": -44.43,
+      "p25": -32.57,
+      "p50": -25.79,
+      "p75": -20.86,
+      "p95": -15.83
+    },
+    "sharpe": {
+      "p5": -0.075,
+      "p25": 0.383,
+      "p50": 0.728,
+      "p75": 1.089,
+      "p95": 1.577
+    },
+    "calmar": {
+      "p5": -0.038,
+      "p25": 0.255,
+      "p50": 0.585,
+      "p75": 1.048,
+      "p95": 1.969
+    },
+    "p_above_0pct": 93.3,
+    "p_above_10pct": 68.8,
+    "p_above_15pct": 50.9,
+    "p_above_20pct": 34.6,
+    "var_95": -1.43,
+    "cvar_95": -5.66
+  },
+  "trade_shuffle": {
+    "cagr_p5": 22.59,
+    "cagr_p50": 22.59,
+    "cagr_p95": 22.59,
+    "spread": 0.0
+  },
+  "trade_bootstrap": {
+    "cagr_p5": -3.88,
+    "cagr_p50": 20.7,
+    "cagr_p95": 63.85,
+    "p_positive": 91.3,
+    "p_above_10": 73.3
+  },
+  "concentration": {
+    "hal_pct_of_gross_profit": 58.4,
+    "top1_pct_of_gross_profit": 52.3,
+    "total_gross_profit_lakhs": 713.2
+  }
+}

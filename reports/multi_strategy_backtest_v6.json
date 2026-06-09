@@ -1,0 +1,320 @@
+{
+  "run_date": "2026-05-24T12:57:01.299646",
+  "oos_start": "2022-01-01",
+  "oos_end": "2026-05-21",
+  "true_oos_start": "2025-01-01",
+  "active_tickers": [
+    "AUBANK",
+    "BAJFINANCE",
+    "BANDHANBNK",
+    "BEL",
+    "BHARTIARTL",
+    "COFORGE",
+    "HAL",
+    "ICICIBANK",
+    "KOTAKBANK",
+    "LT",
+    "LUPIN",
+    "MARUTI",
+    "PERSISTENT",
+    "PNB",
+    "RELIANCE",
+    "SBIN",
+    "TATAELXSI",
+    "TRENT"
+  ],
+  "n_active_tickers": 18,
+  "v2_baseline": {
+    "label": "V2 BASELINE (fixed alloc, no CB)",
+    "oos_start": "2022-01-01",
+    "oos_end": "2026-05-21",
+    "n_years": 4.38,
+    "total_ret": 120.87,
+    "ann_cagr": 19.82,
+    "net_after_tax": 15.85,
+    "max_dd": -16.64,
+    "sharpe": 0.919,
+    "calmar": 1.19,
+    "n_trades": 25,
+    "win_rate": 52.0,
+    "avg_hold_days": 249.7,
+    "avg_win_pct": 47.02,
+    "avg_loss_pct": -6.95,
+    "expected_value": 21.114,
+    "annual": {
+      "2022": 5.6,
+      "2023": 50.7,
+      "2024": 43.1,
+      "2025": 4.5,
+      "2026": -7.1
+    },
+    "ticker_stats": {
+      "BEL": {
+        "n_trades": 2,
+        "wr_pct": 50.0,
+        "avg_pnl_pct": -3.23,
+        "total_pnl_L": -8.1
+      },
+      "BHARTIARTL": {
+        "n_trades": 3,
+        "wr_pct": 33.3,
+        "avg_pnl_pct": 56.98,
+        "total_pnl_L": 210.96
+      },
+      "COFORGE": {
+        "n_trades": 1,
+        "wr_pct": 100.0,
+        "avg_pnl_pct": 39.49,
+        "total_pnl_L": 49.5
+      },
+      "HAL": {
+        "n_trades": 3,
+        "wr_pct": 33.3,
+        "avg_pnl_pct": 1.36,
+        "total_pnl_L": 5.12
+      },
+      "LT": {
+        "n_trades": 4,
+        "wr_pct": 50.0,
+        "avg_pnl_pct": 22.6,
+        "total_pnl_L": 55.82
+      },
+      "LUPIN": {
+        "n_trades": 5,
+        "wr_pct": 60.0,
+        "avg_pnl_pct": 38.93,
+        "total_pnl_L": 247.31
+      },
+      "RELIANCE": {
+        "n_trades": 3,
+        "wr_pct": 66.7,
+        "avg_pnl_pct": 2.26,
+        "total_pnl_L": 8.49
+      },
+      "TATAELXSI": {
+        "n_trades": 4,
+        "wr_pct": 50.0,
+        "avg_pnl_pct": 6.99,
+        "total_pnl_L": 33.25
+      }
+    },
+    "tier_stats": {}
+  },
+  "v6_full": {
+    "label": "V6 PRODUCTION (7 improvements)",
+    "oos_start": "2022-01-01",
+    "oos_end": "2026-05-21",
+    "n_years": 4.38,
+    "total_ret": -21.55,
+    "ann_cagr": -5.39,
+    "net_after_tax": -4.31,
+    "max_dd": -24.63,
+    "sharpe": -1.812,
+    "calmar": -0.219,
+    "n_trades": 11,
+    "win_rate": 9.1,
+    "avg_hold_days": 78.0,
+    "avg_win_pct": 120.39,
+    "avg_loss_pct": -10.77,
+    "expected_value": 1.153,
+    "annual": {
+      "2022": -21.5,
+      "2023": 0.0,
+      "2024": 0.0,
+      "2025": 0.0,
+      "2026": 0.0
+    },
+    "ticker_stats": {
+      "AUBANK": {
+        "n_trades": 1,
+        "wr_pct": 0.0,
+        "avg_pnl_pct": -14.77,
+        "total_pnl_L": -8.32
+      },
+      "BHARTIARTL": {
+        "n_trades": 1,
+        "wr_pct": 0.0,
+        "avg_pnl_pct": -6.17,
+        "total_pnl_L": -9.29
+      },
+      "HAL": {
+        "n_trades": 1,
+        "wr_pct": 100.0,
+        "avg_pnl_pct": 120.39,
+        "total_pnl_L": 0.99
+      },
+      "LT": {
+        "n_trades": 1,
+        "wr_pct": 0.0,
+        "avg_pnl_pct": -9.32,
+        "total_pnl_L": -4.46
+      },
+      "LUPIN": {
+        "n_trades": 2,
+        "wr_pct": 0.0,
+        "avg_pnl_pct": -15.5,
+        "total_pnl_L": -46.63
+      },
+      "PERSISTENT": {
+        "n_trades": 1,
+        "wr_pct": 0.0,
+        "avg_pnl_pct": -16.59,
+        "total_pnl_L": -9.15
+      },
+      "RELIANCE": {
+        "n_trades": 2,
+        "wr_pct": 0.0,
+        "avg_pnl_pct": -8.9,
+        "total_pnl_L": -21.94
+      },
+      "TATAELXSI": {
+        "n_trades": 1,
+        "wr_pct": 0.0,
+        "avg_pnl_pct": -10.91,
+        "total_pnl_L": -7.38
+      },
+      "TRENT": {
+        "n_trades": 1,
+        "wr_pct": 0.0,
+        "avg_pnl_pct": -1.16,
+        "total_pnl_L": -1.57
+      }
+    },
+    "tier_stats": {
+      "T1": {
+        "n_trades": 1,
+        "wr_pct": 0.0,
+        "avg_pnl": -14.77
+      },
+      "T2": {
+        "n_trades": 2,
+        "wr_pct": 0.0,
+        "avg_pnl": -14.33
+      },
+      "T3": {
+        "n_trades": 3,
+        "wr_pct": 33.3,
+        "avg_pnl": 36.11
+      },
+      "T4": {
+        "n_trades": 5,
+        "wr_pct": 0.0,
+        "avg_pnl": -10.44
+      }
+    }
+  },
+  "v6_true_oos": {
+    "label": "V6 PRODUCTION (7 improvements)",
+    "oos_start": "2025-01-01",
+    "oos_end": "2026-05-21",
+    "n_years": 1.38,
+    "total_ret": 7.24,
+    "ann_cagr": 5.19,
+    "net_after_tax": 4.15,
+    "max_dd": -11.13,
+    "sharpe": -0.016,
+    "calmar": 0.466,
+    "n_trades": 14,
+    "win_rate": 50.0,
+    "avg_hold_days": 146.8,
+    "avg_win_pct": 8.0,
+    "avg_loss_pct": -5.9,
+    "expected_value": 1.052,
+    "annual": {
+      "2025": 14.8,
+      "2026": -6.6
+    },
+    "ticker_stats": {
+      "BAJFINANCE": {
+        "n_trades": 3,
+        "wr_pct": 33.3,
+        "avg_pnl_pct": 3.93,
+        "total_pnl_L": 10.58
+      },
+      "BEL": {
+        "n_trades": 1,
+        "wr_pct": 100.0,
+        "avg_pnl_pct": 8.71,
+        "total_pnl_L": 7.42
+      },
+      "BHARTIARTL": {
+        "n_trades": 1,
+        "wr_pct": 0.0,
+        "avg_pnl_pct": -4.68,
+        "total_pnl_L": -1.04
+      },
+      "LT": {
+        "n_trades": 2,
+        "wr_pct": 100.0,
+        "avg_pnl_pct": 2.56,
+        "total_pnl_L": 6.75
+      },
+      "LUPIN": {
+        "n_trades": 1,
+        "wr_pct": 100.0,
+        "avg_pnl_pct": 10.79,
+        "total_pnl_L": 16.22
+      },
+      "PERSISTENT": {
+        "n_trades": 2,
+        "wr_pct": 0.0,
+        "avg_pnl_pct": -10.9,
+        "total_pnl_L": -12.35
+      },
+      "RELIANCE": {
+        "n_trades": 2,
+        "wr_pct": 50.0,
+        "avg_pnl_pct": 2.12,
+        "total_pnl_L": 5.91
+      },
+      "TATAELXSI": {
+        "n_trades": 2,
+        "wr_pct": 50.0,
+        "avg_pnl_pct": 0.29,
+        "total_pnl_L": 0.64
+      }
+    },
+    "tier_stats": {
+      "T1": {
+        "n_trades": 4,
+        "wr_pct": 50.0,
+        "avg_pnl": 5.12
+      },
+      "T2": {
+        "n_trades": 6,
+        "wr_pct": 33.3,
+        "avg_pnl": -3.56
+      },
+      "T3": {
+        "n_trades": 2,
+        "wr_pct": 100.0,
+        "avg_pnl": 4.74
+      },
+      "T4": {
+        "n_trades": 2,
+        "wr_pct": 50.0,
+        "avg_pnl": 3.05
+      }
+    }
+  },
+  "v6_improvements": {
+    "1_new_models": "Retrained 2024-12-31 cutoff (adds 3yr regime data)",
+    "2_conf_scaled_size": "T1=17% T2=22% T3=27% T4=30%",
+    "3_equity_cb": "CAUTION@12% PAUSE@18% EMERGENCY@25%",
+    "4_quality_gates": "RSI 28-68, SMA20, Vol>65%avg",
+    "5_fii_gate": "Block entries when Nifty 5d return < -3%",
+    "6_dynamic_rebal": "21d normal / 14d when VIX>25%",
+    "7_let_winners_run": "ML exit threshold lowered 0.45\u21920.42"
+  },
+  "verification_methodology": {
+    "cagr": "(equity_final / initial_capital)^(1/n_years) - 1",
+    "net_after_tax": "CAGR \u00d7 0.80 (20% STCG, India Budget 2024)",
+    "win_rate": "count(net_pnl > 0) / n_trades",
+    "max_drawdown": "min(equity_t / cummax(equity_0:t) - 1)",
+    "sharpe": "(daily_return.mean() - 0.065/252) / daily_return.std() \u00d7 sqrt(252)",
+    "calmar": "CAGR / |max_drawdown|",
+    "exp_value": "WR \u00d7 avg_win_pct - (1-WR) \u00d7 avg_loss_pct",
+    "stcg_rate": "20% on gains from positions held < 1 year (Budget 2024)",
+    "rf_rate": "6.5% annual (India RBI Repo Rate)"
+  }
+}

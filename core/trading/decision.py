@@ -36,9 +36,19 @@ class DecisionEngine:
         self.oms = executor or getattr(container, "oms", None)
         self.journal = journal
         
+        # FIX: VolatilityAwarePositionSizer was hardcoded to ₹1L capital.
+        # At ₹5cr paper pool this produced trivially small position sizes.
+        # Now reads from config with ₹5cr default.
+        try:
+            from core.utils.config_manager import get_config
+            _config = get_config()
+            _initial_cap = float(getattr(getattr(_config, 'risk', None), 'initial_capital', 50_000_000.0))
+        except Exception:
+            _initial_cap = 50_000_000.0  # ₹5cr fallback
+
         # New Institutional Sizer
         self.sizer = VolatilityAwarePositionSizer(
-            initial_capital=100000.0, # Should come from config
+            initial_capital=_initial_cap,
             default_risk_per_trade=0.01,
             max_position_size_pct=0.05  # RULE 11: 5% max
         )

@@ -1,0 +1,46 @@
+{
+  "baseline": {
+    "label": "BASELINE (Momentum-Only)",
+    "total_ret": 150.18,
+    "ann_ret": 23.27,
+    "net_after_tax": 18.62,
+    "win_rate": 36.2,
+    "max_dd": -22.71,
+    "sharpe": 0.991,
+    "n_trades": 58,
+    "avg_hold": 96.4,
+    "annual": {
+      "2022": 15.4,
+      "2023": 61.7,
+      "2024": 58.5,
+      "2025": -9.3,
+      "2026": -6.7
+    },
+    "mom_trades": 58,
+    "mr_trades": 0,
+    "mom_win_rate": 36.2,
+    "mr_win_rate": 0.0
+  },
+  "enhanced": {
+    "label": "ENHANCED (Multi-Strategy)",
+    "total_ret": 143.97,
+    "ann_ret": 22.57,
+    "net_after_tax": 18.05,
+    "win_rate": 40.9,
+    "max_dd": -22.5,
+    "sharpe": 0.981,
+    "n_trades": 93,
+    "avg_hold": 62.2,
+    "annual": {
+      "2022": 16.4,
+      "2023": 65.1,
+      "2024": 50.4,
+      "2025": -9.2,
+      "2026": -7.1
+    },
+    "mom_trades": 53,
+    "mr_trades": 40,
+    "mom_win_rate": 34.0,
+    "mr_win_rate": 50.0
+  }
+}

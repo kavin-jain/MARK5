@@ -1,0 +1,102 @@
+{
+  "generated_at": "2026-05-23T16:56:40.713841",
+  "oos_start": "2022-01-01",
+  "oos_end": "2026-05-21",
+  "paper_mode": true,
+  "baseline": {
+    "label": "BASELINE (13 tickers, no cash yield)",
+    "total_ret": 150.18,
+    "ann_ret": 23.27,
+    "net_after_tax": 18.62,
+    "win_rate": 36.2,
+    "max_dd": -22.71,
+    "sharpe": 0.991,
+    "n_trades": 58,
+    "avg_hold": 96.4,
+    "annual": {
+      "2022": 15.4,
+      "2023": 61.7,
+      "2024": 58.5,
+      "2025": -9.3,
+      "2026": -6.7
+    },
+    "mom_trades": 58,
+    "mr_trades": 0,
+    "mom_win_rate": 36.2,
+    "mr_win_rate": 0.0,
+    "cash_yield_total": 0.0,
+    "ratchet_dist": {
+      "0": 58,
+      "1": 0,
+      "2": 0
+    }
+  },
+  "enhanced_v2": {
+    "label": "ENHANCED-v2 (32t + cash yield + calibrated MR)",
+    "total_ret": 181.85,
+    "ann_ret": 26.67,
+    "net_after_tax": 21.33,
+    "win_rate": 40.4,
+    "max_dd": -17.64,
+    "sharpe": 1.18,
+    "n_trades": 114,
+    "avg_hold": 60.9,
+    "annual": {
+      "2022": 11.1,
+      "2023": 62.2,
+      "2024": 73.0,
+      "2025": -10.3,
+      "2026": 0.8
+    },
+    "mom_trades": 44,
+    "mr_trades": 70,
+    "mom_win_rate": 31.8,
+    "mr_win_rate": 45.7,
+    "cash_yield_total": 108.87,
+    "ratchet_dist": {
+      "0": 44,
+      "1": 0,
+      "2": 0
+    }
+  },
+  "breakthrough_v3": {
+    "label": "BREAKTHROUGH-v3 (confluence + ratchet + tight CB)",
+    "total_ret": 75.42,
+    "ann_ret": 13.68,
+    "net_after_tax": 10.94,
+    "win_rate": 46.7,
+    "max_dd": -27.52,
+    "sharpe": 0.535,
+    "n_trades": 105,
+    "avg_hold": 55.6,
+    "annual": {
+      "2022": -13.7,
+      "2023": 43.6,
+      "2024": 57.1,
+      "2025": -10.5,
+      "2026": 0.6
+    },
+    "mom_trades": 39,
+    "mr_trades": 66,
+    "mom_win_rate": 46.2,
+    "mr_win_rate": 47.0,
+    "cash_yield_total": 73.08,
+    "ratchet_dist": {
+      "0": 30,
+      "1": 2,
+      "2": 7
+    }
+  },
+  "v3_targets": {
+    "net_annual_pct": 20.0,
+    "win_rate_pct": 50.0,
+    "max_dd_pct": -10.0,
+    "sharpe": 1.5
+  },
+  "v3_achieved": {
+    "net_annual_pct": 10.94,
+    "win_rate_pct": 46.7,
+    "max_dd_pct": -27.52,
+    "sharpe": 0.535
+  }
+}

@@ -1,0 +1,75 @@
+{
+  "run_date": "2026-05-23T20:07:30.101699",
+  "oos_start": "2022-01-01",
+  "oos_end": "2026-05-21",
+  "v4": {
+    "label": "BEHAVIORAL-v4 (behavioral + swing)",
+    "total_ret": 0.9,
+    "ann_ret": 0.2,
+    "net_after_tax": 0.16,
+    "win_rate": 48.8,
+    "max_dd": -33.06,
+    "sharpe": -0.017,
+    "n_trades": 332,
+    "avg_hold": 22.8,
+    "annual": {
+      "2022": -0.2,
+      "2023": -1.0,
+      "2024": 26.0,
+      "2025": -18.7,
+      "2026": -0.3
+    },
+    "mom_trades": 42,
+    "mr_trades": 58,
+    "swing_trades": 232,
+    "mom_win_rate": 52.4,
+    "mr_win_rate": 50.0,
+    "swing_win_rate": 47.8,
+    "swing_avg_hold": 7.6,
+    "cash_yield_total": 61.23,
+    "ratchet_dist": {
+      "0": 33,
+      "1": 2,
+      "2": 7
+    }
+  },
+  "v5": {
+    "label": "LIMIT-v5 (swing_regime + vix_stops + equity_cb + multifactor + sector_div)",
+    "total_ret": 6.62,
+    "ann_ret": 1.47,
+    "net_after_tax": 1.18,
+    "win_rate": 40.0,
+    "max_dd": -17.55,
+    "sharpe": 0.022,
+    "n_trades": 120,
+    "avg_hold": 44.1,
+    "annual": {
+      "2022": 2.9,
+      "2023": 5.8,
+      "2024": 12.1,
+      "2025": -11.4,
+      "2026": -1.3
+    },
+    "mom_trades": 33,
+    "mr_trades": 39,
+    "swing_trades": 48,
+    "mom_win_rate": 33.3,
+    "mr_win_rate": 43.6,
+    "swing_win_rate": 41.7,
+    "swing_avg_hold": 7.1,
+    "cash_yield_total": 98.36,
+    "ratchet_dist": {
+      "0": 25,
+      "1": 2,
+      "2": 6
+    }
+  },
+  "v5_improvements": {
+    "swing_regime_filter": "Skip swing in BULL regime \u2014 BULL RSI dips are pullbacks not reversals",
+    "vix_scaled_stops": "Trail 15%\u219212%\u21928% as VIX rises",
+    "equity_circuit_breaker": "10% CAUTION / 15% PAUSE / 20% EMERGENCY tiers",
+    "multifactor_ranking": "ML 70% + RelMom 30% for stock selection",
+    "sector_diversity": "Max 2 positions per sector",
+    "dynamic_rebalancing": "21d normal / 10d when VIX>28%"
+  }
+}

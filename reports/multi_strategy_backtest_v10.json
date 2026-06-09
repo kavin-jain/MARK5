@@ -1,0 +1,485 @@
+{
+  "metadata": {
+    "version": "V10",
+    "change": "Initial stop 7.0% \u2192 6.5% (tighter, zero false fires)",
+    "false_fire_analysis": {
+      "BHARTIARTL_min45d": -6.3,
+      "LT_min45d": -5.7,
+      "RELIANCE_min45d": -5.3,
+      "TATAELXSI_min45d": -6.0,
+      "threshold": -6.5,
+      "verdict": "ALL SAFE \u2014 no false fires at 6.5% threshold"
+    }
+  },
+  "v8_full": {
+    "label": "V8 (Peak-Capture)",
+    "oos_start": "2022-01-01",
+    "oos_end": "2026-05-21",
+    "n_years": 4.38,
+    "total_ret": 115.89,
+    "ann_cagr": 19.19,
+    "net_after_tax": 15.35,
+    "max_dd": -11.78,
+    "sharpe": 0.899,
+    "calmar": 1.629,
+    "n_trades": 44,
+    "win_rate": 43.2,
+    "avg_hold_days": 170.4,
+    "avg_win_pct": 43.8,
+    "avg_loss_pct": -7.16,
+    "expected_value": 14.842,
+    "annual": {
+      "2022": 8.9,
+      "2023": 58.0,
+      "2024": 33.8,
+      "2025": 0.5,
+      "2026": -6.8
+    },
+    "ticker_stats": {
+      "BAJFINANCE": {
+        "n_trades": 1,
+        "wr_pct": 0.0,
+        "avg_pnl_pct": -0.68,
+        "total_pnl_L": -0.35
+      },
+      "BEL": {
+        "n_trades": 6,
+        "wr_pct": 66.7,
+        "avg_pnl_pct": 4.21,
+        "total_pnl_L": 13.9
+      },
+      "BHARTIARTL": {
+        "n_trades": 2,
+        "wr_pct": 50.0,
+        "avg_pnl_pct": 81.06,
+        "total_pnl_L": 127.47
+      },
+      "COFORGE": {
+        "n_trades": 4,
+        "wr_pct": 25.0,
+        "avg_pnl_pct": -0.71,
+        "total_pnl_L": -4.12
+      },
+      "HAL": {
+        "n_trades": 4,
+        "wr_pct": 50.0,
+        "avg_pnl_pct": 25.11,
+        "total_pnl_L": -12.03
+      },
+      "LT": {
+        "n_trades": 5,
+        "wr_pct": 40.0,
+        "avg_pnl_pct": 21.98,
+        "total_pnl_L": 97.24
+      },
+      "LUPIN": {
+        "n_trades": 6,
+        "wr_pct": 50.0,
+        "avg_pnl_pct": 39.0,
+        "total_pnl_L": 350.29
+      },
+      "PERSISTENT": {
+        "n_trades": 2,
+        "wr_pct": 50.0,
+        "avg_pnl_pct": 19.27,
+        "total_pnl_L": 42.51
+      },
+      "RELIANCE": {
+        "n_trades": 5,
+        "wr_pct": 20.0,
+        "avg_pnl_pct": -4.11,
+        "total_pnl_L": -25.0
+      },
+      "TATAELXSI": {
+        "n_trades": 8,
+        "wr_pct": 37.5,
+        "avg_pnl_pct": 0.15,
+        "total_pnl_L": -16.36
+      },
+      "TRENT": {
+        "n_trades": 1,
+        "wr_pct": 100.0,
+        "avg_pnl_pct": 5.75,
+        "total_pnl_L": 4.67
+      }
+    },
+    "tier_stats": {
+      "T1": {
+        "n_trades": 1,
+        "wr_pct": 0.0,
+        "avg_pnl": -0.68
+      },
+      "T2": {
+        "n_trades": 14,
+        "wr_pct": 42.9,
+        "avg_pnl": 4.1
+      },
+      "T3": {
+        "n_trades": 15,
+        "wr_pct": 66.7,
+        "avg_pnl": 27.64
+      },
+      "T4": {
+        "n_trades": 14,
+        "wr_pct": 21.4,
+        "avg_pnl": 12.98
+      }
+    },
+    "trades": [
+      "Trade(ticker='LUPIN', entry_date=Timestamp('2022-01-03 00:00:00'), exit_date=Timestamp('2022-02-04 00:00:00'), entry_price=926.4551316528319, exit_price=853.1496584472657, shares=16190, net_pnl=-1270369.8356981073, pnl_pct=-8.445032044058392, hold_days=32, exit_reason='INITIAL_STOP(32d,-8%)', conf_entry=0.8076035921472698, alloc_tier='T4', alloc_pct=0.30085613152691165, partial=False)",
+      "Trade(ticker='LT', entry_date=Timestamp('2022-01-03 00:00:00'), exit_date=Timestamp('2022-02-24 00:00:00'), entry_price=1829.3051387939452, exit_price=1668.5162149658204, shares=2609, net_pnl=-445963.1684122598, pnl_pct=-9.3171079536848, hold_days=52, exit_reason='TRAIL_STOP(15%)', conf_entry=0.7486198999454183, alloc_tier='T4', alloc_pct=0.09572995625448065, partial=False)",
+      "Trade(ticker='TRENT', entry_date=Timestamp('2022-02-14 00:00:00'), exit_date=Timestamp('2022-05-09 00:00:00'), entry_price=1032.5110938720702, exit_price=1098.2531865234375, shares=7844, net_pnl=467211.20121259894, pnl_pct=5.752058619507547, hold_days=84, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6610545593245155, alloc_tier='T3', alloc_pct=0.16245008339382966, partial=False)",
+      "Trade(ticker='LUPIN', entry_date=Timestamp('2022-02-28 00:00:00'), exit_date=Timestamp('2022-05-10 00:00:00'), entry_price=731.0198403320312, exit_price=698.8451940307617, shares=12311, net_pnl=-447150.9690852463, pnl_pct=-4.954205869944048, hold_days=71, exit_reason='TRAIL_STOP(9%)', conf_entry=0.8076035921472698, alloc_tier='T4', alloc_pct=0.18051368103130375, partial=False)",
+      "Trade(ticker='BHARTIARTL', entry_date=Timestamp('2022-01-03 00:00:00'), exit_date=Timestamp('2022-06-16 00:00:00'), entry_price=676.3245136108397, exit_price=638.7494661254883, shares=22178, net_pnl=-917919.9642256424, pnl_pct=-6.101964494729692, hold_days=164, exit_reason='TRAIL_STOP(15%)', conf_entry=0.8393328588804151, alloc_tier='T4', alloc_pct=0.30086047371087005, partial=False)",
+      "Trade(ticker='LT', entry_date=Timestamp('2022-06-06 00:00:00'), exit_date=Timestamp('2022-06-17 00:00:00'), entry_price=1560.4058929443358, exit_price=1414.6332670898437, shares=1941, net_pnl=-299690.86471148534, pnl_pct=-9.866264551527435, hold_days=11, exit_reason='INITIAL_STOP(11d,-9%)', conf_entry=0.7485105828957384, alloc_tier='T4', alloc_pct=0.060750624138714994, partial=False)",
+      "Trade(ticker='RELIANCE', entry_date=Timestamp('2022-01-03 00:00:00'), exit_date=Timestamp('2022-07-07 00:00:00'), entry_price=1094.874298095703, exit_price=1085.5275216064454, shares=13700, net_pnl=-214678.2021995932, pnl_pct=-1.4270707025991873, hold_days=185, exit_reason='TRAIL_STOP(15%)', conf_entry=0.8156225732618205, alloc_tier='T4', alloc_pct=0.30086554479548944, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2022-07-18 00:00:00'), exit_date=Timestamp('2022-08-29 00:00:00'), entry_price=7882.1814360351555, exit_price=8610.748795898437, shares=837, net_pnl=569777.5906535937, pnl_pct=8.611441342089483, hold_days=42, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6207084969094807, alloc_tier='T2', alloc_pct=0.13233036561922226, partial=False)",
+      "Trade(ticker='RELIANCE', entry_date=Timestamp('2022-08-29 00:00:00'), exit_date=Timestamp('2022-09-26 00:00:00'), entry_price=1187.0042999267578, exit_price=1084.1669450683594, shares=11373, net_pnl=-1244476.325455621, pnl_pct=-9.191823499635825, hold_days=28, exit_reason='INITIAL_STOP(28d,-9%)', conf_entry=0.6691359305153485, alloc_tier='T3', alloc_pct=0.27077898645571824, partial=False)",
+      "Trade(ticker='BEL', entry_date=Timestamp('2022-10-10 00:00:00'), exit_date=Timestamp('2022-10-31 00:00:00'), entry_price=100.50002731323241, exit_price=102.60385929107666, shares=134328, net_pnl=203484.1791684907, pnl_pct=1.5029353134626935, hold_days=21, exit_reason='ML_EXIT(rc=0.240)', conf_entry=0.6736925174804771, alloc_tier='T3', alloc_pct=0.2707823515034357, partial=False)",
+      "Trade(ticker='HAL', entry_date=Timestamp('2022-01-03 00:00:00'), exit_date=Timestamp('2023-01-02 00:00:00'), entry_price=575.2129439697266, exit_price=1219.4535201416015, shares=143, net_pnl=91382.15420991115, pnl_pct=110.77431485726343, hold_days=364, exit_reason='ML_EXIT(rc=0.364)', conf_entry=0.7036463492719726, alloc_tier='T3', alloc_pct=0.0016498798359107028, partial=False)",
+      "Trade(ticker='LUPIN', entry_date=Timestamp('2022-06-06 00:00:00'), exit_date=Timestamp('2023-02-23 00:00:00'), entry_price=593.4115443115234, exit_price=647.9764969482422, shares=25277, net_pnl=1288240.4677934665, pnl_pct=8.563627871859826, hold_days=262, exit_reason='TRAIL_STOP(15%)', conf_entry=0.8377993646634463, alloc_tier='T4', alloc_pct=0.3008632526003701, partial=False)",
+      "Trade(ticker='COFORGE', entry_date=Timestamp('2022-10-31 00:00:00'), exit_date=Timestamp('2023-03-21 00:00:00'), entry_price=729.5675838623046, exit_price=715.0467496948243, shares=20187, net_pnl=-377703.12503832765, pnl_pct=-2.557146646827526, hold_days=141, exit_reason='TRAIL_STOP(15%)', conf_entry=0.7414612399679416, alloc_tier='T4', alloc_pct=0.2954098275958617, partial=False)",
+      "Trade(ticker='BEL', entry_date=Timestamp('2023-03-27 00:00:00'), exit_date=Timestamp('2023-04-17 00:00:00'), entry_price=89.41922491455077, exit_price=98.62663169860839, shares=73809, net_pnl=639339.0050953031, pnl_pct=9.659026268127008, hold_days=21, exit_reason='ML_EXIT(rc=0.347)', conf_entry=0.6389019891769703, alloc_tier='T2', alloc_pct=0.1323816681615212, partial=False)",
+      "Trade(ticker='COFORGE', entry_date=Timestamp('2023-04-17 00:00:00'), exit_date=Timestamp('2023-07-31 00:00:00'), entry_price=751.0804692993163, exit_price=910.1245479125977, shares=10784, net_pnl=1663179.4825393492, pnl_pct=20.474586485794486, hold_days=105, exit_reason='ML_EXIT(rc=0.417)', conf_entry=0.652264714363616, alloc_tier='T3', alloc_pct=0.16246281542177013, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2023-01-02 00:00:00'), exit_date=Timestamp('2024-01-25 00:00:00'), entry_price=6127.910851562499, exit_price=7500.686629394531, shares=69, net_pnl=91994.44631447067, pnl_pct=21.69414053700107, hold_days=388, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6498146923894514, alloc_tier='T2', alloc_pct=0.008481040874384203, partial=False)",
+      "Trade(ticker='BEL', entry_date=Timestamp('2024-02-07 00:00:00'), exit_date=Timestamp('2024-02-28 00:00:00'), entry_price=177.8971255340576, exit_price=201.70763635253905, shares=41184, net_pnl=935274.5142590804, pnl_pct=12.728698887998767, hold_days=21, exit_reason='ML_EXIT(rc=0.352)', conf_entry=0.687835117457297, alloc_tier='T3', alloc_pct=0.14695524224253625, partial=False)",
+      "Trade(ticker='PERSISTENT', entry_date=Timestamp('2023-07-31 00:00:00'), exit_date=Timestamp('2024-04-22 00:00:00'), entry_price=2337.935697753906, exit_price=3464.0017690429686, shares=4705, net_pnl=5218976.329649331, pnl_pct=47.30809996709758, hold_days=266, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6383498623768146, alloc_tier='T2', alloc_pct=0.22063774843120262, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2024-05-02 00:00:00'), exit_date=Timestamp('2024-09-06 00:00:00'), entry_price=7010.190198730468, exit_price=7497.052083984375, shares=1925, net_pnl=856222.4490705151, pnl_pct=6.326571838655666, hold_days=127, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6930509890544747, alloc_tier='T3', alloc_pct=0.2706750103868113, partial=False)",
+      "Trade(ticker='RELIANCE', entry_date=Timestamp('2024-02-28 00:00:00'), exit_date=Timestamp('2024-10-15 00:00:00'), entry_price=1446.3753503417968, exit_price=1337.3397883300781, shares=5699, net_pnl=-667400.4063731292, pnl_pct=-8.073264228772398, hold_days=230, exit_reason='TRAIL_STOP(15%)', conf_entry=0.73422384453102, alloc_tier='T4', alloc_pct=0.16533595023301068, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2024-09-12 00:00:00'), exit_date=Timestamp('2024-10-22 00:00:00'), entry_price=7708.982531249999, exit_price=7039.73837109375, shares=1751, net_pnl=-1246739.0543036014, pnl_pct=-9.209471857312598, hold_days=40, exit_reason='INITIAL_STOP(40d,-9%)', conf_entry=0.6591653256856417, alloc_tier='T3', alloc_pct=0.27075147709228364, partial=False)",
+      "Trade(ticker='RELIANCE', entry_date=Timestamp('2024-12-05 00:00:00'), exit_date=Timestamp('2024-12-19 00:00:00'), entry_price=1318.107684448242, exit_price=1224.3296206054688, shares=8345, net_pnl=-844106.1967688948, pnl_pct=-7.651775583718537, hold_days=14, exit_reason='INITIAL_STOP(14d,-7%)', conf_entry=0.6137102536898367, alloc_tier='T2', alloc_pct=0.2206301498347614, partial=False)",
+      "Trade(ticker='LUPIN', entry_date=Timestamp('2023-03-06 00:00:00'), exit_date=Timestamp('2025-01-10 00:00:00'), entry_price=653.3172764282226, exit_price=2175.379083984375, shares=22959, net_pnl=34756679.324439436, pnl_pct=231.04870288965435, hold_days=676, exit_reason='ROLLING_PEAK_STOP(233%gain)', conf_entry=0.804897892682137, alloc_tier='T4', alloc_pct=0.30086019864858315, partial=False)",
+      "Trade(ticker='HAL', entry_date=Timestamp('2024-10-24 00:00:00'), exit_date=Timestamp('2025-01-13 00:00:00'), entry_price=4122.870705078125, exit_price=3713.772744140625, shares=2668, net_pnl=-1152107.0374765452, pnl_pct=-10.44358624422082, hold_days=81, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6265812771219378, alloc_tier='T2', alloc_pct=0.22063437032735533, partial=False)",
+      "Trade(ticker='PERSISTENT', entry_date=Timestamp('2024-12-26 00:00:00'), exit_date=Timestamp('2025-01-14 00:00:00'), entry_price=6341.150245117186, exit_price=5818.209169921875, shares=1734, net_pnl=-967924.3791431356, pnl_pct=-8.777415572374588, hold_days=19, exit_reason='INITIAL_STOP(19d,-8%)', conf_entry=0.6366407411015299, alloc_tier='T2', alloc_pct=0.22054883266311598, partial=False)",
+      "Trade(ticker='LT', entry_date=Timestamp('2022-06-27 00:00:00'), exit_date=Timestamp('2025-02-03 00:00:00'), entry_price=1461.0848693847654, exit_price=3224.05787109375, shares=5543, net_pnl=9696847.084462533, pnl_pct=119.38577795526587, hold_days=952, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6972616793075813, alloc_tier='T3', alloc_pct=0.1624455986389931, partial=False)",
+      "Trade(ticker='LUPIN', entry_date=Timestamp('2025-02-06 00:00:00'), exit_date=Timestamp('2025-02-12 00:00:00'), entry_price=2174.014127441406, exit_price=2010.6692028808593, shares=4139, net_pnl=-726313.8152382933, pnl_pct=-8.04838763766507, hold_days=6, exit_reason='INITIAL_STOP(6d,-7%)', conf_entry=0.8248335741250689, alloc_tier='T4', alloc_pct=0.18048678764906143, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2025-01-16 00:00:00'), exit_date=Timestamp('2025-02-25 00:00:00'), entry_price=6121.1897817382805, exit_price=5626.308001464844, shares=1078, net_pnl=-570207.5867046146, pnl_pct=-8.61629886727756, hold_days=40, exit_reason='INITIAL_STOP(40d,-8%)', conf_entry=0.6366223657699591, alloc_tier='T2', alloc_pct=0.13235557296419073, partial=False)",
+      "Trade(ticker='BEL', entry_date=Timestamp('2025-02-27 00:00:00'), exit_date=Timestamp('2025-03-20 00:00:00'), entry_price=249.6660273284912, exit_price=294.811033996582, shares=26435, net_pnl=1151667.8230342083, pnl_pct=17.39926233401273, hold_days=21, exit_reason='ML_EXIT(rc=0.223)', conf_entry=0.6417711245215174, alloc_tier='T2', alloc_pct=0.13238122409165415, partial=False)",
+      "Trade(ticker='COFORGE', entry_date=Timestamp('2025-03-20 00:00:00'), exit_date=Timestamp('2025-04-04 00:00:00'), entry_price=1503.0654066162108, exit_price=1307.9795295410156, shares=5987, net_pnl=-1216785.351544235, pnl_pct=-13.48246196439334, hold_days=15, exit_reason='INITIAL_STOP(15d,-13%)', conf_entry=0.7280516053795502, alloc_tier='T4', alloc_pct=0.1804989852384109, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2025-03-20 00:00:00'), exit_date=Timestamp('2025-04-07 00:00:00'), entry_price=5322.517884277343, exit_price=4749.761109375, shares=1521, net_pnl=-915590.8700395646, pnl_pct=-11.277101221995425, hold_days=18, exit_reason='INITIAL_STOP(18d,-11%)', conf_entry=0.714214047771411, alloc_tier='T3', alloc_pct=0.16238053592243196, partial=False)",
+      "Trade(ticker='HAL', entry_date=Timestamp('2025-04-11 00:00:00'), exit_date=Timestamp('2025-07-25 00:00:00'), entry_price=4063.742788574218, exit_price=4495.528779785156, shares=1624, net_pnl=660909.7043482177, pnl_pct=9.985556211243647, hold_days=105, exit_reason='ML_EXIT(rc=0.367)', conf_entry=0.6148951334304655, alloc_tier='T2', alloc_pct=0.132373137833632, partial=False)",
+      "Trade(ticker='BEL', entry_date=Timestamp('2025-07-25 00:00:00'), exit_date=Timestamp('2025-08-26 00:00:00'), entry_price=393.0064749450683, exit_price=363.9348036804199, shares=20610, net_pnl=-644408.768046571, pnl_pct=-7.932792824249132, hold_days=32, exit_reason='INITIAL_STOP(32d,-7%)', conf_entry=0.7082972851619906, alloc_tier='T3', alloc_pct=0.162467061052377, partial=False)",
+      "Trade(ticker='HAL', entry_date=Timestamp('2025-09-08 00:00:00'), exit_date=Timestamp('2026-02-05 00:00:00'), entry_price=4411.392336914062, exit_price=3998.2455549316405, shares=1836, net_pnl=-803313.7677110694, pnl_pct=-9.889611189705674, hold_days=150, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6697147268459666, alloc_tier='T3', alloc_pct=0.16245608695865768, partial=False)",
+      "Trade(ticker='RELIANCE', entry_date=Timestamp('2025-01-16 00:00:00'), exit_date=Timestamp('2026-03-04 00:00:00'), entry_price=1262.6733992919922, exit_price=1343.655, shares=6414, net_pnl=470936.71491729096, pnl_pct=5.798089725725892, hold_days=412, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6747652381008742, alloc_tier='T3', alloc_pct=0.16244547331779416, partial=False)",
+      "Trade(ticker='BHARTIARTL', entry_date=Timestamp('2022-06-27 00:00:00'), exit_date=Timestamp('2026-03-11 00:00:00'), entry_price=669.1337973632811, exit_price=1805.193, shares=12105, net_pnl=13665136.642859444, pnl_pct=168.22037135463646, hold_days=1353, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6866221120047014, alloc_tier='T3', alloc_pct=0.16246708448944117, partial=False)",
+      "Trade(ticker='LT', entry_date=Timestamp('2025-02-06 00:00:00'), exit_date=Timestamp('2026-03-12 00:00:00'), entry_price=3292.92855493164, exit_price=3679.8382067871094, shares=2459, net_pnl=901687.3368581058, pnl_pct=11.103438779776836, hold_days=399, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6910714237942491, alloc_tier='T3', alloc_pct=0.1624158703878995, partial=False)",
+      "Trade(ticker='BEL', entry_date=Timestamp('2026-02-23 00:00:00'), exit_date=Timestamp('2026-03-23 00:00:00'), entry_price=438.3237195739746, exit_price=405.0945, shares=25095, net_pnl=-895267.4478474967, pnl_pct=-8.11545716066211, hold_days=28, exit_reason='INITIAL_STOP(28d,-7%)', conf_entry=0.5881981411233044, alloc_tier='T2', alloc_pct=0.22063265941125493, partial=False)",
+      "Trade(ticker='COFORGE', entry_date=Timestamp('2026-04-13 00:00:00'), exit_date=Timestamp('2026-04-24 00:00:00'), entry_price=1232.531348876953, exit_price=1149.7491243896484, shares=5354, net_pnl=-480204.7459012503, pnl_pct=-7.255919829566501, hold_days=11, exit_reason='TRAIL_STOP(9%)', conf_entry=0.6189842806968019, alloc_tier='T2', alloc_pct=0.1323621972625736, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2026-04-13 00:00:00'), exit_date=Timestamp('2026-04-24 00:00:00'), entry_price=4415.811302246093, exit_price=4188.807, shares=1494, net_pnl=-376424.7968119746, pnl_pct=-5.689308569760997, hold_days=11, exit_reason='TRAIL_STOP(9%)', conf_entry=0.6184356999985671, alloc_tier='T2', alloc_pct=0.13232708059207549, partial=False)",
+      "Trade(ticker='LUPIN', entry_date=Timestamp('2025-04-11 00:00:00'), exit_date=Timestamp('2026-05-21 00:00:00'), entry_price=1959.034958740234, exit_price=2282.2155, shares=4594, net_pnl=1428186.9231857508, pnl_pct=15.823197326902388, hold_days=405, exit_reason='END_SIM', conf_entry=0.8145457705259688, alloc_tier='T4', alloc_pct=0.18051812079187896, partial=False)",
+      "Trade(ticker='LT', entry_date=Timestamp('2026-04-13 00:00:00'), exit_date=Timestamp('2026-05-21 00:00:00'), entry_price=3919.9665876464837, exit_price=3886.6095, shares=2295, net_pnl=-128511.18330001086, pnl_pct=-1.4243549723993667, hold_days=38, exit_reason='END_SIM', conf_entry=0.7622553032961754, alloc_tier='T4', alloc_pct=0.18044825312545523, partial=False)",
+      "Trade(ticker='BAJFINANCE', entry_date=Timestamp('2026-04-13 00:00:00'), exit_date=Timestamp('2026-05-21 00:00:00'), entry_price=899.8489622192382, exit_price=898.9491132570189, shares=5667, net_pnl=-34661.43128069583, pnl_pct=-0.6777445408315876, hold_days=38, exit_reason='END_SIM', conf_entry=0.5728105027176218, alloc_tier='T1', alloc_pct=0.10228464913392445, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2026-05-04 00:00:00'), exit_date=Timestamp('2026-05-21 00:00:00'), entry_price=4182.878895507812, exit_price=4178.6960166123035, shares=1577, net_pnl=-44836.39056381583, pnl_pct=-0.6777445408316047, hold_days=17, exit_reason='END_SIM', conf_entry=0.6335497439115194, alloc_tier='T2', alloc_pct=0.13231059156537292, partial=False)"
+    ],
+    "n_partial_exits": 0,
+    "n_rolling_exits": 1,
+    "n_conf_trail_exits": 0,
+    "n_initial_stops": 12,
+    "cb_recoveries": 0
+  },
+  "v10_full": {
+    "label": "V10 (Precision Stop)",
+    "oos_start": "2022-01-01",
+    "oos_end": "2026-05-21",
+    "n_years": 4.38,
+    "total_ret": 114.95,
+    "ann_cagr": 19.07,
+    "net_after_tax": 15.26,
+    "max_dd": -11.69,
+    "sharpe": 0.886,
+    "calmar": 1.632,
+    "n_trades": 45,
+    "win_rate": 42.2,
+    "avg_hold_days": 166.4,
+    "avg_win_pct": 43.8,
+    "avg_loss_pct": -7.11,
+    "expected_value": 14.387,
+    "annual": {
+      "2022": 8.0,
+      "2023": 58.6,
+      "2024": 34.0,
+      "2025": 0.6,
+      "2026": -6.8
+    },
+    "ticker_stats": {
+      "BAJFINANCE": {
+        "n_trades": 2,
+        "wr_pct": 0.0,
+        "avg_pnl_pct": -5.56,
+        "total_pnl_L": -7.26
+      },
+      "BEL": {
+        "n_trades": 6,
+        "wr_pct": 66.7,
+        "avg_pnl_pct": 4.21,
+        "total_pnl_L": 13.33
+      },
+      "BHARTIARTL": {
+        "n_trades": 2,
+        "wr_pct": 50.0,
+        "avg_pnl_pct": 81.06,
+        "total_pnl_L": 127.47
+      },
+      "COFORGE": {
+        "n_trades": 4,
+        "wr_pct": 25.0,
+        "avg_pnl_pct": -0.71,
+        "total_pnl_L": -4.0
+      },
+      "HAL": {
+        "n_trades": 4,
+        "wr_pct": 50.0,
+        "avg_pnl_pct": 25.11,
+        "total_pnl_L": -12.03
+      },
+      "LT": {
+        "n_trades": 5,
+        "wr_pct": 40.0,
+        "avg_pnl_pct": 22.92,
+        "total_pnl_L": 99.46
+      },
+      "LUPIN": {
+        "n_trades": 6,
+        "wr_pct": 50.0,
+        "avg_pnl_pct": 39.01,
+        "total_pnl_L": 350.37
+      },
+      "PERSISTENT": {
+        "n_trades": 2,
+        "wr_pct": 50.0,
+        "avg_pnl_pct": 19.27,
+        "total_pnl_L": 42.51
+      },
+      "RELIANCE": {
+        "n_trades": 5,
+        "wr_pct": 20.0,
+        "avg_pnl_pct": -4.11,
+        "total_pnl_L": -24.59
+      },
+      "TATAELXSI": {
+        "n_trades": 8,
+        "wr_pct": 37.5,
+        "avg_pnl_pct": 0.15,
+        "total_pnl_L": -16.38
+      },
+      "TRENT": {
+        "n_trades": 1,
+        "wr_pct": 100.0,
+        "avg_pnl_pct": 5.75,
+        "total_pnl_L": 4.67
+      }
+    },
+    "tier_stats": {
+      "T1": {
+        "n_trades": 1,
+        "wr_pct": 0.0,
+        "avg_pnl": -0.68
+      },
+      "T2": {
+        "n_trades": 15,
+        "wr_pct": 40.0,
+        "avg_pnl": 3.13
+      },
+      "T3": {
+        "n_trades": 15,
+        "wr_pct": 66.7,
+        "avg_pnl": 27.64
+      },
+      "T4": {
+        "n_trades": 14,
+        "wr_pct": 21.4,
+        "avg_pnl": 13.32
+      }
+    },
+    "trades": [
+      "Trade(ticker='LUPIN', entry_date=Timestamp('2022-01-03 00:00:00'), exit_date=Timestamp('2022-02-04 00:00:00'), entry_price=926.4551316528319, exit_price=853.1496584472657, shares=16190, net_pnl=-1270369.8356981073, pnl_pct=-8.445032044058392, hold_days=32, exit_reason='INITIAL_STOP(32d,-8%)', conf_entry=0.8076035921472698, alloc_tier='T4', alloc_pct=0.30085613152691165, partial=False)",
+      "Trade(ticker='LT', entry_date=Timestamp('2022-01-03 00:00:00'), exit_date=Timestamp('2022-02-14 00:00:00'), entry_price=1829.3051387939452, exit_price=1708.0608592529297, shares=2609, net_pnl=-343090.39020033274, pnl_pct=-7.167879389567242, hold_days=42, exit_reason='INITIAL_STOP(42d,-7%)', conf_entry=0.7486198999454183, alloc_tier='T4', alloc_pct=0.09572995625448065, partial=False)",
+      "Trade(ticker='BAJFINANCE', entry_date=Timestamp('2022-02-14 00:00:00'), exit_date=Timestamp('2022-03-07 00:00:00'), entry_price=666.4667042236327, exit_price=600.3510133666992, shares=9902, net_pnl=-691055.2550801365, pnl_pct=-10.441280500384813, hold_days=21, exit_reason='INITIAL_STOP(21d,-10%)', conf_entry=0.6079272588761936, alloc_tier='T2', alloc_pct=0.13236982859615112, partial=False)",
+      "Trade(ticker='TRENT', entry_date=Timestamp('2022-02-14 00:00:00'), exit_date=Timestamp('2022-05-09 00:00:00'), entry_price=1032.5110938720702, exit_price=1098.2531865234375, shares=7844, net_pnl=467211.20121259894, pnl_pct=5.752058619507547, hold_days=84, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6610545593245155, alloc_tier='T3', alloc_pct=0.16245008339382966, partial=False)",
+      "Trade(ticker='LUPIN', entry_date=Timestamp('2022-03-14 00:00:00'), exit_date=Timestamp('2022-05-10 00:00:00'), entry_price=730.3828514404296, exit_price=698.8451940307617, shares=12322, net_pnl=-439678.7637331858, pnl_pct=-4.871313569098122, hold_days=57, exit_reason='TRAIL_STOP(9%)', conf_entry=0.8104190496759994, alloc_tier='T4', alloc_pct=0.18051753700371548, partial=False)",
+      "Trade(ticker='LT', entry_date=Timestamp('2022-06-06 00:00:00'), exit_date=Timestamp('2022-06-13 00:00:00'), entry_price=1560.4058929443358, exit_price=1454.6052180175782, shares=1577, net_pnl=-180636.21467325883, pnl_pct=-7.319441050273717, hold_days=7, exit_reason='INITIAL_STOP(7d,-7%)', conf_entry=0.7485105828957384, alloc_tier='T4', alloc_pct=0.04935792594886839, partial=False)",
+      "Trade(ticker='BHARTIARTL', entry_date=Timestamp('2022-01-03 00:00:00'), exit_date=Timestamp('2022-06-16 00:00:00'), entry_price=676.3245136108397, exit_price=638.7494661254883, shares=22178, net_pnl=-917919.9642256424, pnl_pct=-6.101964494729692, hold_days=164, exit_reason='TRAIL_STOP(15%)', conf_entry=0.8393328588804151, alloc_tier='T4', alloc_pct=0.30086047371087005, partial=False)",
+      "Trade(ticker='RELIANCE', entry_date=Timestamp('2022-01-03 00:00:00'), exit_date=Timestamp('2022-07-07 00:00:00'), entry_price=1094.874298095703, exit_price=1085.5275216064454, shares=13700, net_pnl=-214678.2021995932, pnl_pct=-1.4270707025991873, hold_days=185, exit_reason='TRAIL_STOP(15%)', conf_entry=0.8156225732618205, alloc_tier='T4', alloc_pct=0.30086554479548944, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2022-07-18 00:00:00'), exit_date=Timestamp('2022-08-29 00:00:00'), entry_price=7882.1814360351555, exit_price=8610.748795898437, shares=837, net_pnl=569777.5906535937, pnl_pct=8.611441342089483, hold_days=42, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6207084969094807, alloc_tier='T2', alloc_pct=0.13233036561922226, partial=False)",
+      "Trade(ticker='RELIANCE', entry_date=Timestamp('2022-08-29 00:00:00'), exit_date=Timestamp('2022-09-26 00:00:00'), entry_price=1187.0042999267578, exit_price=1084.1669450683594, shares=11373, net_pnl=-1244476.325455621, pnl_pct=-9.191823499635825, hold_days=28, exit_reason='INITIAL_STOP(28d,-9%)', conf_entry=0.6691359305153485, alloc_tier='T3', alloc_pct=0.27077898645571824, partial=False)",
+      "Trade(ticker='BEL', entry_date=Timestamp('2022-10-10 00:00:00'), exit_date=Timestamp('2022-10-31 00:00:00'), entry_price=100.50002731323241, exit_price=102.60385929107666, shares=134328, net_pnl=203484.1791684907, pnl_pct=1.5029353134626935, hold_days=21, exit_reason='ML_EXIT(rc=0.240)', conf_entry=0.6736925174804771, alloc_tier='T3', alloc_pct=0.2707823515034357, partial=False)",
+      "Trade(ticker='HAL', entry_date=Timestamp('2022-01-03 00:00:00'), exit_date=Timestamp('2023-01-02 00:00:00'), entry_price=575.2129439697266, exit_price=1219.4535201416015, shares=143, net_pnl=91382.15420991115, pnl_pct=110.77431485726343, hold_days=364, exit_reason='ML_EXIT(rc=0.364)', conf_entry=0.7036463492719726, alloc_tier='T3', alloc_pct=0.0016498798359107028, partial=False)",
+      "Trade(ticker='LUPIN', entry_date=Timestamp('2022-06-06 00:00:00'), exit_date=Timestamp('2023-02-23 00:00:00'), entry_price=593.4115443115234, exit_price=647.9764969482422, shares=25277, net_pnl=1288240.4677934665, pnl_pct=8.563627871859826, hold_days=262, exit_reason='TRAIL_STOP(15%)', conf_entry=0.8377993646634463, alloc_tier='T4', alloc_pct=0.3008632526003701, partial=False)",
+      "Trade(ticker='COFORGE', entry_date=Timestamp('2022-10-31 00:00:00'), exit_date=Timestamp('2023-03-21 00:00:00'), entry_price=729.5675838623046, exit_price=715.0467496948243, shares=19567, net_pnl=-366102.7912827525, pnl_pct=-2.557146646827515, hold_days=141, exit_reason='TRAIL_STOP(15%)', conf_entry=0.7414612399679416, alloc_tier='T4', alloc_pct=0.2863369543056534, partial=False)",
+      "Trade(ticker='BEL', entry_date=Timestamp('2023-03-27 00:00:00'), exit_date=Timestamp('2023-04-17 00:00:00'), entry_price=89.41922491455077, exit_price=98.62663169860839, shares=73809, net_pnl=639339.0050953031, pnl_pct=9.659026268127008, hold_days=21, exit_reason='ML_EXIT(rc=0.347)', conf_entry=0.6389019891769703, alloc_tier='T2', alloc_pct=0.1323816681615212, partial=False)",
+      "Trade(ticker='COFORGE', entry_date=Timestamp('2023-04-17 00:00:00'), exit_date=Timestamp('2023-07-31 00:00:00'), entry_price=751.0804692993163, exit_price=910.1245479125977, shares=10784, net_pnl=1663179.4825393492, pnl_pct=20.474586485794486, hold_days=105, exit_reason='ML_EXIT(rc=0.417)', conf_entry=0.652264714363616, alloc_tier='T3', alloc_pct=0.16246281542177013, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2023-01-02 00:00:00'), exit_date=Timestamp('2024-01-25 00:00:00'), entry_price=6127.910851562499, exit_price=7500.686629394531, shares=67, net_pnl=89327.9406241962, pnl_pct=21.69414053700108, hold_days=388, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6498146923894514, alloc_tier='T2', alloc_pct=0.008235213602662921, partial=False)",
+      "Trade(ticker='BEL', entry_date=Timestamp('2024-02-07 00:00:00'), exit_date=Timestamp('2024-02-28 00:00:00'), entry_price=177.8971255340576, exit_price=201.70763635253905, shares=38690, net_pnl=878636.6296786088, pnl_pct=12.728698887998771, hold_days=21, exit_reason='ML_EXIT(rc=0.352)', conf_entry=0.687835117457297, alloc_tier='T3', alloc_pct=0.13805600044589472, partial=False)",
+      "Trade(ticker='PERSISTENT', entry_date=Timestamp('2023-07-31 00:00:00'), exit_date=Timestamp('2024-04-22 00:00:00'), entry_price=2337.935697753906, exit_price=3464.0017690429686, shares=4705, net_pnl=5218976.329649331, pnl_pct=47.30809996709758, hold_days=266, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6383498623768146, alloc_tier='T2', alloc_pct=0.22063774843120262, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2024-05-02 00:00:00'), exit_date=Timestamp('2024-09-06 00:00:00'), entry_price=7010.190198730468, exit_price=7497.052083984375, shares=1925, net_pnl=856222.4490705151, pnl_pct=6.326571838655666, hold_days=127, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6930509890544747, alloc_tier='T3', alloc_pct=0.2706750103868113, partial=False)",
+      "Trade(ticker='RELIANCE', entry_date=Timestamp('2024-02-28 00:00:00'), exit_date=Timestamp('2024-10-15 00:00:00'), entry_price=1446.3753503417968, exit_price=1337.3397883300781, shares=5354, net_pnl=-626998.0304828444, pnl_pct=-8.07326422877239, hold_days=230, exit_reason='TRAIL_STOP(15%)', conf_entry=0.73422384453102, alloc_tier='T4', alloc_pct=0.15532701834489196, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2024-09-12 00:00:00'), exit_date=Timestamp('2024-10-22 00:00:00'), entry_price=7708.982531249999, exit_price=7039.73837109375, shares=1751, net_pnl=-1246739.0543036014, pnl_pct=-9.209471857312598, hold_days=40, exit_reason='INITIAL_STOP(40d,-9%)', conf_entry=0.6591653256856417, alloc_tier='T3', alloc_pct=0.27075147709228364, partial=False)",
+      "Trade(ticker='RELIANCE', entry_date=Timestamp('2024-12-05 00:00:00'), exit_date=Timestamp('2024-12-19 00:00:00'), entry_price=1318.107684448242, exit_price=1224.3296206054688, shares=8345, net_pnl=-844106.1967688948, pnl_pct=-7.651775583718537, hold_days=14, exit_reason='INITIAL_STOP(14d,-7%)', conf_entry=0.6137102536898367, alloc_tier='T2', alloc_pct=0.2206301498347614, partial=False)",
+      "Trade(ticker='LUPIN', entry_date=Timestamp('2023-03-06 00:00:00'), exit_date=Timestamp('2025-01-10 00:00:00'), entry_price=653.3172764282226, exit_price=2175.379083984375, shares=22959, net_pnl=34756679.324439436, pnl_pct=231.04870288965435, hold_days=676, exit_reason='ROLLING_PEAK_STOP(233%gain)', conf_entry=0.804897892682137, alloc_tier='T4', alloc_pct=0.30086019864858315, partial=False)",
+      "Trade(ticker='HAL', entry_date=Timestamp('2024-10-24 00:00:00'), exit_date=Timestamp('2025-01-13 00:00:00'), entry_price=4122.870705078125, exit_price=3713.772744140625, shares=2668, net_pnl=-1152107.0374765452, pnl_pct=-10.44358624422082, hold_days=81, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6265812771219378, alloc_tier='T2', alloc_pct=0.22063437032735533, partial=False)",
+      "Trade(ticker='PERSISTENT', entry_date=Timestamp('2024-12-26 00:00:00'), exit_date=Timestamp('2025-01-14 00:00:00'), entry_price=6341.150245117186, exit_price=5818.209169921875, shares=1734, net_pnl=-967924.3791431356, pnl_pct=-8.777415572374588, hold_days=19, exit_reason='INITIAL_STOP(19d,-8%)', conf_entry=0.6366407411015299, alloc_tier='T2', alloc_pct=0.22054883266311598, partial=False)",
+      "Trade(ticker='LT', entry_date=Timestamp('2022-06-27 00:00:00'), exit_date=Timestamp('2025-02-03 00:00:00'), entry_price=1461.0848693847654, exit_price=3224.05787109375, shares=5543, net_pnl=9696847.084462533, pnl_pct=119.38577795526587, hold_days=952, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6972616793075813, alloc_tier='T3', alloc_pct=0.1624455986389931, partial=False)",
+      "Trade(ticker='LUPIN', entry_date=Timestamp('2025-02-06 00:00:00'), exit_date=Timestamp('2025-02-12 00:00:00'), entry_price=2174.014127441406, exit_price=2010.6692028808593, shares=4139, net_pnl=-726313.8152382933, pnl_pct=-8.04838763766507, hold_days=6, exit_reason='INITIAL_STOP(6d,-7%)', conf_entry=0.8248335741250689, alloc_tier='T4', alloc_pct=0.18048678764906143, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2025-01-16 00:00:00'), exit_date=Timestamp('2025-02-25 00:00:00'), entry_price=6121.1897817382805, exit_price=5626.308001464844, shares=1078, net_pnl=-570207.5867046146, pnl_pct=-8.61629886727756, hold_days=40, exit_reason='INITIAL_STOP(40d,-8%)', conf_entry=0.6366223657699591, alloc_tier='T2', alloc_pct=0.13235557296419073, partial=False)",
+      "Trade(ticker='BEL', entry_date=Timestamp('2025-02-27 00:00:00'), exit_date=Timestamp('2025-03-20 00:00:00'), entry_price=249.6660273284912, exit_price=294.811033996582, shares=26435, net_pnl=1151667.8230342083, pnl_pct=17.39926233401273, hold_days=21, exit_reason='ML_EXIT(rc=0.223)', conf_entry=0.6417711245215174, alloc_tier='T2', alloc_pct=0.13238122409165415, partial=False)",
+      "Trade(ticker='COFORGE', entry_date=Timestamp('2025-03-20 00:00:00'), exit_date=Timestamp('2025-04-04 00:00:00'), entry_price=1503.0654066162108, exit_price=1307.9795295410156, shares=5987, net_pnl=-1216785.351544235, pnl_pct=-13.48246196439334, hold_days=15, exit_reason='INITIAL_STOP(15d,-13%)', conf_entry=0.7280516053795502, alloc_tier='T4', alloc_pct=0.1804989852384109, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2025-03-20 00:00:00'), exit_date=Timestamp('2025-04-07 00:00:00'), entry_price=5322.517884277343, exit_price=4749.761109375, shares=1521, net_pnl=-915590.8700395646, pnl_pct=-11.277101221995425, hold_days=18, exit_reason='INITIAL_STOP(18d,-11%)', conf_entry=0.714214047771411, alloc_tier='T3', alloc_pct=0.16238053592243196, partial=False)",
+      "Trade(ticker='HAL', entry_date=Timestamp('2025-04-11 00:00:00'), exit_date=Timestamp('2025-07-25 00:00:00'), entry_price=4063.742788574218, exit_price=4495.528779785156, shares=1624, net_pnl=660909.7043482177, pnl_pct=9.985556211243647, hold_days=105, exit_reason='ML_EXIT(rc=0.367)', conf_entry=0.6148951334304655, alloc_tier='T2', alloc_pct=0.132373137833632, partial=False)",
+      "Trade(ticker='BEL', entry_date=Timestamp('2025-07-25 00:00:00'), exit_date=Timestamp('2025-08-26 00:00:00'), entry_price=393.0064749450683, exit_price=363.9348036804199, shares=20610, net_pnl=-644408.768046571, pnl_pct=-7.932792824249132, hold_days=32, exit_reason='INITIAL_STOP(32d,-7%)', conf_entry=0.7082972851619906, alloc_tier='T3', alloc_pct=0.162467061052377, partial=False)",
+      "Trade(ticker='HAL', entry_date=Timestamp('2025-09-08 00:00:00'), exit_date=Timestamp('2026-02-05 00:00:00'), entry_price=4411.392336914062, exit_price=3998.2455549316405, shares=1836, net_pnl=-803313.7677110694, pnl_pct=-9.889611189705674, hold_days=150, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6697147268459666, alloc_tier='T3', alloc_pct=0.16245608695865768, partial=False)",
+      "Trade(ticker='RELIANCE', entry_date=Timestamp('2025-01-16 00:00:00'), exit_date=Timestamp('2026-03-04 00:00:00'), entry_price=1262.6733992919922, exit_price=1343.655, shares=6414, net_pnl=470936.71491729096, pnl_pct=5.798089725725892, hold_days=412, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6747652381008742, alloc_tier='T3', alloc_pct=0.16244547331779416, partial=False)",
+      "Trade(ticker='BHARTIARTL', entry_date=Timestamp('2022-06-27 00:00:00'), exit_date=Timestamp('2026-03-11 00:00:00'), entry_price=669.1337973632811, exit_price=1805.193, shares=12105, net_pnl=13665136.642859444, pnl_pct=168.22037135463646, hold_days=1353, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6866221120047014, alloc_tier='T3', alloc_pct=0.16246708448944117, partial=False)",
+      "Trade(ticker='LT', entry_date=Timestamp('2025-02-06 00:00:00'), exit_date=Timestamp('2026-03-12 00:00:00'), entry_price=3292.92855493164, exit_price=3679.8382067871094, shares=2459, net_pnl=901687.3368581058, pnl_pct=11.103438779776836, hold_days=399, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6910714237942491, alloc_tier='T3', alloc_pct=0.1624158703878995, partial=False)",
+      "Trade(ticker='BEL', entry_date=Timestamp('2026-02-23 00:00:00'), exit_date=Timestamp('2026-03-23 00:00:00'), entry_price=438.3237195739746, exit_price=405.0945, shares=25095, net_pnl=-895267.4478474967, pnl_pct=-8.11545716066211, hold_days=28, exit_reason='INITIAL_STOP(28d,-7%)', conf_entry=0.5881981411233044, alloc_tier='T2', alloc_pct=0.22063265941125493, partial=False)",
+      "Trade(ticker='COFORGE', entry_date=Timestamp('2026-04-13 00:00:00'), exit_date=Timestamp('2026-04-24 00:00:00'), entry_price=1232.531348876953, exit_price=1149.7491243896484, shares=5354, net_pnl=-480204.7459012503, pnl_pct=-7.255919829566501, hold_days=11, exit_reason='INITIAL_STOP(11d,-7%)', conf_entry=0.6189842806968019, alloc_tier='T2', alloc_pct=0.1323621972625736, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2026-04-13 00:00:00'), exit_date=Timestamp('2026-04-24 00:00:00'), entry_price=4415.811302246093, exit_price=4188.807, shares=1494, net_pnl=-376424.7968119746, pnl_pct=-5.689308569760997, hold_days=11, exit_reason='TRAIL_STOP(9%)', conf_entry=0.6184356999985671, alloc_tier='T2', alloc_pct=0.13232708059207549, partial=False)",
+      "Trade(ticker='LUPIN', entry_date=Timestamp('2025-04-11 00:00:00'), exit_date=Timestamp('2026-05-21 00:00:00'), entry_price=1959.034958740234, exit_price=2282.2155, shares=4594, net_pnl=1428186.9231857508, pnl_pct=15.823197326902388, hold_days=405, exit_reason='END_SIM', conf_entry=0.8145457705259688, alloc_tier='T4', alloc_pct=0.18051812079187896, partial=False)",
+      "Trade(ticker='LT', entry_date=Timestamp('2026-04-13 00:00:00'), exit_date=Timestamp('2026-05-21 00:00:00'), entry_price=3919.9665876464837, exit_price=3886.6095, shares=2295, net_pnl=-128511.18330001086, pnl_pct=-1.4243549723993667, hold_days=38, exit_reason='END_SIM', conf_entry=0.7622553032961754, alloc_tier='T4', alloc_pct=0.18044825312545523, partial=False)",
+      "Trade(ticker='BAJFINANCE', entry_date=Timestamp('2026-04-13 00:00:00'), exit_date=Timestamp('2026-05-21 00:00:00'), entry_price=899.8489622192382, exit_price=898.9491132570189, shares=5667, net_pnl=-34661.43128069583, pnl_pct=-0.6777445408315876, hold_days=38, exit_reason='END_SIM', conf_entry=0.5728105027176218, alloc_tier='T1', alloc_pct=0.10228464913392445, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2026-05-04 00:00:00'), exit_date=Timestamp('2026-05-21 00:00:00'), entry_price=4182.878895507812, exit_price=4178.6960166123035, shares=1577, net_pnl=-44836.39056381583, pnl_pct=-0.6777445408316047, hold_days=17, exit_reason='END_SIM', conf_entry=0.6335497439115194, alloc_tier='T2', alloc_pct=0.13231059156537292, partial=False)"
+    ],
+    "n_partial_exits": 0,
+    "n_rolling_exits": 1,
+    "n_conf_trail_exits": 0,
+    "n_initial_stops": 15,
+    "cb_recoveries": 0
+  },
+  "v10_true_oos": {
+    "label": "V10 (Precision Stop)",
+    "oos_start": "2025-01-01",
+    "oos_end": "2026-05-21",
+    "n_years": 1.38,
+    "total_ret": -4.42,
+    "ann_cagr": -3.21,
+    "net_after_tax": -2.57,
+    "max_dd": -15.08,
+    "sharpe": -0.635,
+    "calmar": -0.213,
+    "n_trades": 25,
+    "win_rate": 36.0,
+    "avg_hold_days": 92.2,
+    "avg_win_pct": 8.47,
+    "avg_loss_pct": -7.28,
+    "expected_value": -1.608,
+    "annual": {
+      "2025": 8.6,
+      "2026": -12.0
+    },
+    "ticker_stats": {
+      "BAJFINANCE": {
+        "n_trades": 1,
+        "wr_pct": 100.0,
+        "avg_pnl_pct": 4.04,
+        "total_pnl_L": 3.45
+      },
+      "BEL": {
+        "n_trades": 4,
+        "wr_pct": 50.0,
+        "avg_pnl_pct": -1.65,
+        "total_pnl_L": -10.26
+      },
+      "BHARTIARTL": {
+        "n_trades": 2,
+        "wr_pct": 50.0,
+        "avg_pnl_pct": 6.31,
+        "total_pnl_L": 17.4
+      },
+      "COFORGE": {
+        "n_trades": 2,
+        "wr_pct": 0.0,
+        "avg_pnl_pct": -10.06,
+        "total_pnl_L": -13.31
+      },
+      "HAL": {
+        "n_trades": 3,
+        "wr_pct": 33.3,
+        "avg_pnl_pct": -5.83,
+        "total_pnl_L": -6.33
+      },
+      "LT": {
+        "n_trades": 3,
+        "wr_pct": 66.7,
+        "avg_pnl_pct": 3.97,
+        "total_pnl_L": 2.67
+      },
+      "LUPIN": {
+        "n_trades": 2,
+        "wr_pct": 50.0,
+        "avg_pnl_pct": 2.42,
+        "total_pnl_L": 4.37
+      },
+      "PERSISTENT": {
+        "n_trades": 1,
+        "wr_pct": 0.0,
+        "avg_pnl_pct": -7.46,
+        "total_pnl_L": -6.88
+      },
+      "RELIANCE": {
+        "n_trades": 3,
+        "wr_pct": 33.3,
+        "avg_pnl_pct": 1.43,
+        "total_pnl_L": 1.43
+      },
+      "TATAELXSI": {
+        "n_trades": 4,
+        "wr_pct": 0.0,
+        "avg_pnl_pct": -6.56,
+        "total_pnl_L": -16.18
+      }
+    },
+    "tier_stats": {
+      "T1": {
+        "n_trades": 2,
+        "wr_pct": 50.0,
+        "avg_pnl": -2.91
+      },
+      "T2": {
+        "n_trades": 10,
+        "wr_pct": 30.0,
+        "avg_pnl": -2.02
+      },
+      "T3": {
+        "n_trades": 8,
+        "wr_pct": 37.5,
+        "avg_pnl": -2.32
+      },
+      "T4": {
+        "n_trades": 5,
+        "wr_pct": 40.0,
+        "avg_pnl": 0.87
+      }
+    },
+    "trades": [
+      "Trade(ticker='BEL', entry_date=Timestamp('2025-01-01 00:00:00'), exit_date=Timestamp('2025-01-10 00:00:00'), entry_price=290.6589293518066, exit_price=267.4759696655273, shares=46446, net_pnl=-1151932.8327962272, pnl_pct=-8.50819702284572, hold_days=9, exit_reason='INITIAL_STOP(9d,-8%)', conf_entry=0.6883722074748315, alloc_tier='T3', alloc_pct=0.27078188944217524, partial=False)",
+      "Trade(ticker='PERSISTENT', entry_date=Timestamp('2025-01-01 00:00:00'), exit_date=Timestamp('2025-01-13 00:00:00'), entry_price=6381.799251953124, exit_price=5940.210581542969, shares=1441, net_pnl=-687821.7209542319, pnl_pct=-7.457806921914781, hold_days=12, exit_reason='INITIAL_STOP(12d,-7%)', conf_entry=0.6467382689854813, alloc_tier='T2', alloc_pct=0.18445683245916877, partial=False)",
+      "Trade(ticker='HAL', entry_date=Timestamp('2025-01-01 00:00:00'), exit_date=Timestamp('2025-01-13 00:00:00'), entry_price=4096.397969726562, exit_price=3713.772744140625, shares=39, net_pnl=-15805.714105589897, pnl_pct=-9.864833091350244, hold_days=12, exit_reason='INITIAL_STOP(12d,-9%)', conf_entry=0.5746513616715643, alloc_tier='T1', alloc_pct=0.0032044564685942394, partial=False)",
+      "Trade(ticker='LT', entry_date=Timestamp('2025-01-01 00:00:00'), exit_date=Timestamp('2025-01-28 00:00:00'), entry_price=3602.0628198242184, exit_price=3346.2883015136717, shares=3747, net_pnl=-1033889.9878994115, pnl_pct=-7.638036380964253, hold_days=27, exit_reason='INITIAL_STOP(27d,-7%)', conf_entry=0.7190959523521807, alloc_tier='T3', alloc_pct=0.270721409622008, partial=False)",
+      "Trade(ticker='LUPIN', entry_date=Timestamp('2025-01-22 00:00:00'), exit_date=Timestamp('2025-02-14 00:00:00'), entry_price=2128.053417724609, exit_price=1955.7661530761718, shares=4229, net_pnl=-778687.2137964983, pnl_pct=-8.627504645461379, hold_days=23, exit_reason='INITIAL_STOP(23d,-8%)', conf_entry=0.7886201369663445, alloc_tier='T4', alloc_pct=0.18051273126955375, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2025-01-22 00:00:00'), exit_date=Timestamp('2025-02-25 00:00:00'), entry_price=6104.462133300781, exit_price=5626.308001464844, shares=629, net_pnl=-322157.0467276303, pnl_pct=-8.36588623597843, hold_days=34, exit_reason='INITIAL_STOP(34d,-8%)', conf_entry=0.6264887339067068, alloc_tier='T2', alloc_pct=0.0770168366244709, partial=False)",
+      "Trade(ticker='RELIANCE', entry_date=Timestamp('2025-01-22 00:00:00'), exit_date=Timestamp('2025-03-03 00:00:00'), entry_price=1273.2916729736328, exit_price=1165.4241075439454, shares=6361, net_pnl=-731132.3298298717, pnl_pct=-9.000881882387374, hold_days=40, exit_reason='INITIAL_STOP(40d,-8%)', conf_entry=0.7106759579642834, alloc_tier='T3', alloc_pct=0.16245793231894912, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2025-03-05 00:00:00'), exit_date=Timestamp('2025-03-17 00:00:00'), entry_price=5496.77253125, exit_price=5111.4537421875, shares=1473, net_pnl=-612889.7364613051, pnl_pct=-7.547692620753803, hold_days=12, exit_reason='INITIAL_STOP(12d,-7%)', conf_entry=0.6729055034469834, alloc_tier='T3', alloc_pct=0.1624045300350598, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2025-03-26 00:00:00'), exit_date=Timestamp('2025-04-01 00:00:00'), entry_price=5510.233732910156, exit_price=5007.880173339844, shares=1197, net_pnl=-637828.7396084284, pnl_pct=-9.642336448014735, hold_days=6, exit_reason='INITIAL_STOP(6d,-9%)', conf_entry=0.6439503529976172, alloc_tier='T2', alloc_pct=0.13229754905301014, partial=False)",
+      "Trade(ticker='BEL', entry_date=Timestamp('2025-04-16 00:00:00'), exit_date=Timestamp('2025-05-07 00:00:00'), entry_price=291.97042019653315, exit_price=307.61380068969726, shares=27618, net_pnl=384016.86312414147, pnl_pct=4.748556221058639, hold_days=21, exit_reason='ML_EXIT(rc=0.315)', conf_entry=0.6925387695079388, alloc_tier='T3', alloc_pct=0.16174047236552633, partial=False)",
+      "Trade(ticker='HAL', entry_date=Timestamp('2025-05-07 00:00:00'), exit_date=Timestamp('2025-07-30 00:00:00'), entry_price=4423.00061328125, exit_price=4487.92555078125, shares=1908, net_pnl=74570.84409901127, pnl_pct=0.8810814499367672, hold_days=84, exit_reason='ML_EXIT(rc=0.345)', conf_entry=0.7201957384477883, alloc_tier='T4', alloc_pct=0.16927117034268063, partial=False)",
+      "Trade(ticker='BAJFINANCE', entry_date=Timestamp('2025-07-30 00:00:00'), exit_date=Timestamp('2026-01-23 00:00:00'), entry_price=885.7348255615234, exit_price=926.9221256103516, shares=9596, net_pnl=344789.988568563, pnl_pct=4.044855913287625, hold_days=177, exit_reason='TRAIL_STOP(15%)', conf_entry=0.5785707992571059, alloc_tier='T1', alloc_pct=0.17048319938216072, partial=False)",
+      "Trade(ticker='COFORGE', entry_date=Timestamp('2026-02-06 00:00:00'), exit_date=Timestamp('2026-02-12 00:00:00'), entry_price=1547.5459999999998, exit_price=1420.0785, shares=4264, net_pnl=-580217.8775171991, pnl_pct=-8.767438166485574, hold_days=6, exit_reason='INITIAL_STOP(6d,-8%)', conf_entry=0.6280044099893731, alloc_tier='T2', alloc_pct=0.132357449576352, partial=False)",
+      "Trade(ticker='RELIANCE', entry_date=Timestamp('2025-03-05 00:00:00'), exit_date=Timestamp('2026-03-04 00:00:00'), entry_price=1172.0943853759763, exit_price=1343.655, shares=5630, net_pnl=924811.6201182194, pnl_pct=13.974126366734483, hold_days=364, exit_reason='TRAIL_STOP(15%)', conf_entry=0.5942560584250266, alloc_tier='T2', alloc_pct=0.1323605634939356, partial=False)",
+      "Trade(ticker='BHARTIARTL', entry_date=Timestamp('2025-01-01 00:00:00'), exit_date=Timestamp('2026-03-11 00:00:00'), entry_price=1584.0531738281247, exit_price=1805.193, shares=8522, net_pnl=1800792.446545966, pnl_pct=13.301320044065006, hold_days=434, exit_reason='TRAIL_STOP(15%)', conf_entry=0.672095432454684, alloc_tier='T3', alloc_pct=0.27076898241381264, partial=False)",
+      "Trade(ticker='LT', entry_date=Timestamp('2025-03-05 00:00:00'), exit_date=Timestamp('2026-03-12 00:00:00'), entry_price=3181.84663671875, exit_price=3679.8382067871094, shares=2074, net_pnl=991564.2266620276, pnl_pct=14.982187352157187, hold_days=372, exit_reason='TRAIL_STOP(15%)', conf_entry=0.6178377889332205, alloc_tier='T2', alloc_pct=0.1323657491867179, partial=False)",
+      "Trade(ticker='BEL', entry_date=Timestamp('2026-02-27 00:00:00'), exit_date=Timestamp('2026-03-23 00:00:00'), entry_price=443.2576952514648, exit_price=405.0945, shares=14889, net_pnl=-604842.0500208465, pnl_pct=-9.138239403053664, hold_days=24, exit_reason='INITIAL_STOP(24d,-9%)', conf_entry=0.6003566446306645, alloc_tier='T2', alloc_pct=0.13237605699380792, partial=False)",
+      "Trade(ticker='HAL', entry_date=Timestamp('2026-03-20 00:00:00'), exit_date=Timestamp('2026-03-30 00:00:00'), entry_price=3786.1823022460935, exit_price=3483.712751220703, shares=2139, net_pnl=-692078.2556494698, pnl_pct=-8.5208960535202, hold_days=10, exit_reason='INITIAL_STOP(10d,-8%)', conf_entry=0.6836074127085191, alloc_tier='T3', alloc_pct=0.16244260023886914, partial=False)",
+      "Trade(ticker='BEL', entry_date=Timestamp('2026-04-06 00:00:00'), exit_date=Timestamp('2026-04-20 00:00:00'), entry_price=427.5771438903808, exit_price=457.0924378051758, shares=12863, net_pnl=346654.6616208935, pnl_pct=6.2846726544473, hold_days=14, exit_reason='ML_EXIT(rc=0.292)', conf_entry=0.6098006238708387, alloc_tier='T2', alloc_pct=0.11031749167574735, partial=False)",
+      "Trade(ticker='COFORGE', entry_date=Timestamp('2026-04-20 00:00:00'), exit_date=Timestamp('2026-04-24 00:00:00'), entry_price=1289.3880755615232, exit_price=1149.7491243896484, shares=5118, net_pnl=-750874.3142467709, pnl_pct=-11.345553445548084, hold_days=4, exit_reason='INITIAL_STOP(4d,-11%)', conf_entry=0.6295387660553853, alloc_tier='T2', alloc_pct=0.1323645105283795, partial=False)",
+      "Trade(ticker='LUPIN', entry_date=Timestamp('2025-03-05 00:00:00'), exit_date=Timestamp('2026-05-21 00:00:00'), entry_price=1999.6729682617186, exit_price=2282.2155, shares=4500, net_pnl=1215562.7483114488, pnl_pct=13.469400345853522, hold_days=442, exit_reason='END_SIM', conf_entry=0.7963474902709585, alloc_tier='T4', alloc_pct=0.180492481788271, partial=False)",
+      "Trade(ticker='BHARTIARTL', entry_date=Timestamp('2026-03-20 00:00:00'), exit_date=Timestamp('2026-05-21 00:00:00'), entry_price=1847.9460755615232, exit_price=1846.0981294859616, shares=4870, net_pnl=-61170.483695870265, pnl_pct=-0.6777445408315885, hold_days=62, exit_reason='END_SIM', conf_entry=0.8461719495618969, alloc_tier='T4', alloc_pct=0.1805119186081955, partial=False)",
+      "Trade(ticker='TATAELXSI', entry_date=Timestamp('2026-03-20 00:00:00'), exit_date=Timestamp('2026-05-21 00:00:00'), entry_price=4241.937895507812, exit_price=4237.6959576123045, shares=1555, net_pnl=-44835.122288159095, pnl_pct=-0.6777445408315776, hold_days=62, exit_reason='END_SIM', conf_entry=0.6473640547110893, alloc_tier='T2', alloc_pct=0.13230684892908878, partial=False)",
+      "Trade(ticker='LT', entry_date=Timestamp('2026-04-06 00:00:00'), exit_date=Timestamp('2026-05-21 00:00:00'), entry_price=3695.333976318359, exit_price=3886.6095, shares=1826, net_pnl=309119.6827581804, pnl_pct=4.567878665428802, hold_days=45, exit_reason='END_SIM', conf_entry=0.6512727083544793, alloc_tier='T3', alloc_pct=0.1353449622459104, partial=False)",
+      "Trade(ticker='RELIANCE', entry_date=Timestamp('2026-05-11 00:00:00'), exit_date=Timestamp('2026-05-21 00:00:00'), entry_price=1389.5881511230468, exit_price=1388.1985629719238, shares=5397, net_pnl=-50975.580449925736, pnl_pct=-0.6777445408315889, hold_days=10, exit_reason='END_SIM', conf_entry=0.7321408384378588, alloc_tier='T4', alloc_pct=0.15042712225281513, partial=False)"
+    ],
+    "n_partial_exits": 0,
+    "n_rolling_exits": 0,
+    "n_conf_trail_exits": 0,
+    "n_initial_stops": 13,
+    "cb_recoveries": 0
+  }
+}

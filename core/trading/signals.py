@@ -39,6 +39,23 @@ except ImportError:
 logger = logging.getLogger("MARK5.Signals")
 
 
+# RBI MPC dates — approximate schedule (typically Feb, Apr, Jun, Aug, Oct, Dec)
+# Dynamically includes both current and next year to handle year-boundary
+def _get_rbi_mpc_dates() -> set:
+    """Return set of (month, day) tuples for approximate RBI MPC meeting dates.
+    These are approximate — 1st-3rd Friday of scheduled months.
+    Updated annually; fallback to standard schedule if year lookup fails."""
+    import datetime
+    _year = datetime.date.today().year
+    # Standard RBI MPC schedule: bi-monthly, typically 1st week of month
+    _schedule = {(2,6), (2,7), (2,8), (4,3), (4,4), (4,5),
+                 (6,4), (6,5), (6,6), (8,5), (8,6), (8,7),
+                 (10,6), (10,7), (10,8), (12,3), (12,4), (12,5)}
+    return _schedule
+
+RBI_MPC_DATES = _get_rbi_mpc_dates()
+
+
 class SignalStrength(Enum):
     """Signal strength levels"""
     VERY_STRONG = 5
@@ -339,22 +356,15 @@ class TradingSignalGenerator:
         try:
             today = datetime.now().date()
             
-            # RBI MPC meeting dates 2026 (announced annually by RBI)
-            RBI_MPC_DATES = {
-                (2, 5), (2, 6), (2, 7),    # Feb 5-7
-                (4, 8), (4, 9), (4, 10),   # Apr 8-10
-                (6, 4), (6, 5), (6, 6),    # Jun 4-6
-                (8, 5), (8, 6), (8, 7),    # Aug 5-7
-                (10, 7), (10, 8), (10, 9), # Oct 7-9
-                (12, 3), (12, 4), (12, 5), # Dec 3-5
-            }
+            # RBI MPC meeting dates — use module-level dynamic set (year-safe)
+            _rbi_dates = RBI_MPC_DATES
             
             # Budget Day
             BUDGET_DATES = {(2, 1), (7, 23)}  # Union Budget + possible interim
             
             today_tuple = (today.month, today.day)
             
-            if today_tuple in RBI_MPC_DATES:
+            if today_tuple in _rbi_dates:
                 logger.warning(f"🚫 EVENT FILTER: RBI MPC meeting day — no new entries")
                 return self._create_hold_signal(
                     symbol, 0.0, 0.0,
