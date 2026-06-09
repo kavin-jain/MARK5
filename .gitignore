@@ -4,7 +4,16 @@
 .env
 .env.local
 .env.*.local
+.env.save
 .env.BACKUP_DO_NOT_COMMIT
+*.save
+# runtime broker/paper configs that hold API keys/tokens
+temp_paper_config.json
+**/temp_paper_config.json
+*paper_config*.json
+# ...but DO allow the safe placeholder template
+!*paper_config*.example.json
+!**/*paper_config*.example.json
 *.key
 *.pem
 *.p12

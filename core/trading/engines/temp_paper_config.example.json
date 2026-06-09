@@ -1,0 +1,16 @@
+{
+  "_comment": "Copy this to temp_paper_config.json and fill in your OWN values. NEVER commit the real file (it is gitignored). Paper mode only.",
+  "data": {
+    "provider": "kite",
+    "kite_api_key": "YOUR_KITE_API_KEY",
+    "kite_api_secret": "YOUR_KITE_API_SECRET",
+    "kite_access_token": "GENERATED_DAILY_VIA_generate_kite_token.py"
+  },
+  "execution": {
+    "mode": "PAPER",
+    "capital": 50000000,
+    "max_drawdown_pct": 5.0,
+    "max_daily_loss_pct": 2.0
+  },
+  "watchlist": ["HAL", "BEL", "TRENT", "INFY", "NESTLEIND"]
+}
