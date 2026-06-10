@@ -21,7 +21,7 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, load_ohlcv, metrics)
-END = "2026-06-05"
+END = "2026-06-09"
 TAX = 0.15
 TD = 252
 

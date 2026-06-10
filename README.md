@@ -28,16 +28,16 @@ The conclusion is deliberately humble and fully evidenced: **you cannot reliably
 
 | Metric | MARK6 (deployed) | Nifty 50 B&H |
 |---|---:|---:|
-| Net CAGR | **+17.3%** | +11.1% |
-| Sharpe | **0.99** | 0.74 |
-| Max drawdown | **−28%** | −38% |
-| Annualised alpha vs Nifty | **+9.7%/yr** | — |
-| Beta (defensive) | 0.68 | 1.00 |
+| Net CAGR | **+18.8%** | +11.0% |
+| Sharpe | **0.89** | 0.74 |
+| Max drawdown | **−26.7%** | −38.4% |
+| Annualised alpha vs Nifty | **+12.8%/yr** | — |
+| Beta (defensive) | 0.60 | 1.00 |
 | Walk-forward hit-rate | **beats Nifty 7/8 windows** | — |
 
 **Statistical honesty:** Deflated Sharpe Ratio = **99%** (the edge survives multiple-testing); Probability of Backtest Overfitting (PBO) flagged that *fine-tuning the weights* is noise — so the system deploys a robust blend, not an in-sample-optimal one. *(These are the tests professional quant funds use and most retail backtests never compute.)*
 
-> **The deployed portfolio:** 70% concentrated 12-stock factor book · 15% gold (GOLDBEES) · 15% US Nasdaq-100 (MON100) — three near-uncorrelated sleeves, annual rebalance.
+> **The deployed portfolio:** 50% concentrated 12-stock momentum-heavy factor book · 25% gold (GOLDBEES) · 25% US Nasdaq-100 (MON100) — three near-uncorrelated sleeves, annual rebalance. Return decomposition: Nifty B&H 10.1% → +5.6pp wrapper (diversification+discipline) → +2.0pp universe quality → +1.0pp factor ranking = 18.8%.
 
 ---
 

@@ -67,10 +67,15 @@ def metrics(nav: pd.Series) -> dict:
 class Backtester:
     def __init__(self, panel: DataPanel, constructor: PortfolioConstructor,
                  config: BacktestConfig | None = None,
-                 extra_factors: dict | None = None):
+                 extra_factors: dict | None = None,
+                 screen=None):
         self.panel = panel
         self.con = constructor
         self.cfg = config or BacktestConfig()
+        # optional point-in-time universe screen: callable(asof, eligible) -> eligible.
+        # Used for exclusion-style filters (e.g. quality screen) that act BEFORE
+        # factor ranking — distinct from tilt weights, which were falsified (K11/K15).
+        self.screen = screen
         # precompute causal factor series per name (once)
         self._factors: dict[str, pd.DataFrame] = {}
         for t in panel.tickers:
@@ -179,6 +184,8 @@ class Backtester:
                 if n_rebal > cfg.warmup_skip:
                     elig = self.panel.eligible(d, cfg.min_history, cfg.liquidity_pct)
                     elig = [t for t in elig if t in col]
+                    if self.screen is not None and elig:
+                        elig = self.screen(d, elig) or elig
                     if elig:
                         comp, vol = self._factor_panel(d, elig)
                         held = [t for t in tickers if pos[t] > 0]

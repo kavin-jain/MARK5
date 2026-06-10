@@ -19,7 +19,7 @@ from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
 
 CACHE = os.path.join(_ROOT, "data", "cache")
 REPORTS = os.path.join(_ROOT, "reports")
-END = "2026-05-21"
+END = "2026-06-09"
 LTCG = 0.125
 
 
@@ -58,11 +58,14 @@ def main():
 
     # the strategy and the honest benchmark.
     # n_hold=12 + tilt_strength=1.5 validated 2026-06-08: beats the old n_hold=20
-    # config in 8/8 rolling 3-yr walk-forward windows (+2.3pp avg net), Sharpe
-    # 0.86->0.93. The 20-name book was over-diversified, diluting the factor signal.
+    # config in 8/8 rolling 3-yr walk-forward windows (+2.3pp avg net).
+    # 2026-06-10 upgrade: momentum-heavy factor weights validated OOS (+1.4pp avg,
+    # 6/8 walk-forward windows) — momentum 0.45 / trend 0.25 / low_vol 0.15 / stability 0.15.
     factor_cfg = ConstructionConfig(mode="factor_tilt", n_hold=12,
                                     base_weighting="inverse_vol", tilt_strength=1.5,
-                                    max_weight=0.125)
+                                    max_weight=0.125,
+                                    factor_weights={"momentum": 0.45, "low_vol": 0.15,
+                                                    "trend": 0.25, "stability": 0.15})
     ew_cfg = ConstructionConfig(mode="equal_weight", base_weighting="equal")
     bt_factor = Backtester(panel, PortfolioConstructor(factor_cfg))
     bt_ew = Backtester(panel, PortfolioConstructor(ew_cfg))

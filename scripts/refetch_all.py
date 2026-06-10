@@ -16,7 +16,7 @@ from core.portfolio.universe import discover_tickers
 
 CACHE = os.path.join(_ROOT, "data", "cache")
 START = "2015-01-01"
-END = "2026-06-08"            # uniform end
+END = "2026-06-10"            # uniform end
 
 
 def normalize(df):
@@ -50,6 +50,16 @@ def main():
         if (i + 1) % 25 == 0:
             print(f"  {i+1}/{len(tickers)}  ok={ok} fail={fail}", flush=True)
         time.sleep(0.15)
+    # refresh the multi-asset sleeves (excluded from discover_tickers as ETFs)
+    for etf in ("GOLDBEES", "MON100", "LIQUIDBEES"):
+        try:
+            nd = normalize(yf.download(f"{etf}.NS", start=START, end=END,
+                                       auto_adjust=True, progress=False, threads=False))
+            if nd is not None:
+                nd.reset_index().to_parquet(os.path.join(CACHE, f"{etf}_daily.parquet"))
+                print(f"  refreshed {etf} (multi-asset sleeve)")
+        except Exception:
+            print(f"  WARN: {etf} refresh failed")
     # refresh the Nifty proxy used as benchmark
     try:
         nd = normalize(yf.download("^NSEI", start=START, end=END, auto_adjust=True,

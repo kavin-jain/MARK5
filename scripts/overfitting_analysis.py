@@ -24,7 +24,7 @@ from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester)
 from core.portfolio.stats import (deflated_sharpe_ratio, pbo_cscv,
                                    probabilistic_sharpe_ratio, _sharpe)
-START, END = "2016-01-01", "2026-06-05"
+START, END = "2016-01-01", "2026-06-09"
 REPORTS = os.path.join(_ROOT, "reports")
 
 WEIGHTS = {

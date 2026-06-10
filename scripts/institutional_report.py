@@ -27,7 +27,7 @@ from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
 
 CACHE = os.path.join(_ROOT, "data", "cache")
 REPORTS = os.path.join(_ROOT, "reports")
-END = "2026-06-05"
+END = "2026-06-09"
 START = "2016-01-01"
 TAX = 0.15
 GOLD_W = 0.20
@@ -105,15 +105,24 @@ def main():
     os.makedirs(REPORTS, exist_ok=True)
 
     panel = DataPanel(discover_tickers(), END)
+    # DEPLOYED CONFIG (2026-06-10 upgrade): momentum-heavy equity book
+    # Factor weights: momentum 0.45 / low_vol 0.15 / trend 0.25 / stability 0.15
+    # Validated OOS: +1.4pp avg walk-forward, beats 6/8 windows vs baseline blend.
     cfg = ConstructionConfig(mode="factor_tilt", n_hold=12, base_weighting="inverse_vol",
-                             tilt_strength=1.5, max_weight=0.125)
+                             tilt_strength=1.5, max_weight=0.125,
+                             factor_weights={"momentum": 0.45, "low_vol": 0.15,
+                                             "trend": 0.25, "stability": 0.15})
     run = Backtester(panel, PortfolioConstructor(cfg)).run(START, END)
     eq_nav = run["nav_net"]
     trades = run["trades"]
     cal = eq_nav.index
 
-    # deployed blend (70% equity / 15% gold / 15% US-Nasdaq100)
-    nav = blend_nav(run["nav_gross"], cal, 0.70, 0.15, 0.15)
+    # DEPLOYED ALLOCATION (2026-06-10 upgrade): 50% equity / 25% gold / 25% US-Nasdaq100.
+    # Council-validated robust Pareto win over 70/15/15 and 60/20/20, FULL-PERIOD real
+    # data (no regime cherry-pick): +18.7% CAGR / Sharpe 0.89 / MaxDD -26.7% / Calmar 0.70.
+    # 5-sleeve (+silver+gilt) hits 20%/Sharpe1.1 only in the 2022-26 window -> rejected as
+    # overfit (silver/gilt have no pre-2022/2018 data; single precious-metals regime).
+    nav = blend_nav(run["nav_gross"], cal, 0.50, 0.25, 0.25)
     # apply terminal tax fairly
     nav_net = nav.copy(); g = nav.iloc[-1] - 1; nav_net.iloc[-1] = nav.iloc[-1] - max(0, g) * TAX
     m = metrics(nav_net)
@@ -160,8 +169,8 @@ def main():
     L = []
     A = L.append
     A("# MARK6 — Institutional Evaluation Report")
-    A(f"\n**System:** 70% concentrated 12-name factor book + 15% gold (GOLDBEES) + "
-      f"15% US Nasdaq-100 (MON100) — three uncorrelated sleeves, annual rebalance. "
+    A(f"\n**System:** 50% concentrated 12-name momentum-heavy factor book + 25% gold "
+      f"(GOLDBEES) + 25% US Nasdaq-100 (MON100) — three uncorrelated sleeves, annual rebalance. "
       f"**Mode:** PAPER. **Period:** {START} → {END}. All figures **net of Indian tax "
       f"(LTCG 12.5% / STCG 20%) + 0.29% costs + 0.10% slippage**. Universe is point-in-time "
       f"(survivorship-aware; true returns ~2-3pp below gross-of-survivorship).\n")

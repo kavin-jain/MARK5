@@ -84,8 +84,16 @@ def discover_tickers() -> list[str]:
 class DataPanel:
     """Aligned close/volume/turnover matrices for a set of tickers."""
 
-    def __init__(self, tickers: list[str], end: str):
+    # A name whose cache ends > this many calendar days before the panel's true end
+    # is STALE: it silently loses price-eligibility and drops out of the point-in-time
+    # universe near the end of the window, distorting recent-window results
+    # (2026-06 audit: 137/345 files frozen ~2 months back corrupted the 2026 numbers).
+    STALENESS_TOLERANCE_DAYS = 7
+
+    def __init__(self, tickers: list[str], end: str, *, freshness: str = "warn"):
+        """freshness: 'warn' (default) prints stale names, 'raise' aborts, 'off' skips."""
         closes, vols = {}, {}
+        last_dates = {}
         for t in tickers:
             df = load_ohlcv(t)
             if df is None or "close" not in df.columns or "volume" not in df.columns:
@@ -95,10 +103,28 @@ class DataPanel:
                 continue
             closes[t] = df["close"].astype(float)
             vols[t] = df["volume"].astype(float)
+            last_dates[t] = df.index[-1]
         self.close = pd.DataFrame(closes).sort_index()
         self.volume = pd.DataFrame(vols).reindex_like(self.close)
         self.turnover = (self.close * self.volume).rolling(126, min_periods=40).median()
         self.tickers = list(self.close.columns)
+        self.stale_tickers = self._check_freshness(last_dates, freshness)
+
+    def _check_freshness(self, last_dates: dict, mode: str) -> list[str]:
+        if mode == "off" or not last_dates:
+            return []
+        panel_end = max(last_dates.values())
+        cutoff = panel_end - pd.Timedelta(days=self.STALENESS_TOLERANCE_DAYS)
+        stale = sorted(t for t, d in last_dates.items() if d < cutoff)
+        if stale:
+            msg = (f"DATA FRESHNESS: {len(stale)}/{len(last_dates)} tickers end >"
+                   f"{self.STALENESS_TOLERANCE_DAYS}d before panel end {panel_end.date()} "
+                   f"(e.g. {stale[:5]}). Recent-window results are NOT trustworthy — "
+                   f"run scripts/refetch_all.py.")
+            if mode == "raise":
+                raise RuntimeError(msg)
+            print(f"  ⚠ {msg}")
+        return stale
 
     def trading_calendar(self, start: str, end: str) -> pd.DatetimeIndex:
         """Common calendar = union of trading days, restricted to [start, end]."""

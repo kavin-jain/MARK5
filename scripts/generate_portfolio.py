@@ -19,9 +19,9 @@ sys.path.insert(0, _ROOT)
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, FactorLibrary, composite_score)
 
-GOLD_WEIGHT = 0.15
-US_WEIGHT = 0.15            # MON100 (Nasdaq-100) — uncorrelated sleeve, lifts Sharpe to ~1.0
-ASOF = "2026-06-05"
+GOLD_WEIGHT = 0.25
+US_WEIGHT = 0.25            # MON100 (Nasdaq-100) — uncorrelated sleeve, lifts Sharpe to ~1.0
+ASOF = "2026-06-09"
 
 
 def main():
@@ -33,7 +33,9 @@ def main():
 
     panel = DataPanel(discover_tickers(), ASOF)
     cfg = ConstructionConfig(mode="factor_tilt", n_hold=12, base_weighting="inverse_vol",
-                             tilt_strength=1.5, max_weight=0.125)
+                             tilt_strength=1.5, max_weight=0.125,
+                             factor_weights={"momentum": 0.45, "low_vol": 0.15,
+                                             "trend": 0.25, "stability": 0.15})
     con = PortfolioConstructor(cfg)
     asof = pd.Timestamp(ASOF)
 
