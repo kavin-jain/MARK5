@@ -1,0 +1,103 @@
+======================================================================
+MARK5 FULL UNIVERSE BACKTEST REPORT  [FINAL OPTIMIZED]
+Period:    2024-10-01 → 2026-04-01
+Universe:  105 stocks (NIFTY50 + Midcap100)
+Generated: 2026-04-03 15:30 IST
+Base Strategy: 10-Day Hold | 2.5×ATR Target | 2×ATR Stop
+Optimization:  Early Time-Stop (Day 4 if profit < 0.5×ATR)
+Sharpe/DD: Daily NAV mark-to-market  (NOT per-trade estimates)
+======================================================================
+
+━━━ PORTFOLIO SUMMARY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Starting Capital:  ₹2,000,000.00
+  Final Capital:     ₹2,002,273.80
+  Total Return:            +0.11%
+  CAGR:                    +0.08%
+  Sharpe Ratio:            0.212    (≥1.0 target, Rule 62) [daily NAV]
+  Max Drawdown:             0.14%   (≤18% target, Rule 62) [daily NAV]
+  Profit Factor:           1.965   (≥1.5 target, Rule 62)
+  Win Rate:                 66.7%   (≥44% target, Rule 62)
+
+  ─── Period & Benchmark Comparison ──────────────────────────────
+  Period:           2024-10-01 → 2026-03-30
+  Calendar days:    545 days  (17.9 months)
+  Trading sessions: 2582 days
+  NIFTY50 start:     25,824.05  →   22,379.20
+  NIFTY50 B&H:         -13.34%  CAGR   -9.15%
+  MARK5 system:         +0.11%  CAGR   +0.08%
+  Alpha vs index:      +13.45%  CAGR   +9.23%
+
+  ─── Rule 62 Compliance ─────────────────────────────────────────
+  ❌ Sharpe ≥ 1.0             : 0.212
+  ✅ Max DD ≤ 18%             : 0.14%
+  ✅ Profit Factor ≥ 1.5      : 1.965
+  ✅ Win Rate ≥ 44%           : 66.7%
+
+━━━ TRADE STATISTICS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Total Trades:         3
+  Winners:              2  (66.7%)
+  Losers:               1
+  Avg Win:                +1.55%
+  Avg Loss:               -1.58%
+  Avg Hold Period:      6.7 days
+  Total Costs Paid:    ₹    775.58
+
+  Exit Type Breakdown:
+    TARGET              :    1  (33.3%)
+    TIME_EXIT           :    1  (33.3%)
+    STOP_LOSS           :    1  (33.3%)
+
+  Sector Exposure (all trades):
+    Other               :   1 trades | ₹     3,856
+    Metals              :   2 trades | ₹    -1,582
+
+━━━ TOP 10 STOCKS BY NET PNL ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Symbol             Trades    Win%   Avg Ret       Net PnL
+  ────────────────────────────────────────────────────────
+  SHRIRAMFIN.NS           1  100.0%    +2.58%  ₹  3,855.91
+  JSWSTEEL.NS             2   50.0%    -0.53%  ₹ -1,582.11
+
+━━━ BOTTOM 5 STOCKS BY NET PNL ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  Symbol             Trades    Win%   Avg Ret       Net PnL
+  ────────────────────────────────────────────────────────
+  SHRIRAMFIN.NS           1  100.0%    +2.58%  ₹  3,855.91
+  JSWSTEEL.NS             2   50.0%    -0.53%  ₹ -1,582.11
+
+━━━ FULL TRADE JOURNAL ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  [001] SHRIRAMFIN.NS  —  ✅ WIN  [Sector: Other]
+  ┌─ Signal:   2025-02-28  |  Regime: RANGING
+  ├─ Entry:    2025-02-28  |  ₹610.25 × 245 shares  =  ₹149,511
+  ├─ Stops:    SL=₹596.80  |  PT=₹627.06  |  ATR=₹6.73  |  R:R=1.2:1
+  ├─ Signals:  Rank score=+1.7883  |  ML conf=52.9%
+  ├─ Why BUY:  Rank #1/105 | ML=52.9% ≥ gate=52% | Regime=RANGING | Sector=Other | Score=+1.7883
+  ├─ Exit:     2025-03-03  |  TARGET @ ₹627.06  (8d)
+  ├─ Why EXIT: Target hit at ₹627.06
+  ├─ MFE/MAE:  Best=3.24%  |  Worst=-1.31%
+  └─ P&L:      Gross=₹4,118.45  |  Costs=₹262.54  |  Net=₹3,855.91  (+2.58%)
+
+  [002] JSWSTEEL.NS  —  ✅ WIN  [Sector: Metals]
+  ┌─ Signal:   2025-03-21  |  Regime: VOLATILE
+  ├─ Entry:    2025-03-21  |  ₹1052.53 × 142 shares  =  ₹149,459
+  ├─ Stops:    SL=₹1035.54  |  PT=₹1073.76  |  ATR=₹8.49  |  R:R=1.2:1
+  ├─ Signals:  Rank score=+0.6350  |  ML conf=52.3%
+  ├─ Why BUY:  Rank #12/105 | ML=52.3% ≥ gate=52% | Regime=VOLATILE | Sector=Metals | Score=+0.6350
+  ├─ Exit:     2025-03-24  |  TIME_EXIT @ ₹1059.80  (10d)
+  ├─ Why EXIT: Max hold period reached (10 days, Rule 3)
+  ├─ MFE/MAE:  Best=1.85%  |  Worst=-0.46%
+  └─ P&L:      Gross=₹1,032.34  |  Costs=₹258.70  |  Net=₹773.64  (+0.52%)
+
+  [003] JSWSTEEL.NS  —  ❌ LOSS  [Sector: Metals]
+  ┌─ Signal:   2025-09-26  |  Regime: VOLATILE
+  ├─ Entry:    2025-09-26  |  ₹1155.58 × 129 shares  =  ₹149,070
+  ├─ Stops:    SL=₹1139.29  |  PT=₹1175.94  |  ATR=₹8.14  |  R:R=1.2:1
+  ├─ Signals:  Rank score=+1.3130  |  ML conf=54.0%
+  ├─ Why BUY:  Rank #1/105 | ML=54.0% ≥ gate=52% | Regime=VOLATILE | Sector=Metals | Score=+1.3130
+  ├─ Exit:     2025-09-26  |  STOP_LOSS @ ₹1139.29  (2d)
+  ├─ Why EXIT: Stop hit at ₹1139.29
+  ├─ MFE/MAE:  Best=1.07%  |  Worst=-1.50%
+  └─ P&L:      Gross=₹-2,101.41  |  Costs=₹254.34  |  Net=₹-2,355.75  (-1.58%)
+\n======================================================================
+Report:  data/backtest/backtest_report_FINAL.txt
+Trades:  data/backtest/backtest_trades_FINAL.csv
+NAV CSV: data/backtest/backtest_nav_FINAL.csv

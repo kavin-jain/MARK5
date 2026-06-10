@@ -1,0 +1,7 @@
+MARK5 DEEP HISTORY 2007-01-01 to 2026-04-01
+UNIVERSE: NIFTY 51-150 (Midcap 100 exactly)
+Final Value: ₹1,440,272.70  (+-27.99% | CAGR: -1.75%)
+NIFTY Bench: Buy&Hold   (+396.84% | CAGR: 9.04%)
+Alpha CAGR:  -10.79%
+Max DD:      -38.24%
+Trades:      1672  (Win Rate: 46.4%)
