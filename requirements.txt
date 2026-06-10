@@ -45,6 +45,9 @@ plotly>=5.18.0
 # Database
 # sqlite3 is built-in
 
+# Market Data
+yfinance>=0.2.40
+
 # API & Web
 requests>=2.31.0
 flask>=3.0.0

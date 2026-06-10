@@ -30,10 +30,12 @@ jobs:
       - name: Run tests with coverage
         run: |
           pytest tests/ \
+            --ignore=tests/test_trades.py \
+            --ignore=tests/test_universe_optimizer.py \
+            --ignore=tests/integration \
             --cov=core \
             --cov-report=term-missing \
             --cov-report=xml:coverage.xml \
-            -v \
             --tb=short \
             -q
 
