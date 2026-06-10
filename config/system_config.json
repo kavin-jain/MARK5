@@ -31,7 +31,7 @@
     "host": "localhost",
     "port": 5432,
     "user": "postgres",
-    "password": "password",
+    "password": null,
     "database": "mark3_timescale",
     "min_connections": 1,
     "max_connections": 10,

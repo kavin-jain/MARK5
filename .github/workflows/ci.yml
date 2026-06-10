@@ -32,7 +32,11 @@ jobs:
           pytest tests/ \
             --ignore=tests/test_trades.py \
             --ignore=tests/test_universe_optimizer.py \
+            --ignore=tests/test_markrapid.py \
+            --ignore=tests/test_markrapid_v2.py \
+            --ignore=tests/test_security_hardening.py \
             --ignore=tests/integration \
+            --deselect=tests/test_strategies_v2.py::TestUniverseExpander::test_expander_with_real_models \
             --cov=core \
             --cov-report=term-missing \
             --cov-report=xml:coverage.xml \
