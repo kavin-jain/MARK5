@@ -214,3 +214,45 @@ dmypy.json
 .pytype/
 .env
 node_modules/
+
+# ============================================
+# 🤖 AI / IDE Tool Files (never commit)
+# ============================================
+.agent/
+.agents/
+.claude-flow/
+.cursor/
+.gemini/
+.maestro-data/
+.claude/
+GEMINI.md
+agents.md
+graphify-out/
+conductor/
+agentdb.rvf
+agentdb.rvf.lock
+ruvector.db
+wiki/
+MARK5/
+
+# ============================================
+# 📊 Root-level backtest dumps (use reports/)
+# ============================================
+backtest_full_results*.txt
+config.yaml
+prime_cache.py
+test_trades.py
+verify_mark5.py
+2572
+
+# ============================================
+# 🗄️ Runtime / generated
+# ============================================
+catboost_info/
+database/
+logs/
+data/cache/
+data/sentiment/
+markrapid/
+models_v2_oos/
+models_oos/
