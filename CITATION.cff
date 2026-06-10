@@ -1,0 +1,52 @@
+cff-version: 1.2.0
+message: "If you use this software or research methodology in your work, please cite it as below."
+type: software
+title: "MARK5 / MARK6 — Honest Quantitative Equity Research System"
+abstract: >
+  A research-grade, survivorship- and tax-aware quantitative portfolio system for NSE Indian
+  equities. Implements multi-factor smart-beta construction, point-in-time universe management,
+  tax-aware walk-forward backtesting, and anti-overfitting validation via Deflated Sharpe Ratio
+  and Probability of Backtest Overfitting (Bailey & López de Prado, 2014).
+authors:
+  - family-names: "Jain"
+    given-names: "Kavin"
+    email: "kavinjijain239@gmail.com"
+repository-code: "https://github.com/kavin-jain/MARK5"
+license: MIT
+version: "6.0.0"
+date-released: "2026-06-10"
+keywords:
+  - quantitative-finance
+  - backtesting
+  - portfolio-construction
+  - factor-investing
+  - indian-equities
+  - nse
+  - deflated-sharpe-ratio
+  - overfitting-detection
+  - survivorship-bias
+references:
+  - type: article
+    title: "The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting, and Non-Normality"
+    authors:
+      - family-names: "Bailey"
+        given-names: "David H."
+      - family-names: "López de Prado"
+        given-names: "Marcos"
+    year: 2014
+    journal: "Journal of Portfolio Management"
+    url: "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2460551"
+  - type: article
+    title: "The Probability of Backtest Overfitting"
+    authors:
+      - family-names: "Bailey"
+        given-names: "David H."
+      - family-names: "Borwein"
+        given-names: "Jonathan M."
+      - family-names: "López de Prado"
+        given-names: "Marcos"
+      - family-names: "Zhu"
+        given-names: "Qiji Jim"
+    year: 2017
+    journal: "Journal of Computational Finance"
+    url: "https://www.davidhbailey.com/dhbpapers/backtest-prob.pdf"

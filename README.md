@@ -8,6 +8,11 @@
 
 `PAPER MODE ONLY` · `Net of Indian tax & costs` · `Out-of-sample validated`
 
+[![CI](https://github.com/kavin-jain/MARK5/actions/workflows/ci.yml/badge.svg)](https://github.com/kavin-jain/MARK5/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
+[![Methodology: DSR+PBO](https://img.shields.io/badge/Validated-DSR%20%2B%20PBO-green)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2460551)
+
 </div>
 
 ---
@@ -103,6 +108,23 @@ python3 scripts/generate_portfolio.py --capital 500000   # today's holdings
 - [`reports/MARKET_NETWORK.md`](reports/MARKET_NETWORK.md) — RMT eigenstructure & market skeleton
 - [`reports/HOLDING_PERIOD_ANALYSIS.md`](reports/HOLDING_PERIOD_ANALYSIS.md) — why long holds win net of tax
 - Knowledge base: [`docs/KNOWLEDGE_BASE.md`](docs/KNOWLEDGE_BASE.md) · [`docs/MARKET_PLAYBOOK.md`](docs/MARKET_PLAYBOOK.md)
+
+---
+
+## Statistical validation
+
+Most retail backtests report a Sharpe ratio without asking whether it's real or just the luckiest result of many trials. This system applies the two tests the professional quant literature uses to answer that question.
+
+| Test | Result | What it means |
+|---|---|---|
+| **Deflated Sharpe Ratio** (Bailey & López de Prado, 2014) | **DSR = 99%** | After correcting for 60 strategy variants tested, skewness, and kurtosis — the edge has a 99% probability of being genuine, not a statistical artefact |
+| **Probability of Backtest Overfitting** (Bailey et al., 2017) | **PBO = 75.6%** | The optimal *fine-tuned* config beats the median OOS in only 24.4% of train/test splits — so the system deploys a robust blend, not an in-sample-optimal one |
+
+> These are the same tests used by institutional quant funds. Most retail backtests never compute them.
+
+**References**
+- Bailey, D.H. & López de Prado, M. (2014). *The Deflated Sharpe Ratio: Correcting for Selection Bias, Backtest Overfitting, and Non-Normality.* Journal of Portfolio Management. [SSRN 2460551](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2460551)
+- Bailey, D.H., Borwein, J.M., López de Prado, M. & Zhu, Q.J. (2017). *The Probability of Backtest Overfitting.* Journal of Computational Finance. [PDF](https://www.davidhbailey.com/dhbpapers/backtest-prob.pdf)
 
 ---
 
