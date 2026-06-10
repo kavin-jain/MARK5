@@ -9,8 +9,7 @@
 `PAPER MODE ONLY` · `Net of Indian tax & costs` · `Out-of-sample validated`
 
 [![CI](https://github.com/kavin-jain/MARK5/actions/workflows/ci.yml/badge.svg)](https://github.com/kavin-jain/MARK5/actions/workflows/ci.yml)
-[![GitHub release](https://img.shields.io/github/v/release/kavin-jain/MARK5?color=blue&label=release)](https://github.com/kavin-jain/MARK5/releases/latest)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20619267.svg)](https://doi.org/10.5281/zenodo.20619267)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20619267-blue)](https://doi.org/10.5281/zenodo.20619267)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/)
 [![Methodology: DSR+PBO](https://img.shields.io/badge/Validated-DSR%20%2B%20PBO-green)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2460551)
