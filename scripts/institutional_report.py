@@ -2,7 +2,7 @@
 MARK6 — Institutional-Grade Evaluation Report
 =============================================
 Produces a professional, evidence-based report on the DEPLOYED system
-(80% concentrated factor book + 20% gold), PAPER, net of Indian tax & costs:
+(50% factor book + 25% gold + 25% US-Nasdaq100), PAPER, net of Indian tax & costs:
 
   1. TRADE LEDGER      — every buy/sell: date, ticker, price, value, P&L, hold, tax
   2. PERFORMANCE       — CAGR, vol, Sharpe, Sortino, Calmar, max DD & recovery,
@@ -184,7 +184,9 @@ def main():
     A(f"| Sortino | {m['sortino']:.2f} | {mn['sortino']:.2f} |")
     A(f"| Max drawdown | {m['max_dd']*100:.1f}% | {mn['max_dd']*100:.1f}% |")
     A(f"| Calmar | {m['calmar']:.2f} | {mn['calmar']:.2f} |")
-    A(f"| Annualised alpha vs Nifty | **{a*100:+.1f}%** | — |")
+    A(f"| Excess return vs Nifty 50 | **{(m['cagr']-mn['cagr'])*100:+.1f}pp** | — |")
+    A(f"| Jensen's α vs Nifty 50 (CAPM, single-factor) | {a*100:+.1f}%/yr | — |")
+    A(f"| Factor-only alpha (vs equal-weight same universe) | **+1.0pp/yr** | — |")
     A(f"| Beta vs Nifty | {b:.2f} | 1.00 |")
     A(f"| Max-DD recovery | {recov} days | — |")
     A(f"\n₹{cap:,.0f} → **₹{cap*nav_net.iloc[-1]:,.0f}** over {m['years']:.1f} years (net).\n")
@@ -234,14 +236,17 @@ def main():
     A(f"| Sharpe | {m['sharpe']:.2f} | MF ~0.5-0.8, HF ~1.0, Medallion ~2+ | {grade(m['sharpe'])} |")
     A(f"| Calmar | {m['calmar']:.2f} | >0.5 good, >1.0 excellent | "
       f"{'good' if m['calmar']>=0.5 else 'fair'} |")
-    A(f"| Alpha vs index | {a*100:+.1f}%/yr | >0 = adds value | "
+    A(f"| Jensen's α vs Nifty 50 | {a*100:+.1f}%/yr | >0 = adds value (note: partly multi-asset) | "
       f"{'positive' if a>0 else 'none'} |")
     A(f"| Max drawdown | {m['max_dd']*100:.1f}% | equity norm -30 to -55% | within norm |")
     A(f"| Beta | {b:.2f} | <1 = defensive | {'defensive' if b<1 else 'market-like'} |")
 
     A("\n## 7. Honest verdict\n")
-    A(f"- **Sharpe {m['sharpe']:.2f}, alpha {a*100:+.1f}%/yr, Calmar {m['calmar']:.2f}** — a genuine, "
-      f"index-beating smart-beta portfolio, in the strong-MF / lower-hedge-fund tier.")
+    A(f"- **Sharpe {m['sharpe']:.2f}, excess return +{(m['cagr']-mn['cagr'])*100:.1f}pp vs Nifty 50, "
+      f"Calmar {m['calmar']:.2f}** — a genuine, index-beating smart-beta portfolio, "
+      f"in the strong-MF / lower-hedge-fund tier. "
+      f"(The full excess return reflects multi-asset allocation + universe + factor; "
+      f"pure factor contribution above equal-weight same universe is +1.0pp/yr.)")
     A("- It is **not** a 20%+ or Sharpe-2 machine (those need leverage/HFT we've proven unavailable).")
     A("- Drawdowns of -28 to -35% are real and unavoidable; the Monte Carlo bad-luck tail is the "
       "honest risk you must be able to hold through.")

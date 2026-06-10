@@ -31,9 +31,11 @@ The conclusion is deliberately humble and fully evidenced: **you cannot reliably
 | Net CAGR | **+18.8%** | +11.0% |
 | Sharpe | **0.89** | 0.74 |
 | Max drawdown | **−26.7%** | −38.4% |
-| Annualised alpha vs Nifty | **+12.8%/yr** | — |
+| Excess return vs Nifty 50 | **+7.8pp** | — |
 | Beta (defensive) | 0.60 | 1.00 |
 | Walk-forward hit-rate | **beats Nifty 7/8 windows** | — |
+
+> **What drives the +7.8pp excess return:** +5.6pp comes from the multi-asset wrapper (gold + US Nasdaq diversification vs pure Nifty), +2.0pp from universe quality (midcap/quality screen vs cap-weighted index), +1.0pp from the factor ranking itself (vs equal-weight same universe). Calling the full gap "alpha" would be misleading — the +1.0pp factor contribution is the defensible quantitative edge; the rest is deliberate asset-class allocation that any passive multi-asset fund also captures.
 
 **Statistical honesty:** Deflated Sharpe Ratio = **99%** (the edge survives multiple-testing); Probability of Backtest Overfitting (PBO) flagged that *fine-tuning the weights* is noise — so the system deploys a robust blend, not an in-sample-optimal one. *(These are the tests professional quant funds use and most retail backtests never compute.)*
 
