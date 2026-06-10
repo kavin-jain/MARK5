@@ -256,3 +256,4 @@ data/sentiment/
 markrapid/
 models_v2_oos/
 models_oos/
+data/halt_state.json
