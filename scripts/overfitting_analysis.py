@@ -34,33 +34,51 @@ WEIGHTS = {
     "trend_hvy":  {"momentum": .20, "low_vol": .20, "trend": .45, "stability": .15},
     "stab_hvy":   {"momentum": .20, "low_vol": .20, "trend": .15, "stability": .45},
 }
-DEPLOYED = ("blend", 12, 1.5)   # (weights, n_hold, tilt) = the chosen config
+DEPLOYED = ("mom_heavy", 12, 1.5, 126)  # v7.0: momentum-heavy, 6-month refresh
+
+# Research variants whose full daily series we don't regenerate here, but which
+# WERE trials and must count toward the deflation (annualised Sharpes from
+# efficiency_research.py / exit_speed_research.py, 2026-06-11):
+EXTRA_TRIAL_SHARPES_ANN = [
+    1.03, 1.03, 0.96, 0.91, 0.95, 0.97,   # asymmetric exit variants (6)
+    0.80, 0.81,                            # TLH -7% / -12%
+    0.84,                                  # FIP 10%
+    0.87, 0.91, 0.90,                      # sleeve-frequency variants (3)
+]
 
 
 def main():
     panel = DataPanel(discover_tickers(), END)
-    # the grid of "trials" we actually explored across the project
-    grid = list(itertools.product(WEIGHTS.keys(), [8, 12, 16, 20], [0.5, 1.5, 3.0]))
+    from core.portfolio import BacktestConfig
+    # the grid of "trials" we actually explored across the project (annual rebal era)
+    grid = [(w, n, t, 252) for w, n, t in
+            itertools.product(WEIGHTS.keys(), [8, 12, 16, 20], [0.5, 1.5, 3.0])]
+    # + the rebalance-frequency dimension explored 2026-06-11 (mom_heavy book)
+    grid += [("mom_heavy", 12, 1.5, rb) for rb in (21, 42, 63, 126, 189)]
     print(f"Running {len(grid)} strategy trials to assemble the returns matrix...", flush=True)
 
     rets, sharpes, labels, deployed_ret = {}, [], [], None
     cal = None
-    for wname, nh, tilt in grid:
+    for wname, nh, tilt, rb in grid:
         cfg = ConstructionConfig(mode="factor_tilt", n_hold=nh, base_weighting="inverse_vol",
                                  tilt_strength=tilt, max_weight=max(0.08, 1.5 / nh),
                                  factor_weights=WEIGHTS[wname])
-        nav = Backtester(panel, PortfolioConstructor(cfg)).run(START, END)["nav_gross"]
+        nav = Backtester(panel, PortfolioConstructor(cfg),
+                         BacktestConfig(rebal_bars=rb)).run(START, END)["nav_gross"]
         r = nav.pct_change(fill_method=None).fillna(0.0)
         if cal is None:
             cal = r.index
         r = r.reindex(cal).fillna(0.0)
-        lab = f"{wname}|n{nh}|t{tilt}"
+        lab = f"{wname}|n{nh}|t{tilt}|r{rb}"
         rets[lab] = r.values
         sharpes.append(_sharpe(r.values))
         labels.append(lab)
-        if (wname, nh, tilt) == DEPLOYED:
+        if (wname, nh, tilt, rb) == DEPLOYED:
             deployed_ret = r.values
-    print(f"  done. {len(labels)} trials.\n", flush=True)
+    # count the un-regenerated research variants toward the luck ceiling
+    sharpes += [s / np.sqrt(252) for s in EXTRA_TRIAL_SHARPES_ANN]
+    print(f"  done. {len(labels)} series + {len(EXTRA_TRIAL_SHARPES_ANN)} "
+          f"counted-only trials = {len(sharpes)} total.\n", flush=True)
 
     M = np.column_stack([rets[l] for l in labels])     # T x N
     dsr = deflated_sharpe_ratio(deployed_ret, sharpes)
@@ -68,8 +86,10 @@ def main():
     ann = lambda d: d * np.sqrt(252)                   # daily->annual SR
 
     L = ["# MARK6 — Overfitting & Statistical-Significance Analysis", "",
-         "Bailey & López de Prado tests on the deployed config (blend / n_hold=12 / "
-         "tilt=1.5), using the grid of strategy variants we explored as the trial set. "
+         "Bailey & López de Prado tests on the deployed v7.0 config (momentum-heavy / "
+         "n_hold=12 / tilt=1.5 / 126-bar refresh, FY-netting tax), using every strategy "
+         "variant explored across the project as the trial set (factor-weight grid, "
+         "rebalance frequencies, asymmetric exits, TLH, FIP, sleeve frequencies). "
          "All on daily returns, 2016-2026.", "",
          "## Deflated Sharpe Ratio (is the Sharpe real, given how many we tried?)", "",
          f"- Strategy variants tried (N): **{dsr['n_trials']}**",

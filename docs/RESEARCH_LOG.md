@@ -171,17 +171,19 @@ Triggered by "find the core-file bug." Read the full return-critical path + exec
   ~+3pp DD — marginal/possibly regime-fit, NOT shipped. Turnover (130%/yr) is dominated by the
   momentum rotation, which earns its keep (2-yr rebal = worse, +9.4%).
 
-## 4c. Statistical-significance / overfitting audit (2026-06-09)
+## 4c. Statistical-significance / overfitting audit (2026-06-09, re-run 2026-06-11 for v7.0)
 
 `scripts/overfitting_analysis.py` + `core/portfolio/stats.py` (Bailey & López de Prado),
-`reports/OVERFITTING_ANALYSIS.md`. On 60 strategy variants tried:
-- **Deflated Sharpe Ratio = 99%** — the deployed config's Sharpe (0.90 ann.) is REAL, not the
-  luckiest of 60 draws (luck ceiling only 0.15). PSR-vs-0 = 99.7%. ✅ The edge is significant.
-- **PBO = 76%** — picking the in-sample-BEST variant overfits (the 60 near-identical configs
-  are statistically indistinguishable; the IS-winner mean-reverts OOS). Lesson: DON'T optimise
-  weights — deploy a central robust blend (which we did: n=12 even-ish blend, not an extreme).
-  The PBO analysis vindicates that choice. This is the correct, nuanced reading (edge real,
-  tuning noise), not "strategy bad."
+`reports/OVERFITTING_ANALYSIS.md`. **v7.0 re-run (2026-06-11)** on **77 trials** — the full
+factor-weight grid (60) + rebalance frequencies (5) + asymmetric/TLH/FIP/sleeve variants (12),
+deployed = mom_heavy/n12/t1.5/126d under FY netting:
+- **Deflated Sharpe Ratio = 99.3%** — the deployed Sharpe (0.96 ann.) is REAL, not the
+  luckiest of 77 draws (luck ceiling 0.16). PSR-vs-0 = 99.8%. ✅ Edge significant.
+- **PBO = 74.5%** — unchanged lesson: picking the in-sample-BEST variant overfits (the
+  near-identical configs are statistically indistinguishable; the IS-winner mean-reverts).
+  This is exactly why we deployed 126d (7/8 walk-forward consistency) and NOT the
+  full-period-best 21d (+22.6% IS, fails OOS 3/8) — the PBO analysis vindicates choosing
+  on robustness, not the max. Nuanced reading stands: edge real, fine-tuning is noise.
 
 ## 5. 🔭 OPEN FRONTIERS — untested levers worth pursuing
 
