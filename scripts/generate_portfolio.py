@@ -67,10 +67,12 @@ def main():
     print(f"  {'':3}{'GOLDBEES (gold)':<16}{args.gold*100:>8.1f}%{args.capital*args.gold:>13,.0f}")
     print(f"  {'':3}{'MON100 (US Nq100)':<16}{args.us*100:>8.1f}%{args.capital*args.us:>13,.0f}")
     print("=" * 64)
-    print(f"  Holdings: {len(w_eq)} stocks + gold + US ETF | rebalance: annually")
-    print(f"  Expected (full-cycle, net of tax): ~17% CAGR, Sharpe ~1.0,")
-    print(f"  max drawdown ~-28% (you MUST be able to hold through that).")
-    print(f"  vs Nifty50: +9.7%/yr alpha, beats it 7/8 rolling 3-yr windows.")
+    print(f"  Holdings: {len(w_eq)} stocks + gold + US ETF")
+    print(f"  Rebalance: equity book every 6 MONTHS (P12), sleeves annually.")
+    print(f"  Tax: harvest nothing mid-cycle; gains/losses net at FY level (P11).")
+    print(f"  Expected (full-cycle, net of tax): ~20% CAGR, Sharpe ~0.95,")
+    print(f"  max drawdown ~-27% (you MUST be able to hold through that).")
+    print(f"  vs Nifty50 B&H: +8-10pp/yr excess, beats it 7/8 rolling 3-yr windows.")
 
 
 if __name__ == "__main__":

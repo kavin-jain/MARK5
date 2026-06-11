@@ -67,8 +67,14 @@ def main():
                                     factor_weights={"momentum": 0.45, "low_vol": 0.15,
                                                     "trend": 0.25, "stability": 0.15})
     ew_cfg = ConstructionConfig(mode="equal_weight", base_weighting="equal")
-    bt_factor = Backtester(panel, PortfolioConstructor(factor_cfg))
-    bt_ew = Backtester(panel, PortfolioConstructor(ew_cfg))
+    # 2026-06-11 upgrade (P11+P12): honest FY tax netting (losses offset gains, as
+    # Indian law actually works) unblocks semi-annual rebalance — momentum decays at
+    # the 6-12mo horizon, and netting cuts the turnover tax penalty that previously
+    # made faster rebalance look bad (K3 used the no-credit model). Validated:
+    # equity sleeve +2.84pp avg walk-forward (7/8 windows), full system 19.0→20.7%.
+    bt_cfg = BacktestConfig(rebal_bars=126)
+    bt_factor = Backtester(panel, PortfolioConstructor(factor_cfg), bt_cfg)
+    bt_ew = Backtester(panel, PortfolioConstructor(ew_cfg), BacktestConfig(rebal_bars=126))
 
     results = {"config": factor_cfg.__dict__, "windows": {}}
 

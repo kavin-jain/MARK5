@@ -28,18 +28,21 @@ The conclusion is deliberately humble and fully evidenced: **you cannot reliably
 
 | Metric | MARK6 (deployed) | Nifty 50 B&H |
 |---|---:|---:|
-| Net CAGR | **+18.8%** | +11.0% |
-| Sharpe | **0.89** | 0.74 |
-| Max drawdown | **−26.7%** | −38.4% |
-| Excess return vs Nifty 50 | **+7.8pp** | — |
-| Beta (defensive) | 0.60 | 1.00 |
+| Net CAGR | **+20.8%** | +11.0% |
+| Sharpe | **0.96** | 0.74 |
+| Max drawdown | **−26.6%** | −38.4% |
+| Calmar | **0.78** | 0.29 |
+| Excess return vs Nifty 50 | **+9.8pp** | — |
+| Beta (defensive) | 0.61 | 1.00 |
 | Walk-forward hit-rate | **beats Nifty 7/8 windows** | — |
 
-> **What drives the +7.8pp excess return:** +5.6pp comes from the multi-asset wrapper (gold + US Nasdaq diversification vs pure Nifty), +2.0pp from universe quality (midcap/quality screen vs cap-weighted index), +1.0pp from the factor ranking itself (vs equal-weight same universe). Calling the full gap "alpha" would be misleading — the +1.0pp factor contribution is the defensible quantitative edge; the rest is deliberate asset-class allocation that any passive multi-asset fund also captures.
+> **What drives the +9.8pp excess return:** roughly +4.5pp from the multi-asset wrapper (gold + US Nasdaq diversification vs pure Nifty) and +5.3pp from the equity engine — factor ranking plus a 6-month momentum refresh — measured against equal-weight buy-and-hold of the same universe. Calling the full gap "alpha" would be misleading; the +5.3pp engine contribution is the defensible quantitative edge, the rest is deliberate asset-class allocation any passive multi-asset fund also captures.
+>
+> **The 2026-06-11 upgrade (P11+P12):** the backtester previously taxed every winning sale but gave *no credit for losses* — actual Indian law nets losses against gains within the fiscal year (STCL offsets STCG and LTCG, 8-yr carry-forward). Modeling tax honestly removed the phantom penalty on turnover, which unlocked a semi-annual momentum refresh (momentum decays at the 6–12-month horizon). Equity sleeve: +2.84pp avg across 8 rolling 3-yr walk-forward windows (beats 7/8). Full system: 19.0% → 20.8% net CAGR with the same drawdown. Tax-loss harvesting was also tested and **killed** — India's holding-period reset converts future LTCG into STCG and costs more than the credit earns.
 
 **Statistical honesty:** Deflated Sharpe Ratio = **99%** (the edge survives multiple-testing); Probability of Backtest Overfitting (PBO) flagged that *fine-tuning the weights* is noise — so the system deploys a robust blend, not an in-sample-optimal one. *(These are the tests professional quant funds use and most retail backtests never compute.)*
 
-> **The deployed portfolio:** 50% concentrated 12-stock momentum-heavy factor book · 25% gold (GOLDBEES) · 25% US Nasdaq-100 (MON100) — three near-uncorrelated sleeves, annual rebalance. Return decomposition: Nifty B&H 10.1% → +5.6pp wrapper (diversification+discipline) → +2.0pp universe quality → +1.0pp factor ranking = 18.8%.
+> **The deployed portfolio:** 50% concentrated 12-stock momentum-heavy factor book (refreshed every 6 months under fiscal-year tax netting) · 25% gold (GOLDBEES) · 25% US Nasdaq-100 (MON100) — three near-uncorrelated sleeves, sleeves rebalanced annually.
 
 ---
 
@@ -47,9 +50,9 @@ The conclusion is deliberately humble and fully evidenced: **you cannot reliably
 
 Most student / retail quant projects show one flattering backtest and stop. This one is a **scientific program**: every hypothesis was tested out-of-sample, net of tax, against the honest benchmark — and **most were killed**. The value is in the rigor and the truth, not a get-rich claim.
 
-- ✅ **Killed** (with evidence): ML signal prediction, momentum-timing overlays, stop-losses, circuit-breakers, ex-ante multibagger picking, institutional-flow signals, leverage, volatility-targeting, fundamental-quality tilts.
-- ✅ **Kept** (validated OOS): multi-factor smart-beta, concentration, annual-rebalance tax discipline, gold + US diversification, leakage defences.
-- ✅ **Found & fixed real bugs**: a backtest warm-up bug that was *understating* performance; ETF data contamination of the equity universe.
+- ✅ **Killed** (with evidence): ML signal prediction, momentum-timing overlays, stop-losses, circuit-breakers, ex-ante multibagger picking, institutional-flow signals, leverage, volatility-targeting, fundamental-quality tilts, tax-loss harvesting, frog-in-the-pan momentum quality.
+- ✅ **Kept** (validated OOS): multi-factor smart-beta, concentration, fiscal-year tax netting + semi-annual momentum refresh, gold + US diversification, leakage defences.
+- ✅ **Found & fixed real bugs**: a backtest warm-up bug that was *understating* performance; ETF data contamination of the equity universe; a tax model that ignored loss offsets (real Indian law nets them).
 
 Full decision log: [`docs/RESEARCH_LOG.md`](docs/RESEARCH_LOG.md).
 

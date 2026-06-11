@@ -60,13 +60,18 @@ def main():
                 print(f"  refreshed {etf} (multi-asset sleeve)")
         except Exception:
             print(f"  WARN: {etf} refresh failed")
-    # refresh the Nifty proxy used as benchmark
+    # refresh the Nifty proxy used as benchmark.
+    # GUARD: a partial yf response once overwrote the benchmark with 2007-2017-only
+    # data, silently corrupting every vs-Nifty figure. Never save unless the
+    # download is long AND reaches the requested END year.
     try:
         nd = normalize(yf.download("^NSEI", start=START, end=END, auto_adjust=True,
                                    progress=False, threads=False))
-        if nd is not None:
+        if nd is not None and len(nd) > 4000 and str(nd.index.max())[:4] >= END[:4]:
             nd.reset_index().to_parquet(os.path.join(CACHE, "sector_NSEI.parquet"))
             print("  refreshed sector_NSEI (Nifty50 benchmark)")
+        else:
+            print("  WARN: Nifty download partial/stale — benchmark NOT overwritten")
     except Exception:
         print("  WARN: Nifty benchmark refresh failed")
     print(f"\nDONE: ok={ok} fail={fail} of {len(tickers)}")

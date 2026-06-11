@@ -1,17 +1,22 @@
 """
 MARK6 — Walk-Forward Backtester (tax-aware, survivorship-aware)
 ===============================================================
-Daily NAV simulation with per-name average-cost lot tracking, Indian equity tax
-(LTCG 12.5% >365d / STCG 20% <=365d on realised gains + terminal liquidation),
+Daily NAV simulation with per-name average-cost lot tracking, Indian equity tax,
 real transaction costs, and point-in-time universe selection.
+
+Tax model (fy_netting=True, the default — matches actual Indian law):
+  Realised gains/losses accrue to a fiscal-year (Apr–Mar) ledger and are NETTED:
+  STCL offsets STCG then LTCG; LTCL offsets LTCG only; unabsorbed losses carry
+  forward (8-yr limit not binding at our horizons). Net STCG taxed 20%, net LTCG
+  12.5%. Tax is paid each April from cash (positions sold pro-rata if needed —
+  no implicit leverage). The legacy per-trade model (losses earn NO credit)
+  over-taxed turnover and is kept only via fy_netting=False for reproduction.
 
 Design choices that make the numbers trustworthy:
   - Point-in-time eligibility every rebalance (no survivorship/look-ahead).
   - Factors precomputed once per name as causal series; only as-of values used.
   - Tax applied to BOTH the strategy and the equal-weight benchmark so any
     reported alpha is net-to-net and honest.
-  - Annual rebalance default -> low turnover -> gains qualify for LTCG (the single
-    biggest net-return lever discovered this session).
 """
 from __future__ import annotations
 
@@ -40,6 +45,9 @@ class BacktestConfig:
     no_trade_band: float = 0.0        # skip reweight trades smaller than band*NAV on names
                                       # we're KEEPING (full entries/exits always execute).
                                       # Cuts needless STCG-realizing weight-churn. 0 = off.
+    fy_netting: bool = True           # True = honest Indian FY tax netting (losses offset
+                                      # gains, settled each April). False = legacy per-trade
+                                      # model (no loss credit) for reproducing old results.
     warmup_skip: int = 0              # 0 = enter immediately (factors are valid at start —
                                       # built from pre-window history, no look-ahead). Was 1,
                                       # which left the book in CASH for the first ~year of
@@ -127,6 +135,42 @@ class Backtester:
         nav_hist, weights_hist = {}, {}
         trades = []                          # institutional trade ledger
         last_rebal, n_rebal = -10**9, 0
+        # fiscal-year (Apr–Mar) netting ledger; losses stored as negative accruals
+        fy = {"stcg": 0.0, "ltcg": 0.0}
+        cf_stcl, cf_ltcl = 0.0, 0.0          # carried-forward losses (stored positive)
+
+        def fy_of(d):
+            return d.year + (1 if d.month >= 4 else 0)
+
+        cur_fy = fy_of(cal[0])
+
+        def net_tax(st, lt, stl, ltl):
+            """Indian netting: STCL vs STCG then LTCG; LTCL vs LTCG only.
+            Returns (tax, leftover_stcl, leftover_ltcl)."""
+            stl += max(0.0, -st); st = max(0.0, st)
+            ltl += max(0.0, -lt); lt = max(0.0, lt)
+            use = min(stl, st); st -= use; stl -= use
+            use = min(stl, lt); lt -= use; stl -= use
+            use = min(ltl, lt); lt -= use; ltl -= use
+            return st * cfg.stcg + lt * cfg.ltcg, stl, ltl
+
+        def settle_fy(today):
+            """Pay the netted FY tax from cash; sell pro-rata if cash short
+            (sale gains accrue to the NEW fiscal year — no implicit leverage)."""
+            nonlocal cash, tax_paid, cf_stcl, cf_ltcl, fy
+            tax, cf_stcl, cf_ltcl = net_tax(fy["stcg"], fy["ltcg"], cf_stcl, cf_ltcl)
+            fy = {"stcg": 0.0, "ltcg": 0.0}
+            if tax <= 0:
+                return
+            cash -= tax
+            tax_paid += tax
+            if cash < -1e-12:
+                tot = sum(pos.values())
+                if tot > 0:
+                    short = -cash
+                    for t in tickers:
+                        if pos[t] > 0:
+                            cash += realize(t, pos[t] * min(1.0, short / tot), today)
 
         def realize(t, sell_val, today):
             nonlocal tax_paid, traded
@@ -136,14 +180,18 @@ class Backtester:
             gain = sell_val - basis[t] * frac
             held = (today - entry[t]).days if entry[t] is not None else 0
             rate = cfg.ltcg if held > cfg.ltcg_days else cfg.stcg
-            tax = max(0.0, gain) * rate
-            tax_paid += tax
+            if cfg.fy_netting:
+                fy["ltcg" if held > cfg.ltcg_days else "stcg"] += gain
+                tax = 0.0                     # settled at FY level
+            else:
+                tax = max(0.0, gain) * rate   # legacy: per-trade, no loss credit
+                tax_paid += tax
             traded += sell_val
             px = prices.loc[today, t] if today in prices.index else np.nan
             trades.append({"date": today, "ticker": t, "side": "SELL", "price": float(px),
                            "value": float(sell_val), "gain": float(gain),
                            "held_days": int(held), "tax_rate": rate,
-                           "tax": float(max(0.0, gain) * rate),
+                           "tax": float(tax),
                            "term": "LTCG" if held > cfg.ltcg_days else "STCG"})
             pos[t] -= sell_val
             basis[t] -= basis[t] * frac
@@ -178,6 +226,9 @@ class Backtester:
                         rt = r[col[t]]
                         if rt == rt:  # not nan
                             pos[t] = v * (1 + rt)
+            if cfg.fy_netting and fy_of(d) != cur_fy:
+                settle_fy(d)
+                cur_fy = fy_of(d)
             if (i - last_rebal) >= cfg.rebal_bars:
                 n_rebal += 1
                 last_rebal = i
@@ -209,9 +260,22 @@ class Backtester:
 
         # terminal liquidation tax (fair vs buy & hold which also embeds it)
         last = cal[-1]
-        term_tax = sum(max(0.0, pos[t] - basis[t]) *
-                       (cfg.ltcg if (entry[t] and (last - entry[t]).days > cfg.ltcg_days) else cfg.stcg)
-                       for t in tickers if pos[t] > 0)
+        if cfg.fy_netting:
+            # hypothetical liquidation joins the pending FY ledger, netted properly
+            st, lt = fy["stcg"], fy["ltcg"]
+            for t in tickers:
+                if pos[t] > 0:
+                    g = pos[t] - basis[t]
+                    long_term = entry[t] is not None and (last - entry[t]).days > cfg.ltcg_days
+                    if long_term:
+                        lt += g
+                    else:
+                        st += g
+            term_tax, _, _ = net_tax(st, lt, cf_stcl, cf_ltcl)
+        else:
+            term_tax = sum(max(0.0, pos[t] - basis[t]) *
+                           (cfg.ltcg if (entry[t] and (last - entry[t]).days > cfg.ltcg_days) else cfg.stcg)
+                           for t in tickers if pos[t] > 0)
         nav = pd.Series(nav_hist)
         net = nav.copy()
         net.iloc[-1] = nav.iloc[-1] - term_tax
