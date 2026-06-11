@@ -111,6 +111,8 @@ edge across many bets*, not picking the one winner. See [[predictability-study]]
 | K19 | **Frog-in-the-pan momentum quality (FIP, Da-Gurun-Warachka)** as 10% component | ❌ KILL | **[H]** | `efficiency_research.py` (2026-06-11): full-period +0.9pp looked promising but walk-forward says noise — +0.13pp avg, 4/8 windows, worst −2.3pp. US evidence is UP-market-conditional; does not replicate as a robust component here. |
 | K20 | **Sleeve-rebalance frequency** (wrapper 50/25/25 quarterly/semi-annual vs annual) | ❌ KILL | **[H]** | `efficiency_research.py` (2026-06-11): 18.8/19.1/19.0% — noise-level spread; faster sleeve rebalance adds STCG drag for no rebalancing-premium gain at these correlations. Annual sleeves stay. |
 | BUG3 | **Nifty benchmark silently overwritten with partial data (FIXED 2026-06-11)** | ✅ FIXED | **[H]** | `refetch_all.py`'s ^NSEI refresh saved a PARTIAL yfinance response (2007–2017 only) over the good benchmark file → every vs-Nifty figure computed after that was garbage (Nifty showed +1.5% CAGR). Re-fetched full history (2007–2026-06-09); added a guard: never overwrite unless >4000 rows AND reaches the requested END year. Lesson = same as BUG2: NEVER trust a fetch without a recency+length check. |
+| K21 | **Faster symmetric rebalance (21/42/63d) under honest netting** | ❌ KILL (21/42d) · 🟡 (63d) | **[H]** | `exit_speed_research.py` (2026-06-11): full-period means flatter (21d +22.6%!) but walk-forward fails — 21d −1.38pp avg 3/8, 42d −2.34pp 1/8. 63d: +1.13pp avg but only 5/8, worst −6.2pp = higher-mean/fatter-tail coin-flip, NOT robust enough to displace 126d (which beat annual 7/8). The response curve under TRUE tax: flat 21-126d on mean, 126d dominates on consistency; cliff at 189d+. Losing windows are always crash-recoveries (2018-20/2019-21) — fast re-ranking sells V-recovery names at the bottom. |
+| K22 | **Asymmetric fast derank-exits** (126d entries + 21/42/63d exit checks, exit_rank 24/18) | ❌ KILL | **[H]** | `exit_speed_research.py` (2026-06-11): the "cut faders faster" hypothesis. Full-period optics excellent (check21/x18: +22.8%, Sharpe 1.03, hold 173d) but walk-forward = +0.25pp avg, **4/8 windows, worst −6.1pp** (2018-20). Same whipsaw mechanism as K21: in crash-recovery regimes the fast exit dumps temporarily-deranked names that then lead the rebound. Momentum needs ~6mo to re-form after shocks; 126d full-cycle stays the deployed default (avg hold 262d). |
 | P6 | **BUGFIX: `backtest.py` warmup_skip 1→0** (full-codebase audit, 2026-06-08) | ✅ KEEP | **[H]** | The backtester left the book in CASH for the first ~252 bars (one year) of EVERY window because `warmup_skip=1` skipped the first scheduled rebalance. Factors are valid at the window start (built from pre-window history — no look-ahead), so this was pure drag. Impact: ~0 on full period (1 lost yr in 10) but **distorted the walk-forward badly** (a third of each 3-yr window in cash) — corrected walk-forward avg ~13%→~20%, **beats Nifty 7/8 (was 3/8)**, and made the vs-Nifty comparison fair (Nifty is day-1 invested). Verified legit (full-period stayed +16.0%, not inflated → not look-ahead). 22/22 tests pass. **This is the "core-file bug" the prior walk-forward pessimism partly rested on.** |
 
 **Bottom line:** the deliverable is a **portfolio, not a strategy** — an equal-weight /
@@ -211,9 +213,16 @@ Ranked by plausible edge × feasibility. Each: hypothesis → how to test → re
   Documented: F&O-expiry timing and SIP-timing edges in Nifty (22-yr study). Small but
   cheap. *Test:* expiry-week entry/exit timing on the basket; budget-day / RBI-policy gates.
 
-- **F5 — Event-driven (index inclusion, earnings drift).** **[L]**
-  Index rebalance front-running and post-earnings-announcement drift are documented
-  globally; untested here. Needs event dates (free from NSE). Crowded but worth a look.
+- **F5 — Event-driven (index inclusion, earnings drift).** **[L→downgraded 2026-06-11]**
+  Data-source scan: Indian PEAD studies (100 NSE firms, 2014-18) find the market largely
+  EFFICIENT post-announcement — no robust drift to harvest. News sentiment in India is
+  short-lived (1-10 days; strongest documented effect ≈13bps/mo in a LONG-SHORT setup we
+  can't run), and free news sources have no point-in-time archive → lookahead trap.
+  Index-inclusion front-running remains documented but hits ~1-2 of our 12 names/yr →
+  breadth too low to matter (≤+0.2pp est.). Verdict: news/PEAD/event data sources are NOT
+  worth integration effort at our 6-month cadence. The one actionable open data item
+  remains **K17 quality-as-SCREEN** (needs `fetch_fundamentals.py` + indianapi key;
+  honest estimate ±0-1pp CAGR, mainly DD reduction in flight-to-quality regimes).
 
 - **F6 — Δ-Promoter holding as a weak factor input.** ❌ **TESTED → KILL (K12), 2026-06-07.**
   Added as a sleeve via `core/portfolio/external_factors.py` + `factor_research.py`. The weak
