@@ -265,3 +265,4 @@ data/halt_state.json
 data/bhavcopy/
 data/pit_cache/
 data/paper/
+data/nested_wf_navs.parquet

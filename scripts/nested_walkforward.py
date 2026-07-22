@@ -58,6 +58,12 @@ def main():
     print(f"Running {len(grid)} configs once each over {START}..{END} "
           f"(the NAV matrix makes every selection rule free to evaluate)...", flush=True)
 
+    cache = os.path.join(_ROOT, "data", "nested_wf_navs.parquet")
+    if os.path.exists(cache):
+        nav_df = pd.read_parquet(cache)
+        print(f"  reusing cached NAV matrix ({nav_df.shape[1]} configs) from {cache}")
+        return report(nav_df)
+
     navs = {}
     for i, (w, n, r) in enumerate(grid, 1):
         bt.con = PortfolioConstructor(ConstructionConfig(
@@ -69,6 +75,11 @@ def main():
             print(f"  {i}/{len(grid)}", flush=True)
 
     nav_df = pd.DataFrame(navs)
+    nav_df.to_parquet(cache)
+    return report(nav_df)
+
+
+def report(nav_df):
     ret = nav_df.pct_change(fill_method=None).fillna(0.0)
 
     def seg_cagr(label_ret, lo, hi):
@@ -112,8 +123,18 @@ def main():
     print("-" * 88)
     print(f"  CHAINED OOS CAGR   selection rule {sel*100:+.2f}%   "
           f"deployed-config {dep*100:+.2f}%   1/N ensemble {ens*100:+.2f}%")
-    print(f"  Walk-Forward Efficiency (OOS/IS) = {sel/is_of_picks:.2f}  "
-          f"(Pardo pass bar 0.50-0.60)  -> {'PASS' if sel/is_of_picks >= 0.5 else 'FAIL'}")
+    wfe = sel / is_of_picks
+    print(f"  Walk-Forward Efficiency (OOS/IS) = {wfe:.2f}  "
+          f"(Pardo pass bar 0.50-0.60)  -> {'PASS' if wfe >= 0.5 else 'FAIL'}")
+    if wfe > 1.0:
+        print("    ^ CAUTION: WFE > 1 does NOT mean the selection rule is skilful. It means the "
+              "OOS\n      years were simply a kinder regime than the training years "
+              "(2020-25 post-COVID vs 2016-19).\n      Read the rank correlation below instead — "
+              "it is regime-neutral.")
+    print(f"  NOTE: the deployed-config column is NOT a clean out-of-sample number — that config "
+          f"was\n    originally chosen with full-sample knowledge, which is the very leak this "
+          f"script exists to\n    measure. Quote the selection-rule or ensemble figure, never the "
+          f"deployed one, as 'nested OOS'.")
     print(f"  Config stability: {len(set(picks))} distinct configs chosen across "
           f"{len(picks)} years {picks}")
     print(f"  Mean IS->OOS config rank correlation (Spearman) = {rho:+.3f}")
@@ -127,7 +148,11 @@ def main():
 
     os.makedirs(REPORTS, exist_ok=True)
     out = {"chained_oos_selection": sel, "chained_oos_deployed": dep,
-           "chained_oos_ensemble": ens, "walk_forward_efficiency": sel / is_of_picks,
+           "chained_oos_ensemble": ens, "walk_forward_efficiency": wfe,
+           "wfe_caveat": ("WFE>1 reflects a kinder OOS regime (2020-25) than the training "
+                          "years, NOT selection skill; read is_oos_rank_corr instead"),
+           "deployed_caveat": ("chained_oos_deployed is NOT clean OOS — that config was "
+                               "chosen with full-sample knowledge; do not quote it as such"),
            "is_oos_rank_corr": rho, "picks": picks, "test_years": TEST_YEARS[:len(picks)],
            "verdict": verdict}
     json.dump(out, open(os.path.join(REPORTS, "nested_walkforward.json"), "w"),

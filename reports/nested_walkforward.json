@@ -1,0 +1,26 @@
+{
+  "chained_oos_selection": 0.21850132204536488,
+  "chained_oos_deployed": 0.2938535572019496,
+  "chained_oos_ensemble": 0.23999962938990205,
+  "walk_forward_efficiency": 1.0679154440191971,
+  "wfe_caveat": "WFE>1 reflects a kinder OOS regime (2020-25) than the training years, NOT selection skill; read is_oos_rank_corr instead",
+  "deployed_caveat": "chained_oos_deployed is NOT clean OOS \u2014 that config was chosen with full-sample knowledge; do not quote it as such",
+  "is_oos_rank_corr": -0.12636022514071302,
+  "picks": [
+    "lowvol_hvy|n12|r126",
+    "mom_heavy|n8|r252",
+    "mom_heavy|n8|r252",
+    "mom_heavy|n8|r252",
+    "mom_heavy|n8|r126",
+    "mom_heavy|n8|r126"
+  ],
+  "test_years": [
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "verdict": "Config selection adds nothing; the honest deployment is a fixed, economically-motivated config (or the 1/N ensemble), NOT a learned choice."
+}
