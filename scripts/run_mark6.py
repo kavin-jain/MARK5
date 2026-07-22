@@ -61,9 +61,9 @@ def main():
     # config in 8/8 rolling 3-yr walk-forward windows (+2.3pp avg net).
     # 2026-06-10 upgrade: momentum-heavy factor weights validated OOS (+1.4pp avg,
     # 6/8 walk-forward windows) — momentum 0.45 / trend 0.25 / low_vol 0.15 / stability 0.15.
-    factor_cfg = ConstructionConfig(mode="factor_tilt", n_hold=12,
+    factor_cfg = ConstructionConfig(mode="factor_tilt", n_hold=20,
                                     base_weighting="inverse_vol", tilt_strength=1.5,
-                                    max_weight=0.125,
+                                    max_weight=0.08,
                                     factor_weights={"momentum": 0.45, "low_vol": 0.15,
                                                     "trend": 0.25, "stability": 0.15})
     ew_cfg = ConstructionConfig(mode="equal_weight", base_weighting="equal")

@@ -51,8 +51,8 @@ def cmd_init(capital: float):
         sys.exit("ERROR: empty data cache — run scripts/refetch_all.py first.")
     panel = DataPanel(tickers, str(date.today()))
     asof = panel.close.index[-1]
-    cfg = ConstructionConfig(mode="factor_tilt", n_hold=12, base_weighting="inverse_vol",
-                             tilt_strength=1.5, max_weight=0.125,
+    cfg = ConstructionConfig(mode="factor_tilt", n_hold=20, base_weighting="inverse_vol",
+                             tilt_strength=1.5, max_weight=0.08,
                              factor_weights={"momentum": 0.45, "low_vol": 0.15,
                                              "trend": 0.25, "stability": 0.15})
     elig = panel.eligible(asof, 252, 0.40)

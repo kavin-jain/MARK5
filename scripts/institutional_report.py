@@ -108,8 +108,8 @@ def main():
     # DEPLOYED CONFIG (2026-06-10 upgrade): momentum-heavy equity book
     # Factor weights: momentum 0.45 / low_vol 0.15 / trend 0.25 / stability 0.15
     # Validated OOS: +1.4pp avg walk-forward, beats 6/8 windows vs baseline blend.
-    cfg = ConstructionConfig(mode="factor_tilt", n_hold=12, base_weighting="inverse_vol",
-                             tilt_strength=1.5, max_weight=0.125,
+    cfg = ConstructionConfig(mode="factor_tilt", n_hold=20, base_weighting="inverse_vol",
+                             tilt_strength=1.5, max_weight=0.08,
                              factor_weights={"momentum": 0.45, "low_vol": 0.15,
                                              "trend": 0.25, "stability": 0.15})
     # 2026-06-11 upgrade (P11+P12): FY tax netting + semi-annual equity rebalance.
@@ -183,7 +183,7 @@ def main():
     L = []
     A = L.append
     A("# MARK6 — Institutional Evaluation Report")
-    A(f"\n**System:** 50% concentrated 12-name momentum-heavy factor book (refreshed every "
+    A(f"\n**System:** 50% 20-name momentum-heavy factor book (refreshed every "
       f"6 months, FY tax netting, FIFO lots, next-close execution) + 25% gold (GOLDBEES) + "
       f"25% US Nasdaq-100 (MON100) — three uncorrelated sleeves, sleeves rebalanced annually. "
       f"**Mode:** PAPER. **Period:** {START} → {END}. All figures **net of Indian tax "

@@ -3,7 +3,7 @@ MARK6 — Generate TODAY's deployable portfolio (the executable deliverable).
 ==========================================================================
 Turns the validated, audited system into a concrete instruction: exactly which
 stocks and weights to hold now. Config is the deployed v7.1 book:
-  - 12-name concentrated factor book (momentum-heavy, inverse-vol weighted)
+  - 20-name factor book (momentum-heavy, inverse-vol weighted)
   - GOLDBEES (gold) + MON100 (US Nasdaq-100) diversifier sleeves
 
 PAPER mode. Equity book refreshed every 6 months, sleeves annually.
@@ -54,8 +54,8 @@ def main():
         print(f"  ⚠ DATA IS {age} DAYS OLD (last print {asof.date()}). Holdings below "
               f"reflect that date — run scripts/refetch_all.py before acting on them.")
 
-    cfg = ConstructionConfig(mode="factor_tilt", n_hold=12, base_weighting="inverse_vol",
-                             tilt_strength=1.5, max_weight=0.125,
+    cfg = ConstructionConfig(mode="factor_tilt", n_hold=20, base_weighting="inverse_vol",
+                             tilt_strength=1.5, max_weight=0.08,
                              factor_weights={"momentum": 0.45, "low_vol": 0.15,
                                              "trend": 0.25, "stability": 0.15})
     con = PortfolioConstructor(cfg)
