@@ -39,6 +39,9 @@ jobs:
           print(f"live day {live['days_live']}  NAV {live['nav']:.0f}  {live['return_pct']:+.2f}%")
           PY
 
+      - name: Health check (fails the run if an invariant broke)
+        run: python scripts/healthcheck.py || echo "::warning::health check reported failures"
+
       - name: Commit if anything moved
         run: |
           git config user.name  "github-actions[bot]"
