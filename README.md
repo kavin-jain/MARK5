@@ -24,24 +24,41 @@ A months-long, end-to-end quantitative research program that asked one question 
 
 The conclusion is deliberately humble: **you cannot reliably beat same-universe buy-and-hold by prediction or timing — but you _can_ build a disciplined, diversified, tax-efficient portfolio that beats the cap-weighted index.** That system is the deliverable.
 
-### Headline results — deployed system, v7.1 engine (net of tax, 2016–2026)
+### Headline results — v7.2, on a **survivorship-free** universe (net of tax, 2016–2026)
+
+Built from 3,064 days of NSE bhavcopy: **1,333 symbols, of which 178 (13.4%) stopped trading** — the delisted names a yfinance universe structurally cannot contain.
 
 | Metric | MARK6 (deployed) | Nifty 50 **TRI** B&H |
 |---|---:|---:|
-| Net CAGR | **+20.7%** | +11.1% |
-| Sharpe (raw, rf=0) | 0.96 | 0.79 |
-| **Sharpe (excess of 6.5% risk-free)** | **0.68** | 0.37 |
-| Max drawdown | **−26.5%** | −36.3% |
-| Calmar | **0.78** | 0.30 |
-| Excess return vs Nifty 50 TRI | **+9.6pp/yr** | — |
-| Beta (defensive) | 0.67 | 1.00 |
-| Equity-sleeve walk-forward | **beats Nifty TRI 7/8, equal-weight 8/8** rolling 3-yr windows | — |
+| Net CAGR | **+21.3%** | +11.1% |
+| **Sharpe (excess of 6.5% risk-free)** | **0.67** | 0.37 |
+| Max drawdown | **−31.2%** | −36.3% |
+| Calmar | **0.68** | 0.30 |
+| Excess return vs Nifty 50 TRI | **+10.4pp/yr** | — |
+| Equity sleeve alone | +18.6% CAGR, −54.4% MaxDD | — |
+| Equity-sleeve walk-forward | **beats equal-weight 8/8** rolling 3-yr windows | — |
+
+₹5cr → **₹37.9cr** over 10.4 years, net of tax and costs.
+
+> **The survivorship cost is real, and it is ~5pp/yr — it just isn't visible in the headline.** At *matched* universe breadth (300 candidates vs 150), the honest number is:
+>
+> | Universe | Candidates | CAGR | Excess Sharpe | MaxDD |
+> |---|---:|---:|---:|---:|
+> | Old survivor cache | ~115 | 20.1% | 0.66 | −37.6% |
+> | PIT, comparable breadth | 150 | **14.6%** | 0.43 | −55.7% |
+> | PIT, deployed breadth | 300 | 18.6% | 0.56 | −54.4% |
+>
+> Like-for-like, survivorship was inflating returns by **~5pp/yr** — matching the published Indian estimate of 4.94pp (arXiv 2603.19380, NIFTY Smallcap 250, 2016–25). The system recovers to ~21% only by deliberately reaching *wider* (300 names, a capacity-constrained choice), not because the bias was harmless.
+>
+> **Where survivorship really hid was risk, not return.** The equity sleeve's true drawdown is **−54%**, not −38%. The multi-asset wrapper is what makes that liveable (−31%); the equity book alone is not something a retail investor could hold through.
+>
+> **One finding runs the other way, and it is the most interesting result here:** the factor engine's edge over equal-weight *grew* on honest data, **+4.7pp → +7.4pp**. Momentum and trend systematically avoid the names that die; equal-weight rides them to zero. A survivor-only backtest structurally cannot show this — it is real alpha that was previously invisible.
 
 > **Benchmark honesty:** the benchmark is Nifty 50 **total-return** (dividends reinvested, real NIFTYBEES-adjusted series), taxed at terminal LTCG exactly like the strategy. The strategy book runs on dividend-adjusted prices, so a price-only index — which most retail backtests use — would flatter the excess by ~1pp/yr. We don't.
 >
-> **What drives the +9.6pp:** the factor engine (momentum-heavy ranking + 6-month refresh under fiscal-year tax netting) contributes **+4.7pp/yr over equal-weight buy-and-hold of the same universe** (computed, not asserted — see `reports/INSTITUTIONAL_REPORT.md`); the remainder is deliberate multi-asset allocation (gold + US Nasdaq diversification) that any passive multi-asset fund also captures. Calling the whole gap "alpha" would be misleading.
+> **What drives the +10.4pp:** the factor engine (momentum-heavy ranking + 6-month refresh under fiscal-year tax netting) contributes **+7.4pp/yr over equal-weight buy-and-hold of the same universe** on the survivorship-free data (computed, not asserted); the remainder is deliberate multi-asset allocation (gold + US Nasdaq diversification) that any passive multi-asset fund also captures. Calling the whole gap "alpha" would be misleading.
 >
-> **Survivorship caveat (subtract before believing):** universe *eligibility* is point-in-time, but the candidate list is today's surviving index constituents — fully-delisted names are absent. Estimated inflation **~1–2pp/yr**; the honest forward expectation is **~18–19% CAGR over a full cycle**, single years anywhere from −15% to +40%.
+> **Survivorship: SOLVED, not caveated.** v7.2 rebuilt the universe from NSE daily bhavcopy, so delisted names are present until the day they delist. This is the fix, not an estimate. Residual limits: the corporate-action feed does not carry demergers, so 67 symbols with unexplained post-adjustment jumps are excluded; and pre-2016 history starts 2014, bounding the earliest window.
 
 **The deployed portfolio:** 50% concentrated 12-stock momentum-heavy factor book (refreshed every 6 months under FY tax netting) · 25% gold (GOLDBEES) · 25% US Nasdaq-100 (MON100) — three near-uncorrelated sleeves, rebalanced annually.
 
@@ -53,7 +70,7 @@ Most student/retail quant projects show one flattering backtest and stop. This i
 
 - ❌ **Killed** (with evidence): ML signal prediction, momentum-timing overlays, stop-losses, circuit-breakers, ex-ante multibagger picking, institutional-flow signals, leverage, volatility-targeting, fundamental-quality tilts, tax-loss harvesting, frog-in-the-pan momentum, fast exit rules.
 - ✅ **Kept** (validated OOS): multi-factor smart-beta, concentration, fiscal-year tax netting + semi-annual momentum refresh, gold + US diversification, leakage defences.
-- 🔍 **Adversarially audited** (2026-07-22, 16-agent black-box audit): the audit *found and we fixed* — a price-index benchmark that flattered the excess ~1pp/yr (now TRI), same-close execution (now next-close), average-cost tax lots (now statutory FIFO), a phantom cost-free overdraft (buys now cash-constrained), suspended names compounding at 0% (now haircut + force-exited), and Sharpe quoted without a risk-free rate (both now reported). **The headline moved only 20.8% → 20.7%** — the edge never lived in the biased parts. Full decision log: [`docs/RESEARCH_LOG.md`](docs/RESEARCH_LOG.md).
+- 🔍 **Adversarially audited** (2026-07-22, 16-agent black-box audit): the audit *found and we fixed* — a price-index benchmark that flattered the excess ~1pp/yr (now TRI), same-close execution (now next-close), average-cost tax lots (now statutory FIFO), a phantom cost-free overdraft (buys now cash-constrained), suspended names compounding at 0% (now haircut + force-exited), and Sharpe quoted without a risk-free rate (both now reported). **The headline moved only 20.8% → 20.7%** — the edge never lived in the biased parts. v7.2 then went further and rebuilt the universe itself from bhavcopy (below). Full decision log: [`docs/RESEARCH_LOG.md`](docs/RESEARCH_LOG.md).
 
 ---
 
@@ -137,7 +154,7 @@ Prices come from yfinance, so a fresh clone reproduces the *methodology* exactly
 ## Honest disclaimers
 
 - **PAPER MODE ONLY.** This is a research system, not investment advice. It has never traded real money — and by its own rule it must first track its backtest through 6–12 months of `paper_track.py` before anyone considers funding it.
-- Survivorship-adjusted expectation is **~18–19% CAGR**, not the +20.7% headline.
+- The equity sleeve's honest max drawdown is **−54%**. The multi-asset wrapper reduces the deployed system to −31%, but this book is volatile and you must be able to hold it.
 - Drawdowns of **−25% to −35% are real and unavoidable** in any long-only equity book. Abandoning the system mid-drawdown converts the entire edge into a loss.
 - The excess Sharpe of 0.68 is strong-mutual-fund tier, **not** hedge-fund tier. Sharpe ≳ 1 (excess) requires leverage and infrastructure unavailable to an Indian retail investor; claiming otherwise would be dishonest.
 - The edge was measured in a single decade (2016–2026) that was kind to Indian equities, gold, and US tech. Regimes change.

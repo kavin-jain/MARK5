@@ -46,20 +46,43 @@ def fetch_corporate_actions(start="2016-01-01", end="2026-06-09") -> list:
     """NSE CA API, monthly chunks. Cached — the API needs warm cookies and is slow."""
     if os.path.exists(CA_CACHE):
         return json.load(open(CA_CACHE))
-    op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor())
-    op.addheaders = list(UA.items())
-    op.open("https://www.nseindia.com/companies-listing/corporate-filings-actions", timeout=30).read()
-    out, months = [], pd.date_range(start, end, freq="MS")
+    import time
+
+    def warm():
+        op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor())
+        op.addheaders = list(UA.items())
+        op.open("https://www.nseindia.com/companies-listing/corporate-filings-actions",
+                timeout=30).read()
+        return op
+
+    op, out, failed = warm(), [], []
+    months = pd.date_range(start, end, freq="MS")
     for i, m0 in enumerate(months, 1):
         m1 = min(m0 + pd.offsets.MonthEnd(0), pd.Timestamp(end))
         url = ("https://www.nseindia.com/api/corporates-corporateActions?index=equities"
                f"&from_date={m0:%d-%m-%Y}&to_date={m1:%d-%m-%Y}")
-        try:
-            out += json.loads(op.open(url, timeout=45).read())
-        except Exception as e:
-            print(f"  WARN {m0:%Y-%m}: {type(e).__name__}", flush=True)
+        # a transient DNS/cookie blip must not silently drop a month of corporate
+        # actions — a missed split injects a fake >50% move into the momentum factor
+        for attempt in range(4):
+            try:
+                out += json.loads(op.open(url, timeout=45).read())
+                break
+            except Exception as e:
+                if attempt == 3:
+                    failed.append(f"{m0:%Y-%m}")
+                    print(f"  WARN {m0:%Y-%m} unrecoverable: {type(e).__name__}", flush=True)
+                else:
+                    time.sleep(3 * (attempt + 1))
+                    try:
+                        op = warm()
+                    except Exception:
+                        pass
         if i % 24 == 0:
             print(f"  corporate actions {i}/{len(months)} months, {len(out)} records", flush=True)
+    if failed:
+        sys.exit(f"ABORT: {len(failed)} months of corporate actions could not be fetched "
+                 f"({failed[:6]}). Adjusting prices with missing splits would inject fake "
+                 f"returns into the factors — re-run when the network is stable.")
     json.dump(out, open(CA_CACHE, "w"))
     return out
 
@@ -156,8 +179,40 @@ def main():
     med = turn.rolling(126, min_periods=40).median().max() / 1e7      # peak, in crore
     keep = [s for s in close.columns
             if close[s].notna().sum() >= args.min_days and med.get(s, 0) >= args.min_turnover_cr]
-    print(f"  keeping {len(keep):,} symbols (>= {args.min_days}d of prints, peak 126d median "
-          f"turnover >= Rs {args.min_turnover_cr}cr)")
+    print(f"  {len(keep):,} symbols pass history + liquidity")
+
+    # ── structural ETF/fund exclusion by ISIN prefix ──────────────────────────
+    # Indian ISINs: INE = operating company equity, INF = mutual fund / ETF units.
+    # Name heuristics (endswith BEES/ETF) miss SETFGOLD, LICMFGOLD, AXISGOLD,
+    # GROWWGOLD... and an ETF in an equity book is not a cosmetic problem: the
+    # research log records LIQUIDBEES (~cash, lowest vol) being inverse-vol
+    # OVERWEIGHTED to the top of the book. Prefix is structural, so use it.
+    isin_of = eod.dropna(subset=["isin"]).groupby("symbol")["isin"].agg(
+        lambda s: s.astype(str).mode().iat[0] if len(s) else "")
+    funds = [s for s in keep if str(isin_of.get(s, "")).startswith("INF")]
+    keep = [s for s in keep if s not in set(funds)]
+    print(f"  excluded {len(funds):,} ETF/fund units by ISIN prefix INF "
+          f"(e.g. {sorted(funds)[:6]})")
+
+    # ── residual-jump guard, tested on the ADJUSTED series ────────────────────
+    # The question is not "was there a corporate action nearby" but "did the
+    # adjustment actually work". Testing raw prices and excusing moves near a known
+    # event lets PARTIALLY adjusted names through — BAJFINANCE had a bonus AND a
+    # split on one ex-date, so catching either one still leaves a fake -49% day.
+    # Demergers and capital reductions are absent from the CA feed entirely. A
+    # fabricated -90% return is strictly worse than omitting the name.
+    suspect = []
+    for s in keep:
+        c = close[s].dropna()
+        if len(c) < 2:
+            continue
+        r = (adjust(c, events[s]) if s in events else c).pct_change()
+        if bool(((r < -0.45) | (r > 1.5)).any()):
+            suspect.append(s)
+    keep = [s for s in keep if s not in set(suspect)]
+    print(f"  excluded {len(suspect):,} symbols still showing >45% single-day moves AFTER "
+          f"adjustment (demerger / partial-CA): {sorted(suspect)[:6]}")
+    print(f"  keeping {len(keep):,} symbols")
 
     os.makedirs(OUT, exist_ok=True)
     ohlc = {c: eod.pivot_table(index="date", columns="symbol", values=c, aggfunc="last")

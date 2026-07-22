@@ -72,9 +72,12 @@ def main():
     # the 6-12mo horizon, and netting cuts the turnover tax penalty that previously
     # made faster rebalance look bad (K3 used the no-credit model). Validated:
     # equity sleeve +2.84pp avg walk-forward (7/8 windows), full system 19.0→20.7%.
-    bt_cfg = BacktestConfig(rebal_bars=126)
+    min_turn = float(os.environ.get("MARK5_MIN_TURNOVER", "0"))
+    if min_turn:
+        print(f"  absolute liquidity floor: Rs {min_turn/1e7:.0f}cr/day median turnover\n")
+    bt_cfg = BacktestConfig(rebal_bars=126, min_turnover=min_turn)
     bt_factor = Backtester(panel, PortfolioConstructor(factor_cfg), bt_cfg)
-    bt_ew = Backtester(panel, PortfolioConstructor(ew_cfg), BacktestConfig(rebal_bars=126))
+    bt_ew = Backtester(panel, PortfolioConstructor(ew_cfg), BacktestConfig(rebal_bars=126, min_turnover=min_turn))
 
     results = {"config": factor_cfg.__dict__, "windows": {}}
 
@@ -90,7 +93,7 @@ def main():
         re_ = bt_ew.run(s, e)["metrics"]
         rn = nifty_buyhold(s, e)
         vs_ew = (rf["cagr"] - re_["cagr"]) * 100
-        vs_n = (rf["cagr"] - rn["cagr"]) * 100 if rn else float("nan")
+        vs_n = (rf["cagr"] - rn["cagr"]) * 100 if rn.get("cagr") == rn.get("cagr") else float("nan")
         print(f"\n  {label}")
         print(f"    MARK6 factor : {fmt(rf)}")
         print(f"    EqualWeight  : {fmt(re_)}")
@@ -114,8 +117,9 @@ def main():
         rf = bt_factor.run(s, e)["metrics"]
         re_ = bt_ew.run(s, e)["metrics"]
         rn = nifty_buyhold(s, e)
-        if not rf or not rn:
+        if not rf:
             continue
+        rn = rn or {"cagr": float("nan")}
         vew, vn = (rf["cagr"]-re_["cagr"])*100, (rf["cagr"]-rn["cagr"])*100
         wins += 1; beats_ew += vew > 0; beats_n += vn > 0
         print(f"  {y0}-{y0+2:<11}{rf['cagr']*100:>+8.1f}%{re_['cagr']*100:>+8.1f}%"
@@ -148,7 +152,7 @@ def _write_md(r):
          "|---|---|---|---|---|---|"]
     for label, w in r["windows"].items():
         L.append(f"| {label} | {w['factor']['cagr']*100:+.1f}% | "
-                 f"{w['equal_weight']['cagr']*100:+.1f}% | {w['nifty']['cagr']*100:+.1f}% | "
+                 f"{w['equal_weight']['cagr']*100:+.1f}% | {w['nifty'].get('cagr', float('nan'))*100:+.1f}% | "
                  f"{w['vs_nifty_pp']:+.1f}pp | {w['vs_ew_pp']:+.1f}pp |")
     s = r["walk_forward_summary"]
     L += ["", "## Rolling 3-year walk-forward", "",

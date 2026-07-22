@@ -80,6 +80,10 @@ class BacktestConfig:
     stale_exit_days: int = 21         # force-exit a holding with no real print this long
     delist_haircut: float = 0.25      # value haircut applied on a forced stale exit
                                       # (a suspended name never sells at its frozen mark)
+    top_n_liquid: int = 0             # keep only the N most-liquid seasoned names.
+                                      # PREFERRED screen: time-invariant (adapts as
+                                      # market turnover grows) and capacity-meaningful.
+                                      # 0 = off.
     min_turnover: float = 0.0         # absolute floor on 126d median daily rupee turnover
                                       # (e.g. 2e8 = Rs 20cr/day). Preferred over
                                       # liquidity_pct, which is a PERCENTILE of whatever
@@ -380,7 +384,8 @@ class Backtester:
                 last_rebal = i
                 if n_rebal > cfg.warmup_skip:
                     elig = self.panel.eligible(d, cfg.min_history, cfg.liquidity_pct,
-                                               min_turnover=cfg.min_turnover)
+                                               min_turnover=cfg.min_turnover,
+                                               top_n=cfg.top_n_liquid)
                     elig = [t for t in elig if t in col]
                     if self.screen is not None and elig:
                         elig = self.screen(d, elig) or elig

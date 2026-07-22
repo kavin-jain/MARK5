@@ -37,6 +37,10 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__
 CACHE = os.environ.get("MARK5_CACHE") or os.path.join(_ROOT, "data", "cache")
 if not os.path.isabs(CACHE):
     CACHE = os.path.join(_ROOT, CACHE)
+# Benchmark series (Nifty) is NOT part of the investable universe, so it must not
+# move when MARK5_CACHE swaps the universe — otherwise switching to the PIT cache
+# silently drops the benchmark and every "vs Nifty" figure becomes n/a.
+BENCH_CACHE = os.path.join(_ROOT, "data", "cache")
 
 # Names that are structurally inappropriate for an equity-quality basket
 # (a-priori exclusions, NOT performance-based — documented to avoid snooping).
@@ -59,10 +63,17 @@ def _norm(name: str) -> str:
 
 
 def load_ohlcv(ticker: str) -> pd.DataFrame | None:
-    """Load one instrument's OHLCV (lowercase cols, tz-naive DatetimeIndex)."""
+    """Load one instrument's OHLCV (lowercase cols, tz-naive DatetimeIndex).
+
+    Falls back to the default cache: the multi-asset sleeve ETFs (GOLDBEES, MON100)
+    and benchmark series are deliberately NOT in the equity PIT universe, but every
+    wrapper still needs them, so they must survive a MARK5_CACHE swap.
+    """
     for suffix in ("_daily.parquet", "_NS_1d.parquet"):
-        path = os.path.join(CACHE, f"{ticker}{suffix}")
-        if os.path.exists(path):
+        for root in dict.fromkeys((CACHE, BENCH_CACHE)):
+            path = os.path.join(root, f"{ticker}{suffix}")
+            if not os.path.exists(path):
+                continue
             try:
                 df = pd.read_parquet(path)
             except Exception as e:
@@ -108,6 +119,16 @@ NIFTY_DIV_YIELD = 0.013   # long-run Nifty 50 dividend yield used to approximate
                           # free machine-readable history).
 
 
+def _first_existing(fname: str) -> str | None:
+    """Look in the active cache, then the default one — benchmark files live with
+    the primary cache and are shared by every universe."""
+    for d in (CACHE, BENCH_CACHE):
+        p = os.path.join(d, fname)
+        if os.path.exists(p):
+            return p
+    return None
+
+
 def load_nifty(total_return: bool = True) -> pd.Series | None:
     """Nifty 50 benchmark series (close). The strategy book runs on dividend-
     adjusted (total-return) stock prices, so a fair benchmark must be total-return
@@ -116,8 +137,8 @@ def load_nifty(total_return: bool = True) -> pd.Series | None:
     total_return=False returns the raw price index (unfair vs this book —
     kept only for explicit price-index comparisons)."""
     if total_return:
-        tri = os.path.join(CACHE, "NIFTY_TRI.parquet")
-        if os.path.exists(tri):
+        tri = _first_existing("NIFTY_TRI.parquet")
+        if tri is not None:
             df = pd.read_parquet(tri)
             df.columns = [c.lower() for c in df.columns]
             if "date" in df.columns:
@@ -128,8 +149,8 @@ def load_nifty(total_return: bool = True) -> pd.Series | None:
             # 25% away from its local median for a day or two
             med = s.rolling(11, center=True, min_periods=3).median()
             return s[(s / med - 1).abs() <= 0.25]
-    path = os.path.join(CACHE, "sector_NSEI.parquet")
-    if not os.path.exists(path):
+    path = _first_existing("sector_NSEI.parquet")
+    if path is None:
         return None
     df = pd.read_parquet(path)
     df.columns = [c.lower() for c in df.columns]
@@ -201,7 +222,7 @@ class DataPanel:
 
     def eligible(self, asof: pd.Timestamp, min_history: int = 252,
                  liquidity_pct: float = 0.40, max_stale_days: int = 14,
-                 min_turnover: float = 0.0) -> list[str]:
+                 min_turnover: float = 0.0, top_n: int = 0) -> list[str]:
         """Point-in-time investable universe as-of `asof`.
 
         min_turnover (absolute rupee 126d-median daily turnover) is the preferred
@@ -225,8 +246,22 @@ class DataPanel:
             turn_now[t] = float(tv.iloc[-1])
         if not seasoned:
             return []
+        # top_n is the preferred screen: it is TIME-INVARIANT (adapts as the market's
+        # rupee turnover grows) and capacity-meaningful (you know exactly how deep
+        # into the liquidity ranking you are reaching). It mirrors NSE's own Nifty 500
+        # rule, which ranks by turnover rather than using a fixed rupee threshold.
+        # A fixed rupee floor is NOT time-invariant: Rs 20cr/day admitted 0 names in
+        # 2016 but 436 in 2026, so it silently disables itself early in a backtest.
+        ranked = sorted(seasoned, key=lambda t: turn_now[t], reverse=True)
+        if top_n and top_n > 0:
+            ranked = ranked[:top_n]
         if min_turnover > 0:
-            keep = [t for t in seasoned if turn_now[t] >= min_turnover]
-            return keep if keep else seasoned      # never starve the book entirely
+            keep = [t for t in ranked if turn_now[t] >= min_turnover]
+            # Falling back to the FULL seasoned list here would swap a strict screen
+            # for no screen at all — the opposite of intent, and invisible in results.
+            # Degrade to the most-liquid decile of the ranked set instead.
+            return keep if keep else ranked[:max(1, len(ranked) // 10)]
+        if top_n and top_n > 0:
+            return ranked
         floor = np.nanquantile(list(turn_now.values()), liquidity_pct)
         return [t for t in seasoned if turn_now[t] >= floor]

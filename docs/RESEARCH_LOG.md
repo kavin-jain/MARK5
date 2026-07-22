@@ -212,6 +212,31 @@ lesson: the biased components contributed almost nothing — the edge is structu
 (diversified beta + tax discipline + momentum refresh), which is why honesty was
 cheap. Survivorship (~1-2pp) remains the largest disclosed inflation.
 
+## 4e. v7.2 — TRUE point-in-time universe + tranching (2026-07-22)
+
+| # | What | Verdict | Evidence | Result |
+|---|------|---------|----------|--------|
+| P13 | **Survivorship SOLVED: universe rebuilt from NSE daily bhavcopy** | ✅ KEEP | **[H]** | `fetch_bhavcopy.py` + `build_pit_cache.py`. 3,064 trading days (2014-2026), 1,333 symbols, **178 (13.4%) stopped trading** — delisted names a yfinance cache structurally cannot hold. Bhavcopy is UNADJUSTED (the claim that PREVCLOSE is split-adjusted is FALSE — verified on IRCTC 1:5, CLOSE 913.5 vs PREVCLOSE 4130.15); joined 25k corporate-action records. Validation: IRCTC split adjusted, 0/1333 residual >45% single-day moves, 12/12 daily-return correlation >0.99 vs the independently-adjusted yfinance series. ETFs excluded structurally by **ISIN prefix INF** (name heuristics missed SETFGOLD/LICMFGOLD/AXISGOLD/GROWWGOLD). |
+| K23 | **Absolute rupee liquidity floor (`min_turnover`)** | ❌ KILL as primary screen | **[H]** | Rs 20cr/day admitted **0 names in 2016 but 436 in 2026** — a fixed rupee threshold is NOT time-invariant as market turnover grows ~4x. Worse, the fallback silently degraded to *no filter*, so the early years traded 1,333 micro-caps (fake -53% DD). Replaced by `top_n_liquid` (top-N by turnover), which is time-invariant and capacity-meaningful, mirroring NSE's own Nifty 500 turnover-rank rule. Kept only as a secondary hard floor with a defined degrade path. |
+| P14 | **Rebalance tranching** (3 sleeves, 42-bar stagger) | ✅ KEEP | **[H]** | Anchor lottery measured over 19 offsets: single-anchor CAGR spans 18.59-26.79% (std **2.17pp**) purely by start date; 3-tranche blend std **0.51pp** (**-67% dispersion**) for a -0.29pp mean shift. On the PIT universe it also *raised* the equity sleeve 18.6→20.6% and cut DD -54.4→-51.9%. Variance reduction by averaging — not an alpha claim, which is why it is trustworthy. |
+| P15 | **Nested walk-forward: config selection is NOISE** | ✅ KEEP (as knowledge) | **[H]** | `nested_walkforward.py`, 40 configs, config re-picked yearly on prior data only. IS→OOS config rank Spearman = **-0.126**. Chained OOS: learned rule **+21.85%**, 1/N ensemble **+24.00%** — the learned rule LOSES to averaging everything. Never deploy a learned config; deploy a fixed economically-motivated one. (Caution logged: WFE=1.07 looked like a "PASS" but only reflects 2020-25 being a kinder regime than 2016-19 — regime artefact, not skill.) |
+
+**The v7.2 honest headline (survivorship-free, top_n=300):** equity sleeve **+18.6% net CAGR,
+excess Sharpe 0.56, MaxDD -54.4%**; full 50/25/25 system **+21.3% CAGR, excess Sharpe 0.67,
+MaxDD -31.2%, Calmar 0.68** vs Nifty TRI-net +11.1% → **+10.4pp/yr excess**, ₹5cr→₹37.9cr/10.4y.
+
+**Three lessons that matter more than the numbers:**
+1. **Survivorship cost is ~5pp/yr at matched breadth** (PIT top_n=150 → 14.6% vs survivor-cache
+   20.1%), closely matching the published Indian estimate of 4.94pp (arXiv 2603.19380). The
+   deployed headline only returns to ~21% by deliberately reaching *wider* (300 names) — the
+   bias was not harmless, it was traded away for capacity.
+2. **Survivorship hid RISK, not return.** True equity-sleeve MaxDD is **-54%**, not -38%. The
+   multi-asset wrapper is what makes the system holdable, and that is now a load-bearing fact
+   rather than a nice-to-have.
+3. **The factor engine's edge over equal-weight GREW on honest data: +4.7pp → +7.4pp (8/8
+   windows).** Momentum/trend systematically avoid names that die; equal-weight rides them to
+   zero. A survivor-only backtest structurally cannot show this — previously invisible real alpha.
+
 ## 5. 🔭 OPEN FRONTIERS — untested levers worth pursuing
 
 Ranked by plausible edge × feasibility. Each: hypothesis → how to test → realistic ceiling.
