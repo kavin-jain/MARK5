@@ -84,8 +84,12 @@ data/processed/
 data/backups/
 data/temp/
 *.csv
-# evidence ledger is tracked: the institutional report cites it
+# evidence ledgers are tracked. A global *.csv rule silently excluded the paper
+# track record — the append-only ledger and the daily NAV history — which would
+# have meant the Action committed nothing and the whole record lived on one
+# laptop. These files ARE the evidence; losing them loses the project.
 !reports/trade_ledger.csv
+!data/paper/*.csv
 *.parquet
 *.feather
 *.hdf5
