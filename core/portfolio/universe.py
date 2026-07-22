@@ -10,12 +10,15 @@ Eligibility at date T:
                    (no IPO-pop look-ahead; the name was actually listed & tradable)
   2. Liquid      : trailing-126d median turnover (close*volume) as-of T is at or
                    above the `liquidity_pct` quantile of all seasoned names
-  3. Priced      : has a valid price at T
+  3. Priced      : has a real (non-stale) print within `max_stale_days` of T
 
 This makes universe membership a point-in-time decision that naturally adds names
-as they list/grow liquid and (within the survivor data we have) reflects what was
-actually investable. Residual survivorship from fully-delisted names is bounded
-separately via failure-injection in the backtester.
+as they list/grow liquid. HONEST LIMIT: the CANDIDATE list is whatever the local
+cache holds — in practice today's surviving index constituents — so fully-delisted
+names are absent and headline returns carry residual survivorship bias (estimated
+~1-2pp/yr; see README and scripts/survivorship_validation.py, which bounds it via
+failure injection on the equal-weight basket). The backtester adds a stale-print
+force-exit so suspended names cannot silently compound at 0%.
 """
 from __future__ import annotations
 
@@ -54,7 +57,11 @@ def load_ohlcv(ticker: str) -> pd.DataFrame | None:
     for suffix in ("_daily.parquet", "_NS_1d.parquet"):
         path = os.path.join(CACHE, f"{ticker}{suffix}")
         if os.path.exists(path):
-            df = pd.read_parquet(path)
+            try:
+                df = pd.read_parquet(path)
+            except Exception as e:
+                raise RuntimeError(f"Corrupt cache file {path}: {e}. "
+                                   f"Delete it and re-run scripts/refetch_all.py.") from e
             df.columns = [c.lower() for c in df.columns]
             if "date" in df.columns:
                 df.index = pd.to_datetime(df["date"])
@@ -67,7 +74,9 @@ def load_ohlcv(ticker: str) -> pd.DataFrame | None:
 
 
 def discover_tickers() -> list[str]:
-    """All cached single-name instruments (excludes indices/sector series)."""
+    """All cached single-name instruments (excludes indices/sector series).
+    Falls back to the version-pinned list in config/universe_tickers.json when
+    the cache is empty, so a fresh clone knows what to fetch (reproducibility)."""
     names = set()
     for f in glob.glob(os.path.join(CACHE, "*.parquet")):
         b = os.path.basename(f).replace(".parquet", "")
@@ -78,7 +87,55 @@ def discover_tickers() -> list[str]:
         if _is_etf(nm) or nm in ("block_deals", "bulk_deals"):
             continue
         names.add(nm)
+    if not names:
+        pinned = os.path.join(_ROOT, "config", "universe_tickers.json")
+        if os.path.exists(pinned):
+            import json
+            with open(pinned) as f:
+                names = set(json.load(f)["tickers"])
     return sorted(names - STRUCTURAL_EXCLUDE)
+
+
+NIFTY_DIV_YIELD = 0.013   # long-run Nifty 50 dividend yield used to approximate TRI
+                          # when no true total-return series is cached (~1.2-1.4%/yr
+                          # historically; NSE publishes the exact TRI but with no
+                          # free machine-readable history).
+
+
+def load_nifty(total_return: bool = True) -> pd.Series | None:
+    """Nifty 50 benchmark series (close). The strategy book runs on dividend-
+    adjusted (total-return) stock prices, so a fair benchmark must be total-return
+    too. Prefers a real TRI series (data/cache/NIFTY_TRI.parquet) if present;
+    otherwise approximates TRI = price index compounded by NIFTY_DIV_YIELD.
+    total_return=False returns the raw price index (unfair vs this book —
+    kept only for explicit price-index comparisons)."""
+    if total_return:
+        tri = os.path.join(CACHE, "NIFTY_TRI.parquet")
+        if os.path.exists(tri):
+            df = pd.read_parquet(tri)
+            df.columns = [c.lower() for c in df.columns]
+            if "date" in df.columns:
+                df.index = pd.to_datetime(df["date"])
+            s = df["close"].astype(float).sort_index()
+            # drop corporate-action mis-adjustments (e.g. the Dec-2019 NIFTYBEES
+            # 1:10 split glitch in yfinance): an index ETF cannot really print
+            # 25% away from its local median for a day or two
+            med = s.rolling(11, center=True, min_periods=3).median()
+            return s[(s / med - 1).abs() <= 0.25]
+    path = os.path.join(CACHE, "sector_NSEI.parquet")
+    if not os.path.exists(path):
+        return None
+    df = pd.read_parquet(path)
+    df.columns = [c.lower() for c in df.columns]
+    if "date" in df.columns:
+        df.index = pd.to_datetime(df["date"])
+    s = df["close"].astype(float).sort_index()
+    if getattr(s.index, "tz", None) is not None:
+        s.index = s.index.tz_localize(None)
+    if total_return:
+        yrs = (s.index - s.index[0]).days / 365.25
+        s = s * (1.0 + NIFTY_DIV_YIELD) ** yrs
+    return s
 
 
 class DataPanel:
@@ -131,12 +188,16 @@ class DataPanel:
         return self.close.loc[start:end].index
 
     def eligible(self, asof: pd.Timestamp, min_history: int = 252,
-                 liquidity_pct: float = 0.40) -> list[str]:
+                 liquidity_pct: float = 0.40, max_stale_days: int = 14) -> list[str]:
         """Point-in-time investable universe as-of `asof`."""
         seasoned, turn_now = [], {}
         for t in self.tickers:
             hist = self.close[t].loc[:asof].dropna()
             if len(hist) < min_history:
+                continue
+            # Priced: must have a real print near `asof` — a name that stopped
+            # trading (suspension/delisting) is not investable, whatever ffill says.
+            if (asof - hist.index[-1]).days > max_stale_days:
                 continue
             tv = self.turnover[t].loc[:asof].dropna()
             if len(tv) == 0:

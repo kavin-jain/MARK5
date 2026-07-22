@@ -244,6 +244,10 @@ def wrap(eq_ret, gold, us, rebal_bars=252, w=(0.50, 0.25, 0.25), tax=0.15):
         out[d] = nav
         if i > 0 and i % rebal_bars == 0:
             tot = sum(cur)
+            # costs on turnover — computed BEFORE resetting positions (v7.1 audit
+            # fix: the old order zeroed every term, silently waiving all sleeve
+            # rebalance costs)
+            turn = sum(abs(tot * weights[s] - c) for s, c in enumerate(cur))
             for s in range(3):
                 tgt = tot * weights[s]
                 if cur[s] > tgt:                # selling: realize gain pro-rata
@@ -253,8 +257,6 @@ def wrap(eq_ret, gold, us, rebal_bars=252, w=(0.50, 0.25, 0.25), tax=0.15):
                     cb[s] *= (1 - frac)
                 cb[s] += max(0.0, tgt - cur[s])
                 cur[s] = tgt
-            # costs on turnover
-            turn = sum(abs(tot * weights[s] - c) for s, c in enumerate(cur))
             nav -= nav * 0.001 * (turn / tot if tot > 0 else 0)
     nav_s = pd.Series(out)
     g = nav_s.iloc[-1] - 1
@@ -278,7 +280,11 @@ def main():
     print(f"  {'config':<34}{'CAGR':>8}{'Sharpe':>7}{'MaxDD':>9}{'Calmar':>7}")
 
     # A. baseline (current engine: per-trade tax, no loss credit)
-    a = Backtester(panel, PortfolioConstructor(cfg)).run(START, END)
+    # explicit legacy tax model — the core engine now defaults to fy_netting=True,
+    # so the A-vs-B contrast must pin it off (v7.1 audit fix: the bare default
+    # made A silently identical to B, invalidating this script's narrative)
+    a = Backtester(panel, PortfolioConstructor(cfg),
+                   BacktestConfig(fy_netting=False)).run(START, END)
     report("A baseline (no loss credit)", a["metrics"],
            f"tax={a['metrics']['tax_paid']:.3f}")
 

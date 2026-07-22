@@ -22,7 +22,8 @@ import pandas as pd
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
-                            ConstructionConfig, Backtester, load_ohlcv, metrics)
+                            ConstructionConfig, Backtester, BacktestConfig,
+                            load_ohlcv, load_nifty, metrics)
 
 END = "2026-06-09"
 TAX = 0.15
@@ -37,15 +38,15 @@ def sleeve_ret(name, cal):
 
 
 def nifty_ret(cal):
-    df = pd.read_parquet(os.path.join(_ROOT, "data", "cache", "sector_NSEI.parquet"))
-    df.columns = [c.lower() for c in df.columns]
-    idx = pd.to_datetime(df["date"]) if "date" in df.columns else pd.to_datetime(df.index)
-    s = pd.Series(df["close"].astype(float).values, index=idx).sort_index()
+    # total-return (v7.1 audit fix: price-only index flattered every sleeve ~1pp/yr)
+    s = load_nifty(total_return=True)
     return s.reindex(cal).ffill().bfill().pct_change(fill_method=None).fillna(0.0)
 
 
 def book_ret(panel, cfg, start, end, cal):
-    nav = Backtester(panel, PortfolioConstructor(cfg)).run(start, end)["nav_net"]
+    # deployed engine settings: semi-annual refresh (P12), next-close execution
+    nav = Backtester(panel, PortfolioConstructor(cfg),
+                     BacktestConfig(rebal_bars=126)).run(start, end)["nav_net"]
     return nav.pct_change(fill_method=None).fillna(0.0).reindex(cal).fillna(0.0)
 
 

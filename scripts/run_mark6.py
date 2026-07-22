@@ -15,7 +15,8 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
-                            ConstructionConfig, Backtester, BacktestConfig, metrics)
+                            ConstructionConfig, Backtester, BacktestConfig, metrics,
+                            load_nifty)
 
 CACHE = os.path.join(_ROOT, "data", "cache")
 REPORTS = os.path.join(_ROOT, "reports")
@@ -24,21 +25,20 @@ LTCG = 0.125
 
 
 def nifty_buyhold(start, end):
-    """Cap-weighted Nifty 50 buy-and-hold, net of one terminal LTCG hit."""
-    for p in [os.path.join(CACHE, "nse", "NIFTY50_20150101_20260521.parquet"),
-              os.path.join(CACHE, "sector_NSEI.parquet")]:
-        if os.path.exists(p):
-            df = pd.read_parquet(p); df.columns = [c.lower() for c in df.columns]
-            if "date" in df.columns:
-                df.index = pd.to_datetime(df["date"])
-            s = df["close"].astype(float).sort_index().loc[start:end]
-            if len(s) < 30:
-                continue
-            gross = s / s.iloc[0]
-            net = gross.copy()
-            net.iloc[-1] = 1 + (gross.iloc[-1] - 1) * (1 - LTCG)   # terminal LTCG
-            return metrics(net)
-    return {}
+    """Nifty 50 TOTAL-RETURN buy-and-hold, net of one terminal LTCG hit.
+    Total-return (dividends reinvested, via the NIFTYBEES adjusted series) —
+    the strategy book runs on dividend-adjusted prices, so a price-only index
+    would flatter it by ~1pp/yr (v7.1 audit fix)."""
+    s = load_nifty(total_return=True)
+    if s is None:
+        return {}
+    s = s.loc[start:end]
+    if len(s) < 30:
+        return {}
+    gross = s / s.iloc[0]
+    net = gross.copy()
+    net.iloc[-1] = 1 + (gross.iloc[-1] - 1) * (1 - LTCG)   # terminal LTCG
+    return metrics(net)
 
 
 def fmt(m):
@@ -139,10 +139,12 @@ def main():
 def _write_md(r):
     L = ["# MARK6 — Honest Smart-Beta Portfolio: Performance Report", "",
          "All figures **net of Indian equity tax** (LTCG 12.5% / STCG 20%) and "
-         "transaction costs. Universe is point-in-time (survivorship-aware). "
-         "Benchmark = cap-weighted Nifty 50 buy-and-hold (what 'buy and hold' "
-         "normally means).", "", "## Headline windows", "",
-         "| Window | MARK6 net CAGR | EqualWeight | Nifty50 B&H | vs Nifty | vs EW |",
+         "transaction costs, on the v7.1 engine (FIFO tax lots, next-close "
+         "execution, cash-constrained). Benchmark = **Nifty 50 TOTAL-RETURN** "
+         "buy-and-hold (dividends reinvested, via NIFTYBEES-adjusted series), "
+         "net of terminal LTCG — the strategy book earns dividends, so a "
+         "price-only index would flatter it ~1pp/yr.", "", "## Headline windows", "",
+         "| Window | MARK6 net CAGR | EqualWeight | Nifty50 TRI B&H | vs Nifty | vs EW |",
          "|---|---|---|---|---|---|"]
     for label, w in r["windows"].items():
         L.append(f"| {label} | {w['factor']['cagr']*100:+.1f}% | "
@@ -157,8 +159,11 @@ def _write_md(r):
         L.append(f"| {w['window']} | {w['factor']*100:+.1f}% | {w['ew']*100:+.1f}% | "
                  f"{w['nifty']*100:+.1f}% | {w['vs_nifty']:+.1f}pp |")
     L += ["", "## Honest caveats", "",
-          "- Survivorship: universe is today's listed names; residual bias bounded "
-          "by `survivorship_validation.py` (failure injection ~2-3pp).",
+          "- Survivorship: the candidate universe is today's surviving constituents "
+          "(fully-delisted names absent), so headline CAGR is inflated an estimated "
+          "~1-2pp/yr. `survivorship_validation.py` bounds this via failure injection "
+          "on the equal-weight basket; the concentrated momentum book has NOT been "
+          "separately failure-injected.",
           "- Drawdowns are equity-level (~-30 to -40%); inverse-vol weighting reduces "
           "but cannot eliminate them. The 5% hard-stop design is incompatible with "
           "equity returns and was proven to destroy the edge.",

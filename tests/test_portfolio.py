@@ -228,6 +228,181 @@ class TestBacktester:
         assert quarterly["metrics"]["turnover_yr"] > annual["metrics"]["turnover_yr"]
 
 
+# ── engine truth: FIFO lots, FY netting, execution lag, cash, stale exits ──────
+class _ScriptedCon:
+    """Constructor stub that returns a fixed sequence of target-weight dicts,
+    one per rebalance call — lets tests drive exact trade scenarios."""
+    def __init__(self, seq):
+        self.cfg = ConstructionConfig()
+        self.seq = list(seq)
+        self.calls = 0
+
+    def target_weights(self, comp, vol, held):
+        w = self.seq[min(self.calls, len(self.seq) - 1)]
+        self.calls += 1
+        return pd.Series(w, dtype=float)
+
+
+def _flat_panel(prices: dict, days=800, start="2016-05-02"):
+    """DataPanel stub from explicit price Series (index auto if plain list)."""
+    from core.portfolio.universe import DataPanel
+    idx = pd.date_range(start, periods=days, freq="B")
+    closes = {}
+    for t, p in prices.items():
+        arr = np.asarray(p, dtype=float)
+        if len(arr) < days:
+            arr = np.concatenate([arr, np.full(days - len(arr), arr[-1])])
+        closes[t] = pd.Series(arr[:days], index=idx)
+    panel = DataPanel.__new__(DataPanel)
+    panel.close = pd.DataFrame(closes)
+    panel.volume = pd.DataFrame(1e6, index=idx, columns=list(prices))
+    panel.turnover = (panel.close * panel.volume).rolling(126, min_periods=1).median()
+    panel.tickers = list(panel.close.columns)
+    panel.trading_calendar = lambda s, e: panel.close.loc[s:e].index
+    panel.eligible = lambda asof, mh=252, lq=0.4: panel.tickers
+    return panel
+
+
+def _no_friction(**kw):
+    from core.portfolio import BacktestConfig
+    base = dict(cost_pct=0.0, slippage_pct=0.0, exec_lag=0, warmup_skip=0)
+    base.update(kw)
+    return BacktestConfig(**base)
+
+
+class TestEngineTruth:
+    def test_fifo_lot_classification(self):
+        """Partial sale after a recent top-up must consume the OLDEST lot first
+        (statutory FIFO) -> LTCG, where a blended entry date would say STCG."""
+        from core.portfolio import Backtester
+        panel = _flat_panel({"S0": [100.0]}, days=800)
+        con = _ScriptedCon([{"S0": 0.5}, {"S0": 0.6}, {"S0": 0.3}])
+        bt = Backtester(panel, con, _no_friction(rebal_bars=189))
+        out = bt.run("2016-05-02", "2019-06-01")
+        # third rebalance (i=378) sells 0.30 of NAV; lot 1 is 378*1.4 ≈ 529
+        # calendar days old -> every consumed slice must be LTCG
+        sells = [t for t in out["trades"] if t["side"] == "SELL"]
+        assert sells, "expected a partial sale"
+        first_sale_date = min(t["date"] for t in sells)
+        first_sale = [t for t in sells if t["date"] == first_sale_date]
+        assert all(t["term"] == "LTCG" for t in first_sale), first_sale
+
+    def test_fy_netting_loss_offsets_gain(self):
+        """Equal gain and loss realised in the same FY -> zero tax under netting,
+        positive tax under the legacy no-credit model."""
+        from core.portfolio import Backtester
+        days = 500
+        up = 100 * (1 + 0.5 * np.arange(days) / 200).clip(max=1.5)     # +50% by day 200
+        dn = 100 * (1 - 0.5 * np.arange(days) / 200).clip(min=0.5)     # -50% by day 200
+        panel = _flat_panel({"A": up, "B": dn}, days=days)
+        seq = [{"A": 0.5, "B": 0.5}, {}, {}]
+        m_net = Backtester(panel, _ScriptedCon(seq),
+                           _no_friction(rebal_bars=200, fy_netting=True)
+                           ).run("2016-05-02", "2018-03-01")["metrics"]
+        m_leg = Backtester(panel, _ScriptedCon(seq),
+                           _no_friction(rebal_bars=200, fy_netting=False)
+                           ).run("2016-05-02", "2018-03-01")["metrics"]
+        assert m_net["tax_paid"] == pytest.approx(0.0, abs=1e-9)
+        assert m_leg["tax_paid"] > 0.01
+
+    def test_exec_lag_misses_signal_day_jump(self):
+        """exec_lag=1 buys at the NEXT close: a +100% move on the day after the
+        signal must be captured by exec_lag=0 and missed by exec_lag=1."""
+        from core.portfolio import Backtester
+        px = [100.0, 200.0]                    # doubles on bar 1, flat after
+        panel = _flat_panel({"S0": px}, days=300)
+        seq = [{"S0": 1.0}]
+        nav0 = Backtester(panel, _ScriptedCon(seq), _no_friction(rebal_bars=10**6, exec_lag=0)
+                          ).run("2016-05-02", "2017-06-01")["nav_gross"]
+        nav1 = Backtester(panel, _ScriptedCon(seq), _no_friction(rebal_bars=10**6, exec_lag=1)
+                          ).run("2016-05-02", "2017-06-01")["nav_gross"]
+        assert nav0.iloc[-1] == pytest.approx(2.0, rel=1e-6)
+        assert nav1.iloc[-1] == pytest.approx(1.0, rel=1e-6)
+
+    def test_buys_are_cash_constrained(self):
+        """With heavy friction, total buys must be scaled so cash never goes
+        negative (no phantom interest-free overdraft)."""
+        from core.portfolio import Backtester, BacktestConfig
+        panel = _flat_panel({"S0": [100.0], "S1": [100.0]}, days=300)
+        cfg = BacktestConfig(cost_pct=0.05, slippage_pct=0.001, exec_lag=0,
+                             warmup_skip=0, rebal_bars=10**6)
+        out = Backtester(panel, _ScriptedCon([{"S0": 0.5, "S1": 0.5}]), cfg
+                         ).run("2016-05-02", "2017-06-01")
+        friction = cfg.cost_pct / 2 + cfg.slippage_pct
+        total_buys = sum(t["value"] for t in out["trades"] if t["side"] == "BUY")
+        assert total_buys <= 1.0 / (1 + friction) + 1e-9
+        # NAV identity: nav = cash + positions, and cash >= 0 => nav >= positions
+        assert out["nav_gross"].iloc[-1] > 0
+
+    def test_stale_name_is_haircut_and_force_exited(self):
+        """A held name whose prints stop must be written down and force-sold,
+        not compounded at 0% and sold at full frozen value."""
+        from core.portfolio import Backtester, BacktestConfig
+        days = 400
+        px = np.full(days, 100.0)
+        px[120:] = np.nan                      # stops trading after bar 119
+        panel = _flat_panel({"S0": px, "S1": [100.0]}, days=days)
+        cfg = BacktestConfig(cost_pct=0.0, slippage_pct=0.0, exec_lag=0,
+                             warmup_skip=0, rebal_bars=10**6,
+                             stale_exit_days=10, delist_haircut=0.25)
+        out = Backtester(panel, _ScriptedCon([{"S0": 0.5, "S1": 0.5}]), cfg
+                         ).run("2016-05-02", "2017-11-01")
+        s0_sells = [t for t in out["trades"] if t["ticker"] == "S0" and t["side"] == "SELL"]
+        assert s0_sells, "stale name was never force-exited"
+        assert sum(t["gain"] for t in s0_sells) < -0.05   # haircut booked as real loss
+        # final NAV reflects the loss: 0.5 intact + 0.5*(1-0.25) = 0.875
+        assert out["nav_gross"].iloc[-1] == pytest.approx(0.875, abs=0.01)
+
+
+class TestStatsAndMetrics:
+    def test_metrics_excess_sharpe_below_raw(self):
+        from core.portfolio import metrics
+        idx = pd.date_range("2016-01-01", periods=800, freq="B")
+        rng = np.random.default_rng(0)
+        nav = pd.Series(np.cumprod(1 + rng.normal(0.0008, 0.01, 800)), index=idx)
+        m = metrics(nav, rf_annual=0.065)
+        assert m["sharpe_excess"] < m["sharpe"]
+        assert m["rf_annual"] == 0.065
+
+    def test_pbo_near_half_on_pure_noise(self):
+        from core.portfolio.stats import pbo_cscv
+        rng = np.random.default_rng(7)
+        M = rng.normal(0, 0.01, size=(1200, 20))
+        pbo = pbo_cscv(M, n_splits=12)["pbo"]
+        assert 0.3 < pbo < 0.7                 # no strategy is really better
+
+    def test_dsr_deflates_with_more_trials(self):
+        from core.portfolio.stats import deflated_sharpe_ratio
+        rng = np.random.default_rng(1)
+        ret = rng.normal(0.0005, 0.01, 1500)
+        few = deflated_sharpe_ratio(ret, list(rng.normal(0.02, 0.02, 5)))
+        many = deflated_sharpe_ratio(ret, list(rng.normal(0.02, 0.02, 500)))
+        assert many["deflated_sharpe"] < few["deflated_sharpe"]
+
+    def test_psr_orders_by_edge(self):
+        from core.portfolio.stats import probabilistic_sharpe_ratio
+        rng = np.random.default_rng(2)
+        good = rng.normal(0.001, 0.01, 1000)
+        flat = rng.normal(0.0, 0.01, 1000)
+        assert probabilistic_sharpe_ratio(good) > probabilistic_sharpe_ratio(flat)
+
+
+class TestUniverseGuards:
+    def test_eligible_excludes_stale_names(self):
+        from core.portfolio.universe import DataPanel
+        idx = pd.date_range("2016-01-01", periods=600, freq="B")
+        fresh = pd.Series(100.0, index=idx)
+        stale = pd.Series(100.0, index=idx).copy()
+        stale.iloc[-80:] = np.nan              # last print ~4 months before asof
+        panel = DataPanel.__new__(DataPanel)
+        panel.close = pd.DataFrame({"FRESH": fresh, "STALE": stale})
+        panel.volume = pd.DataFrame(1e6, index=idx, columns=["FRESH", "STALE"])
+        panel.turnover = (panel.close * panel.volume).rolling(126, min_periods=1).median()
+        panel.tickers = ["FRESH", "STALE"]
+        elig = DataPanel.eligible(panel, idx[-1], min_history=252, liquidity_pct=0.0)
+        assert "FRESH" in elig and "STALE" not in elig
+
+
 # ── real-data integration smoke test ───────────────────────────────────────────
 class TestIntegration:
     def test_real_data_runs_and_is_sane(self):

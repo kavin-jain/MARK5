@@ -84,6 +84,8 @@ data/processed/
 data/backups/
 data/temp/
 *.csv
+# evidence ledger is tracked: the institutional report cites it
+!reports/trade_ledger.csv
 *.parquet
 *.feather
 *.hdf5

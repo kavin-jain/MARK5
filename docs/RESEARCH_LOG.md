@@ -185,6 +185,33 @@ deployed = mom_heavy/n12/t1.5/126d under FY netting:
   full-period-best 21d (+22.6% IS, fails OOS 3/8) — the PBO analysis vindicates choosing
   on robustness, not the max. Nuanced reading stands: edge real, fine-tuning is noise.
 
+## 4d. v7.1 — Adversarial audit & engine truth fixes (2026-07-22)
+
+A 16-agent black-box audit (every line read, every script run, 7 headline claims
+adversarially verified with synthetic-trade probes) confirmed the core engine and
+found the following, ALL FIXED in v7.1:
+
+| # | Finding | Fix | Headline impact |
+|---|---------|-----|-----------------|
+| A1 | Benchmark was the ^NSEI PRICE index while the book earns dividends (auto_adjust) — flattered vs-Nifty ~1pp/yr | Nifty **TRI** via NIFTYBEES-adjusted series (`load_nifty`), taxed like the strategy; bad-print filter for the Dec-2019 split glitch | excess +9.8 → **+9.6pp** |
+| A2 | Same-close execution (signal and fill on day-d close) | `exec_lag=1` next-close fills (default; 0 = legacy) | ~−0.1pp |
+| A3 | Average-cost lots + blended entry date ≠ statutory FIFO — misclassified STCG/LTCG on top-up-then-sell paths | Per-lot FIFO tracking in `backtest.py`, per-lot term classification | ~0 (netting absorbs) |
+| A4 | Buys not cash-constrained → permanent ~0.25% costless overdraft | Buys scaled to available cash | ~0 |
+| A5 | Suspended/delisted names compounded at 0% and exited at full frozen value; `eligible()` never enforced its documented "Priced" check | Stale-print watchdog (21d) + 25% haircut force-exit; `max_stale_days` in `eligible()` | 0 today (survivor cache), matters for failure injection |
+| A6 | Sharpe reported with rf=0 (0.96 ≈ 0.68 excess at 6.5% rf); Sortino non-standard | `metrics()` reports raw + excess Sharpe, LPM2 Sortino | presentation |
+| A7 | `efficiency_research.py` sleeve-rebalance costs always 0 (turnover computed after reset); "A baseline" label silently ran netting | Both fixed | immaterial (verified <0.05pp) |
+| A8 | Presentation drift: README carried stale v6 stats (60 trials/PBO 75.6%), dead links (setup.sh, 2 scripts, 2 reports), stale committed reports 4.5pp below fresh output, hardcoded "+5.3pp" claim vs computed 4.9pp | Full README rewrite from regenerated artifacts; vs-EW alpha now computed in-script; universe pinned (`config/universe_tickers.json`); trade ledger committed; CI slimmed | trust |
+
+**v7.1 verdict [H]:** deployed system on the honest engine = **+20.7% net CAGR /
+raw Sharpe 0.96 / excess Sharpe 0.68 / MaxDD −26.5% / Calmar 0.78 vs Nifty TRI-net
++11.1%** (excess +9.6pp; engine alpha vs same-universe EW **+4.7pp**, computed).
+Equity sleeve +20.0%, walk-forward **7/8 vs Nifty TRI, 8/8 vs EW**. DSR 99.3% (77
+trials), PBO 76.7% — still an honest FAIL of fine-tuning, still the reason we
+deploy the 7/8-consistency config and not the in-sample best. The audit's meta
+lesson: the biased components contributed almost nothing — the edge is structural
+(diversified beta + tax discipline + momentum refresh), which is why honesty was
+cheap. Survivorship (~1-2pp) remains the largest disclosed inflation.
+
 ## 5. 🔭 OPEN FRONTIERS — untested levers worth pursuing
 
 Ranked by plausible edge × feasibility. Each: hypothesis → how to test → realistic ceiling.

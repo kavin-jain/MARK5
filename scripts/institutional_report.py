@@ -24,7 +24,7 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, BacktestConfig,
-                            load_ohlcv, metrics)
+                            load_ohlcv, load_nifty, metrics)
 
 CACHE = os.path.join(_ROOT, "data", "cache")
 REPORTS = os.path.join(_ROOT, "reports")
@@ -36,10 +36,9 @@ TD = 252
 
 
 def nifty_series(cal):
-    df = pd.read_parquet(os.path.join(CACHE, "sector_NSEI.parquet"))
-    df.columns = [c.lower() for c in df.columns]
-    df.index = pd.to_datetime(df["date"]) if "date" in df.columns else pd.to_datetime(df.index)
-    return df["close"].astype(float).sort_index().reindex(cal).ffill().bfill()
+    """Nifty 50 TOTAL-RETURN series (v7.1 audit fix: the strategy book runs on
+    dividend-adjusted prices, so the benchmark must include dividends too)."""
+    return load_nifty(total_return=True).reindex(cal).ffill().bfill()
 
 
 def blend_nav(eq_nav, cal, w_eq=0.70, w_gold=0.15, w_us=0.15):
@@ -132,9 +131,18 @@ def main():
     # apply terminal tax fairly
     nav_net = nav.copy(); g = nav.iloc[-1] - 1; nav_net.iloc[-1] = nav.iloc[-1] - max(0, g) * TAX
     m = metrics(nav_net)
+    # benchmark: Nifty TRI, taxed symmetrically (terminal LTCG on gains)
     nifty = nifty_series(cal); nifty_nav = nifty / nifty.iloc[0]
-    mn = metrics(nifty_nav)
+    nifty_net = nifty_nav.copy()
+    ng = nifty_nav.iloc[-1] - 1
+    nifty_net.iloc[-1] = nifty_nav.iloc[-1] - max(0, ng) * 0.125
+    mn = metrics(nifty_net)
     a, b = alpha_beta(nav_net.pct_change(), nifty_nav.pct_change())
+    # factor-engine alpha vs equal-weight of the SAME universe (computed, not quoted)
+    ew_run = Backtester(panel, PortfolioConstructor(
+        ConstructionConfig(mode="equal_weight", base_weighting="equal")),
+        BacktestConfig(rebal_bars=126)).run(START, END)
+    vs_ew_pp = (run["metrics"]["cagr"] - ew_run["metrics"]["cagr"]) * 100
 
     # ── trade ledger CSV (scaled to capital) + summary ────────────────────────
     cap = args.capital
@@ -176,24 +184,27 @@ def main():
     A = L.append
     A("# MARK6 — Institutional Evaluation Report")
     A(f"\n**System:** 50% concentrated 12-name momentum-heavy factor book (refreshed every "
-      f"6 months, FY tax netting) + 25% gold (GOLDBEES) + 25% US Nasdaq-100 (MON100) — "
-      f"three uncorrelated sleeves, sleeves rebalanced annually. "
+      f"6 months, FY tax netting, FIFO lots, next-close execution) + 25% gold (GOLDBEES) + "
+      f"25% US Nasdaq-100 (MON100) — three uncorrelated sleeves, sleeves rebalanced annually. "
       f"**Mode:** PAPER. **Period:** {START} → {END}. All figures **net of Indian tax "
-      f"(LTCG 12.5% / STCG 20%) + 0.29% costs + 0.10% slippage**. Universe is point-in-time "
-      f"(survivorship-aware; true returns ~2-3pp below gross-of-survivorship).\n")
+      f"(LTCG 12.5% / STCG 20%) + 0.29% costs + 0.10% slippage**. Benchmark is **Nifty 50 "
+      f"total-return** (dividends reinvested), taxed at terminal LTCG like the strategy. "
+      f"Universe eligibility is point-in-time, but the candidate list is today's survivors — "
+      f"headline is inflated an estimated ~1-2pp/yr by residual survivorship.\n")
 
     A("## 1. Headline performance\n")
-    A("| Metric | MARK6 (deployed) | Nifty50 B&H |")
+    A("| Metric | MARK6 (deployed) | Nifty50 TRI B&H |")
     A("|---|---|---|")
     A(f"| Net CAGR | **{m['cagr']*100:+.1f}%** | {mn['cagr']*100:+.1f}% |")
     A(f"| Volatility (ann.) | {m['vol']*100:.1f}% | {mn['vol']*100:.1f}% |")
-    A(f"| **Sharpe** | **{m['sharpe']:.2f}** | {mn['sharpe']:.2f} |")
+    A(f"| Sharpe (rf=0, raw) | {m['sharpe']:.2f} | {mn['sharpe']:.2f} |")
+    A(f"| **Sharpe (excess of {m['rf_annual']*100:.1f}% risk-free)** | **{m['sharpe_excess']:.2f}** | {mn['sharpe_excess']:.2f} |")
     A(f"| Sortino | {m['sortino']:.2f} | {mn['sortino']:.2f} |")
     A(f"| Max drawdown | {m['max_dd']*100:.1f}% | {mn['max_dd']*100:.1f}% |")
     A(f"| Calmar | {m['calmar']:.2f} | {mn['calmar']:.2f} |")
-    A(f"| Excess return vs Nifty 50 | **{(m['cagr']-mn['cagr'])*100:+.1f}pp** | — |")
+    A(f"| Excess return vs Nifty 50 TRI | **{(m['cagr']-mn['cagr'])*100:+.1f}pp** | — |")
     A(f"| Jensen's α vs Nifty 50 (CAPM, single-factor) | {a*100:+.1f}%/yr | — |")
-    A(f"| Factor+refresh alpha (vs equal-weight same universe) | **+5.3pp/yr** | — |")
+    A(f"| Factor+refresh alpha (vs equal-weight same universe, computed) | **{vs_ew_pp:+.1f}pp/yr** | — |")
     A(f"| Beta vs Nifty | {b:.2f} | 1.00 |")
     A(f"| Max-DD recovery | {recov} days | — |")
     A(f"\n₹{cap:,.0f} → **₹{cap*nav_net.iloc[-1]:,.0f}** over {m['years']:.1f} years (net).\n")
@@ -240,7 +251,7 @@ def main():
                 "average" if sh >= 0.5 else "below par")
     A("| Dimension | This system | Industry reference | Verdict |")
     A("|---|---|---|---|")
-    A(f"| Sharpe | {m['sharpe']:.2f} | MF ~0.5-0.8, HF ~1.0, Medallion ~2+ | {grade(m['sharpe'])} |")
+    A(f"| Sharpe (excess of rf) | {m['sharpe_excess']:.2f} | MF ~0.5-0.8, HF ~1.0, Medallion ~2+ | {grade(m['sharpe_excess'])} |")
     A(f"| Calmar | {m['calmar']:.2f} | >0.5 good, >1.0 excellent | "
       f"{'good' if m['calmar']>=0.5 else 'fair'} |")
     A(f"| Jensen's α vs Nifty 50 | {a*100:+.1f}%/yr | >0 = adds value (note: partly multi-asset) | "
@@ -249,15 +260,23 @@ def main():
     A(f"| Beta | {b:.2f} | <1 = defensive | {'defensive' if b<1 else 'market-like'} |")
 
     A("\n## 7. Honest verdict\n")
-    A(f"- **Sharpe {m['sharpe']:.2f}, excess return +{(m['cagr']-mn['cagr'])*100:.1f}pp vs Nifty 50, "
-      f"Calmar {m['calmar']:.2f}** — a genuine, index-beating smart-beta portfolio, "
-      f"in the strong-MF / lower-hedge-fund tier. "
+    A(f"- **Excess Sharpe {m['sharpe_excess']:.2f}, excess return +{(m['cagr']-mn['cagr'])*100:.1f}pp "
+      f"vs Nifty 50 TRI, Calmar {m['calmar']:.2f}** — a genuine, index-beating smart-beta "
+      f"portfolio in the strong-MF tier. "
       f"(The full excess return reflects multi-asset allocation + universe + factor; "
-      f"factor ranking + 6-mo refresh contributes +5.3pp/yr above equal-weight same universe.)")
-    A("- It is **not** a 20%+ or Sharpe-2 machine (those need leverage/HFT we've proven unavailable).")
-    A("- Drawdowns of -28 to -35% are real and unavoidable; the Monte Carlo bad-luck tail is the "
+      f"factor ranking + 6-mo refresh contributes {vs_ew_pp:+.1f}pp/yr above "
+      f"equal-weight of the same universe — the rest is asset allocation any "
+      f"multi-asset fund also captures.)")
+    A(f"- Survivorship caveat: subtract ~1-2pp/yr from the headline for the missing "
+      f"delisted names; the realistic forward expectation is "
+      f"~{(m['cagr']-0.02)*100:.0f}-{m['cagr']*100:.0f}% CAGR over a full cycle, "
+      f"with single years anywhere from -15% to +40%.")
+    A("- It is not a Sharpe-2 machine (that needs leverage/infrastructure unavailable at retail).")
+    A("- Drawdowns of -25 to -35% are real and unavoidable; the Monte Carlo bad-luck tail is the "
       "honest risk you must be able to hold through.")
-    A("- All claims are evidenced by the trade ledger and reproducible via this script.\n")
+    A("- All claims are evidenced by the trade ledger and reproducible via this script "
+      "(local data cache; a fresh clone rebuilds it with scripts/refetch_all.py from "
+      "the pinned config/universe_tickers.json).\n")
 
     open(os.path.join(REPORTS, "INSTITUTIONAL_REPORT.md"), "w").write("\n".join(L))
     print("\n".join(L))

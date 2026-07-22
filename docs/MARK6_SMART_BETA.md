@@ -1,5 +1,15 @@
 # MARK6 — Honest Smart-Beta Portfolio System
 
+> ⚠️ **HISTORICAL DESIGN DOCUMENT (v6.0, 2026-06-08).** The numbers below
+> (+13.4% CAGR, walk-forward 3/8) describe the ORIGINAL 20-name annual-rebalance
+> book *before* the warmup-bug fix, concentration upgrade (P5), momentum-heavy
+> weights (P9), FY tax netting (P11), semi-annual refresh (P12), and the v7.1
+> audit fixes (TRI benchmark, FIFO lots, next-close execution). Current
+> validated numbers live in [`../README.md`](../README.md) and
+> [`../reports/MARK6_REPORT.md`](../reports/MARK6_REPORT.md) — equity sleeve
+> +20.0% net, walk-forward 7/8 vs Nifty TRI. The design *rationale* below is
+> still the system's foundation; the figures are superseded.
+
 > **The one-line truth:** You cannot beat *same-universe* buy-and-hold by trading
 > (we proved it across 25+ configs, 2 universes, 2 windows, net of tax). You **can**
 > beat the **cap-weighted Nifty 50** — the thing a normal investor means by "buy and

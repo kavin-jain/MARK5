@@ -13,8 +13,8 @@ authors:
     email: "kavinjijain239@gmail.com"
 repository-code: "https://github.com/kavin-jain/MARK5"
 license: MIT
-version: "6.0.0"
-date-released: "2026-06-10"
+version: "7.1.0"
+date-released: "2026-07-22"
 keywords:
   - quantitative-finance
   - backtesting
