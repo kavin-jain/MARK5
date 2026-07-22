@@ -2,7 +2,7 @@
 MARK6 — F4: rebalance-date (anchor) sensitivity of the deployed system
 ======================================================================
 The deployed engine rebalances every 126 bars anchored to the backtest start
-date. If the +20.8% result depended on WHICH day the cycle lands (calendar/
+date. If the headline result depended on WHICH day the cycle lands (calendar/
 expiry effects, F4), staggering the anchor would scatter the results. Small
 dispersion = anchor-robust; large = fragile (and a possible calendar edge).
 
