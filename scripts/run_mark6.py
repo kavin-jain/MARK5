@@ -75,9 +75,12 @@ def main():
     min_turn = float(os.environ.get("MARK5_MIN_TURNOVER", "0"))
     if min_turn:
         print(f"  absolute liquidity floor: Rs {min_turn/1e7:.0f}cr/day median turnover\n")
-    bt_cfg = BacktestConfig(rebal_bars=126, min_turnover=min_turn)
+    bt_cfg = BacktestConfig(rebal_bars=126, min_turnover=min_turn,
+                            top_n_liquid=int(os.environ.get('MARK5_TOP_N', '0')))
     bt_factor = Backtester(panel, PortfolioConstructor(factor_cfg), bt_cfg)
-    bt_ew = Backtester(panel, PortfolioConstructor(ew_cfg), BacktestConfig(rebal_bars=126, min_turnover=min_turn))
+    bt_ew = Backtester(panel, PortfolioConstructor(ew_cfg),
+                       BacktestConfig(rebal_bars=126, min_turnover=min_turn,
+                                      top_n_liquid=int(os.environ.get('MARK5_TOP_N', '0'))))
 
     results = {"config": factor_cfg.__dict__, "windows": {}}
 

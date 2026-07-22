@@ -117,7 +117,8 @@ def main():
     # it unblocks the 6-month momentum refresh that per-trade taxation punished.
     # Validated: +2.84pp avg equity walk-forward (7/8), full system 19.0→20.7%.
     run = Backtester(panel, PortfolioConstructor(cfg),
-                     BacktestConfig(rebal_bars=126)).run(START, END)
+                     BacktestConfig(rebal_bars=126,
+                                    top_n_liquid=int(os.environ.get('MARK5_TOP_N', '0')))).run(START, END)
     eq_nav = run["nav_net"]
     trades = run["trades"]
     cal = eq_nav.index
@@ -141,7 +142,8 @@ def main():
     # factor-engine alpha vs equal-weight of the SAME universe (computed, not quoted)
     ew_run = Backtester(panel, PortfolioConstructor(
         ConstructionConfig(mode="equal_weight", base_weighting="equal")),
-        BacktestConfig(rebal_bars=126)).run(START, END)
+        BacktestConfig(rebal_bars=126,
+                       top_n_liquid=int(os.environ.get('MARK5_TOP_N', '0')))).run(START, END)
     vs_ew_pp = (run["metrics"]["cagr"] - ew_run["metrics"]["cagr"]) * 100
 
     # ── trade ledger CSV (scaled to capital) + summary ────────────────────────

@@ -86,7 +86,14 @@ def load_ohlcv(ticker: str) -> pd.DataFrame | None:
             if getattr(df.index, "tz", None) is not None:
                 df.index = df.index.tz_localize(None)
             df = df.sort_index()
-            return df[~df.index.duplicated(keep="last")]
+            df = df[~df.index.duplicated(keep="last")]
+            if "close" in df.columns:
+                keep = despike(df["close"].astype(float)).index
+                dropped = len(df) - len(keep)
+                if dropped:
+                    print(f"  data hygiene: dropped {dropped} corrupt print(s) from {ticker}")
+                df = df.loc[keep]
+            return df
     return None
 
 
@@ -119,6 +126,28 @@ NIFTY_DIV_YIELD = 0.013   # long-run Nifty 50 dividend yield used to approximate
                           # free machine-readable history).
 
 
+def despike(s: pd.Series, tol: float = 0.5, window: int = 11) -> pd.Series:
+    """Drop single-day price prints that are absurdly far from their local median.
+
+    yfinance mis-applies some corporate actions, leaving a one-day crash that fully
+    reverses: GOLDBEES 2019-12-19 printed 0.34 against a 33.60 neighbourhood (-99%,
+    recovered next session); MON100 2021-06-17 printed 10.09 against 101.56 (-90%).
+    These are not market moves. Left in, each one injects a fake crash-and-recover
+    into any portfolio holding the series - which INFLATES volatility and drawdown
+    and therefore UNDERSTATES Sharpe. Gold + US are half the deployed book, so the
+    effect was material.
+
+    A `tol` of 0.5 against an 11-day centred median only fires on data errors: no
+    real instrument sits 50% away from its own two-week median for a single print
+    and then returns.
+    """
+    if len(s) < window:
+        return s
+    med = s.rolling(window, center=True, min_periods=3).median()
+    ok = (s / med - 1).abs() <= tol
+    return s[ok.fillna(True)]
+
+
 def _first_existing(fname: str) -> str | None:
     """Look in the active cache, then the default one — benchmark files live with
     the primary cache and are shared by every universe."""
@@ -147,8 +176,7 @@ def load_nifty(total_return: bool = True) -> pd.Series | None:
             # drop corporate-action mis-adjustments (e.g. the Dec-2019 NIFTYBEES
             # 1:10 split glitch in yfinance): an index ETF cannot really print
             # 25% away from its local median for a day or two
-            med = s.rolling(11, center=True, min_periods=3).median()
-            return s[(s / med - 1).abs() <= 0.25]
+            return despike(s, tol=0.25)
     path = _first_existing("sector_NSEI.parquet")
     if path is None:
         return None
