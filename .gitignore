@@ -264,5 +264,6 @@ data/halt_state.json
 # then scripts/build_pit_cache.py — ~180MB, same policy as data/cache/)
 data/bhavcopy/
 data/pit_cache/
-data/paper/
+# the paper track record IS the public evidence - it must be committed
+!data/paper/
 data/nested_wf_navs.parquet

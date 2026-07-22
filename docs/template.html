@@ -1,0 +1,373 @@
+<title>MARK6 — Live System Performance</title>
+<style>
+:root{
+  --ground:#FAFAF8; --raised:#FFFFFF; --ink:#14161A; --ink-2:#4A5058; --muted:#7C8288;
+  --line:#E2E1DC; --line-2:#EFEEE9;
+  --accent:#A8762A; --accent-soft:#C8963E1A;
+  --up:#1F7A52; --down:#A93E30;
+  --grid:#00000010;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --ground:#0B0C0E; --raised:#121417; --ink:#E8E6E1; --ink-2:#A7ACB2; --muted:#7C8288;
+    --line:#22262B; --line-2:#1A1D21;
+    --accent:#C8963E; --accent-soft:#C8963E14;
+    --up:#3FB07A; --down:#D06251;
+    --grid:#FFFFFF0F;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0B0C0E; --raised:#121417; --ink:#E8E6E1; --ink-2:#A7ACB2; --muted:#7C8288;
+  --line:#22262B; --line-2:#1A1D21; --accent:#C8963E; --accent-soft:#C8963E14;
+  --up:#3FB07A; --down:#D06251; --grid:#FFFFFF0F;
+}
+:root[data-theme="light"]{
+  --ground:#FAFAF8; --raised:#FFFFFF; --ink:#14161A; --ink-2:#4A5058; --muted:#7C8288;
+  --line:#E2E1DC; --line-2:#EFEEE9; --accent:#A8762A; --accent-soft:#C8963E1A;
+  --up:#1F7A52; --down:#A93E30; --grid:#00000010;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  font-size:14px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+.prose{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Helvetica,Arial,sans-serif}
+.wrap{max-width:1180px; margin:0 auto; padding:0 24px}
+h1,h2,h3{font-weight:600; text-wrap:balance; margin:0}
+a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent}
+a:hover{border-bottom-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
+.num{font-variant-numeric:tabular-nums}
+.up{color:var(--up)} .down{color:var(--down)}
+
+/* ── masthead ─────────────────────────────────────────── */
+header{border-bottom:1px solid var(--line); padding:28px 0 22px; margin-bottom:0}
+.mast{display:flex; justify-content:space-between; align-items:flex-start; gap:24px; flex-wrap:wrap}
+.brandline{display:flex; align-items:baseline; gap:12px}
+h1{font-size:22px; letter-spacing:.14em; text-transform:uppercase}
+.kanji{color:var(--accent); font-size:19px; opacity:.85}
+.sub{color:var(--muted); font-size:12px; margin-top:6px; letter-spacing:.02em}
+.themetog{background:none; border:1px solid var(--line); color:var(--ink-2); cursor:pointer;
+  font:inherit; font-size:11px; padding:5px 10px; letter-spacing:.1em; text-transform:uppercase}
+.themetog:hover{border-color:var(--accent); color:var(--accent)}
+
+/* ── the honesty banner: not decoration, the most important element ── */
+.banner{border:1px solid var(--accent); border-left-width:3px; background:var(--accent-soft);
+  padding:13px 16px; margin:22px 0 8px; font-size:12.5px; line-height:1.6; color:var(--ink-2)}
+.banner b{color:var(--ink)}
+
+section{padding:38px 0; border-bottom:1px solid var(--line-2)}
+.shead{display:flex; align-items:baseline; gap:14px; margin-bottom:6px}
+.snum{color:var(--accent); font-size:11px; letter-spacing:.18em}
+h2{font-size:13px; letter-spacing:.18em; text-transform:uppercase}
+.sdesc{color:var(--muted); font-size:12.5px; margin:0 0 22px; max-width:66ch}
+
+/* status chip encodes state in FORM, not just colour */
+.chip{display:inline-flex; align-items:center; gap:7px; border:1px solid var(--line);
+  padding:4px 10px; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-2)}
+.chip.live{border-color:var(--up); color:var(--up)}
+.chip.sim{border-color:var(--muted); color:var(--muted)}
+.dot{width:6px; height:6px; border-radius:50%; background:currentColor}
+.chip.live .dot{animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ── metric grid ─────────────────────────────────────── */
+.kpis{display:grid; grid-template-columns:repeat(auto-fit,minmax(158px,1fr)); gap:1px;
+  background:var(--line); border:1px solid var(--line)}
+.kpi{background:var(--raised); padding:15px 16px}
+.kpi .k{color:var(--muted); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+  display:flex; align-items:center; gap:5px}
+.kpi .v{font-size:25px; margin-top:7px; letter-spacing:-.02em}
+.kpi .n{color:var(--muted); font-size:11px; margin-top:3px}
+.help{border-bottom:1px dotted var(--muted); cursor:help}
+
+/* ── charts ──────────────────────────────────────────── */
+.chartbox{border:1px solid var(--line); background:var(--raised); padding:16px 18px 10px; margin-top:20px}
+.ctitle{display:flex; justify-content:space-between; align-items:baseline; gap:16px; margin-bottom:12px}
+.ctitle h3{font-size:11.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2)}
+.legend{display:flex; gap:14px; font-size:11px; color:var(--muted); flex-wrap:wrap}
+.legend i{display:inline-block; width:14px; height:2px; vertical-align:middle; margin-right:5px}
+svg{display:block; width:100%; height:auto; overflow:visible}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:20px}
+@media (max-width:820px){.grid2{grid-template-columns:1fr}}
+
+/* ── tables ──────────────────────────────────────────── */
+.scroll{overflow-x:auto; border:1px solid var(--line); background:var(--raised); margin-top:18px}
+table{width:100%; border-collapse:collapse; font-size:12.5px}
+th{position:sticky; top:0; background:var(--raised); text-align:left; color:var(--muted);
+  font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; font-weight:500;
+  padding:11px 14px; border-bottom:1px solid var(--line); white-space:nowrap}
+td{padding:9px 14px; border-bottom:1px solid var(--line-2); white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--accent-soft)}
+th.r,td.r{text-align:right}
+.tall{max-height:460px; overflow-y:auto}
+.bar{height:3px; background:var(--accent); opacity:.5; margin-top:4px}
+.ctl{display:flex; gap:10px; align-items:center; margin-top:16px; flex-wrap:wrap}
+input,select{background:var(--raised); border:1px solid var(--line); color:var(--ink);
+  font:inherit; font-size:12px; padding:7px 10px}
+input:focus,select:focus{border-color:var(--accent); outline:none}
+.count{color:var(--muted); font-size:11.5px}
+
+.notes{list-style:none; padding:0; margin:16px 0 0; display:grid; gap:9px}
+.notes li{padding-left:20px; position:relative; color:var(--ink-2); font-size:12.5px; max-width:78ch}
+.notes li::before{content:"—"; position:absolute; left:0; color:var(--accent)}
+footer{padding:30px 0 60px; color:var(--muted); font-size:11.5px; display:flex;
+  justify-content:space-between; gap:16px; flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="mast">
+    <div>
+      <div class="brandline"><h1>MARK6</h1><span class="kanji">相場</span></div>
+      <div class="sub">Quantitative equity system · NSE India · <span id="gen"></span></div>
+    </div>
+    <button class="themetog" id="tt" type="button">Theme</button>
+  </div>
+  <div class="banner">
+    <b>Paper mode — no money is at risk.</b> The <b>live</b> panel is a real paper book:
+    real market prices, whole-share quantities, real brokerage and tax costs, an append-only
+    ledger. The <b>research</b> panel is a historical simulation — real prices, simulated
+    trades. They are different kinds of evidence and are never combined. Not investment advice.
+  </div>
+</header>
+
+<section>
+  <div class="shead"><span class="snum">01</span><h2>Live paper book</h2>
+    <span class="chip live"><span class="dot"></span>Live</span></div>
+  <p class="sdesc">Opened <span id="startdate"></span> and marked to market every trading day
+  since. This is the only panel describing what the system is doing <em>now</em>.</p>
+  <div class="kpis" id="livekpi"></div>
+  <div class="scroll"><table id="livetbl">
+    <thead><tr><th>Instrument</th><th class="r">Qty</th><th class="r">Entry</th>
+    <th class="r">Price</th><th class="r">Value ₹</th><th class="r">Weight</th><th class="r">P&L</th></tr></thead>
+    <tbody></tbody></table></div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">02</span><h2>Research backtest</h2>
+    <span class="chip sim"><span class="dot"></span>Simulated</span></div>
+  <p class="sdesc" id="resdesc"></p>
+  <div class="kpis" id="reskpi"></div>
+
+  <div class="chartbox">
+    <div class="ctitle"><h3>Growth of ₹1</h3>
+      <div class="legend"><span><i style="background:var(--accent)"></i>MARK6</span>
+      <span><i style="background:var(--muted)"></i>Nifty 50 TRI</span></div></div>
+    <div id="eq"></div>
+  </div>
+
+  <div class="grid2">
+    <div class="chartbox">
+      <div class="ctitle"><h3>Drawdown</h3><span class="legend">depth below prior peak</span></div>
+      <div id="dd"></div>
+    </div>
+    <div class="chartbox">
+      <div class="ctitle"><h3>Rolling 12-month Sharpe</h3><span class="legend">excess of 6.5% risk-free</span></div>
+      <div id="rs"></div>
+    </div>
+  </div>
+
+  <div class="chartbox">
+    <div class="ctitle"><h3>Return by calendar year</h3>
+      <div class="legend"><span><i style="background:var(--accent)"></i>MARK6</span>
+      <span><i style="background:var(--muted)"></i>Nifty 50</span></div></div>
+    <div id="yr"></div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">03</span><h2>Evidence</h2></div>
+  <p class="sdesc">Every simulated trade the backtest placed. Nothing is summarised away —
+  losers included.</p>
+  <div class="ctl">
+    <input id="q" type="search" placeholder="Filter by ticker…" aria-label="Filter trades by ticker">
+    <select id="side" aria-label="Filter by side">
+      <option value="">All trades</option><option value="BUY">Buys</option><option value="SELL">Sells</option>
+    </select>
+    <span class="count" id="tcount"></span>
+  </div>
+  <div class="scroll tall"><table id="trades">
+    <thead><tr><th>Date</th><th>Ticker</th><th>Side</th><th class="r">Price</th>
+    <th class="r">Value ₹</th><th class="r">P&L ₹</th><th class="r">Held</th></tr></thead>
+    <tbody></tbody></table></div>
+</section>
+
+<section>
+  <div class="shead"><span class="snum">04</span><h2>Validation &amp; limits</h2></div>
+  <p class="sdesc">The tests that try to prove the system is luck rather than skill — including
+  the one it fails.</p>
+  <div class="kpis" id="valkpi"></div>
+  <ul class="notes" id="limits"></ul>
+</section>
+
+<footer>
+  <span>MARK6 · <a href="https://github.com/kavin-jain/MARK5">github.com/kavin-jain/MARK5</a></span>
+  <span id="stamp"></span>
+</footer>
+</div>
+
+<script>
+const D = /*__DATA__*/null;
+const $ = s => document.querySelector(s);
+const fmt = (n,d=2) => n==null||isNaN(n) ? "—" : Number(n).toLocaleString("en-IN",
+  {minimumFractionDigits:d, maximumFractionDigits:d});
+const inr = n => "₹" + Number(n).toLocaleString("en-IN",{maximumFractionDigits:0});
+const sign = n => (n>=0?"+":"") + fmt(n) + "%";
+const cls = n => n>=0 ? "up" : "down";
+
+/* theme toggle: stamps data-theme so it beats the media query both ways */
+$("#tt").onclick = () => {
+  const cur = document.documentElement.getAttribute("data-theme")
+    || (matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light");
+  document.documentElement.setAttribute("data-theme", cur === "dark" ? "light" : "dark");
+};
+
+const kpi = (el, items) => el.innerHTML = items.map(i => `
+  <div class="kpi"><div class="k">${i.t?`<span class="help" title="${i.t}">${i.k}</span>`:i.k}</div>
+  <div class="v num ${i.c||""}">${i.v}</div>${i.n?`<div class="n">${i.n}</div>`:""}</div>`).join("");
+
+/* ── 01 live ─────────────────────────────────────────── */
+const L = D.live, R = D.research;
+$("#gen").textContent = "updated " + (D.generated||"").slice(0,10);
+$("#stamp").textContent = "Generated " + (D.generated||"").replace("T"," ").slice(0,16);
+if (L && L.start_date) {
+  $("#startdate").textContent = L.start_date;
+  kpi($("#livekpi"), [
+    {k:"NAV", v:inr(L.nav), n:"from " + inr(L.capital)},
+    {k:"Return", v:sign(L.return_pct), c:cls(L.return_pct), n:"since inception"},
+    {k:"Days live", v:L.days_live, n:"opened " + L.start_date},
+    {k:"Positions", v:(L.holdings||[]).length, n:"whole shares only"},
+    {k:"Uninvested", v:inr(L.cash), n:"cash the shares could not absorb"},
+  ]);
+  $("#livetbl tbody").innerHTML = (L.holdings||[]).map(h => `<tr>
+    <td>${h.ticker}</td><td class="r num">${h.qty}</td><td class="r num">${fmt(h.entry)}</td>
+    <td class="r num">${fmt(h.price)}</td><td class="r num">${inr(h.value)}</td>
+    <td class="r num">${fmt(h.weight,1)}%</td>
+    <td class="r num ${cls(h.pnl_pct)}">${sign(h.pnl_pct)}</td></tr>`).join("");
+}
+
+/* ── 02 research ─────────────────────────────────────── */
+const H = R.headline, B = R.benchmark;
+$("#resdesc").textContent = `${R.period.start} to ${R.period.end} (${R.period.years} years), net of `
+  + `Indian tax and costs, on a survivorship-free universe of ${R.universe.symbols} symbols `
+  + `including ${R.universe.delisted_included} that later delisted. Benchmark is ${B.name}.`;
+kpi($("#reskpi"), [
+  {k:"Net CAGR", v:fmt(H.cagr)+"%", c:cls(H.cagr), n:"vs Nifty "+fmt(B.cagr)+"%",
+   t:"Compound annual growth rate — the average yearly pace of growth, smoothed."},
+  {k:"Sharpe", v:fmt(H.sharpe_excess), n:"vs Nifty "+fmt(B.sharpe_excess),
+   t:"Return per unit of volatility, above a 6.5% risk-free rate. Higher = better paid for the risk."},
+  {k:"Max drawdown", v:fmt(H.max_dd)+"%", c:"down", n:"Nifty "+fmt(B.max_dd)+"%",
+   t:"Worst peak-to-trough fall. You must be able to hold through this."},
+  {k:"Calmar", v:fmt(H.calmar), n:"return ÷ worst fall",
+   t:"CAGR divided by max drawdown — return earned per unit of pain."},
+  {k:"Volatility", v:fmt(H.vol)+"%", n:"annualised"},
+  {k:"Excess vs Nifty", v:sign(H.excess_vs_nifty), c:cls(H.excess_vs_nifty), n:"per year"},
+  {k:"Engine alpha", v:sign(H.engine_alpha_vs_ew), c:cls(H.engine_alpha_vs_ew),
+   n:"vs equal-weight, same universe",
+   t:"What the stock-picking adds over simply holding the whole universe equally."},
+  {k:"Turnover", v:fmt(H.turnover_yr,0)+"%", n:"per year"},
+]);
+
+/* ── charts: hand-rolled SVG, no libraries ───────────── */
+const W=1000, PAD={l:46,r:14,t:12,b:26};
+function axes(h, yticks, xlabels, fmtY){
+  let s = "";
+  yticks.forEach(([y,v]) => {
+    s += `<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${y}" y2="${y}" stroke="var(--grid)"/>`
+      +  `<text x="${PAD.l-8}" y="${y+3.5}" text-anchor="end" font-size="10" fill="var(--muted)">${fmtY(v)}</text>`;
+  });
+  xlabels.forEach(([x,t]) =>
+    s += `<text x="${x}" y="${h-6}" text-anchor="middle" font-size="10" fill="var(--muted)">${t}</text>`);
+  return s;
+}
+function lineChart(el, series, opts){
+  const h = opts.h||260, pts = series[0].data;
+  const xs = pts.map(p=>+new Date(p[0]));
+  const x0=Math.min(...xs), x1=Math.max(...xs);
+  const all = series.flatMap(s=>s.data.map(p=>p[1]));
+  let lo = opts.lo!=null?opts.lo:Math.min(...all), hi = opts.hi!=null?opts.hi:Math.max(...all);
+  if(opts.log){ lo=Math.log(Math.max(lo,.01)); hi=Math.log(hi); }
+  const pad=(hi-lo)*.08; lo-=pad; hi+=pad;
+  const X = t => PAD.l + (t-x0)/(x1-x0) * (W-PAD.l-PAD.r);
+  const Y = v => { if(opts.log) v=Math.log(Math.max(v,.01));
+                   return PAD.t + (1-(v-lo)/(hi-lo)) * (h-PAD.t-PAD.b); };
+  const yt=[], N=4;
+  for(let i=0;i<=N;i++){ const v = lo+(hi-lo)*i/N; yt.push([Y(opts.log?Math.exp(v):v), opts.log?Math.exp(v):v]); }
+  const years = {};
+  pts.forEach(p => { const y=p[0].slice(0,4); if(!(y in years)) years[y]=X(+new Date(p[0])); });
+  const xl = Object.entries(years).filter((_,i)=>i%2===0).map(([y,x])=>[x,y]);
+  let g = axes(h, yt, xl, opts.fmtY||(v=>fmt(v,1)));
+  series.forEach(s => {
+    const d = s.data.map((p,i)=>`${i?"L":"M"}${X(+new Date(p[0])).toFixed(1)} ${Y(p[1]).toFixed(1)}`).join("");
+    if(s.fill) g += `<path d="${d}L${X(x1)} ${Y(opts.base||0)}L${X(x0)} ${Y(opts.base||0)}Z"
+      fill="${s.color}" opacity=".10"/>`;
+    g += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.w||1.6}"
+      stroke-linejoin="round"/>`;
+    if(s.dot){ const last=s.data[s.data.length-1];
+      g += `<circle cx="${X(+new Date(last[0]))}" cy="${Y(last[1])}" r="3.2" fill="${s.color}"/>`; }
+  });
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${h}" role="img" aria-label="${opts.label||""}">${g}</svg>`;
+}
+lineChart($("#eq"), [
+  {data:R.benchmark_curve, color:"var(--muted)", w:1.3},
+  {data:R.equity_curve, color:"var(--accent)", fill:true, dot:true},
+], {h:290, log:true, base:1, label:"Growth of one rupee", fmtY:v=>"₹"+fmt(v,1)});
+lineChart($("#dd"), [{data:R.drawdown, color:"var(--down)", fill:true}],
+  {h:220, hi:0, base:0, label:"Drawdown", fmtY:v=>fmt(v*100,0)+"%"});
+lineChart($("#rs"), [{data:R.rolling_sharpe, color:"var(--accent)"}],
+  {h:220, label:"Rolling Sharpe", fmtY:v=>fmt(v,1)});
+
+/* yearly bars */
+(function(){
+  const Y=R.yearly, h=240, bw=(W-PAD.l-PAD.r)/Y.length;
+  const all=Y.flatMap(y=>[y.system,y.nifty]).filter(v=>v!=null);
+  const lo=Math.min(0,...all)*1.1, hi=Math.max(...all)*1.1;
+  const Yc = v => PAD.t + (1-(v-lo)/(hi-lo))*(h-PAD.t-PAD.b);
+  let g = `<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${Yc(0)}" y2="${Yc(0)}" stroke="var(--line)"/>`;
+  [-20,0,20,40].forEach(v => { if(v>lo&&v<hi)
+    g += `<line x1="${PAD.l}" x2="${W-PAD.r}" y1="${Yc(v)}" y2="${Yc(v)}" stroke="var(--grid)"/>`
+      +  `<text x="${PAD.l-8}" y="${Yc(v)+3.5}" text-anchor="end" font-size="10" fill="var(--muted)">${v}%</text>`; });
+  Y.forEach((y,i)=>{
+    const x=PAD.l+i*bw, w=bw*.34;
+    const t=Yc(Math.max(0,y.system)), b=Yc(Math.min(0,y.system));
+    g += `<rect x="${x+bw*.10}" y="${t}" width="${w}" height="${Math.max(1,b-t)}" fill="var(--accent)"/>`;
+    if(y.nifty!=null){ const t2=Yc(Math.max(0,y.nifty)), b2=Yc(Math.min(0,y.nifty));
+      g += `<rect x="${x+bw*.50}" y="${t2}" width="${w}" height="${Math.max(1,b2-t2)}" fill="var(--muted)" opacity=".55"/>`; }
+    g += `<text x="${x+bw*.42}" y="${h-6}" text-anchor="middle" font-size="10" fill="var(--muted)">${String(y.year).slice(2)}</text>`;
+  });
+  $("#yr").innerHTML = `<svg viewBox="0 0 ${W} ${h}" role="img" aria-label="Yearly returns">${g}</svg>`;
+})();
+
+/* ── 03 trades ───────────────────────────────────────── */
+const T = R.trades||[];
+function renderTrades(){
+  const q = $("#q").value.trim().toUpperCase(), sd = $("#side").value;
+  const rows = T.filter(t => (!q || t.ticker.includes(q)) && (!sd || t.side===sd));
+  $("#tcount").textContent = `${rows.length.toLocaleString("en-IN")} of ${T.length.toLocaleString("en-IN")} trades`;
+  $("#trades tbody").innerHTML = rows.slice(0,600).map(t=>{
+    const p = t.pnl_inr ? Number(String(t.pnl_inr).replace(/,/g,"")) : null;
+    return `<tr><td class="num">${t.date}</td><td>${t.ticker}</td>
+      <td class="${t.side==="BUY"?"":"down"}">${t.side}</td>
+      <td class="r num">${t.price}</td><td class="r num">${t.value_inr}</td>
+      <td class="r num ${p==null?"":cls(p)}">${p==null?"—":t.pnl_inr}</td>
+      <td class="r num">${t.held_days>0?t.held_days+"d":"—"}</td></tr>`;
+  }).join("");
+}
+$("#q").oninput = renderTrades; $("#side").onchange = renderTrades; renderTrades();
+
+/* ── 04 validation ───────────────────────────────────── */
+const V = R.validation;
+kpi($("#valkpi"), [
+  {k:"Deflated Sharpe", v:V.dsr_pct!=null?fmt(V.dsr_pct,1)+"%":"—", c:"up", n:"across "+(V.trials||"—")+" variants tried",
+   t:"Probability the Sharpe is real skill rather than the luckiest of many attempts."},
+  {k:"PBO", v:V.pbo_pct!=null?fmt(V.pbo_pct,1)+"%":"—", c:"down", n:"FAILS the <20% bar — read below",
+   t:"Probability of backtest overfitting. Above 20% means tuning the config is noise-fitting."},
+  {k:"Walk-forward", v:"8 windows", n:"rolling 3-year, out-of-sample"},
+  {k:"Universe", v:R.universe.symbols, n:R.universe.delisted_included+" later delisted"},
+]);
+$("#limits").innerHTML = [V.pbo_reading, ...(R.limitations||[])].map(t=>`<li>${t}</li>`).join("");
+</script>

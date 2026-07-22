@@ -1,0 +1,169 @@
+{
+ "start_date": "2026-07-22",
+ "start_timestamp": "2026-07-22T11:40:00+05:30",
+ "capital": 500000.0,
+ "signal_asof": "2026-07-21",
+ "eligible_universe": 300,
+ "n_hold": 20,
+ "top_n_liquid": 300,
+ "cost_rate_buy": 0.0011862259999999999,
+ "cash": 16244.606917105266,
+ "positions": {
+  "GOLDBEES": {
+   "qty": 1047,
+   "entry_price": 119.31999969482422,
+   "entry_value": 124928.03968048096,
+   "entry_cost": 148.19288879801817,
+   "target_weight": 0.25
+  },
+  "MON100": {
+   "qty": 386,
+   "entry_price": 323.44000244140625,
+   "entry_value": 124847.84094238281,
+   "entry_cost": 148.09775496971898,
+   "target_weight": 0.25
+  },
+  "ATHERENERG": {
+   "qty": 14,
+   "entry_price": 1305.5999755859375,
+   "entry_value": 18278.399658203125,
+   "entry_cost": 21.68231291295166,
+   "target_weight": 0.03731775360826131
+  },
+  "LAURUSLABS": {
+   "qty": 11,
+   "entry_price": 1585.4000244140625,
+   "entry_value": 17439.400268554688,
+   "entry_cost": 20.68707002296655,
+   "target_weight": 0.03542356948173828
+  },
+  "CUPID": {
+   "qty": 77,
+   "entry_price": 207.14999389648438,
+   "entry_value": 15950.549530029297,
+   "entry_cost": 18.92095656680853,
+   "target_weight": 0.03198520376675957
+  },
+  "BHARATFORG": {
+   "qty": 6,
+   "entry_price": 2199.10009765625,
+   "entry_value": 13194.6005859375,
+   "entry_cost": 15.651778274654294,
+   "target_weight": 0.030096833628616676
+  },
+  "THANGAMAYL": {
+   "qty": 2,
+   "entry_price": 6442.5,
+   "entry_value": 12885.0,
+   "entry_cost": 15.284522009999998,
+   "target_weight": 0.02719646668285115
+  },
+  "HFCL": {
+   "qty": 60,
+   "entry_price": 221.4499969482422,
+   "entry_value": 13286.999816894531,
+   "entry_cost": 15.76138464479553,
+   "target_weight": 0.026819985833232248
+  },
+  "SANSERA": {
+   "qty": 4,
+   "entry_price": 3316.39990234375,
+   "entry_value": 13265.599609375,
+   "entry_cost": 15.735999162230467,
+   "target_weight": 0.026649835604921804
+  },
+  "WELCORP": {
+   "qty": 7,
+   "entry_price": 1612.0999755859375,
+   "entry_value": 11284.699829101562,
+   "entry_cost": 13.386204339475828,
+   "target_weight": 0.025242671251439926
+  },
+  "SYRMA": {
+   "qty": 9,
+   "entry_price": 1369.0,
+   "entry_value": 12321.0,
+   "entry_cost": 14.615490545999998,
+   "target_weight": 0.024759125684241132
+  },
+  "KIRLOSENG": {
+   "qty": 5,
+   "entry_price": 2202.199951171875,
+   "entry_value": 11010.999755859375,
+   "entry_cost": 13.06153419639404,
+   "target_weight": 0.024320478161621806
+  },
+  "ADANIPOWER": {
+   "qty": 55,
+   "entry_price": 218.4199981689453,
+   "entry_value": 12013.099899291992,
+   "entry_cost": 14.250251441137541,
+   "target_weight": 0.024285428710947528
+  },
+  "ASTRAMICRO": {
+   "qty": 6,
+   "entry_price": 1744.0,
+   "entry_value": 10464.0,
+   "entry_cost": 12.412668863999999,
+   "target_weight": 0.02396037591718519
+  },
+  "STLTECH": {
+   "qty": 20,
+   "entry_price": 553.0,
+   "entry_value": 11060.0,
+   "entry_cost": 13.119659559999999,
+   "target_weight": 0.023032716899411578
+  },
+  "ADANIENSOL": {
+   "qty": 6,
+   "entry_price": 1748.4000244140625,
+   "entry_value": 10490.400146484375,
+   "entry_cost": 12.443985404163573,
+   "target_weight": 0.021890663529177706
+  },
+  "RRKABEL": {
+   "qty": 4,
+   "entry_price": 2441.0,
+   "entry_value": 9764.0,
+   "entry_cost": 11.582310663999998,
+   "target_weight": 0.021858926223964972
+  },
+  "TDPOWERSYS": {
+   "qty": 8,
+   "entry_price": 1167.5,
+   "entry_value": 9340.0,
+   "entry_cost": 11.079350839999998,
+   "target_weight": 0.020455895165670524
+  },
+  "NETWEB": {
+   "qty": 2,
+   "entry_price": 4354.7998046875,
+   "entry_value": 8709.599609375,
+   "entry_cost": 10.331553506230467,
+   "target_weight": 0.020096715564113063
+  },
+  "GVT&D": {
+   "qty": 2,
+   "entry_price": 4520.10009765625,
+   "entry_value": 9040.2001953125,
+   "entry_cost": 10.723720516884764,
+   "target_weight": 0.019666474193517105
+  },
+  "MTARTECH": {
+   "qty": 1,
+   "entry_price": 5852.0,
+   "entry_value": 5852.0,
+   "entry_cost": 6.941794551999999,
+   "target_weight": 0.018706271169552594
+  },
+  "AEROFLEX": {
+   "qty": 19,
+   "entry_price": 408.20001220703125,
+   "entry_value": 7755.800231933594,
+   "entry_cost": 9.200131885925659,
+   "target_weight": 0.016234608922775777
+  }
+ },
+ "mode": "PAPER \u2014 no real money; all prices, quantities and costs are real",
+ "integrity": "77a5de0d83926722"
+}
