@@ -158,6 +158,11 @@ class Backtester:
     def run(self, start: str, end: str) -> dict:
         cfg = self.cfg
         cal = self.panel.trading_calendar(start, end)
+        if len(cal) == 0:
+            raise ValueError(
+                f"No trading days in [{start}, {end}] — the data panel covers "
+                f"{self.panel.close.index.min()} to {self.panel.close.index.max()}. "
+                f"Check the window, or refresh the cache with scripts/refetch_all.py.")
         raw_prices = self.panel.close.loc[start:end].reindex(cal)
         prices = raw_prices.ffill(limit=5)
         rets = prices.ffill().pct_change(fill_method=None)

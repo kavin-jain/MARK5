@@ -408,9 +408,14 @@ class TestIntegration:
     def test_real_data_runs_and_is_sane(self):
         from core.portfolio import (DataPanel, discover_tickers, Backtester,
                                      BacktestConfig, PortfolioConstructor, ConstructionConfig)
+        import glob
+        from core.portfolio.universe import CACHE
+        # skip on DATA availability, not on ticker NAMES — discover_tickers() falls
+        # back to the pinned universe list when the cache is empty (fresh clone / CI),
+        # so counting names would sail past this guard into an empty panel.
+        if len(glob.glob(os.path.join(CACHE, "*.parquet"))) < 20:
+            pytest.skip("no local price cache — run scripts/refetch_all.py")
         tickers = discover_tickers()
-        if len(tickers) < 20:
-            pytest.skip("insufficient cached data for integration test")
         panel = DataPanel(tickers, "2026-05-21")
         con = PortfolioConstructor(ConstructionConfig(mode="factor_tilt", n_hold=20))
         bt = Backtester(panel, con, BacktestConfig())

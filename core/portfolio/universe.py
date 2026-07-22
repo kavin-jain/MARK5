@@ -161,6 +161,12 @@ class DataPanel:
             closes[t] = df["close"].astype(float)
             vols[t] = df["volume"].astype(float)
             last_dates[t] = df.index[-1]
+        if not closes:
+            raise RuntimeError(
+                f"No cached price data found for any of {len(tickers)} tickers in {CACHE}. "
+                f"Run scripts/refetch_all.py to build the cache from the pinned universe "
+                f"(config/universe_tickers.json). Knowing the ticker NAMES is not the same "
+                f"as having their DATA.")
         self.close = pd.DataFrame(closes).sort_index()
         self.volume = pd.DataFrame(vols).reindex_like(self.close)
         self.turnover = (self.close * self.volume).rolling(126, min_periods=40).median()
