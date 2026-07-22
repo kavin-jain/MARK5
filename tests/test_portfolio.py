@@ -187,7 +187,7 @@ def _synthetic_panel(n=12, days=900, seed=1):
     panel.turnover = (panel.close * panel.volume).rolling(126, min_periods=40).median()
     panel.tickers = list(panel.close.columns)
     panel.trading_calendar = lambda s, e: panel.close.loc[s:e].index
-    def _elig(asof, min_history=252, liquidity_pct=0.40):
+    def _elig(asof, min_history=252, liquidity_pct=0.40, **kw):
         return [t for t in panel.tickers if len(panel.close[t].loc[:asof].dropna()) >= min_history]
     panel.eligible = _elig
     return panel
@@ -259,7 +259,7 @@ def _flat_panel(prices: dict, days=800, start="2016-05-02"):
     panel.turnover = (panel.close * panel.volume).rolling(126, min_periods=1).median()
     panel.tickers = list(panel.close.columns)
     panel.trading_calendar = lambda s, e: panel.close.loc[s:e].index
-    panel.eligible = lambda asof, mh=252, lq=0.4: panel.tickers
+    panel.eligible = lambda asof, mh=252, lq=0.4, **kw: panel.tickers
     return panel
 
 
@@ -387,7 +387,52 @@ class TestStatsAndMetrics:
         assert probabilistic_sharpe_ratio(good) > probabilistic_sharpe_ratio(flat)
 
 
+class TestTranching:
+    def test_blend_lies_within_tranche_range(self):
+        """An average of tranche NAVs cannot beat the best or trail the worst —
+        the invariant that makes tranching variance reduction, not an edge claim."""
+        from core.portfolio import Backtester, tranched_run
+        rng = np.random.default_rng(11)
+        px = {f"S{i}": 100 * np.cumprod(1 + rng.normal(0.0004, 0.02, 1400))
+              for i in range(8)}
+        panel = _flat_panel(px, days=1400)
+        con = _ScriptedCon([{f"S{i}": 0.125 for i in range(8)}])
+        bt = Backtester(panel, con, _no_friction(rebal_bars=126))
+        out = tranched_run(bt, "2016-05-02", "2021-06-01", n_tranches=3, stagger_bars=42)
+        finals = [n.reindex(out["nav_net"].index).ffill().pipe(lambda s: s / s.iloc[0]).iloc[-1]
+                  for n in out["tranche_navs"]]
+        assert min(finals) - 1e-9 <= out["nav_net"].iloc[-1] <= max(finals) + 1e-9
+        assert out["metrics"]["n_tranches"] == 3
+
+    def test_single_tranche_matches_plain_run(self):
+        from core.portfolio import Backtester, tranched_run
+        panel = _flat_panel({"S0": [100.0], "S1": [100.0]}, days=600)
+        seq = [{"S0": 0.5, "S1": 0.5}]
+        bt = Backtester(panel, _ScriptedCon(seq), _no_friction(rebal_bars=126))
+        one = tranched_run(bt, "2016-05-02", "2018-06-01", n_tranches=1)
+        bt2 = Backtester(panel, _ScriptedCon(seq), _no_friction(rebal_bars=126))
+        plain = bt2.run("2016-05-02", "2018-06-01")
+        assert one["nav_net"].iloc[-1] == pytest.approx(
+            plain["nav_net"].iloc[-1] / plain["nav_net"].iloc[0], rel=1e-9)
+
+
 class TestUniverseGuards:
+    def test_absolute_turnover_floor_beats_percentile(self):
+        """min_turnover filters on real rupees, not on a percentile of whatever
+        happens to be cached (which drifts as the universe grows)."""
+        from core.portfolio.universe import DataPanel
+        idx = pd.date_range("2016-01-01", periods=600, freq="B")
+        close = pd.DataFrame({"BIG": 100.0, "SMALL": 100.0}, index=idx)
+        vol = pd.DataFrame({"BIG": 1e7, "SMALL": 1e3}, index=idx)   # 100cr vs 1 lakh/day
+        panel = DataPanel.__new__(DataPanel)
+        panel.close, panel.volume = close, vol
+        panel.turnover = (close * vol).rolling(126, min_periods=1).median()
+        panel.tickers = ["BIG", "SMALL"]
+        # percentile floor keeps both (SMALL is simply the bottom of a 2-name pool)
+        assert set(DataPanel.eligible(panel, idx[-1], 252, liquidity_pct=0.0)) == {"BIG", "SMALL"}
+        # absolute Rs 20cr floor keeps only the genuinely liquid one
+        assert DataPanel.eligible(panel, idx[-1], 252, min_turnover=2e8) == ["BIG"]
+
     def test_eligible_excludes_stale_names(self):
         from core.portfolio.universe import DataPanel
         idx = pd.date_range("2016-01-01", periods=600, freq="B")

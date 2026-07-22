@@ -30,7 +30,13 @@ import numpy as np
 import pandas as pd
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-CACHE = os.path.join(_ROOT, "data", "cache")
+# MARK5_CACHE lets the whole engine run against an alternative price cache without
+# code changes — used to compare the survivor-biased yfinance cache (data/cache)
+# against the true point-in-time bhavcopy cache (data/pit_cache, built by
+# scripts/build_pit_cache.py). Relative paths resolve from the repo root.
+CACHE = os.environ.get("MARK5_CACHE") or os.path.join(_ROOT, "data", "cache")
+if not os.path.isabs(CACHE):
+    CACHE = os.path.join(_ROOT, CACHE)
 
 # Names that are structurally inappropriate for an equity-quality basket
 # (a-priori exclusions, NOT performance-based — documented to avoid snooping).
@@ -194,8 +200,15 @@ class DataPanel:
         return self.close.loc[start:end].index
 
     def eligible(self, asof: pd.Timestamp, min_history: int = 252,
-                 liquidity_pct: float = 0.40, max_stale_days: int = 14) -> list[str]:
-        """Point-in-time investable universe as-of `asof`."""
+                 liquidity_pct: float = 0.40, max_stale_days: int = 14,
+                 min_turnover: float = 0.0) -> list[str]:
+        """Point-in-time investable universe as-of `asof`.
+
+        min_turnover (absolute rupee 126d-median daily turnover) is the preferred
+        liquidity control: `liquidity_pct` is a percentile of whatever is cached, so
+        it silently tightens as the universe grows and cannot express a real capacity
+        constraint. When min_turnover > 0 it is applied INSTEAD of the percentile.
+        """
         seasoned, turn_now = [], {}
         for t in self.tickers:
             hist = self.close[t].loc[:asof].dropna()
@@ -212,5 +225,8 @@ class DataPanel:
             turn_now[t] = float(tv.iloc[-1])
         if not seasoned:
             return []
+        if min_turnover > 0:
+            keep = [t for t in seasoned if turn_now[t] >= min_turnover]
+            return keep if keep else seasoned      # never starve the book entirely
         floor = np.nanquantile(list(turn_now.values()), liquidity_pct)
         return [t for t in seasoned if turn_now[t] >= floor]

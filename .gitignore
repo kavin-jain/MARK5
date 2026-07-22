@@ -259,3 +259,9 @@ markrapid/
 models_v2_oos/
 models_oos/
 data/halt_state.json
+
+# bhavcopy raw snapshots + derived PIT cache (regenerate with scripts/fetch_bhavcopy.py
+# then scripts/build_pit_cache.py — ~180MB, same policy as data/cache/)
+data/bhavcopy/
+data/pit_cache/
+data/paper/
