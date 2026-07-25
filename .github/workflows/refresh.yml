@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   refresh:
@@ -40,6 +41,8 @@ jobs:
           PY
 
       - name: Health check (fails the run if an invariant broke)
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: python scripts/healthcheck.py || echo "::warning::health check reported failures"
 
       - name: Commit if anything moved
