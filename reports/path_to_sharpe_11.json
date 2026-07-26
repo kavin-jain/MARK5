@@ -1,0 +1,106 @@
+{
+ "start": {
+  "sleeve_sharpes": {
+   "eq": 0.6804261197626099,
+   "GOLDBEES": 0.7123668394342864,
+   "MON100": 0.8295190149213151
+  },
+  "vols": {
+   "eq": 0.22057956877030582,
+   "GOLDBEES": 0.15648626189309692,
+   "MON100": 0.2345630718113957
+  },
+  "corr": [
+   [
+    1.0,
+    0.005065768542825831,
+    0.2888220150316121
+   ],
+   [
+    0.005065768542825831,
+    1.0,
+    0.06431307222129395
+   ],
+   [
+    0.2888220150316121,
+    0.06431307222129395,
+    1.0
+   ]
+  ],
+  "erc_weights": {
+   "eq": 0.2888892341848912,
+   "GOLDBEES": 0.4481316401294744,
+   "MON100": 0.26297912568563453
+  },
+  "erc_sharpe": 1.154736064732488,
+  "zero_corr_sharpe": 1.277895339520713
+ },
+ "q1_required_equity_sharpe": [
+  {
+   "allocation": "ERC 27/49/24",
+   "eq_sharpe_now": 0.6804261197626099,
+   "eq_sharpe_needed": 0.5729497860618828,
+   "gap": -0.10747633370072707
+  },
+  {
+   "allocation": "deployed 50/25/25",
+   "eq_sharpe_now": 0.6804261197626099,
+   "eq_sharpe_needed": 0.7587215120799735,
+   "gap": 0.0782953923173636
+  },
+  {
+   "allocation": "40/30/30",
+   "eq_sharpe_now": 0.6804261197626099,
+   "eq_sharpe_needed": 0.6775919309906413,
+   "gap": -0.0028341887719686154
+  }
+ ],
+ "q2_required_new_sleeve": [
+  {
+   "rho": 0.0,
+   "min_sharpe": -Infinity,
+   "assessment": "yes \u2014 common"
+  },
+  {
+   "rho": 0.1,
+   "min_sharpe": -Infinity,
+   "assessment": "yes \u2014 common"
+  },
+  {
+   "rho": 0.2,
+   "min_sharpe": -Infinity,
+   "assessment": "yes \u2014 common"
+  },
+  {
+   "rho": 0.3,
+   "min_sharpe": -Infinity,
+   "assessment": "yes \u2014 common"
+  },
+  {
+   "rho": 0.4,
+   "min_sharpe": -Infinity,
+   "assessment": "yes \u2014 common"
+  },
+  {
+   "rho": 0.5,
+   "min_sharpe": -Infinity,
+   "assessment": "yes \u2014 common"
+  },
+  {
+   "rho": 0.6,
+   "min_sharpe": -Infinity,
+   "assessment": "yes \u2014 common"
+  }
+ ],
+ "q3_gold_haircut": {
+  "gold_sharpe_after": 0.25561349294244035,
+  "erc_sharpe_after": 0.8987433246985713,
+  "best_possible": 0.971439359960908,
+  "best_weights": [
+   0.34,
+   0.2,
+   0.4599999999999999
+  ],
+  "target_reachable": false
+ }
+}

@@ -1,0 +1,109 @@
+{
+ "generated": "2026-07-26T13:24:19",
+ "period": {
+  "start": "2016-01-01",
+  "end": "2026-07-21"
+ },
+ "sleeves": {
+  "eq": {
+   "ann_return_pct": 21.508810007728897,
+   "ann_vol_pct": 22.057956877030584,
+   "sharpe_excess": 0.6804261197626099
+  },
+  "GOLDBEES": {
+   "ann_return_pct": 17.647562379967148,
+   "ann_vol_pct": 15.648626189309692,
+   "sharpe_excess": 0.7123668394342864
+  },
+  "MON100": {
+   "ann_return_pct": 25.957452826590664,
+   "ann_vol_pct": 23.45630718113957,
+   "sharpe_excess": 0.8295190149213151
+  }
+ },
+ "correlations": {
+  "eq": {
+   "eq": 1.0,
+   "GOLDBEES": 0.005065768542825831,
+   "MON100": 0.2888220150316121
+  },
+  "GOLDBEES": {
+   "eq": 0.005065768542825831,
+   "GOLDBEES": 1.0,
+   "MON100": 0.06431307222129395
+  },
+  "MON100": {
+   "eq": 0.2888220150316121,
+   "GOLDBEES": 0.06431307222129395,
+   "MON100": 1.0
+  }
+ },
+ "deployed_sharpe": 1.0407041939095474,
+ "long_only_max_sharpe": 1.1597286254541546,
+ "long_only_max_weights": {
+  "eq": 0.24067478397013845,
+  "GOLDBEES": 0.4620047200982039,
+  "MON100": 0.2973204959316577
+ },
+ "unconstrained_tangency_sharpe": 1.1597286254541543,
+ "target": 1.1,
+ "reachable_by_reweighting": true,
+ "gap": {
+  "current_return_pct": 21.6556588055039,
+  "current_vol_pct": 14.562888181097456,
+  "need_return_pct": 22.519176999207204,
+  "need_vol_pct": 13.777871641367181
+ },
+ "candidates": [
+  {
+   "asset": "LTGILTBEES",
+   "years": 8.186173853524982,
+   "sharpe": 0.09722795347052847,
+   "rho": 0.026693321732705323,
+   "hurdle": 0.028808825742903853,
+   "helps": true,
+   "new_ceiling": 1.0814202646169049,
+   "s_p_overlap": 1.0792521826763344
+  },
+  {
+   "asset": "GILT5YBEES",
+   "years": 5.284052019164956,
+   "sharpe": -0.15807627180524872,
+   "rho": 0.07760641985424682,
+   "hurdle": 0.0925523945344927,
+   "helps": false,
+   "new_ceiling": 1.2187939508429768,
+   "s_p_overlap": 1.1925868337737524
+  },
+  {
+   "asset": "SILVERBEES",
+   "years": 4.4490075290896645,
+   "sharpe": 0.8741954223172061,
+   "rho": 0.39886431720745497,
+   "hurdle": 0.42566300527526363,
+   "helps": true,
+   "new_ceiling": 1.1739387972235107,
+   "s_p_overlap": 1.0671874793298952
+  },
+  {
+   "asset": "MAFANG",
+   "years": 5.177275838466803,
+   "sharpe": 0.9471886774856685,
+   "rho": 0.3928273838743255,
+   "hurdle": 0.47313211666130267,
+   "helps": true,
+   "new_ceiling": 1.3101076140263261,
+   "s_p_overlap": 1.2044275325079388
+  },
+  {
+   "asset": "LIQUIDBEES",
+   "years": 10.543463381245722,
+   "sharpe": -2.7075333114722686,
+   "rho": 0.052397230007341755,
+   "hurdle": 0.05453001701788375,
+   "helps": false,
+   "new_ceiling": 2.9551754404695383,
+   "s_p_overlap": 1.0407041939095474
+  }
+ ]
+}

@@ -307,6 +307,60 @@ capacity ~₹10–25cr.** Its measured edge over the index is large and real; it
 *the factors it is made of* is +4.4%/yr and not statistically significant on 10.6 years.
 Both statements are true and both should be said.
 
+## 4h. v7.4 — Can this system reach Sharpe 1.1? Solved, not searched (2026-07-26)
+
+The question was attacked analytically rather than by tuning. For any set of assets
+the maximum Sharpe of ANY fixed combination is closed-form, `S* = sqrt(mu' Sigma^-1 mu)`,
+so the ceiling is computable before any search — and the requirement for closing a
+gap can be *solved for* instead of hunted.
+
+| # | Finding | Verdict | Evidence | Result |
+|---|---------|---------|----------|--------|
+| P22 | **Deployed 50/25/25 is badly risk-unbalanced** | ✅ KEEP (as knowledge) | **[H]** | `allocation_robustness.py`. 50% of CAPITAL in the equity sleeve is **66% of the portfolio's RISK** (gold contributes just **8%**). The allocation was chosen by grid search on returns (P10), and it shows. |
+| P23 | **Risk parity (ERC)** — validated, then **DECLINED on design grounds** (see decision note below) | ✅ VALID · ⛔ **NOT DEPLOYED** | **[H]** | Equal Risk Contribution uses **only the covariance matrix — no expected returns at all**, so it cannot be return-chasing by construction. It lands at **~29% eq / 45% gold / 26% US** and is **stable in all 8 rolling 3-year subperiods** (std 2.7 / 3.6 / 2.6pp), including 2016-2018 when gold did nothing. Measured through the real wrapper net of tax: **Sharpe 0.93→0.99, MaxDD −22.1%→−17.9%, Calmar 0.94→1.11.** Walk-forward: **MaxDD 8/8 windows**, Calmar 6-7/8, Sharpe 5/8. The drawdown result is the most robust finding in the entire project. |
+| K30 | **Learned / optimised allocation, re-picked yearly on prior data** | ❌ KILL | **[H]** | `allocation_walkforward.py`: learned +22.35%/yr vs fixed 50/25/25 +24.15%/yr, beating it in only **3/8 years**. Extends P15 (config selection is noise, ρ=−0.126) from the equity config to the ASSET ALLOCATION. Deploy a fixed, economically-motivated allocation; never a fitted one. |
+| K31 | **Faster sleeve rebalancing to capture the risk-parity Sharpe** | ❌ KILL | **[H]** | `sleeve_rebalance_erc.py`, charging **real ETF friction (0.15% round trip) and realised STCG/LTCG**, which the dashboard's `wrap()` does not. Hypothesis was that ERC's 45% gold sleeve drifts far more than 25% does, so K20's "cadence is noise" might not hold at these weights. It holds: 21d→504d spans Sharpe 0.97–0.99 with no ordering. The theory-vs-measurement gap is **not** drift. |
+| **K32** | **Sharpe 1.1 is NOT attainable — the binding constraint is TAX, not strategy** | ❌ **KILL the target** | **[H]** | `sharpe_ceiling.py` + `path_to_sharpe_11.py`. Decomposition at ERC weights: three sleeves perfectly uncorrelated would give **1.278**; the real eq-US correlation of **0.289** costs −0.12 → **1.155** theoretical; Indian tax + transaction friction costs a further **−0.16** → **~0.99 measured**. So the single largest obstacle between this book and hedge-fund Sharpe is **the tax and cost regime it operates in**, not the signal, the weighting or the assets. An offshore or tax-exempt vehicle running the identical book would score ~1.15. That is not available at Indian retail. |
+| K33 | **The whole gold tilt is conditional on gold** | ⚠️ DISCLOSURE | **[H]** | Gold earned **17.65%/yr (excess 11.1%)** over this sample — an exceptional decade. Stress: force gold's excess to a normal **4%**, keeping its real vol and real correlations. ERC then scores **0.90**, and the **best possible allocation of the three assets reaches only 0.971** — 1.1 becomes unreachable by any weighting. The DIVERSIFICATION benefit (eq-gold correlation **0.005**) is structural and survives; the RETURN contribution does not. Any claim built on the gold sleeve must carry this caveat. |
+| K34 | **Candidate 4th sleeves** | ❌ KILL (all) | **[H]** | Marginal-value rule `S_new > rho x S_port`: LTGILTBEES passes but with Sharpe 0.10 over only 8.2y; SILVERBEES (0.87) and MAFANG (0.95) pass but hold 4.4y and 5.2y of a single favourable regime — exactly F7's failure mode — and MAFANG is US mega-cap tech, i.e. a second helping of MON100 rather than a diversifier. LIQUIDBEES and GILT5YBEES "pass" only via a NEGATIVE optimal weight, i.e. shorting cash/bonds = leverage, already killed by K13 at Indian financing costs. **No deployable fourth sleeve exists in the available data.** |
+
+### DECISION (2026-07-26): allocation stays 50/25/25 — deliberately, not by default
+
+P23 (risk parity, ~29/45/26) is statistically the strongest result in this log:
+Sharpe 0.93→0.99, MaxDD −22.1%→−17.9%, Calmar 0.94→1.11, **MaxDD better in 8/8
+walk-forward windows**, derived without expected returns and stable in every
+subperiod. It was nevertheless **NOT deployed**, and the reason is a design
+constraint rather than a statistical one:
+
+> Risk parity would cut the Indian equity sleeve from 50% to ~29% of capital.
+> MARK6 is intended to be an **Indian stock-market system**. At 29% equity it
+> would be a multi-asset fund holding a minority stock sleeve, and describing it
+> as a stock-picking system would stop being accurate. The +8.63pp/yr selection
+> alpha (P20) is the part of this project that represents actual skill; diluting
+> it to buy ~0.06 of Sharpe and ~4pp of drawdown was judged the wrong trade.
+
+This is recorded so the distinction survives: **P23 was validated and declined,
+not falsified.** If the design goal ever changes — a pure risk-adjusted-return
+mandate rather than a stock-picking one — the evidence to act on is already here
+and needs no re-testing. A 40/30/30 middle option (Sharpe 0.97, MaxDD −20.8%,
+Calmar 1.00, MaxDD 8/8) also remains available and keeps equity the largest sleeve.
+
+**Target status: Sharpe 1.1 is formally ABANDONED as unattainable (K32), accepted
+as such rather than pursued further.** The measured unlevered long-only ceiling under
+Indian tax is ~1.00. Continuing to chase the last 0.1 would mean re-litigating
+settled KILLs (K13 leverage, F7/K34 short-history sleeves) or overfitting. The
+deployed system stands at **Sharpe 0.94, MaxDD −22.2%, Calmar 0.94, CAGR +20.87%**,
+which is honest, reproducible, and defensible.
+
+**v7.4 verdict.** The honest ceiling for this system, unlevered and long-only under
+Indian tax, is **Sharpe ≈ 1.00**. Risk parity gets there and simultaneously delivers
+the best drawdown and Calmar the project has ever measured (**−17.9% / 1.11**), on the
+most robust evidence in the log (8/8 windows, derived without expected returns, stable
+in every subperiod). **Sharpe 1.1 requires either escaping the tax regime or finding a
+genuinely uncorrelated long-history asset that does not exist in the data.** Both of the
+project's stated risk goals — lowest drawdown, highest Calmar — ARE reachable; the
+Sharpe target is not, and chasing it further would mean overfitting.
+
 ## 5. 🔭 OPEN FRONTIERS — untested levers worth pursuing
 
 Ranked by plausible edge × feasibility. Each: hypothesis → how to test → realistic ceiling.
