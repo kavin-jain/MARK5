@@ -135,16 +135,24 @@ def main():
 
     # ── 4b. the standalone page embeds the feed; it must not lag it ──────
     idx = os.path.join(_ROOT, "docs", "index.html")
-    if feed and os.path.exists(idx):
+    local_feed = os.path.join(_ROOT, "docs", "data", "mark6.json")
+    if os.path.exists(idx) and os.path.exists(local_feed):
         html = open(idx, encoding="utf-8").read()
         i = html.find('"generated"')
         emb = html[i + 13:i + 38].split('"')[0] if i >= 0 else ""
         # docs/index.html EMBEDS the JSON rather than fetching it, so a feed update
         # alone leaves it frozen. That is invisible: the page still renders, just
         # with superseded numbers. It drifted 4 days before anyone noticed.
+        #
+        # Compare against the LOCAL feed, not the served one. The two are built
+        # together and pushed together; the served copy lags by however long
+        # GitHub Pages takes to rebuild, so comparing to it fails spuriously after
+        # every deploy — a check that cries wolf gets ignored, which is worse than
+        # not having it.
+        want = json.load(open(local_feed)).get("generated", "")
         check("standalone page matches the feed",
-              emb[:16] == str(feed.get("generated", ""))[:16],
-              f"page built {emb[:16] or '?'} vs feed {str(feed.get('generated',''))[:16]}"
+              emb[:16] == str(want)[:16],
+              f"page built {emb[:16] or '?'} vs feed {str(want)[:16]}"
               " — run docs/build_dashboard.py")
 
     # ── 5. the record must only ever grow ────────────────────────────────
