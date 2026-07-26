@@ -538,6 +538,67 @@ never tested in this project, and unobtainable free (no point-in-time archive ex
 Indian estimates). That is the single item worth revisiting at scale — everything else
 is either falsified, incompatible, or unaffordable.
 
+## 4l. v7.7 — `deliv_chg` DEPLOYED as a PROVISIONAL factor component (2026-07-26)
+
+K36/K37 killed the delivery signals on IC significance. This is the follow-up that
+asked the different, fairer question — not "is the IC significant?" but "does it earn
+its keep in the actual book?" — because the IC test was demonstrably underpowered at
+the traded horizon (~12 independent windows, minimum detectable IC 0.046 vs observed
++0.023) and both signals were orthogonal and monotonic.
+
+`scripts/delivery_factor_test.py`, equity sleeve, 2020-07 → 2026-07 (all the archive
+allows), bar set before the run: ≥3/4 windows on net CAGR **and** drawdown not worse.
+
+| config | CAGR | shExc | MaxDD | Calmar | wf CAGR | wf MaxDD |
+|---|---:|---:|---:|---:|---:|---:|
+| baseline | +30.71% | 1.06 | −29.6% | 1.04 | — | — |
+| + `deliv_per_z` @10% | +29.96% | 1.05 | −31.4% | 0.95 | 2/4 | 1/4 |
+| **+ `deliv_chg` @10%** | **+34.78%** | **1.22** | −31.3% | **1.11** | **4/4** | 0/4 |
+| + both @5% each | +33.82% | 1.18 | −31.6% | 1.07 | 4/4 | 0/4 |
+| + `deliv_chg` @20% | +33.96% | 1.23 | −30.2% | 1.12 | 3/4 | 0/4 |
+
+**Per-window, to check one window was not carrying it:** +5.56 / +10.13 / +4.12 / +4.59pp
+— all four positive, **+4.76pp even excluding the best window**.
+
+**Two artefact checks, both passed.** (a) Not a disguised size/liquidity tilt:
+corr(`deliv_chg`, log turnover) = **+0.057**, and the selected book's median liquidity
+rank moves only 152 → 160 out of 300. (b) Not one lucky configuration: `deliv_chg`
+improves CAGR in **every** variant tested (10%, 20%, blended); only `deliv_per_z`
+hurts, and it is excluded.
+
+| # | Verdict | |
+|---|---|---|
+| **P25** | **`deliv_chg` @10% — ✅ DEPLOYED, flagged PROVISIONAL** | first new-information factor in this project's history to survive a portfolio test |
+| K41 | `deliv_per_z` — ❌ KILL | −0.75pp, 2/4 windows. Tested worse than baseline; explicitly NOT deployed despite being requested alongside `deliv_chg`. |
+
+**Why PROVISIONAL and not a clean KEEP — the case against, recorded in full:**
+1. It **fails the pre-set bar**. The bar required drawdown not to worsen; drawdown is
+   worse in **4/4** windows (−1 to −2pp). Deploying anyway is a deliberate, documented
+   override on the user's decision, not a quiet goalpost move.
+2. The underlying **IC is not statistically significant** (t = 1.02).
+3. The realised effect is **~4.6× larger than Grinold predicts** from that IC
+   (theory +1.3pp vs observed ~+6pp). Plausibly conditional-IC-at-the-selection-margin
+   exceeding unconditional IC across 300 names, but **this remains unexplained** and is
+   the single strongest reason to distrust it.
+4. **Six years, all post-2020.** The archive begins 2019-10, so it cannot be tested
+   against 2016–2019 at all, and K12 is the standing precedent: Δ-promoter at a
+   *stronger* IC (+0.034) failed to convert on a longer window.
+
+**Effect on the published headline** (full period 2016→2026; the factor is neutral
+before 2019-10 where no data exists, which leaves ranking unchanged there because a
+uniform score shift does not reorder):
+**+20.87% → +21.16% CAGR, Sharpe 0.94 → 0.97, MaxDD −22.2% → −23.8%, Calmar 0.94 → 0.94.**
+
+Deployed to the live book on 2026-07-26 (second rebalance that day, 28 trades, both
+recorded — the ledger is append-only and neither was rewritten). Implementation:
+`core/portfolio/external_factors.load_delivery_factors()`, wired into `paper_track.py`
+and `export_dashboard.py`, and **degrading to the price-only book if the archive is
+absent** (it is 130MB and gitignored).
+
+**What would settle it:** three more years of archive, or a 2016–2019 delivery source
+if one is ever found. Until then this is the project's most promising unproven result,
+and it is labelled as such everywhere it appears.
+
 ## 5. 🔭 OPEN FRONTIERS — untested levers worth pursuing
 
 Ranked by plausible edge × feasibility. Each: hypothesis → how to test → realistic ceiling.

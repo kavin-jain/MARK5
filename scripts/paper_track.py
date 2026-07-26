@@ -36,7 +36,7 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, FactorLibrary, composite_score,
-                            load_sector_map)
+                            load_sector_map, load_delivery_factors)
 
 PAPER_DIR = os.path.join(_ROOT, "data", "paper")
 BOOK = os.path.join(PAPER_DIR, "paper_book.json")
@@ -216,10 +216,17 @@ def target_book():
     if age > 7:
         sys.exit(f"ERROR: price data ends {asof.date()}, {age} days ago. Refusing to open a "
                  f"book on stale prices — refresh the cache first.")
+    # v7.7: deliv_chg added at 10% — PROVISIONAL (RESEARCH_LOG 4l). It wins 4/4
+    # walk-forward windows on return and is orthogonal to every price factor AND to
+    # size, but its underlying IC is not statistically significant and it makes
+    # drawdown ~1.5pp worse. deliv_per_z is deliberately EXCLUDED: it tested worse
+    # than baseline. Degrades to the price-only book if the archive is absent.
+    dfac = load_delivery_factors(universe=panel.tickers)
+    fw = {"momentum": 0.45, "low_vol": 0.15, "trend": 0.25, "stability": 0.15}
+    if dfac:
+        fw["deliv_chg"] = 0.10
     cfg = ConstructionConfig(mode="factor_tilt", n_hold=N_HOLD, base_weighting="inverse_vol",
-                             tilt_strength=1.5, max_weight=0.08,
-                             factor_weights={"momentum": 0.45, "low_vol": 0.15,
-                                             "trend": 0.25, "stability": 0.15})
+                             tilt_strength=1.5, max_weight=0.08, factor_weights=fw)
     elig = panel.eligible(asof, 252, top_n=TOP_N)
     raw = {f: {} for f in FactorLibrary.DEFAULT_FACTORS}
     vol = {}
@@ -231,6 +238,15 @@ def target_book():
         for f in raw:
             raw[f][t] = last.get(f, float("nan"))
         vol[t] = -last.get("low_vol", float("nan"))
+    # delivery factor as-of the signal date, strictly causal
+    if dfac:
+        raw["deliv_chg"] = {}
+        for t in elig:
+            e = dfac.get(t)
+            if e is not None:
+                e = e.loc[:asof]
+                if not e.empty:
+                    raw["deliv_chg"][t] = e["deliv_chg"].iloc[-1]
     comp = composite_score({f: pd.Series(v) for f, v in raw.items()}, cfg.factor_weights)
     w = PortfolioConstructor(cfg, sector_map=load_sector_map()).target_weights(
         comp, pd.Series(vol), [])

@@ -7,42 +7,35 @@
  "n_hold": 20,
  "top_n_liquid": 300,
  "cost_rate_buy": 0.0011862259999999999,
- "cash": 48.33730465029933,
+ "cash": 12.513934662822408,
  "positions": {
   "GOLDBEES": {
-   "qty": 1051,
+   "qty": 1050,
    "entry_price": 119.31463339213073,
-   "entry_value": 125399.6796951294,
-   "entry_cost": 148.75236044603454,
+   "entry_value": 125280.36506173726,
+   "entry_cost": 148.61082632572433,
    "target_weight": 0.25
   },
   "MON100": {
-   "qty": 378,
+   "qty": 377,
    "entry_price": 323.45246273626094,
-   "entry_value": 122265.03091430664,
-   "entry_cost": 145.0339585613543,
+   "entry_value": 121941.57845157037,
+   "entry_cost": 144.6502708402925,
    "target_weight": 0.25
   },
   "ATHERENERG": {
-   "qty": 9,
+   "qty": 8,
    "entry_price": 1305.5999755859375,
-   "entry_value": 11750.399780273436,
-   "entry_cost": 13.938629729754636,
+   "entry_value": 10444.799804687498,
+   "entry_cost": 12.389893093115232,
    "target_weight": 0.03731775360826131
   },
   "LAURUSLABS": {
-   "qty": 11,
+   "qty": 10,
    "entry_price": 1586.8363813920455,
-   "entry_value": 17455.2001953125,
-   "entry_cost": 20.705812306884766,
+   "entry_value": 15868.363813920454,
+   "entry_cost": 18.823465733531606,
    "target_weight": 0.03542356948173828
-  },
-  "CUPID": {
-   "qty": 43,
-   "entry_price": 207.29604037972385,
-   "entry_value": 8913.729736328125,
-   "entry_cost": 10.573697970205565,
-   "target_weight": 0.03198520376675957
   },
   "BHARATFORG": {
    "qty": 7,
@@ -51,25 +44,18 @@
    "entry_cost": 18.204062252096676,
    "target_weight": 0.03284218138160658
   },
-  "THANGAMAYL": {
-   "qty": 2,
-   "entry_price": 6674.5,
-   "entry_value": 13349.0,
-   "entry_cost": 15.834930873999998,
-   "target_weight": 0.02719646668285115
-  },
   "HFCL": {
-   "qty": 46,
-   "entry_price": 221.4499969482422,
-   "entry_value": 10186.69985961914,
-   "entry_cost": 12.083728227676572,
+   "qty": 47,
+   "entry_price": 220.92659288771608,
+   "entry_value": 10383.549865722656,
+   "entry_cost": 12.31723682301672,
    "target_weight": 0.026819985833232248
   },
   "SANSERA": {
-   "qty": 3,
-   "entry_price": 3316.39990234375,
-   "entry_value": 9949.19970703125,
-   "entry_cost": 11.80199937167285,
+   "qty": 4,
+   "entry_price": 3283.4749145507812,
+   "entry_value": 13133.899658203125,
+   "entry_cost": 15.579773255951658,
    "target_weight": 0.026649835604921804
   },
   "WELCORP": {
@@ -81,23 +67,16 @@
   },
   "SYRMA": {
    "qty": 8,
-   "entry_price": 1369.0,
-   "entry_value": 10952.0,
-   "entry_cost": 12.991547151999997,
+   "entry_price": 1358.9125061035156,
+   "entry_value": 10871.300048828125,
+   "entry_cost": 12.895818771721189,
    "target_weight": 0.024759125684241132
   },
-  "KIRLOSENG": {
-   "qty": 4,
-   "entry_price": 2202.199951171875,
-   "entry_value": 8808.7998046875,
-   "entry_cost": 10.449227357115234,
-   "target_weight": 0.024320478161621806
-  },
   "ADANIPOWER": {
-   "qty": 59,
+   "qty": 58,
    "entry_price": 218.09728667695643,
-   "entry_value": 12867.73991394043,
-   "entry_cost": 15.264047647153898,
+   "entry_value": 12649.642627263474,
+   "entry_cost": 15.005334975168239,
    "target_weight": 0.025627602264334522
   },
   "ASTRAMICRO": {
@@ -108,18 +87,11 @@
    "target_weight": 0.02396037591718519
   },
   "STLTECH": {
-   "qty": 12,
-   "entry_price": 553.0,
-   "entry_value": 6636.0,
-   "entry_cost": 7.871795735999999,
+   "qty": 13,
+   "entry_price": 553.8576941856971,
+   "entry_value": 7200.1500244140625,
+   "entry_cost": 8.541005162860595,
    "target_weight": 0.023032716899411578
-  },
-  "ADANIENSOL": {
-   "qty": 6,
-   "entry_price": 1748.4000244140625,
-   "entry_value": 10490.400146484375,
-   "entry_cost": 12.443985404163573,
-   "target_weight": 0.021890663529177706
   },
   "RRKABEL": {
    "qty": 4,
@@ -137,11 +109,11 @@
    "entry_date": "2026-07-26"
   },
   "NYKAA": {
-   "qty": 51,
+   "qty": 53,
    "entry_price": 322.79998779296875,
-   "entry_value": 16462.799377441406,
-   "entry_cost": 19.528600654304807,
-   "target_weight": 0.033575022571074274,
+   "entry_value": 17108.399353027344,
+   "entry_cost": 20.294428130944212,
+   "target_weight": 0.034828456727594985,
    "entry_date": "2026-07-26"
   },
   "CUMMINSIND": {
@@ -160,21 +132,53 @@
    "target_weight": 0.029002737514157783,
    "entry_date": "2026-07-26"
   },
-  "SAILIFE": {
-   "qty": 11,
-   "entry_price": 1232.9000244140625,
-   "entry_value": 13561.900268554688,
-   "entry_cost": 16.08747870796655,
-   "target_weight": 0.02669917618364747,
+  "RBLBANK": {
+   "qty": 39,
+   "entry_price": 352.8999938964844,
+   "entry_value": 13763.09976196289,
+   "entry_cost": 16.32614677823419,
+   "target_weight": 0.027993118144620542,
+   "entry_date": "2026-07-26"
+  },
+  "KTKBANK": {
+   "qty": 47,
+   "entry_price": 279.70001220703125,
+   "entry_value": 13145.900573730469,
+   "entry_cost": 15.594009053973997,
+   "target_weight": 0.026535484711360354,
+   "entry_date": "2026-07-26"
+  },
+  "BHEL": {
+   "qty": 28,
+   "entry_price": 417.29998779296875,
+   "entry_value": 11684.399658203125,
+   "entry_cost": 13.860338668951659,
+   "target_weight": 0.023987099134642934,
+   "entry_date": "2026-07-26"
+  },
+  "TDPOWERSYS": {
+   "qty": 8,
+   "entry_price": 1113.5999755859375,
+   "entry_value": 8908.7998046875,
+   "entry_cost": 10.567849957115232,
+   "target_weight": 0.017857292347697135,
+   "entry_date": "2026-07-26"
+  },
+  "AEROFLEX": {
+   "qty": 16,
+   "entry_price": 420.8500061035156,
+   "entry_value": 6733.60009765625,
+   "entry_cost": 7.987571509442382,
+   "target_weight": 0.014201069531446104,
    "entry_date": "2026-07-26"
   }
  },
  "mode": "PAPER \u2014 no real money; all prices, quantities and costs are real",
  "integrity": "77a5de0d83926722",
- "fy_stcg": -1766.4226809045601,
+ "fy_stcg": -1732.8946754525493,
  "last_rebalance": "2026-07-26",
- "realised_pnl": -1766.4226809045601,
- "tax_accrued": 200.58721681462018,
+ "realised_pnl": -1732.8946754525493,
+ "tax_accrued": 339.05197697288685,
  "rebalances": [
   {
    "date": "2026-07-26",
@@ -182,6 +186,13 @@
    "trades": 36,
    "realised_pnl": -1766.4226809045601,
    "tax_accrued": 200.58721681462018
+  },
+  {
+   "date": "2026-07-26",
+   "signal_asof": "2026-07-21",
+   "trades": 28,
+   "realised_pnl": 33.52800545201083,
+   "tax_accrued": 138.46476015826667
   }
  ]
 }
