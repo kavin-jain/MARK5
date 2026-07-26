@@ -102,7 +102,13 @@ class PortfolioConstructor:
 
         # base weighting
         if cfg.base_weighting == "inverse_vol" and recent_vol is not None:
-            iv = (1.0 / recent_vol.reindex(picks).clip(lower=1e-3)).fillna(0.0)
+            v = recent_vol.reindex(picks)
+            # A name with no volatility estimate must NOT silently fall to zero
+            # weight: it was selected on its score, so dropping it here would hold
+            # fewer names than n_hold with no trace in the output. Impute the
+            # median vol of the picks — neutral, and keeps the book at full size.
+            v = v.fillna(v.median())
+            iv = (1.0 / v.clip(lower=1e-3)).fillna(0.0)
             base = iv / iv.sum() if iv.sum() > 0 else pd.Series(1.0 / len(picks), index=picks)
         else:
             base = pd.Series(1.0 / len(picks), index=picks)

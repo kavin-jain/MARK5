@@ -60,7 +60,10 @@ def main():
                                              "trend": 0.25, "stability": 0.15})
     con = PortfolioConstructor(cfg)
 
-    elig = panel.eligible(asof, 252, 0.40)
+    # MUST match the deployed screen in scripts/paper_track.py (top 300 by turnover).
+    # A percentile screen here would print a DIFFERENT portfolio than the live book
+    # actually holds — the one thing an "executable deliverable" must never do.
+    elig = panel.eligible(asof, 252, top_n=300)
     if len(elig) < cfg.n_hold:
         sys.exit(f"ERROR: only {len(elig)} eligible names as-of {asof.date()} — "
                  f"cannot build a {cfg.n_hold}-stock book. Data cache is likely "

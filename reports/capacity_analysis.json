@@ -1,0 +1,65 @@
+{
+ "generated": "2026-07-26T12:33:50.119854",
+ "levels": [
+  {
+   "capital": 500000.0,
+   "worst_participation": 0.001683614294571284,
+   "median_participation": 4.075772844993137e-05,
+   "frac_over_10pct": 0.0,
+   "impact_per_rebal_bps": 2.366976372746801,
+   "annual_drag_pct": 0.023669763727468013
+  },
+  {
+   "capital": 2500000.0,
+   "worst_participation": 0.00841807147285642,
+   "median_participation": 0.00020378864224965685,
+   "frac_over_10pct": 0.0,
+   "impact_per_rebal_bps": 5.292720070597727,
+   "annual_drag_pct": 0.05292720070597727
+  },
+  {
+   "capital": 10000000.0,
+   "worst_participation": 0.03367228589142568,
+   "median_participation": 0.0008151545689986274,
+   "frac_over_10pct": 0.0,
+   "impact_per_rebal_bps": 10.585440141195454,
+   "annual_drag_pct": 0.10585440141195454
+  },
+  {
+   "capital": 50000000.0,
+   "worst_participation": 0.1683614294571284,
+   "median_participation": 0.004075772844993137,
+   "frac_over_10pct": 0.004761904761904762,
+   "impact_per_rebal_bps": 23.669763727468005,
+   "annual_drag_pct": 0.23669763727468007
+  },
+  {
+   "capital": 100000000.0,
+   "worst_participation": 0.3367228589142568,
+   "median_participation": 0.008151545689986274,
+   "frac_over_10pct": 0.023809523809523808,
+   "impact_per_rebal_bps": 33.474100881552,
+   "annual_drag_pct": 0.33474100881551994
+  },
+  {
+   "capital": 500000000.0,
+   "worst_participation": 1.683614294571284,
+   "median_participation": 0.04075772844993137,
+   "frac_over_10pct": 0.2619047619047619,
+   "impact_per_rebal_bps": 74.85036505683591,
+   "annual_drag_pct": 0.7485036505683591
+  },
+  {
+   "capital": 1000000000.0,
+   "worst_participation": 3.367228589142568,
+   "median_participation": 0.08151545689986274,
+   "frac_over_10pct": 0.4523809523809524,
+   "impact_per_rebal_bps": 105.85440141195456,
+   "annual_drag_pct": 1.0585440141195457
+  }
+ ],
+ "median_adv_inr": 308387860.4254593,
+ "p10_adv_inr": 49122577.69844697,
+ "hard_limit_inr": 10000000.0,
+ "soft_limit_inr": 100000000.0
+}

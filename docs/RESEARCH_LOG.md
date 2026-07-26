@@ -237,6 +237,45 @@ MaxDD -31.2%, Calmar 0.68** vs Nifty TRI-net +11.1% → **+10.4pp/yr excess**, �
    windows).** Momentum/trend systematically avoid names that die; equal-weight rides them to
    zero. A survivor-only backtest structurally cannot show this — previously invisible real alpha.
 
+## 4f. v7.3 — Structural-lever sweep on the honest PIT universe (2026-07-26)
+
+Full re-read of every core and script file, then a walk-forward sweep of the levers
+that had never been tested on the survivorship-free universe. Bar as always:
+beat the deployed baseline in **≥6/8 rolling 3-year windows**, counted **per metric**
+(judging a risk lever by a return win-count is the wrong axis — a mistake this sweep
+corrected mid-run). Baseline = deployed config on `data/pit_cache`, 2016→2026-07-21:
+equity sleeve **+18.92% / shExc 0.60 / MaxDD −47.0%**, full 50/25/25 system
+**+20.67% / shExc 0.89 / MaxDD −24.9% / Calmar 0.83** (reproduces `docs/data/mark6.json`
+exactly, confirming the published headline).
+
+| # | Approach | Verdict | Evidence | Result |
+|---|----------|---------|----------|--------|
+| K24 | **Correlation-aware weighting** (min-variance / ERC / max-diversification instead of inverse-vol) | ❌ KILL **before testing** | **[H]** | `risk_model_diagnostic.py`: the book holds 20 names and makes **14.9 independent bets** (eigenvalue entropy), mean pairwise corr **0.204**, diversification ratio **2.03**. For that correlation level the theoretical minimum portfolio vol is 23.5%; the book realises **23.7%**. Inverse-vol is already at the diversification limit — there is no headroom for a covariance model to recover. The −47% sleeve DD is NOT a correlation problem: selected names average **47.6% annualised vol**. Diagnostic killed the idea for the cost of one script. |
+| K25 | **`n_hold=12` (i.e. P5) re-tested on honest PIT data** | ❌ **KILL — FALSIFIES P5** | **[H]** | `edge_research_2026_07.py`: −5.42pp avg, **1/8 windows**, MaxDD −47.0→−54.3%, Sharpe 0.60→0.51. P5's "12 beats 20 in 8/8" was measured on the **survivor cache**; concentration is only safe when the universe cannot contain names that die. On honest data the concentrated book is strictly worse. **n_hold=20 stands.** Textbook demonstration that a survivor-biased backtest mis-ranks *risk* decisions, not just return. |
+| K26 | **Breadth expansion** (`n_hold` 30 / 40) | ❌ KILL | **[H]** | 2/8 and 2/8. Grinold's √breadth does not pay here — the marginal name is worse-scoring by exactly enough to offset the diversification. n_hold≈20 is a genuine optimum, not a tuned one. |
+| K27 | **Turnover reduction via wider hold buffer** (`buffer_mult` 3.0 / 4.0) | 🟡 marginal | [M] | 4/8 and 4-5/8 — inside noise on every metric. Does cut turnover 255%→216%/yr for no measurable cost, so it is free, but it is not an edge. |
+| K28 | **Max-volatility exclusion screen** (drop top 10%/25% most-volatile before ranking) | ❌ KILL as a return lever | **[H]** | 3/8 CAGR. Genuinely cuts vol (24.1→19.9%) and lifts Sharpe (0.60→0.70) but fails the walk-forward return bar — the same shape as K10: the low-vol anomaly is real, harvesting it harder costs CAGR. |
+| P16 | **Rebalance tranching (P14) — CONFIRMED but CAPITAL-GATED** | ✅ KEEP · ⛔ not deployable at current capital | **[H]** | 3 tranches × 42-bar stagger, n_hold=20: sleeve +18.92→**+21.49%**, shExc 0.60→0.70, MaxDD −47.0→−44.6%, **6/8 on CAGR, Sharpe AND MaxDD** — the only clean win in the sweep, and a validated KEEP that had **never been wired into production**. **But it requires 3×20 = 60 whole-share slots.** At ₹5L capital that is ₹4,167/slot: 4 of the 20 current holdings cost more than that per share (THANGAMAYL ₹6,442, MTARTECH ₹5,852, GVT&D ₹4,520, NETWEB ₹4,355) and average weight error from whole-share rounding hits **33.6%**. Clean execution needs ≈**₹1.55cr**. Capital-efficient variants were tested and **fail**: 3×n_hold-7 (21 slots) gives +20.61% CAGR but MaxDD **−55.0%** (worse than baseline) and **1/8** on MaxDD — the benefit came from holding 60 names, not from staggered anchors alone. **Deploy at ≥₹1.5cr; do not deploy at ₹5L.** |
+| P17 | **Rank-transform the factor cross-section** (z-score ranks, not raw values) | ✅ KEEP as a RISK lever only | **[H]** | Momentum is heavily right-skewed; one name up 400% sets the z-scale and squashes every real distinction below it even after 3σ clipping. Ranking makes the score depend only on ORDER, which is all the composite uses. Result is unambiguous and one-sided: **MaxDD 7/8 windows** (sleeve −47.0→−39.7%, system −24.9→−22.2%), Calmar 0.83→0.93, Sharpe 0.89→0.92 — but **2/8 on CAGR**. Honest reading: a reliable drawdown reducer that buys no return. Combined T+R reaches **8/8 on MaxDD** at sleeve level. |
+| P18 | **Capacity / market-impact analysis** (never previously done) | ✅ KEEP (as knowledge) | **[H]** | `capacity_analysis.py`, square-root impact law (Almgren), 20d median rupee ADV per held name. Median held name trades **₹30.8cr/day**, 10th-pctile ₹4.9cr/day. Every position stays under 10% of daily volume to **₹1cr**; ≤5% of positions breach it to **₹10cr**. At the quoted **₹5cr** headline: worst-case participation 16.8%, modelled drag **0.24%/yr** — so the published number survives, minus a ~0.24pp haircut the backtest does not model. Breaks down by ₹50cr (26% of positions over the limit, 0.75%/yr drag). **Honest capacity: ₹10–25cr.** |
+
+**v7.3 meta-lesson.** Ten structural levers tested; **one** cleared the bar, and it is
+gated behind ~30x the current capital. The strategy is at its practical ceiling *for
+its capital and constraints* — the binding constraint on this system is no longer
+ideas, it is capital, track-record length, and the long-only/unlevered retail
+structure. Two logged KEEPs were also corrected: P5 (n_hold=12) is falsified on
+honest data, and P14 (tranching) is real but not executable at ₹5L.
+
+### Engine defects found in the same pass (all fixed)
+
+| # | Defect | Impact |
+|---|--------|--------|
+| BUG4 | `paper_track.py` accrued tax to `book["tax_accrued"]` but **never deducted it from NAV or cash** | The live NAV would have overstated itself permanently from the first rebalance (due ~Jan 2027). Caught before it fired — 0 rebalances so far. Fixed with real FY netting (`net_fy_tax`), so the live book and the backtest engine now apply the **same tax law** (P11) instead of two different ones. |
+| BUG5 | `generate_portfolio.py` screened the universe by `liquidity_pct=0.40` while the deployed book uses `top_n=300` | The "executable deliverable" printed a **different portfolio than the live book holds**. Fixed to match. |
+| BUG6 | `construction.py` gave a selected name with NaN volatility **zero weight**, silently holding fewer than `n_hold` names | Rare but invisible. Fixed by imputing the median vol of the picks. |
+| BUG7 | `max_sector_weight=0.30` is **dead code** — `sector_map` is never passed to `PortfolioConstructor` anywhere in production | Measured impact small (top sector averages 20% of the book, breaching 30% in only 3/21 rebalances) but the cap is advertised and not enforced. Also 7.7 names/rebalance are absent from `config/sector_map.json` and would escape the cap regardless. |
+| — | `config/system_config.json` is a **dead MARK3 artifact** referenced by no code | 300 lines still advertising "Advanced AI Stock Prediction System", XGBoost/LSTM/GRU ensembles, news-sentiment, 5% stop-losses, Redis/TimescaleDB — every one of which this log KILLED. A reviewer reading the public repo finds it. Flagged, not deleted. |
+
 ## 5. 🔭 OPEN FRONTIERS — untested levers worth pursuing
 
 Ranked by plausible edge × feasibility. Each: hypothesis → how to test → realistic ceiling.

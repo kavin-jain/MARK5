@@ -249,9 +249,32 @@ def cmd_init(capital: float):
     print(f"  Ledger -> {LEDGER} (append-only)\n  Run 'status' to mark to market.\n")
 
 
+def net_fy_tax(book) -> float:
+    """Tax owed on gains realised so far this fiscal year, AFTER netting losses.
+
+    Indian law (Sec 70/74) nets losses against gains within the FY: STCL offsets
+    STCG then LTCG; LTCL offsets LTCG only. The backtest engine has modelled this
+    since P11; this is the same rule applied to the live book, so the live record
+    and the research record use the same tax law rather than two different ones.
+
+    The result is a LIABILITY. It is money the book owes and cannot spend, so it
+    is deducted from NAV — otherwise every rebalance that books a gain would make
+    the track record look better than it is, permanently and invisibly.
+    """
+    st = book.get("fy_stcg", 0.0)
+    lt = book.get("fy_ltcg", 0.0)
+    stl = max(0.0, -st) + book.get("cf_stcl", 0.0)
+    ltl = max(0.0, -lt) + book.get("cf_ltcl", 0.0)
+    st, lt = max(0.0, st), max(0.0, lt)
+    use = min(stl, st); st -= use; stl -= use      # STCL vs STCG
+    use = min(stl, lt); lt -= use; stl -= use      # then vs LTCG
+    use = min(ltl, lt); lt -= use                  # LTCL vs LTCG only
+    return st * STCG + lt * LTCG
+
+
 def _mark(book):
     px = live_prices(list(book["positions"]))
-    mv, detail = book.get("cash", 0.0), []
+    mv, detail = book.get("cash", 0.0) - net_fy_tax(book), []
     for t, p in book["positions"].items():
         now = px.get(t)
         if now is None:
@@ -328,6 +351,12 @@ def cmd_export():
            "benchmark_nav": bench, "benchmark_return_pct": bench_ret,
            "relative_pct": (ret * 100 - bench_ret) if bench_ret is not None else None,
            "max_drawdown_pct": mdd * 100, "observations": len(navs),
+           # tax owed on gains realised this fiscal year, after netting losses.
+           # Already deducted from `nav` above — surfaced so the page can show
+           # that the headline is net of it rather than leaving it implicit.
+           "tax_liability": net_fy_tax(book),
+           "realised_pnl": book.get("realised_pnl", 0.0),
+           "rebalances": len(book.get("rebalances", [])),
            "holdings": detail, "nav_history": hist}
     path = os.path.join(PAPER_DIR, "paper_export.json")
     json.dump(out, open(path, "w"), indent=1, default=float)
@@ -385,6 +414,11 @@ def cmd_rebalance(force=False):
         days_held = (pd.Timestamp.today().normalize()
                      - pd.Timestamp(p.get("entry_date", book["start_date"])).normalize()).days
         rate = LTCG if days_held > 365 else STCG
+        # accrue the GAIN (signed) to its fiscal-year bucket; the tax is computed
+        # on the netted total, not per trade — a loss here really does reduce the
+        # bill, which is what Indian law says and what the backtest engine models.
+        book["fy_ltcg" if days_held > 365 else "fy_stcg"] = \
+            book.get("fy_ltcg" if days_held > 365 else "fy_stcg", 0.0) + pnl
         tax = max(0.0, pnl) * rate
         realised += pnl
         tax_accrued += tax
@@ -427,6 +461,7 @@ def cmd_rebalance(force=False):
             frac = -delta / p["qty"]
             pnl = gross - p["entry_value"] * frac - p["entry_cost"] * frac - cost
             realised += pnl; tax_accrued += max(0.0, pnl) * STCG
+            book["fy_stcg"] = book.get("fy_stcg", 0.0) + pnl
             cash += gross - cost
             p["entry_value"] *= (1 - frac); p["entry_cost"] *= (1 - frac); p["qty"] = want_qty
             rows.append({"timestamp": now_iso(), "date": today, "action": "SELL", "ticker": t,
