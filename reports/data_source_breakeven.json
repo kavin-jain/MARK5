@@ -14,38 +14,48 @@
  },
  "sources": [
   {
-   "name": "Kite Connect (data + execution)",
-   "cost": 24000,
-   "category": "intraday/tick",
-   "note": "F1's enabler. Intraday effects documented but every public backtest excludes costs, and SEBI finds 70-93% of retail intraday traders lose money. Fundamentally incompatible with this book's long-hold tax design.",
-   "breakeven_capital_inr": 2205745.067762962
-  },
-  {
    "name": "Screener.in premium",
    "cost": 4000,
-   "category": "fundamentals",
-   "note": "Fundamentals as a TILT already falsified on 12 years of real data (K15).",
-   "breakeven_capital_inr": 367624.1779604937
+   "data": "fundamentals, ratios, historical financials",
+   "ic": 0.0,
+   "ic_src": "none",
+   "note": "Fundamentals as a TILT falsified on 12 years of real data (K15): walk-forward -1 to -4.5pp, beats <=5/8 windows. Expected IC ~0.",
+   "breakeven_capital_inr": Infinity
   },
   {
    "name": "Trendlyne premium",
    "cost": 12000,
-   "category": "shareholding + estimates",
-   "note": "Shareholding path explicitly falsified (K7/I1): the free NSE XBRL run concluded paid Trendlyne would NOT have helped. Estimate-revision data is the part that is genuinely untested.",
-   "breakeven_capital_inr": 1102872.533881481
+   "data": "shareholding, FII/DII, some analyst estimates",
+   "ic": -0.025,
+   "ic_src": "measured",
+   "note": "Shareholding path measured at IC -0.025 on FREE NSE XBRL covering the same ground (K7/I1), which explicitly concluded paid Trendlyne would NOT have helped. Its estimates coverage is the only untested part.",
+   "breakeven_capital_inr": Infinity
   },
   {
-   "name": "Analyst estimate revisions (institutional feed)",
+   "name": "Kite Connect (Zerodha)",
+   "cost": 24000,
+   "data": "intraday/tick bars, order execution API",
+   "ic": null,
+   "ic_src": "unknown",
+   "note": "F1's enabler. Documented intraday effects, but every public backtest excludes costs and SEBI finds 70-93% of retail intraday traders lose money. Incompatible with this book's long-hold tax design regardless.",
+   "breakeven_capital_inr": 2205745.067762962
+  },
+  {
+   "name": "Refinitiv / LSEG I/B/E/S estimates",
    "cost": 150000,
-   "category": "estimates",
-   "note": "The ONE category with strong global literature that this project has never tested and cannot obtain free. Chan-Jegadeesh-Lakonishok: revision momentum is among the most robust documented anomalies.",
+   "data": "analyst EPS estimates + revision history, point-in-time",
+   "ic": null,
+   "ic_src": "unknown",
+   "note": "The ONE category with strong global literature never tested here and unobtainable free (no PIT archive exists for Indian estimates). Chan-Jegadeesh-Lakonishok: revision momentum is among the most robust documented anomalies. IC on Indian mid-caps is genuinely unknown.",
    "breakeven_capital_inr": 13785906.673518514
   },
   {
-   "name": "Refinitiv / Bloomberg terminal",
+   "name": "Bloomberg Terminal",
    "cost": 2000000,
-   "category": "everything",
-   "note": "Institutional pricing. Delivers estimates, PIT fundamentals, holdings.",
+   "data": "everything: estimates, PIT fundamentals, holdings, news",
+   "ic": null,
+   "ic_src": "unknown",
+   "note": "Institutional pricing. Superset of the above.",
    "breakeven_capital_inr": 183812088.98024684
   }
  ]

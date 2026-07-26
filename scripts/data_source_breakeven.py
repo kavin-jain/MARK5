@@ -48,26 +48,43 @@ CAPITALS = [5e5, 25e5, 1e7, 5e7, 2.5e8, 1e9]
 
 # Indicative annual costs in INR. VERIFY BEFORE PURCHASE — vendor pricing changes
 # and several of these are quote-only. They are order-of-magnitude, not offers.
+#
+# `ic` is the crux and the honest problem: NO VENDOR PUBLISHES THE IC OF THEIR DATA.
+# IC is a property of a signal YOU construct and measure on YOUR universe, not a
+# product attribute. So each row is tagged with WHERE its IC number comes from:
+#   measured  — this project measured it, on this universe. Trustworthy.
+#   none      — the category is already falsified here; expected IC ~0.
+#   unknown   — never tested here and not obtainable free. The honest answer is
+#               that nobody knows what it would be on Indian mid-caps.
 SOURCES = [
-    {"name": "Kite Connect (data + execution)", "cost": 24_000,
-     "category": "intraday/tick",
-     "note": "F1's enabler. Intraday effects documented but every public backtest "
-             "excludes costs, and SEBI finds 70-93% of retail intraday traders lose "
-             "money. Fundamentally incompatible with this book's long-hold tax design."},
-    {"name": "Screener.in premium", "cost": 4_000, "category": "fundamentals",
-     "note": "Fundamentals as a TILT already falsified on 12 years of real data (K15)."},
-    {"name": "Trendlyne premium", "cost": 12_000, "category": "shareholding + estimates",
-     "note": "Shareholding path explicitly falsified (K7/I1): the free NSE XBRL run "
-             "concluded paid Trendlyne would NOT have helped. Estimate-revision data "
-             "is the part that is genuinely untested."},
-    {"name": "Analyst estimate revisions (institutional feed)", "cost": 150_000,
-     "category": "estimates",
-     "note": "The ONE category with strong global literature that this project has "
-             "never tested and cannot obtain free. Chan-Jegadeesh-Lakonishok: revision "
-             "momentum is among the most robust documented anomalies."},
-    {"name": "Refinitiv / Bloomberg terminal", "cost": 2_000_000,
-     "category": "everything",
-     "note": "Institutional pricing. Delivers estimates, PIT fundamentals, holdings."},
+    {"name": "Screener.in premium", "cost": 4_000,
+     "data": "fundamentals, ratios, historical financials",
+     "ic": 0.0, "ic_src": "none",
+     "note": "Fundamentals as a TILT falsified on 12 years of real data (K15): "
+             "walk-forward -1 to -4.5pp, beats <=5/8 windows. Expected IC ~0."},
+    {"name": "Trendlyne premium", "cost": 12_000,
+     "data": "shareholding, FII/DII, some analyst estimates",
+     "ic": -0.025, "ic_src": "measured",
+     "note": "Shareholding path measured at IC -0.025 on FREE NSE XBRL covering the "
+             "same ground (K7/I1), which explicitly concluded paid Trendlyne would "
+             "NOT have helped. Its estimates coverage is the only untested part."},
+    {"name": "Kite Connect (Zerodha)", "cost": 24_000,
+     "data": "intraday/tick bars, order execution API",
+     "ic": None, "ic_src": "unknown",
+     "note": "F1's enabler. Documented intraday effects, but every public backtest "
+             "excludes costs and SEBI finds 70-93% of retail intraday traders lose "
+             "money. Incompatible with this book's long-hold tax design regardless."},
+    {"name": "Refinitiv / LSEG I/B/E/S estimates", "cost": 150_000,
+     "data": "analyst EPS estimates + revision history, point-in-time",
+     "ic": None, "ic_src": "unknown",
+     "note": "The ONE category with strong global literature never tested here and "
+             "unobtainable free (no PIT archive exists for Indian estimates). "
+             "Chan-Jegadeesh-Lakonishok: revision momentum is among the most robust "
+             "documented anomalies. IC on Indian mid-caps is genuinely unknown."},
+    {"name": "Bloomberg Terminal", "cost": 2_000_000,
+     "data": "everything: estimates, PIT fundamentals, holdings, news",
+     "ic": None, "ic_src": "unknown",
+     "note": "Institutional pricing. Superset of the above."},
 ]
 
 # Plausible IC for a genuinely orthogonal, well-documented signal. Anchored to
@@ -115,28 +132,60 @@ def main():
         print(row)
     print("\n  (rupees per year of extra NET return, at each capital)")
 
-    print("\n" + "=" * 92)
-    print("  VERDICT PER SOURCE — minimum capital for the source to pay for itself")
-    print("=" * 92)
-    print(f"  {'source':<44}{'cost/yr':>10}   {'break-even capital (good IC 0.05)':>34}")
-    print("  " + "-" * 88)
+    print("\n" + "=" * 110)
+    print("  PER SOURCE — named, with WHERE its IC number comes from")
+    print("=" * 110)
+    print("  No vendor publishes the IC of their data: IC is a property of a signal you")
+    print("  build and measure on your own universe, not a product attribute. So the IC")
+    print("  column below is tagged by provenance rather than quoted as if it were sold.\n")
+    print(f"  {'source':<30}{'cost/yr':>10}{'IC':>10}{'source of IC':>14}"
+          f"{'worth at 5L':>13}{'break-even':>13}")
+    print("  " + "-" * 106)
     out = []
     for s in SOURCES:
-        need = s["cost"] / vals["good"] if vals["good"] > 0 else float("inf")
-        verdict = ("viable at your capital" if need <= 5e5 else
-                   f"needs Rs {need/1e5:,.0f}L+")
-        print(f"  {s['name']:<44}{s['cost']:>10,}   {verdict:>34}")
+        ic, src = s["ic"], s["ic_src"]
+        if src == "unknown":
+            ic_txt, worth_txt, be_txt = "unknown", "unknown", f"Rs {s['cost']/vals['good']/1e5:,.1f}L*"
+            need = s["cost"] / vals["good"]
+        elif ic is not None and ic <= 0:
+            ic_txt = f"{ic:+.3f}" if ic else "~0"
+            worth_txt, be_txt, need = "Rs 0", "never", float("inf")
+        else:
+            need = s["cost"] / extra_net_return(ic) if extra_net_return(ic) > 0 else float("inf")
+            ic_txt = f"{ic:+.3f}"
+            worth_txt = f"Rs {extra_net_return(ic)*5e5:,.0f}"
+            be_txt = f"Rs {need/1e5:,.1f}L"
+        print(f"  {s['name']:<30}{s['cost']:>10,}{ic_txt:>10}{src:>14}"
+              f"{worth_txt:>13}{be_txt:>13}")
         out.append({**s, "breakeven_capital_inr": float(need)})
+    print("\n  * for 'unknown' rows the break-even assumes a GOOD IC of 0.05 — an")
+    print("    assumption more optimistic than anything this project has ever measured")
+    print("    in new data (best observed: +0.023, and it failed significance).")
+    print("\n  What each actually sells:")
+    for s in SOURCES:
+        print(f"    {s['name']:<30} {s['data']}")
 
     print("\n" + "=" * 92)
     print("  READING")
     print("=" * 92)
     v5 = vals["good"] * 5e5
-    print(f"  At Rs 5,00,000, a GOOD orthogonal signal (IC 0.05) is worth about")
-    print(f"  Rs {v5:,.0f}/year. Every paid source above costs more than that.")
-    print(f"  The cheapest (Screener, Rs 4,000) needs roughly "
-          f"Rs {SOURCES[1]['cost']/vals['good']/1e5:,.0f} lakh of capital to break even —")
-    print(f"  and its category is already falsified here anyway.")
+    cheapest = min(SOURCES, key=lambda s: s["cost"])
+    measured_dead = [s["name"] for s in SOURCES if s["ic_src"] in ("measured", "none")
+                     and (s["ic"] or 0) <= 0]
+    unknown = [s for s in SOURCES if s["ic_src"] == "unknown"]
+    cheapest_unknown = min(unknown, key=lambda s: s["cost"]) if unknown else None
+    print(f"  At Rs 5,00,000, a GOOD orthogonal signal (IC 0.05) is worth about "
+          f"Rs {v5:,.0f}/year in TOTAL.")
+    print()
+    print(f"  Two of the five are already dead on measured evidence, at any price:")
+    for n in measured_dead:
+        print(f"    - {n}")
+    print(f"  The cheapest source whose value is still UNKNOWN is "
+          f"{cheapest_unknown['name']} at Rs {cheapest_unknown['cost']:,},")
+    print(f"  which needs Rs {cheapest_unknown['cost']/vals['good']/1e5:,.0f} lakh of "
+          f"capital before it repays itself even on optimistic assumptions.")
+    print(f"  (Cheapest overall is {cheapest['name']} at Rs {cheapest['cost']:,}, but its "
+          f"category\n   is falsified, so buying it would purchase a measured zero.)")
     print()
     print("  The constraint is NOT data quality. It is that a percentage edge on a small")
     print("  book produces few rupees, while data is priced in absolute rupees. Paid data")
