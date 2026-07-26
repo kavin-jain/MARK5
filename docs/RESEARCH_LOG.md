@@ -414,6 +414,79 @@ remove it — offshore domicile, tax-exempt vehicles — are not available to In
 retail and are outside this project's scope. K32's verdict stands: Sharpe ~1.00 is
 the honest unlevered ceiling, now reached at **0.97 on the live book's actual capital**.
 
+## 4j. v7.6 — New data source: NSE delivery data (2026-07-26)
+
+**Why a new data source was needed, stated as a mechanism rather than a hope.** Every
+factor this project has tested — momentum, trend, low-vol, stability, candlesticks,
+foundation models — is a **function of the same OHLCV series**, so they all lie in the
+same span. That is the structural reason K1–K9 all failed, and why K29 finds the equity
+sleeve's alpha insignificant (t=1.19, R²=0.71) against factors built from its own
+universe. Recombining price data cannot escape the span it already occupies. New alpha
+requires genuinely new information.
+
+**Source chosen:** NSE `sec_bhavdata_full_DDMMYYYY.csv` — free, daily, archival,
+carrying `DELIV_QTY` / `DELIV_PER` (what fraction of traded volume was actually
+**delivered to a demat account** rather than squared off intraday) and `NO_OF_TRADES`.
+Price cannot express delivery. Point-in-time safe: published same day, never restated.
+Fetched via `scripts/fetch_delivery.py` — **1,764 trading days, 2019-10-01 → 2026-07-24,
+3,202 symbols** (one day, 2022-08-08, is permanently 404 at NSE and is recorded as a
+known hole rather than silently ignored).
+
+**The bar was written into `scripts/delivery_signal_study.py` BEFORE any data arrived**
+so it could not drift: |IC| ≥ 0.02 **and** |t| ≥ 2.0 at a traded horizon (63/126 bars);
+|corr| < 0.30 against every existing factor; monotonic terciles.
+
+| # | Signal | IC (21/63/126d) | t | Orthogonal? | Verdict |
+|---|--------|-----------------|---|-------------|---------|
+| K36 | `deliv_per_z` — delivery % vs own 126d history | +0.013 / +0.017 / +0.020 | 1.47 / 1.10 / 0.95 | ✅ max corr 0.126 | ❌ KILL |
+| K37 | `deliv_chg` — 21d mean delivery % minus 126d mean | +0.013 / +0.022 / **+0.023** | 1.33 / 1.27 / 1.02 | ✅ max corr 0.191 | ❌ KILL |
+| K38 | `deliv_turn_z` — delivered rupee value vs own history | +0.001 / −0.004 / +0.002 | ≈0 | ✅ | ❌ KILL (IC≈0, non-monotonic) |
+| K39 | `trade_size_z` — avg trade size (institutional proxy) | −0.001 / −0.004 / −0.003 | ≈0 | ✅ | ❌ KILL (IC≈0, non-monotonic) |
+
+**KILL — but the precise wording matters.** The delivery signals are genuinely
+**orthogonal** (max factor correlation 0.245 — this really is new information, unlike
+every price-derived factor), and the two delivery-% signals are **monotonic** across
+terciles (+0.98pp and +1.22pp top-minus-bottom over 126 days). What they are not is
+**statistically significant**, and the top-minus-bottom spread of ~1pp per half-year is
+noise-level against a book averaging 13% per 126 days — it would not survive costs and tax.
+
+**Honest qualifier — the test is UNDERPOWERED at the traded horizon.** With 5-day
+sampling and 126-day forward windows, 6.8 years contains only **~12 independent
+observations**. Minimum detectable IC at t=2:
+
+| horizon | independent obs | min detectable IC | observed (best) |
+|---|---:|---:|---:|
+| 21d | 76.0 | 0.018 | +0.013 |
+| 63d | 24.6 | 0.035 | +0.022 |
+| 126d | 11.8 | **0.046** | +0.023 |
+
+At 126 days the observed +0.023 sits **below the detection floor**. The correct
+statement is **"not demonstrated"**, not "proven absent". Resolving it needs history
+NSE does not publish — the archive simply does not start before Oct 2019.
+
+**Methodological lesson, measured on this project's own work.** A smoke-test on the
+first 15 months of the archive showed `deliv_per_z` at IC **+0.039 / +0.054 / +0.041**
+and was noted mid-run as "promising". On the full 6.8 years the same signal reads
+**+0.013 / +0.017 / +0.020** — the apparent edge **shrank 60–70% as data grew**. This
+is exactly K15's failure mode (a 66-ticker partial run flagged a KEEP that evaporated
+on full data), reproduced live. **A partial-data IC is not evidence.** The pre-committed
+bar is what stopped it becoming a KEEP.
+
+**Free sources surveyed and rejected without fetching** (documented so the next session
+does not re-scan): F&O open interest / PCR / basis — covers only ~180 F&O names against
+a 300-name universe, and the local archive (2022→Jan 2025) is stale; FII/DII daily flows
+— market-level only, so it can only drive timing, killed by K2; India VIX — same;
+news sentiment — **no point-in-time archive, so any backtest is a look-ahead trap** (F5);
+bulk/block deals — stock-level and PIT-safe but far too few events per name, breadth too
+low to matter under Grinold; shareholding XBRL — already killed (K7/K12); fundamentals —
+already killed as a tilt (K15).
+
+**Net conclusion.** The one free, orthogonal, point-in-time-safe stock-level data source
+that had never been tested has now been tested and does not carry usable alpha at this
+book's horizons. Combined with K29, the honest position is that **this system's edge is
+factor harvesting plus tax discipline plus diversification, and no free public dataset
+found so far converts it into demonstrated stock-selection alpha.**
+
 ## 5. 🔭 OPEN FRONTIERS — untested levers worth pursuing
 
 Ranked by plausible edge × feasibility. Each: hypothesis → how to test → realistic ceiling.

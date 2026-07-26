@@ -271,3 +271,6 @@ data/pit_cache/
 # the paper track record IS the public evidence - it must be committed
 !data/paper/
 data/nested_wf_navs.parquet
+
+# 130MB delivery archive — regenerate with scripts/fetch_delivery.py
+data/delivery/raw/
