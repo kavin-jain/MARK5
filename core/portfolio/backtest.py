@@ -80,6 +80,18 @@ class BacktestConfig:
     stale_exit_days: int = 21         # force-exit a holding with no real print this long
     delist_haircut: float = 0.25      # value haircut applied on a forced stale exit
                                       # (a suspended name never sells at its frozen mark)
+    capital_inr: float = 0.0          # rupee size of the book. 0 = scale-free NAV-unit
+                                      # mode (the historical default): tax rates apply
+                                      # with no rupee thresholds. Set it and the
+                                      # LTCG annual exemption below becomes active,
+                                      # which makes after-tax return CAPITAL-DEPENDENT
+                                      # — smaller books keep more.
+    ltcg_exemption_inr: float = 125000.0   # Sec 112A: the first Rs 1.25 lakh of net
+                                      # LONG-term capital gain each fiscal year is
+                                      # exempt. There is NO equivalent exemption for
+                                      # short-term gains. Ignored unless capital_inr
+                                      # is set. Modelling it is what makes a small
+                                      # book's honest return higher than the headline.
     top_n_liquid: int = 0             # keep only the N most-liquid seasoned names.
                                       # PREFERRED screen: time-invariant (adapts as
                                       # market turnover grows) and capacity-meaningful.
@@ -238,14 +250,25 @@ class Backtester:
 
         cur_fy = fy_of(cal[0])
 
+        # Sec 112A exemption expressed in NAV units. The book runs on NAV units
+        # (start = 1.0), so a rupee threshold only has meaning once the book has a
+        # rupee size: exempt_units = exemption / capital. A Rs 1.25L exemption is
+        # 25% of a Rs 5L book but 0.025% of a Rs 5cr one — which is precisely why
+        # after-tax performance is capital-dependent and the scale-free headline
+        # UNDERSTATES what a small book keeps.
+        exempt_units = (cfg.ltcg_exemption_inr / cfg.capital_inr) if cfg.capital_inr > 0 else 0.0
+
         def net_tax(st, lt, stl, ltl):
             """Indian netting: STCL vs STCG then LTCG; LTCL vs LTCG only.
+            Then the Sec 112A long-term exemption on whatever LTCG survives netting.
             Returns (tax, leftover_stcl, leftover_ltl)."""
             stl += max(0.0, -st); st = max(0.0, st)
             ltl += max(0.0, -lt); lt = max(0.0, lt)
             use = min(stl, st); st -= use; stl -= use
             use = min(stl, lt); lt -= use; stl -= use
             use = min(ltl, lt); lt -= use; ltl -= use
+            # exemption applies AFTER loss set-off, to net long-term gain only
+            lt = max(0.0, lt - exempt_units)
             return st * cfg.stcg + lt * cfg.ltcg, stl, ltl
 
         def settle_fy(today):

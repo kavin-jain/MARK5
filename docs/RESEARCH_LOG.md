@@ -361,6 +361,59 @@ genuinely uncorrelated long-history asset that does not exist in the data.** Bot
 project's stated risk goals — lowest drawdown, highest Calmar — ARE reachable; the
 Sharpe target is not, and chasing it further would mean overfitting.
 
+## 4i. v7.5 — Attacking the tax regime, the binding constraint (2026-07-26)
+
+K32 identified tax + friction as the single largest obstacle between this book and
+hedge-fund Sharpe (−0.16). This is the follow-up. Scope note: this is quantitative
+research on **tax-efficient portfolio construction** using Indian law as the engine
+models it. It is not tax advice, and a real-money implementation needs a qualified
+professional.
+
+**Exact size of the prize, measured (equity sleeve, zero-tax counterfactual):**
+tax costs **2.91pp of CAGR and 0.112 of Sharpe** (+20.06% / 0.673 taxed vs
++22.97% / 0.784 untaxed).
+
+| # | Approach | Verdict | Evidence | Result |
+|---|----------|---------|----------|--------|
+| K35 | **LTCG-aware exit deferral** — hold a position past 365 days when it is close, converting STCG 20% → LTCG 12.5% | ❌ KILL — **prize is already captured** | **[H]** | Looked mechanically attractive: **75% of SELLS are STCG**. But by VALUE only **12% of gains** are — the big winners are already held long, so 88% of gains already receive 12.5%. Worse, the holding-period histogram has **zero sells in the 300-365d window**: the 126-bar cadence lands rebalances at ~182 and ~365 calendar days, so nothing sits just below the threshold waiting to be nudged over. Converting every STCG gain would be worth ≈**0.07pp/yr**. The semi-annual cadence plus the ranking buffer already deliver the deferral this lever was meant to add. Not built. |
+| **P24** | **Sec 112A ₹1.25 lakh annual LTCG exemption — modelled for the first time** | ✅ **KEEP, DEPLOYED** | **[H]** | The engine had never modelled it (documented as "conservative"). It is real law, it is the largest *legitimate* tax lever available, and its value is **capital-dependent** — which is exactly why a scale-free backtest misses it. Now implemented via `BacktestConfig.capital_inr` + `ltcg_exemption_inr`, applied **after** loss set-off, and **only to Sec 112A-eligible gains** (listed Indian equity). GOLDBEES and MON100 fall under different provisions and are deliberately excluded — exempting them would understate the bill. |
+
+**Measured effect of P24 (equity sleeve CAGR, and the decay that validates the model):**
+
+| total capital | sleeve CAGR | vs scale-free | tax paid |
+|---|---|---|---|
+| scale-free (old headline) | +20.06% | — | 1.109 |
+| ₹1L | +21.73% | **+1.67pp** | −45% |
+| **₹5L (the live book)** | **+21.27%** | **+1.21pp** | **−28%** |
+| ₹25L | +20.41% | +0.35pp | −7% |
+| ₹5cr | +20.06% | +0.00pp | −0% |
+
+The benefit decays monotonically to exactly zero as capital grows, which is the
+correct shape for a fixed rupee allowance and is the model's own validation.
+
+**Full system 50/25/25 at the live book's ₹5,00,000: +21.44% CAGR, excess Sharpe
+0.97, Calmar 0.97** — versus the published scale-free +20.87% / 0.94 / 0.94.
+
+> **The headline UNDERSTATES a small book by +0.56pp CAGR and +0.03 Sharpe.** Both
+> figures are correct; they answer different questions. The scale-free number is the
+> right one to quote for institutional capacity (₹5cr+), the capital-aware number is
+> the right one for what this ₹5 lakh paper book will actually experience. The public
+> page must show both and say which is which.
+
+Also deployed to the live book: `paper_track.net_fy_tax` now applies the same Sec 112A
+exemption with the same equity-only eligibility rule, so the live record and the
+research engine continue to use identical tax law. Verified against 7 hand-computed
+cases including ETF-sourced LTCG correctly receiving **no** exemption.
+
+**Where the remaining tax drag actually sits.** After P24 the residual is *not*
+avoidable by construction: 88% of gains are already long-term at 12.5%, losses
+already net within the fiscal year (P11), harvesting resets the clock and loses
+(K18), and faster or slower cadences have been tested to exhaustion (K3/K20/K21/K31).
+**The remaining ~2pp is the statutory rate on real gains.** The only structures that
+remove it — offshore domicile, tax-exempt vehicles — are not available to Indian
+retail and are outside this project's scope. K32's verdict stands: Sharpe ~1.00 is
+the honest unlevered ceiling, now reached at **0.97 on the live book's actual capital**.
+
 ## 5. 🔭 OPEN FRONTIERS — untested levers worth pursuing
 
 Ranked by plausible edge × feasibility. Each: hypothesis → how to test → realistic ceiling.

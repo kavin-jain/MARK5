@@ -315,13 +315,21 @@ def net_fy_tax(book) -> float:
     """
     st = book.get("fy_stcg", 0.0)
     lt = book.get("fy_ltcg", 0.0)
+    lt_112a = book.get("fy_ltcg_112a", 0.0)        # equity-sourced part of `lt`
     stl = max(0.0, -st) + book.get("cf_stcl", 0.0)
     ltl = max(0.0, -lt) + book.get("cf_ltcl", 0.0)
     st, lt = max(0.0, st), max(0.0, lt)
     use = min(stl, st); st -= use; stl -= use      # STCL vs STCG
     use = min(stl, lt); lt -= use; stl -= use      # then vs LTCG
     use = min(ltl, lt); lt -= use                  # LTCL vs LTCG only
-    return st * STCG + lt * LTCG
+    # Sec 112A: the first Rs 1.25 lakh of long-term gain on LISTED INDIAN EQUITY is
+    # exempt each fiscal year. It does NOT cover the gold or US-Nasdaq ETF sleeves,
+    # so only the equity-sourced share of the surviving long-term gain qualifies;
+    # exempting the whole figure would understate the bill. At this book's size the
+    # exemption is worth roughly +0.6pp/yr, which is why the scale-free headline
+    # UNDERSTATES what a small book actually keeps.
+    exempt = min(LTCG_EXEMPTION, max(0.0, lt_112a), lt)
+    return st * STCG + max(0.0, lt - exempt) * LTCG
 
 
 def _mark(book):
@@ -418,6 +426,7 @@ def cmd_export():
 SELL_COST_RATE = 0.001 + 0.0000297 + 0.000001 + 0.18 * (0.0000297 + 0.000001)  # STT+txn+SEBI+GST
 REBAL_DAYS = 182          # the deployed cadence is 126 trading days ~ 6 calendar months
 LTCG, STCG = 0.125, 0.20
+LTCG_EXEMPTION = 125000.0   # Sec 112A, per person per fiscal year, listed Indian equity only
 
 
 def cmd_rebalance(force=False):
@@ -469,8 +478,13 @@ def cmd_rebalance(force=False):
         # accrue the GAIN (signed) to its fiscal-year bucket; the tax is computed
         # on the netted total, not per trade — a loss here really does reduce the
         # bill, which is what Indian law says and what the backtest engine models.
-        book["fy_ltcg" if days_held > 365 else "fy_stcg"] = \
-            book.get("fy_ltcg" if days_held > 365 else "fy_stcg", 0.0) + pnl
+        bucket = "fy_ltcg" if days_held > 365 else "fy_stcg"
+        book[bucket] = book.get(bucket, 0.0) + pnl
+        # track how much of the long-term gain is Sec 112A-eligible (listed Indian
+        # equity). The ETF sleeves are taxed under different provisions and get no
+        # Rs 1.25L exemption, so they must not be counted toward it.
+        if days_held > 365 and t not in SLEEVES:
+            book["fy_ltcg_112a"] = book.get("fy_ltcg_112a", 0.0) + pnl
         tax = max(0.0, pnl) * rate
         realised += pnl
         tax_accrued += tax

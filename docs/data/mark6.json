@@ -1,8 +1,8 @@
 {
- "generated": "2026-07-26T13:15:23+05:30",
+ "generated": "2026-07-26T13:51:44+05:30",
  "disclaimer": "PAPER MODE. The live panel is a real-price paper book with no money at risk. The research panel is a historical simulation: real prices, simulated trades. Neither is investment advice.",
  "live": {
-  "generated": "2026-07-26T13:15:23+05:30",
+  "generated": "2026-07-26T13:51:44+05:30",
   "mode": "PAPER \u2014 no real money; all prices, quantities and costs are real",
   "start_date": "2026-07-22",
   "days_live": 4,
@@ -16027,5 +16027,42 @@
   "r2": 0.5628035945301839,
   "worst_rolling_1y_pct": -15.788455344009055,
   "pct_negative_1y_windows": 12.46278179498086
+ },
+ "tax": {
+  "note": "Headline figures are scale-free: they apply no rupee thresholds, which is correct for institutional capital. India exempts the first Rs 1.25 lakh of long-term capital gain on listed equity each year (Sec 112A). That allowance is a fixed rupee amount, so it matters enormously to a small book and not at all to a large one. Both numbers below are real; they answer different questions.",
+  "tax_drag_equity_sleeve": {
+   "cagr_pp": 2.91,
+   "sharpe": 0.112,
+   "detail": "equity sleeve taxed +20.06%/0.673 vs zero-tax counterfactual +22.97%/0.784"
+  },
+  "by_capital": {
+   "published headline (scale-free)": {
+    "cagr": 0.2087,
+    "sharpe_excess": 0.9404,
+    "max_dd": -0.2216,
+    "calmar": 0.9421
+   },
+   "at Rs 5,00,000 actual capital": {
+    "cagr": 0.2144,
+    "sharpe_excess": 0.9702,
+    "max_dd": -0.2216,
+    "calmar": 0.9676
+   },
+   "at Rs 25,00,000": {
+    "cagr": 0.2103,
+    "sharpe_excess": 0.9488,
+    "max_dd": -0.2216,
+    "calmar": 0.9492
+   },
+   "at Rs 5cr (institutional)": {
+    "cagr": 0.2088,
+    "sharpe_excess": 0.9409,
+    "max_dd": -0.2216,
+    "calmar": 0.9425
+   }
+  },
+  "sec_112a_exemption_inr": 125000,
+  "eligibility": "listed Indian equity only; the gold and US-Nasdaq ETF sleeves do not qualify",
+  "disclaimer": "Not tax advice. Real-money implementation requires a qualified professional."
  }
 }

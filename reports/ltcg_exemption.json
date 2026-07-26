@@ -1,0 +1,72 @@
+[
+ {
+  "total_capital_inr": 0.0,
+  "cagr_pct": 20.061817173280726,
+  "sharpe_excess": 0.6725543771502532,
+  "calmar": 0.504528861204395,
+  "tax_paid_navunits": 1.109349555082924
+ },
+ {
+  "total_capital_inr": 100000.0,
+  "cagr_pct": 21.728606113893314,
+  "sharpe_excess": 0.7378523355753686,
+  "calmar": 0.5663223726018117,
+  "tax_paid_navunits": 0.6103929255950299
+ },
+ {
+  "total_capital_inr": 250000.0,
+  "cagr_pct": 21.582755990958734,
+  "sharpe_excess": 0.7321620854015007,
+  "calmar": 0.5625210156610294,
+  "tax_paid_navunits": 0.6846973465022441
+ },
+ {
+  "total_capital_inr": 500000.0,
+  "cagr_pct": 21.272457908224276,
+  "sharpe_excess": 0.7199699783751831,
+  "calmar": 0.554433578045065,
+  "tax_paid_navunits": 0.7997130788261286
+ },
+ {
+  "total_capital_inr": 1000000.0,
+  "cagr_pct": 20.90605953205995,
+  "sharpe_excess": 0.7056793725077303,
+  "calmar": 0.5433910373102718,
+  "tax_paid_navunits": 0.9146990716924934
+ },
+ {
+  "total_capital_inr": 2500000.0,
+  "cagr_pct": 20.407269324589983,
+  "sharpe_excess": 0.6862299973707219,
+  "calmar": 0.5199647343313976,
+  "tax_paid_navunits": 1.0309022907299388
+ },
+ {
+  "total_capital_inr": 5000000.0,
+  "cagr_pct": 20.235728254976504,
+  "sharpe_excess": 0.6794582024391299,
+  "calmar": 0.5122263842893874,
+  "tax_paid_navunits": 1.0701259229064195
+ },
+ {
+  "total_capital_inr": 10000000.0,
+  "cagr_pct": 20.14907326697639,
+  "sharpe_excess": 0.6760229153462324,
+  "calmar": 0.5083726777385128,
+  "tax_paid_navunits": 1.0897377389946679
+ },
+ {
+  "total_capital_inr": 50000000.0,
+  "cagr_pct": 20.079316902137844,
+  "sharpe_excess": 0.6732507567049588,
+  "calmar": 0.5052968485447881,
+  "tax_paid_navunits": 1.1054271918652727
+ },
+ {
+  "total_capital_inr": 500000000.0,
+  "cagr_pct": 20.063568242866523,
+  "sharpe_excess": 0.672624075369616,
+  "calmar": 0.5046056426660533,
+  "tax_paid_navunits": 1.108957318761158
+ }
+]
