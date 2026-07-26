@@ -40,6 +40,12 @@ jobs:
           print(f"live day {live['days_live']}  NAV {live['nav']:.0f}  {live['return_pct']:+.2f}%")
           PY
 
+      - name: Rebuild the standalone dashboard from the feed
+        # docs/index.html EMBEDS mark6.json rather than fetching it, so updating the
+        # feed alone leaves the standalone page frozen at whatever it was built with.
+        # It silently drifted 4 days and kept serving a superseded headline.
+        run: python docs/build_dashboard.py
+
       - name: Health check (fails the run if an invariant broke)
         env:
           GH_TOKEN: ${{ github.token }}
@@ -49,6 +55,6 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/data/mark6.json data/paper/
+          git add docs/data/mark6.json docs/index.html data/paper/
           git diff --staged --quiet || git commit -m "chore: daily live refresh [skip ci]"
           git push

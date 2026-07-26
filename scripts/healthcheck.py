@@ -133,6 +133,20 @@ def main():
         check("benchmark present", has_bench,
               "" if has_bench else "missing — the vs-index number is the whole point")
 
+    # ── 4b. the standalone page embeds the feed; it must not lag it ──────
+    idx = os.path.join(_ROOT, "docs", "index.html")
+    if feed and os.path.exists(idx):
+        html = open(idx, encoding="utf-8").read()
+        i = html.find('"generated"')
+        emb = html[i + 13:i + 38].split('"')[0] if i >= 0 else ""
+        # docs/index.html EMBEDS the JSON rather than fetching it, so a feed update
+        # alone leaves it frozen. That is invisible: the page still renders, just
+        # with superseded numbers. It drifted 4 days before anyone noticed.
+        check("standalone page matches the feed",
+              emb[:16] == str(feed.get("generated", ""))[:16],
+              f"page built {emb[:16] or '?'} vs feed {str(feed.get('generated',''))[:16]}"
+              " — run docs/build_dashboard.py")
+
     # ── 5. the record must only ever grow ────────────────────────────────
     print("\nRECORD DURABILITY  (nothing may be deleted)")
     led = os.path.join(PAPER, "paper_ledger.csv")
