@@ -16,7 +16,7 @@ sys.path.insert(0, _ROOT)
 
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, BacktestConfig, metrics,
-                            load_nifty, load_sector_map)
+                            load_nifty, load_sector_map, load_delivery_factors)
 
 CACHE = os.path.join(_ROOT, "data", "cache")
 REPORTS = os.path.join(_ROOT, "reports")
@@ -77,8 +77,12 @@ def main():
         print(f"  absolute liquidity floor: Rs {min_turn/1e7:.0f}cr/day median turnover\n")
     bt_cfg = BacktestConfig(rebal_bars=126, min_turnover=min_turn,
                             top_n_liquid=int(os.environ.get('MARK5_TOP_N', '0')))
+    # v7.7 PROVISIONAL: deliv_chg @10% (RESEARCH_LOG 4l)
+    dfac = load_delivery_factors(universe=panel.tickers)
+    if dfac:
+        factor_cfg.factor_weights = {**factor_cfg.factor_weights, "deliv_chg": 0.10}
     bt_factor = Backtester(panel, PortfolioConstructor(factor_cfg,
-                           sector_map=load_sector_map()), bt_cfg)
+                           sector_map=load_sector_map()), bt_cfg, extra_factors=dfac)
     bt_ew = Backtester(panel, PortfolioConstructor(ew_cfg),
                        BacktestConfig(rebal_bars=126, min_turnover=min_turn,
                                       top_n_liquid=int(os.environ.get('MARK5_TOP_N', '0'))))

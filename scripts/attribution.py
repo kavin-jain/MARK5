@@ -38,7 +38,8 @@ sys.path.insert(0, _ROOT)
 
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, BacktestConfig,
-                            load_ohlcv, load_nifty, metrics, load_sector_map)
+                            load_ohlcv, load_nifty, metrics, load_sector_map,
+                            load_delivery_factors)
 
 START, END = "2016-01-01", "2026-07-21"
 TD = 252
@@ -53,11 +54,16 @@ def cagr(s):
 
 def main():
     panel = DataPanel(discover_tickers(), END, freshness="off")
+    # v7.7 PROVISIONAL: deliv_chg @10% (RESEARCH_LOG 4l)
+    dfac = load_delivery_factors(universe=panel.tickers)
+    fw = dict(MOM)
+    if dfac:
+        fw["deliv_chg"] = 0.10
     cfg = ConstructionConfig(mode="factor_tilt", n_hold=20, base_weighting="inverse_vol",
-                             tilt_strength=1.5, max_weight=0.08, factor_weights=MOM)
+                             tilt_strength=1.5, max_weight=0.08, factor_weights=fw)
     bt = BacktestConfig(rebal_bars=126, top_n_liquid=300)
     run = Backtester(panel, PortfolioConstructor(cfg, sector_map=load_sector_map()),
-                     bt).run(START, END)
+                     bt, extra_factors=dfac).run(START, END)
     ew = Backtester(panel, PortfolioConstructor(
         ConstructionConfig(mode="equal_weight", base_weighting="equal")), bt).run(START, END)
 

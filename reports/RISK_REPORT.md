@@ -8,34 +8,34 @@ Historical VaR makes no distributional assumption; parametric assumes normality.
 
 | Horizon | Confidence | Historical VaR | Historical CVaR | Parametric VaR |
 |---|---|---|---|---|
-| 1 day | 95% | -1.38% | -2.30% | -1.42% |
-| 1 day | 99% | -2.89% | -3.89% | -2.05% |
-| 21 days | 95% | -5.64% | -8.37% | -5.10% |
-| 21 days | 99% | -9.51% | -13.38% | -7.97% |
+| 1 day | 95% | -1.37% | -2.25% | -1.39% |
+| 1 day | 99% | -2.83% | -3.80% | -2.00% |
+| 21 days | 95% | -5.57% | -8.56% | -4.94% |
+| 21 days | 99% | -9.72% | -14.46% | -7.75% |
 
-Daily skew **-0.93**, kurtosis **9.8** (normal = 3.0) — fat-tailed and negatively skewed, the usual equity shape. Worst day -7.91%, best +5.35%.
+Daily skew **-1.00**, kurtosis **9.9** (normal = 3.0) — fat-tailed and negatively skewed, the usual equity shape. Worst day -8.14%, best +4.77%.
 
 ### Full system 50/25/25
 
-Annualised alpha **+10.47%** (t = 3.46), R² = 0.56.
+Annualised alpha **+10.96%** (t = 3.68), R² = 0.56.
 
 | Factor | Beta | t-stat |
 |---|---|---|
-| market | +0.509 | 31.10 |
-| size | +0.052 | 1.99 |
-| momentum | +0.386 | 23.42 |
-| lowvol | -0.247 | -17.02 |
+| market | +0.514 | 31.89 |
+| size | +0.055 | 2.15 |
+| momentum | +0.358 | 22.08 |
+| lowvol | -0.230 | -16.14 |
 
 ### Equity sleeve only
 
-Annualised alpha **+4.42%** (t = 1.19), R² = 0.71.
+Annualised alpha **+5.79%** (t = 1.61), R² = 0.71.
 
 | Factor | Beta | t-stat |
 |---|---|---|
-| market | +0.757 | 37.57 |
-| size | +0.050 | 1.56 |
-| momentum | +0.633 | 31.16 |
-| lowvol | -0.535 | -29.97 |
+| market | +0.768 | 39.34 |
+| size | +0.060 | 1.94 |
+| momentum | +0.567 | 28.86 |
+| lowvol | -0.498 | -28.79 |
 
 Factors are long/short terciles rebuilt every 21 bars from the same point-in-time universe (size = small minus big by turnover; momentum and low-volatility from the engine's own causal definitions). A high R² with a large momentum beta would mean the book is simply a momentum index; a surviving positive alpha means the ranking adds something the raw factors do not.
 
@@ -45,20 +45,20 @@ Each drawdown worse than −5%, decomposed into the rupee P&L each sleeve contri
 
 | Peak | Trough | Depth | Days | Equity | Gold | US |
 |---|---|---|---|---|---|---|
-| 2020-02-28 | 2020-03-23 | -22.2% | 95 | -14.3% | -1.8% | -5.2% |
-| 2022-04-25 | 2022-06-20 | -20.5% | 385 | -14.5% | -0.9% | -4.2% |
+| 2020-02-28 | 2020-03-23 | -23.8% | 103 | -15.9% | -1.8% | -5.2% |
+| 2022-04-25 | 2022-06-20 | -19.6% | 375 | -12.9% | -0.9% | -4.2% |
 | 2018-02-02 | 2018-12-26 | -17.6% | 689 | -10.1% | +0.8% | -5.6% |
-| 2025-01-10 | 2025-04-07 | -15.4% | 192 | -9.7% | +3.3% | -5.2% |
-| 2026-02-02 | 2026-03-23 | -12.7% | 72 | -3.9% | -4.1% | -1.1% |
+| 2025-01-10 | 2025-04-07 | -15.2% | 192 | -9.5% | +3.1% | -5.0% |
+| 2026-02-02 | 2026-03-23 | -12.3% | 72 | -3.4% | -4.2% | -1.1% |
 
 ## 4. Stress tests
 
 | Scenario | System | Nifty50 TRI |
 |---|---|---|
 | 2018 NBFC / IL&FS | -9.9% | -4.0% |
-| COVID crash 2020 | +3.5% | -16.3% |
-| 2022 rate shock | -12.8% | -10.0% |
-| 2024-25 correction | -2.2% | -6.5% |
+| COVID crash 2020 | +2.3% | -16.3% |
+| 2022 rate shock | -13.6% | -10.0% |
+| 2024-25 correction | -1.2% | -6.5% |
 
 Worst rolling 1-year return **-15.8%** (ending 2019-01-30); **12%** of rolling 1-year windows were negative. A holder must be able to sit through both.
 

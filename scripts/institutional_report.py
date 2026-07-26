@@ -24,7 +24,8 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, BacktestConfig,
-                            load_ohlcv, load_nifty, metrics, load_sector_map)
+                            load_ohlcv, load_nifty, metrics, load_sector_map,
+                            load_delivery_factors)
 
 CACHE = os.path.join(_ROOT, "data", "cache")
 REPORTS = os.path.join(_ROOT, "reports")
@@ -116,9 +117,15 @@ def main():
     # Netting = actual Indian law (losses offset gains within the fiscal year);
     # it unblocks the 6-month momentum refresh that per-trade taxation punished.
     # Validated: +2.84pp avg equity walk-forward (7/8), full system 19.0→20.7%.
+    # v7.7 PROVISIONAL: deliv_chg @10% (RESEARCH_LOG 4l). Degrades to the
+    # price-only book if the gitignored delivery archive is absent.
+    dfac = load_delivery_factors(universe=panel.tickers)
+    if dfac:
+        cfg.factor_weights = {**cfg.factor_weights, "deliv_chg": 0.10}
     run = Backtester(panel, PortfolioConstructor(cfg, sector_map=load_sector_map()),
                      BacktestConfig(rebal_bars=126,
-                                    top_n_liquid=int(os.environ.get('MARK5_TOP_N', '0')))).run(START, END)
+                                    top_n_liquid=int(os.environ.get('MARK5_TOP_N', '0'))),
+                     extra_factors=dfac).run(START, END)
     eq_nav = run["nav_net"]
     trades = run["trades"]
     cal = eq_nav.index

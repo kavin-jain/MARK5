@@ -1,20 +1,20 @@
 {
- "generated": "2026-07-26T13:08:35",
+ "generated": "2026-07-26T16:48:39",
  "period": {
   "start": "2016-01-01",
   "end": "2026-07-21",
   "years": 10.55
  },
- "system_cagr": 22.511070642731745,
+ "system_cagr": 22.810005103892948,
  "nifty_cagr": 11.90827717017493,
  "sleeves": [
   {
    "key": "eq",
    "label": "Equity book (THE SYSTEM)",
    "weight_pct": 50.0,
-   "standalone_cagr": 20.48862293591993,
-   "contribution_x": 3.362401483523457,
-   "share_of_gain_pct": 44.717678545983155,
+   "standalone_cagr": 21.524899834660904,
+   "contribution_x": 3.5794238909070812,
+   "share_of_gain_pct": 46.239262522137345,
    "passive": false
   },
   {
@@ -22,8 +22,8 @@
    "label": "Gold ETF (anyone can buy)",
    "weight_pct": 25.0,
    "standalone_cagr": 17.4228934125614,
-   "contribution_x": 1.8485716186958696,
-   "share_of_gain_pct": 24.584759380800143,
+   "contribution_x": 1.8449577119670932,
+   "share_of_gain_pct": 23.83330015833066,
    "passive": true
   },
   {
@@ -31,18 +31,18 @@
    "label": "US Nasdaq-100 (anyone can buy)",
    "weight_pct": 25.0,
    "standalone_cagr": 25.476353587118727,
-   "contribution_x": 2.308204084194501,
-   "share_of_gain_pct": 30.697562073216073,
+   "contribution_x": 2.3167104813549697,
+   "share_of_gain_pct": 29.927437319532725,
    "passive": true
   }
  ],
- "rebalancing_effect_x": 4.796163466380676e-14,
- "rebalancing_share_pct": 6.378574872589367e-13,
- "passive_share_pct": 55.28232145401621,
+ "rebalancing_effect_x": -5.595524044110789e-14,
+ "rebalancing_share_pct": -7.228339339239407e-13,
+ "passive_share_pct": 53.76073747786339,
  "selection": {
   "equal_weight_cagr": 11.435267702168117,
-  "factor_cagr": 20.061817173280726,
-  "selection_alpha_pp": 8.626549471112611,
+  "factor_cagr": 21.08327814110411,
+  "selection_alpha_pp": 9.648010438935994,
   "note": "Selection alpha is measured against equal-weight of the SAME point-in-time universe, net of the same tax and costs. The gold and US sleeves are passive ETFs and are not skill."
  }
 }
