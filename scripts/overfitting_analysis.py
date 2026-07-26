@@ -21,10 +21,10 @@ import pandas as pd
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
-                            ConstructionConfig, Backtester)
+                            ConstructionConfig, Backtester, load_sector_map)
 from core.portfolio.stats import (deflated_sharpe_ratio, pbo_cscv,
                                    probabilistic_sharpe_ratio, _sharpe)
-START, END = "2016-01-01", "2026-06-09"
+START, END = "2016-01-01", "2026-07-21"
 REPORTS = os.path.join(_ROOT, "reports")
 
 WEIGHTS = {
@@ -34,17 +34,50 @@ WEIGHTS = {
     "trend_hvy":  {"momentum": .20, "low_vol": .20, "trend": .45, "stability": .15},
     "stab_hvy":   {"momentum": .20, "low_vol": .20, "trend": .15, "stability": .45},
 }
-DEPLOYED = ("mom_heavy", 12, 1.5, 126)  # v7.0: momentum-heavy, 6-month refresh
+DEPLOYED = ("mom_heavy", 20, 1.5, 126)  # v7.5 deployed: mom-heavy, n_hold=20, 6-month
+# refresh. n_hold=12 (the old v7.0 deployment) was FALSIFIED on the honest PIT
+# universe in v7.3 (K25: 1/8 walk-forward windows, -5.42pp) and is now only a trial.
 
 # Research variants whose full daily series we don't regenerate here, but which
-# WERE trials and must count toward the deflation (annualised Sharpes from
-# efficiency_research.py / exit_speed_research.py, 2026-06-11):
-EXTRA_TRIAL_SHARPES_ANN = [
+# WERE trials and must count toward the deflation. Hard-coded ones are from
+# efficiency_research.py / exit_speed_research.py (2026-06-11); the rest are READ
+# from the v7.3-v7.5 research artifacts so the trial count cannot silently drift
+# below the number of things actually tried. Under-counting trials inflates the
+# Deflated Sharpe, so this list erring long is the conservative direction.
+_LEGACY_SHARPES_ANN = [
     1.03, 1.03, 0.96, 0.91, 0.95, 0.97,   # asymmetric exit variants (6)
     0.80, 0.81,                            # TLH -7% / -12%
     0.84,                                  # FIP 10%
     0.87, 0.91, 0.90,                      # sleeve-frequency variants (3)
 ]
+
+
+def _session_trial_sharpes():
+    """Annualised Sharpes of every config tested in the v7.3-v7.5 sweeps."""
+    import glob, json
+    out = []
+    for f, path in (("edge_research_2026_07.json", ("full_sy", "sharpe_excess")),
+                    ("drawdown_research.json", ("sy", "sharpe_excess"))):
+        p = os.path.join(REPORTS, f)
+        if not os.path.exists(p):
+            continue
+        for v in json.load(open(p)).values():
+            m = v.get(path[0]) if isinstance(v, dict) else None
+            if isinstance(m, dict) and m.get(path[1]) is not None:
+                out.append(float(m[path[1]]))
+    for f, key, fld in (("allocation_walkforward.json", "fixed_grid", "sharpe_excess"),
+                        ("sleeve_rebalance_erc.json", "rows", "sharpe_excess")):
+        p = os.path.join(REPORTS, f)
+        if not os.path.exists(p):
+            continue
+        d = json.load(open(p))
+        for r in (d.get(key) or []):
+            if r.get(fld) is not None:
+                out.append(float(r[fld]))
+    return out
+
+
+EXTRA_TRIAL_SHARPES_ANN = _LEGACY_SHARPES_ANN + _session_trial_sharpes()
 
 
 def main():
@@ -54,7 +87,11 @@ def main():
     grid = [(w, n, t, 252) for w, n, t in
             itertools.product(WEIGHTS.keys(), [8, 12, 16, 20], [0.5, 1.5, 3.0])]
     # + the rebalance-frequency dimension explored 2026-06-11 (mom_heavy book)
-    grid += [("mom_heavy", 12, 1.5, rb) for rb in (21, 42, 63, 126, 189)]
+    # rebalance-frequency dimension, for BOTH the old n_hold=12 deployment and the
+    # current n_hold=20 one. The deployed config must appear in this grid or its own
+    # return series is never captured and the DSR silently evaluates to NaN.
+    grid += [("mom_heavy", n, 1.5, rb)
+             for n in (12, 20) for rb in (21, 42, 63, 126, 189)]
     print(f"Running {len(grid)} strategy trials to assemble the returns matrix...", flush=True)
 
     rets, sharpes, labels, deployed_ret = {}, [], [], None
@@ -63,8 +100,10 @@ def main():
         cfg = ConstructionConfig(mode="factor_tilt", n_hold=nh, base_weighting="inverse_vol",
                                  tilt_strength=tilt, max_weight=max(0.08, 1.5 / nh),
                                  factor_weights=WEIGHTS[wname])
-        nav = Backtester(panel, PortfolioConstructor(cfg),
-                         BacktestConfig(rebal_bars=rb)).run(START, END)["nav_gross"]
+        nav = Backtester(panel, PortfolioConstructor(cfg, sector_map=load_sector_map()),
+                         BacktestConfig(rebal_bars=rb,
+                                        top_n_liquid=int(os.environ.get("MARK5_TOP_N", "0")))
+                         ).run(START, END)["nav_gross"]
         r = nav.pct_change(fill_method=None).fillna(0.0)
         if cal is None:
             cal = r.index
@@ -80,14 +119,19 @@ def main():
     print(f"  done. {len(labels)} series + {len(EXTRA_TRIAL_SHARPES_ANN)} "
           f"counted-only trials = {len(sharpes)} total.\n", flush=True)
 
+    if deployed_ret is None:
+        sys.exit(f"ERROR: deployed config {DEPLOYED} is not in the trial grid, so its "
+                 f"return series was never captured. Every statistic below would be NaN. "
+                 f"Add it to `grid` rather than reporting an empty result.")
     M = np.column_stack([rets[l] for l in labels])     # T x N
     dsr = deflated_sharpe_ratio(deployed_ret, sharpes)
     pbo = pbo_cscv(M, n_splits=12)
     ann = lambda d: d * np.sqrt(252)                   # daily->annual SR
 
     L = ["# MARK6 — Overfitting & Statistical-Significance Analysis", "",
-         "Bailey & López de Prado tests on the deployed v7.0 config (momentum-heavy / "
-         "n_hold=12 / tilt=1.5 / 126-bar refresh, FY-netting tax), using every strategy "
+         "Bailey & López de Prado tests on the DEPLOYED v7.5 config (momentum-heavy / "
+         "n_hold=20 / tilt=1.5 / 126-bar refresh, rank-transformed scores, sector cap "
+         "enforced, FY-netting tax), using every strategy "
          "variant explored across the project as the trial set (factor-weight grid, "
          "rebalance frequencies, asymmetric exits, TLH, FIP, sleeve frequencies). "
          "All on daily returns, 2016-2026.", "",

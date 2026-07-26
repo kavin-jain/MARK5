@@ -28,7 +28,7 @@ from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
 
 CACHE = os.path.join(_ROOT, "data", "cache")
 REPORTS = os.path.join(_ROOT, "reports")
-END = "2026-06-09"
+END = "2026-07-21"
 START = "2016-01-01"
 TAX = 0.15
 GOLD_W = 0.20

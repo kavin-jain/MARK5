@@ -20,7 +20,7 @@ from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
 
 CACHE = os.path.join(_ROOT, "data", "cache")
 REPORTS = os.path.join(_ROOT, "reports")
-END = "2026-06-09"
+END = "2026-07-21"
 LTCG = 0.125
 
 
