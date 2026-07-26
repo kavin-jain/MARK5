@@ -7,6 +7,7 @@ with disciplined multi-factor construction held through the cycle.
 """
 from .factors import FactorLibrary, composite_score, cross_sectional_z
 from .universe import DataPanel, discover_tickers, load_ohlcv, load_nifty
+from .universe import load_sector_map
 from .construction import ConstructionConfig, PortfolioConstructor
 from .backtest import Backtester, BacktestConfig, metrics, tranched_run
 from .external_factors import load_external_factors, EXTERNAL_FACTOR_NAMES
@@ -14,7 +15,7 @@ from .fundamentals import load_quality_factors, QUALITY_FACTORS
 
 __all__ = [
     "FactorLibrary", "composite_score", "cross_sectional_z",
-    "DataPanel", "discover_tickers", "load_ohlcv", "load_nifty",
+    "DataPanel", "discover_tickers", "load_ohlcv", "load_sector_map", "load_nifty",
     "ConstructionConfig", "PortfolioConstructor",
     "Backtester", "BacktestConfig", "metrics", "tranched_run",
     "load_external_factors", "EXTERNAL_FACTOR_NAMES",

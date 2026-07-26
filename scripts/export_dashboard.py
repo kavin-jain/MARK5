@@ -26,7 +26,7 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, BacktestConfig,
-                            load_ohlcv, load_nifty, metrics)
+                            load_ohlcv, load_nifty, metrics, load_sector_map)
 
 REPORTS = os.path.join(_ROOT, "reports")
 PAPER = os.path.join(_ROOT, "data", "paper")
@@ -75,7 +75,10 @@ def main():
     panel = DataPanel(discover_tickers(), end, freshness="off")
     cfg = ConstructionConfig(mode="factor_tilt", n_hold=20, base_weighting="inverse_vol",
                              tilt_strength=1.5, max_weight=0.08, factor_weights=MOM)
-    run = Backtester(panel, PortfolioConstructor(cfg),
+    # sector cap enforced from v7.3 (it was configured but dead: no script ever
+    # passed a map). The equal-weight benchmark below deliberately does NOT get it —
+    # a capped "equal weight" would stop being the honest do-nothing baseline.
+    run = Backtester(panel, PortfolioConstructor(cfg, sector_map=load_sector_map()),
                      BacktestConfig(rebal_bars=126, top_n_liquid=300)).run(START, end)
     eq = run["nav_gross"]
     sys_nav = wrap(eq, {"eq": .5, "GOLDBEES": .25, "MON100": .25})

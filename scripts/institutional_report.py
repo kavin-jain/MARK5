@@ -24,7 +24,7 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, BacktestConfig,
-                            load_ohlcv, load_nifty, metrics)
+                            load_ohlcv, load_nifty, metrics, load_sector_map)
 
 CACHE = os.path.join(_ROOT, "data", "cache")
 REPORTS = os.path.join(_ROOT, "reports")
@@ -116,7 +116,7 @@ def main():
     # Netting = actual Indian law (losses offset gains within the fiscal year);
     # it unblocks the 6-month momentum refresh that per-trade taxation punished.
     # Validated: +2.84pp avg equity walk-forward (7/8), full system 19.0→20.7%.
-    run = Backtester(panel, PortfolioConstructor(cfg),
+    run = Backtester(panel, PortfolioConstructor(cfg, sector_map=load_sector_map()),
                      BacktestConfig(rebal_bars=126,
                                     top_n_liquid=int(os.environ.get('MARK5_TOP_N', '0')))).run(START, END)
     eq_nav = run["nav_net"]

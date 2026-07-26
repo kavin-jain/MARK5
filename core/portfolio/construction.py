@@ -33,8 +33,14 @@ class ConstructionConfig:
     base_weighting: str = "inverse_vol"  # "equal" | "inverse_vol"
     tilt_strength: float = 0.50           # 0 = pure base weighting; >0 tilts to score
     max_weight: float = 0.08              # cap per name
-    max_sector_weight: float = 0.30       # cap per sector (if sector map provided)
+    max_sector_weight: float = 0.30       # cap per sector. ENFORCED ONLY IF A SECTOR MAP
+                                          # IS PASSED to PortfolioConstructor — until
+                                          # v7.3 no production script did, so this was
+                                          # silently dead. Use load_sector_map().
     buffer_mult: float = 2.0              # hold a name until it leaves top n_hold*mult
+    rank_transform: bool = True           # score on cross-sectional RANKS, not raw factor
+                                          # values (v7.3 P17: MaxDD 7/8 windows, return
+                                          # unchanged). False reproduces pre-v7.3.
 
 
 def _cap_weights(w: pd.Series, max_weight: float) -> pd.Series:

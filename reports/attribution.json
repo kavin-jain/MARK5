@@ -1,0 +1,48 @@
+{
+ "generated": "2026-07-26T13:08:35",
+ "period": {
+  "start": "2016-01-01",
+  "end": "2026-07-21",
+  "years": 10.55
+ },
+ "system_cagr": 22.511070642731745,
+ "nifty_cagr": 11.90827717017493,
+ "sleeves": [
+  {
+   "key": "eq",
+   "label": "Equity book (THE SYSTEM)",
+   "weight_pct": 50.0,
+   "standalone_cagr": 20.48862293591993,
+   "contribution_x": 3.362401483523457,
+   "share_of_gain_pct": 44.717678545983155,
+   "passive": false
+  },
+  {
+   "key": "GOLDBEES",
+   "label": "Gold ETF (anyone can buy)",
+   "weight_pct": 25.0,
+   "standalone_cagr": 17.4228934125614,
+   "contribution_x": 1.8485716186958696,
+   "share_of_gain_pct": 24.584759380800143,
+   "passive": true
+  },
+  {
+   "key": "MON100",
+   "label": "US Nasdaq-100 (anyone can buy)",
+   "weight_pct": 25.0,
+   "standalone_cagr": 25.476353587118727,
+   "contribution_x": 2.308204084194501,
+   "share_of_gain_pct": 30.697562073216073,
+   "passive": true
+  }
+ ],
+ "rebalancing_effect_x": 4.796163466380676e-14,
+ "rebalancing_share_pct": 6.378574872589367e-13,
+ "passive_share_pct": 55.28232145401621,
+ "selection": {
+  "equal_weight_cagr": 11.435267702168117,
+  "factor_cagr": 20.061817173280726,
+  "selection_alpha_pp": 8.626549471112611,
+  "note": "Selection alpha is measured against equal-weight of the SAME point-in-time universe, net of the same tax and costs. The gold and US sleeves are passive ETFs and are not skill."
+ }
+}

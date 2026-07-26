@@ -201,7 +201,8 @@ class Backtester:
                     for f in self.extra_names:
                         raw[f][t] = elast.get(f, np.nan)
         panel = {f: pd.Series(raw[f]) for f in raw}
-        comp = composite_score(panel, self.con.cfg.factor_weights)
+        comp = composite_score(panel, self.con.cfg.factor_weights,
+                               rank_transform=self.con.cfg.rank_transform)
         return comp, pd.Series(vol)
 
     def run(self, start: str, end: str) -> dict:

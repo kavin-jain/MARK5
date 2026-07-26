@@ -54,6 +54,28 @@ STRUCTURAL_EXCLUDE = {
 }
 
 
+def load_sector_map() -> dict:
+    """{ticker -> NSE industry}. Empty dict if the file is absent.
+
+    Needed because `ConstructionConfig.max_sector_weight` is only enforced when a
+    map is actually handed to `PortfolioConstructor`. Until v7.3 no production
+    script passed one, so the configured 30% sector cap never executed — the
+    control was advertised in the config and absent from the book.
+
+    Coverage is 268/300 (89%) of the live eligible universe. Unmapped names are
+    treated as their own sector and therefore escape the cap; that is the
+    conservative behaviour and it is NOT patched by guessing a label, because
+    inventing sector data to make a control look complete is exactly the kind of
+    fabrication this project refuses elsewhere.
+    """
+    p = os.path.join(_ROOT, "config", "sector_map.json")
+    if not os.path.exists(p):
+        return {}
+    import json
+    with open(p) as f:
+        return json.load(f).get("sectors", {})
+
+
 def _is_etf(name: str) -> bool:
     return name.upper().endswith("BEES") or name.upper().endswith("ETF")
 

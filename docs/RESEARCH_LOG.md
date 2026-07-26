@@ -276,6 +276,37 @@ honest data, and P14 (tranching) is real but not executable at ₹5L.
 | BUG7 | `max_sector_weight=0.30` is **dead code** — `sector_map` is never passed to `PortfolioConstructor` anywhere in production | Measured impact small (top sector averages 20% of the book, breaching 30% in only 3/21 rebalances) but the cap is advertised and not enforced. Also 7.7 names/rebalance are absent from `config/sector_map.json` and would escape the cap regardless. |
 | — | `config/system_config.json` is a **dead MARK3 artifact** referenced by no code | 300 lines still advertising "Advanced AI Stock Prediction System", XGBoost/LSTM/GRU ensembles, news-sentiment, 5% stop-losses, Redis/TimescaleDB — every one of which this log KILLED. A reviewer reading the public repo finds it. Flagged, not deleted. |
 
+## 4g. v7.3 — DEPLOYED changes, attribution, and the factor-regression reality check (2026-07-26)
+
+### Deployed to the live book on 2026-07-26 (day 4, 36 trades, all in the append-only ledger)
+
+| # | Change | Why | Effect (full system, walk-forward) |
+|---|--------|-----|------------------------------------|
+| P17 | **Rank-transform** the factor cross-section (`ConstructionConfig.rank_transform=True`) | momentum is right-skewed; one name up 400% sets the z-scale and squashes every real distinction below it — clipping caps that name but not the inflated σ it created | MaxDD **7/8** windows |
+| BUG7fix | **Sector cap ENFORCED** — `load_sector_map()` now passed to `PortfolioConstructor` in all 5 production scripts | the 30% cap was configured and dead since inception | MaxDD **8/8** windows (sleeve) |
+| P19 | **Largest-remainder share allocator** in `paper_track.py` (init + rebalance residual sweep) | naive `floor()` rounds every position DOWN, stranding cash and pulling weights one-way off target | see below |
+
+Combined **R+S**, validated ≥6/8 on MaxDD *and* Calmar at BOTH levels:
+**CAGR +20.67→+20.87%, excess Sharpe 0.89→0.94, MaxDD −24.9→−22.2% (7/8), Calmar 0.83→0.94 (6/8).**
+Deliberately deployed **without** `n_hold=25`, which showed better full-period optics
+(Sharpe 0.97) but **worse** walk-forward consistency (Calmar 6/8→4/8) — the same PBO
+discipline that chose 126d over the in-sample-best 21d.
+
+| # | Finding | Verdict | Evidence | Result |
+|---|---------|---------|----------|--------|
+| P19 | **Whole-share granularity is a real, fixable cost at small capital** | ✅ KEEP | **[H]** | `capital_flexibility.py`, measured at each real rebalance against real forward prices. Naive `floor()` drags **−0.35pp/yr at ₹5L** and **−1.26pp/yr at ₹1L**, stranding 1.9%/9.8% of the book in idle cash and pulling weights **6.6pp** off target — always downward. Largest-remainder apportionment cuts the drag to **+0.11pp at ₹5L** (i.e. zero) for no strategy change, no added risk and no overfitting surface. Verified live: idle cash **₹16,245 → ₹48** at the 2026-07-26 rebalance. **This is the answer to "make a small book behave like a large one."** |
+| P20 | **Attribution: what is skill vs what anyone can buy** | ✅ KEEP (as knowledge) | **[H]** | `attribution.py`. Of the total 7.52x gain: **gold 25% + US Nasdaq 31% = 55% came from two passive ETFs**; the equity book contributed **45%**. Inside the equity sleeve, against equal-weight of the SAME point-in-time universe, net of the same tax and costs: **+8.63pp/yr selection alpha** (+20.06% vs +11.44%). Both halves must always be reported together — quoting +22.5% system CAGR as "stock picking" would be false. |
+| **K29** | **Is the equity alpha real once you control for known factors?** | ⚠️ **NOT PROVEN** | **[H]** | `risk_report.py` regresses the book on long/short tercile factors **built from this same point-in-time universe** (market, size=small−big by turnover, momentum, low-vol), rebuilt every 21 bars. **Equity sleeve: annualised alpha +4.42%/yr but t = 1.19 — NOT statistically significant.** R² = 0.71, explained by market β 0.757, momentum β 0.633, low-vol β **−0.535** (i.e. a deliberate tilt INTO high-volatility names, confirming the 47.6% average name vol from K24's diagnostic). The full 50/25/25 system shows alpha +10.47%/yr at t = 3.46, but that is significant largely because gold and Nasdaq are **not in the factor model** — it is diversification, not stock selection. **Honest characterisation: MARK6 is efficient, tax-disciplined harvesting of the momentum premium plus genuine multi-asset diversification. It is NOT demonstrated idiosyncratic alpha.** The +8.63pp vs equal-weight in P20 is real as a comparison but is substantially momentum-factor exposure, which equal-weight simply does not have. This is the single most important honest statement about the system and it belongs on any page or application that describes it. |
+| P21 | **Tail-risk profile** | ✅ KEEP (as knowledge) | **[H]** | Daily skew **−0.93**, kurtosis **9.76** (normal 3.0) — materially fat-tailed. 99% 1-day historical VaR **−2.89%** vs parametric **−2.05%**: a normal model **understates** the bad days by ~40%, so any risk figure quoted parametrically is optimistic. 21-day 99% CVaR **−13.4%**. Worst rolling 1-year **−15.8%**; **12%** of rolling 1-year windows were negative. Drawdown attribution confirms the equity sleeve drives every major drawdown, with gold offsetting in 2018 (+0.8%) and 2025 (+3.3%) — the multi-asset structure is load-bearing, not decorative. |
+
+**v7.3 closing position.** Twelve structural levers tested across two sweeps; two were
+deployed, both risk levers, neither adding return. The system's honest description is
+now precise: **a momentum-tilted, high-volatility, long-only Indian equity book (β_mkt
+0.76, β_mom 0.63) at 50%, diversified with gold and US tech, harvested tax-efficiently,
+capacity ~₹10–25cr.** Its measured edge over the index is large and real; its edge over
+*the factors it is made of* is +4.4%/yr and not statistically significant on 10.6 years.
+Both statements are true and both should be said.
+
 ## 5. 🔭 OPEN FRONTIERS — untested levers worth pursuing
 
 Ranked by plausible edge × feasibility. Each: hypothesis → how to test → realistic ceiling.

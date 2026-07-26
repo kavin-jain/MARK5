@@ -16,7 +16,8 @@ import pandas as pd
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
-                            ConstructionConfig, FactorLibrary, composite_score)
+                            ConstructionConfig, FactorLibrary, composite_score,
+                            load_sector_map)
 
 GOLD_WEIGHT = 0.25
 US_WEIGHT = 0.25            # MON100 (Nasdaq-100) — uncorrelated sleeve
@@ -58,7 +59,7 @@ def main():
                              tilt_strength=1.5, max_weight=0.08,
                              factor_weights={"momentum": 0.45, "low_vol": 0.15,
                                              "trend": 0.25, "stability": 0.15})
-    con = PortfolioConstructor(cfg)
+    con = PortfolioConstructor(cfg, sector_map=load_sector_map())
 
     # MUST match the deployed screen in scripts/paper_track.py (top 300 by turnover).
     # A percentile screen here would print a DIFFERENT portfolio than the live book
