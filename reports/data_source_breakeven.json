@@ -1,0 +1,52 @@
+{
+ "assumptions": {
+  "breadth": 40,
+  "transfer_coefficient": 0.4,
+  "equity_vol": 0.221,
+  "equity_weight": 0.5,
+  "effective_tax": 0.15,
+  "extra_turnover_cost": 0.002
+ },
+ "value_by_ic": {
+  "weak": 0.006128406301551562,
+  "good": 0.010880677169252603,
+  "exceptional": 0.01800908347080416
+ },
+ "sources": [
+  {
+   "name": "Kite Connect (data + execution)",
+   "cost": 24000,
+   "category": "intraday/tick",
+   "note": "F1's enabler. Intraday effects documented but every public backtest excludes costs, and SEBI finds 70-93% of retail intraday traders lose money. Fundamentally incompatible with this book's long-hold tax design.",
+   "breakeven_capital_inr": 2205745.067762962
+  },
+  {
+   "name": "Screener.in premium",
+   "cost": 4000,
+   "category": "fundamentals",
+   "note": "Fundamentals as a TILT already falsified on 12 years of real data (K15).",
+   "breakeven_capital_inr": 367624.1779604937
+  },
+  {
+   "name": "Trendlyne premium",
+   "cost": 12000,
+   "category": "shareholding + estimates",
+   "note": "Shareholding path explicitly falsified (K7/I1): the free NSE XBRL run concluded paid Trendlyne would NOT have helped. Estimate-revision data is the part that is genuinely untested.",
+   "breakeven_capital_inr": 1102872.533881481
+  },
+  {
+   "name": "Analyst estimate revisions (institutional feed)",
+   "cost": 150000,
+   "category": "estimates",
+   "note": "The ONE category with strong global literature that this project has never tested and cannot obtain free. Chan-Jegadeesh-Lakonishok: revision momentum is among the most robust documented anomalies.",
+   "breakeven_capital_inr": 13785906.673518514
+  },
+  {
+   "name": "Refinitiv / Bloomberg terminal",
+   "cost": 2000000,
+   "category": "everything",
+   "note": "Institutional pricing. Delivers estimates, PIT fundamentals, holdings.",
+   "breakeven_capital_inr": 183812088.98024684
+  }
+ ]
+}

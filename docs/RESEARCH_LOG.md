@@ -487,6 +487,57 @@ book's horizons. Combined with K29, the honest position is that **this system's 
 factor harvesting plus tax discipline plus diversification, and no free public dataset
 found so far converts it into demonstrated stock-selection alpha.**
 
+## 4k. v7.6b — Is any PAID data source worth it? Break-even arithmetic (2026-07-26)
+
+`scripts/data_source_breakeven.py`. Treats a subscription as an investment that must
+return more than it costs, using Grinold + Clarke-de Silva-Thorley on THIS system's
+measured properties (breadth = 20 names x 2 refreshes = 40 bets/yr; equity vol 22.1%;
+equity weight 50%; effective tax 15%; transfer coefficient 0.40 for a long-only book
+with an 8% name cap and 20 slots — ignoring TC is the standard way vendor ROI gets
+overstated).
+
+**Value of a genuinely orthogonal new signal, by IC:**
+
+| IC | realised IR | extra NET return | worth at ₹5L | worth at ₹5cr |
+|---|---:|---:|---:|---:|
+| 0.03 "weak" | 0.076 | +0.61pp | ₹3,064/yr | ₹3.06L/yr |
+| 0.05 "good" | 0.126 | +1.09pp | ₹5,440/yr | ₹5.44L/yr |
+| 0.08 "exceptional" | 0.202 | +1.80pp | ₹9,005/yr | ₹9.00L/yr |
+
+**Break-even capital per source (at a GOOD IC of 0.05):**
+
+| Source | ~cost/yr | Break-even capital | Status |
+|---|---:|---:|---|
+| Screener.in premium | ₹4,000 | ₹3.7L | Clears at ₹5L — but its category (fundamentals-as-tilt) is **already falsified**, K15 |
+| Trendlyne premium | ₹12,000 | ₹11L | Shareholding path **already falsified**, K7/I1 explicitly concluded paid Trendlyne would not have helped |
+| Kite Connect (intraday + execution) | ₹24,000 | ₹22L | **Incompatible** with this book's long-hold tax design; SEBI: 70-93% of retail intraday traders lose money |
+| Analyst estimate revisions (institutional) | ₹1.5L | **₹1.38cr** | The **only** untested category with strong literature (Chan-Jegadeesh-Lakonishok revision momentum) |
+| Refinitiv / Bloomberg | ₹20L | ₹18.4cr | Institutional pricing |
+
+*(Costs are indicative order-of-magnitude and several are quote-only — verify before any purchase.)*
+
+**K40 — VERDICT: no paid data source is worth it at ₹5 lakh. ❌ KILL.** [H]
+At that capital a *good* orthogonal signal is worth **₹5,440/year in total**. Every
+candidate except Screener costs more than the entire benefit, and Screener's category
+is already dead. The binding constraint is **not data quality** — it is that a
+percentage edge on a small book produces few rupees while data is priced in absolute
+rupees. Paid data becomes rational somewhere around **₹1–5 crore**, not at retail scale.
+
+**Two honesty qualifiers on the table above.**
+1. **The IC scenarios are more optimistic than anything this project has ever measured
+   in new data.** Ownership flow came in at IC −0.025 (K7); delivery data at +0.023 and
+   failed significance (K37). Nothing has reached 0.05. The "good" column is therefore
+   an upper bound on a hypothetical, not a forecast.
+2. **Break-even is not the same as worth buying.** A source that merely repays its
+   subscription adds no margin of safety against the signal decaying, being crowded out,
+   or failing walk-forward — which is what has happened to every signal tested here.
+
+**The one genuinely open paid candidate**, if capital ever reaches ~₹1.5cr+, is
+**analyst earnings-estimate revisions**: strong global literature, orthogonal to price,
+never tested in this project, and unobtainable free (no point-in-time archive exists for
+Indian estimates). That is the single item worth revisiting at scale — everything else
+is either falsified, incompatible, or unaffordable.
+
 ## 5. 🔭 OPEN FRONTIERS — untested levers worth pursuing
 
 Ranked by plausible edge × feasibility. Each: hypothesis → how to test → realistic ceiling.
