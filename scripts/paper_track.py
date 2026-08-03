@@ -462,6 +462,13 @@ def cmd_rebalance(force=False):
         print(f"  not due — {due}d since last refresh, cadence is {REBAL_DAYS}d "
               f"(next ~{(last + pd.Timedelta(days=REBAL_DAYS)).date()}). Use --force to override.")
         return
+    # --force overrides the CADENCE, never the market calendar. Two forced
+    # rebalances once fired on a Sunday against Friday's closes: the ledger then
+    # records fills at prices nobody could have traded at. There is no reason to
+    # ever want that, so this guard has no override.
+    if pd.Timestamp.today().weekday() >= 5:
+        sys.exit("ERROR: market closed today — every quote is stale. Refusing to "
+                 "book fills at prices that were never tradeable. Run on a session day.")
     reconcile_corporate_actions(book)
 
     w_eq, asof, _ = target_book()

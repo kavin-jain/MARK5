@@ -1,0 +1,51 @@
+{
+ "generated": "2026-08-03T20:03:29",
+ "days_live": 12,
+ "sessions": 10,
+ "book_return_pct": -0.07091773919049027,
+ "bench_return_pct": 2.381478678107407,
+ "relative_pct": -2.4523964172978974,
+ "sleeves": {
+  "eq": {
+   "value": 257585.240524292,
+   "pnl": 6845.853744881108,
+   "return_pct": 2.730266605821996,
+   "nav_impact_pp": 1.3691707489762215
+  },
+  "gold": {
+   "value": 123123.00224304199,
+   "pnl": -2305.9736450209944,
+   "return_pct": -1.8384696428350993,
+   "nav_impact_pp": -0.4611947290041989
+  },
+  "us": {
+   "value": 118924.65460205078,
+   "pnl": -3161.5741203598823,
+   "return_pct": -2.5896238694934235,
+   "nav_impact_pp": -0.6323148240719765
+  }
+ },
+ "selection_vs_index_pp": 0.3487879277145889,
+ "noise_test": {
+  "windows": 2567,
+  "mean_pp": 0.16660973166991613,
+  "std_pp": 1.6549442302583697,
+  "p5": -2.3634045972881896,
+  "p50": 0.12622472210130908,
+  "p95": 2.780642654921604,
+  "live_percentile": 4.518893650175302,
+  "note": "Equity sleeve proxied by Nifty itself, so the test isolates allocation drag and assumes zero selection skill."
+ },
+ "churn": {
+  "rebalances": 2,
+  "date": "2026-07-26",
+  "weekday": "Sunday",
+  "day_of_book": 4,
+  "cadence_days": 182,
+  "trades": 64,
+  "costs_inr": 366.76999999999964,
+  "realised_pnl_inr": -1732.8946754525493,
+  "realised_is_not_extra_damage": "NAV is marked to market, so these losses were already in NAV as unrealised. NAV moved on rebalance day by exactly the transaction cost. The real harm is a contaminated track record, not P&L.",
+  "effect_pp": 0.5662129864564981
+ }
+}

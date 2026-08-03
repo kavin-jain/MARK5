@@ -599,6 +599,60 @@ absent** (it is 130MB and gitignored).
 if one is ever found. Until then this is the project's most promising unproven result,
 and it is labelled as such everywhere it appears.
 
+## 5a. Live paper book — first drawdown review (2026-08-03, day 12)
+
+**Trigger:** the book read **−0.07%** against Nifty **+2.38%** (**−2.45pp**) and looked
+broken. Script: `scripts/paper_diagnosis.py` → `reports/paper_diagnosis.json`.
+
+### The number is allocation, not selection
+
+| sleeve | weight | return | NAV impact |
+|---|---:|---:|---:|
+| Indian equity (the system) | 51.6% | **+2.73%** | +1.37pp |
+| Gold ETF (passive) | 24.6% | −1.84% | −0.46pp |
+| US Nasdaq-100 (passive) | 23.8% | −2.59% | −0.63pp |
+
+The equity sleeve **beat the Nifty by +0.35pp**. The shortfall is entirely the 50%
+that is deliberately *not* Indian equity, in a window where Nifty rallied and both
+diversifiers fell. This is the designed behaviour of a beta-0.61 book, priced in at
+`4h`'s allocation decision — not a malfunction.
+
+**Is −2.45pp abnormal?** Over 2,567 historical 12-day windows of the deployed
+50/25/25 blend vs Nifty — *assuming zero selection skill* — the distribution is
+mean +0.17pp, σ 1.65pp, 5th pct −2.36pp. The live reading sits at the **5th
+percentile**: roughly **1 window in 22**, from allocation alone. Unpleasant,
+unremarkable, and far too short to carry information. 10 sessions cannot measure an
+edge that needs years; **KEEP** the book running untouched.
+
+### The real defect: two forced rebalances on day 4 — KILL the practice
+
+A 182-day book was rebalanced **twice on 2026-07-26 (a Sunday), on day 4**, at stale
+Friday closes, 64 trades. Root cause: `paper_track.py rebalance --force` was used to
+push *config* changes (`4g` rank-transform/sector-cap at 13:06, `4l` `deliv_chg` at
+16:32) into the live book. The 182-day guard worked; `--force` bypassed it, and
+nothing in the health check looked.
+
+- Cost: **₹367** (0.073%). The ₹1,733 "realised loss" is **not** extra damage — NAV is
+  marked to market, so it was already there as unrealised. Proof: NAV moved that day
+  by −₹192.86 against a rebalance cost of ₹192.85, i.e. **by the cost and nothing else**.
+- Counterfactual (hold the opening book untouched to 2026-08-03): NAV ₹496,814 =
+  −0.637% vs actual ₹499,645 = −0.071%. The rebalance **helped by +0.57pp**.
+
+**It made money and is still wrong.** The harm is that a 12-day series which was
+supposed to be an out-of-sample test of one fixed system is instead a test of three
+configs spliced together. That is a track-record problem, not a P&L problem, and the
+favourable outcome was luck.
+
+**Fixed (2026-08-03):** `--force` now overrides the *cadence* but never the market
+calendar — rebalancing on a closed market `sys.exit`s with no override. Health check
+gained two checks (22 total): rebalance count vs cadence, and no rebalance on a
+non-session day. Both verified to fail on an injected violation. The two historical
+events are **waived by count, never deleted**, so the guard watches the next one.
+
+**Standing rule:** a config change does **not** entitle the live book to a rebalance.
+Deploy config to the engine; the book adopts it at its next scheduled refresh
+(~2027-01-24). Otherwise every research idea silently rewrites the track record.
+
 ## 5. 🔭 OPEN FRONTIERS — untested levers worth pursuing
 
 Ranked by plausible edge × feasibility. Each: hypothesis → how to test → realistic ceiling.

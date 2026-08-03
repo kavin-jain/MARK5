@@ -133,6 +133,31 @@ def main():
         check("benchmark present", has_bench,
               "" if has_bench else "missing — the vs-index number is the whole point")
 
+        # The book refreshes semi-annually. Two forced rebalances fired on day 4
+        # (a Sunday, at stale prices) to resync the live book after a mid-flight
+        # config change, and nothing here noticed. An off-schedule refresh is not
+        # a P&L problem, it is a track-record problem: the series stops being an
+        # out-of-sample test of one fixed system.
+        # The two 2026-07-26 events are a KNOWN, DOCUMENTED incident (see
+        # RESEARCH_LOG 5a). They stay in the ledger forever — nothing is ever
+        # deleted — but they are waived here so the check keeps guarding against
+        # the NEXT violation instead of failing permanently and being ignored.
+        WAIVED = 2  # both fired 2026-07-26, day 4, resyncing config mid-flight
+        start = datetime.fromisoformat(book["start_date"]).date()
+        elapsed = (datetime.now(timezone.utc).date() - start).days
+        rebs = book.get("rebalances", [])
+        allowed = elapsed // 182 + WAIVED
+        check("rebalances on schedule", len(rebs) <= allowed,
+              f"{len(rebs)} fired in {elapsed}d; cadence 182d + {WAIVED} waived "
+              f"allows {allowed}" if len(rebs) > allowed
+              else f"{len(rebs)} in {elapsed}d ({WAIVED} waived, documented)")
+        offday = [r["date"] for r in rebs
+                  if datetime.fromisoformat(r["date"]).weekday() >= 5
+                  and r["date"] != "2026-07-26"]
+        check("no rebalance on a closed market", not offday,
+              f"executed at stale prices on {offday}" if offday else
+              "guard added; 2026-07-26 waived as documented incident")
+
     # ── 4b. the standalone page embeds the feed; it must not lag it ──────
     idx = os.path.join(_ROOT, "docs", "index.html")
     local_feed = os.path.join(_ROOT, "docs", "data", "mark6.json")
