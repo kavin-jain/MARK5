@@ -274,3 +274,6 @@ data/nested_wf_navs.parquet
 
 # 130MB delivery archive — regenerate with scripts/fetch_delivery.py
 data/delivery/raw/
+
+# browser-verification scratch (screenshots, console logs)
+.playwright-mcp/

@@ -408,6 +408,134 @@ def cmd_status(quiet=False):
     return book, nav, ret, days, detail, bench
 
 
+PASSIVE = {"GOLDBEES": "Gold ETF", "MON100": "US Nasdaq-100"}
+
+
+def sleeve_attribution(book, detail, nav_now):
+    """Split the headline into its three sleeves. Real money, two honest measures.
+
+    The blended headline hides the only thing worth knowing: half the book is two
+    passive ETFs anyone can buy, and only the other half is the system. When Nifty
+    rallies and both diversifiers fall, the total looks broken while nothing is.
+
+    Two DIFFERENT measures, because they answer different questions and disagree:
+
+      P&L / NAV impact — cash-on-cash: current value minus every rupee put in,
+        including brokerage. Exact by construction, since
+            capital = SUM(net invested) + cash   and   NAV = SUM(value) + cash
+        so the sleeve impacts sum to the headline return with nothing left over.
+        This is "what did it do to my money".
+
+      Return % — TIME-WEIGHTED, chain-linked across rebalances. This is "how did
+        it perform", and it is the only one comparable to an index. The naive
+        holdings-vs-entry figure is NOT used: a rebalance resets entry prices and
+        sweeps idle cash in, and counting a deposit as profit flattered the equity
+        sleeve by +0.74pp on 2026-08-03 (RESEARCH_LOG 5a). Reconstructed as
+            equity value = NAV - cash - ETF quantities x ETF closes
+        from the append-only ledger, so it needs only two price series and stays
+        exact however many names the equity sleeve has traded.
+    """
+    led = list(csv.DictReader(open(LEDGER))) if os.path.exists(LEDGER) else []
+    if not led:
+        return None
+    cap = book["capital"]
+
+    # cash-on-cash: net rupees committed per sleeve, brokerage included
+    invested = {}
+    for r in led:
+        k = PASSIVE.get(r["ticker"], "eq")
+        sgn = 1 if r["action"] == "BUY" else -1
+        invested[k] = invested.get(k, 0.0) + sgn * float(r["value_inr"]) + float(r["cost_inr"])
+
+    value = {}
+    for h in detail:
+        k = PASSIVE.get(h["ticker"], "eq")
+        value[k] = value.get(k, 0.0) + h["value"]
+
+    twr = _sleeve_twr(book, led)
+    labels = {"eq": "Indian equity", "Gold ETF": "Gold ETF",
+              "US Nasdaq-100": "US Nasdaq-100"}
+    rows = []
+    for k in ("eq", "Gold ETF", "US Nasdaq-100"):
+        val, inv = value.get(k, 0.0), invested.get(k, 0.0)
+        rows.append({
+            "key": k, "label": labels[k], "passive": k != "eq",
+            "role": ("Factor-ranked stock selection — this is the system"
+                     if k == "eq" else "Passive ETF — anyone can buy this"),
+            "n_holdings": sum(1 for h in detail if PASSIVE.get(h["ticker"], "eq") == k),
+            "value_inr": val, "invested_inr": inv,
+            "weight_pct": val / nav_now * 100 if nav_now else None,
+            "pnl_inr": val - inv,
+            "nav_impact_pp": (val - inv) / cap * 100,
+            "return_pct": twr.get(k),
+        })
+    return {"rows": rows, "cash_inr": book.get("cash", 0.0),
+            "total_pnl_inr": sum(r["pnl_inr"] for r in rows),
+            "total_impact_pp": sum(r["nav_impact_pp"] for r in rows),
+            "method": ("NAV impact is cash-on-cash and sums exactly to the headline. "
+                       "Return % is time-weighted and chain-linked across rebalances, "
+                       "so cash swept in at a rebalance is never counted as profit.")}
+
+
+def _sleeve_twr(book, led):
+    """{sleeve -> time-weighted return %} over the live window, flow-neutral."""
+    import yfinance as yf
+    if not os.path.exists(NAV_LOG):
+        return {}
+    hist = [r for r in csv.DictReader(open(NAV_LOG)) if r.get("nav_inr")]
+    if len(hist) < 2:
+        return {}
+    dates = [pd.Timestamp(r["date"]) for r in hist]
+    etf = list(PASSIVE)
+    try:
+        px = yf.download([f"{t}.NS" for t in etf], start=book["start_date"],
+                         end=str((dates[-1] + pd.Timedelta(days=2)).date()),
+                         auto_adjust=True, progress=False, threads=False)["Close"]
+        px.index = px.index.tz_localize(None)
+    except Exception:
+        return {}
+
+    qty, cash, states = {t: 0 for t in etf}, float(book["capital"]), {}
+    for d in sorted({r["date"] for r in led}):
+        for r in led:
+            if r["date"] != d:
+                continue
+            sgn = 1 if r["action"] == "BUY" else -1
+            cash -= sgn * float(r["value_inr"]) + float(r["cost_inr"])
+            if r["ticker"] in etf:
+                qty[r["ticker"]] += sgn * int(r["qty"])
+        states[pd.Timestamp(d)] = (dict(qty), cash)
+    keys = sorted(states)
+
+    series = {"eq": [], **{PASSIVE[t]: [] for t in etf}}
+    for i, d in enumerate(dates):
+        q, csh = states[max(k for k in keys if k <= d)]
+        tot = 0.0
+        for t in etf:
+            try:
+                p = float(px[f"{t}.NS"].reindex([d], method="ffill").iloc[0])
+            except Exception:
+                return {}
+            v = q[t] * p
+            series[PASSIVE[t]].append(v)
+            tot += v
+        series["eq"].append(float(hist[i]["nav_inr"]) - csh - tot)
+
+    # chain-link across rebalance dates — the only points cash enters a sleeve
+    breaks = sorted({pd.Timestamp(r["date"]) for r in book.get("rebalances", [])}
+                    & set(dates))
+    cuts = [0] + [dates.index(b) for b in breaks] + [len(dates)]
+    out = {}
+    for k, s in series.items():
+        r = 1.0
+        for a, b in zip(cuts[:-1], cuts[1:]):
+            if b - 1 <= a or not s[a]:
+                continue
+            r *= s[b - 1] / s[a]
+        out[k] = (r - 1) * 100
+    return out
+
+
 def cmd_export():
     """Emit the JSON the public dashboard reads. Real data only."""
     book, nav, ret, days, detail, bench = cmd_status(quiet=True)
@@ -433,6 +561,8 @@ def cmd_export():
            "tax_liability": net_fy_tax(book),
            "realised_pnl": book.get("realised_pnl", 0.0),
            "rebalances": len(book.get("rebalances", [])),
+           # the blended headline hides that half the book is passive ETFs
+           "sleeves": sleeve_attribution(book, detail, nav),
            "holdings": detail, "nav_history": hist}
     path = os.path.join(PAPER_DIR, "paper_export.json")
     json.dump(out, open(path, "w"), indent=1, default=float)

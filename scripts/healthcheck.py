@@ -133,6 +133,22 @@ def main():
         check("benchmark present", has_bench,
               "" if has_bench else "missing — the vs-index number is the whole point")
 
+        # The page splits the headline into three sleeves. If the parts stop summing
+        # to the whole, the split is fiction — fail loudly rather than serve it.
+        sv = live.get("sleeves")
+        if sv:
+            gap = abs(sv["total_impact_pp"] - live["return_pct"])
+            check("sleeve split reconciles to headline", gap < 0.01,
+                  f"sleeves {sv['total_impact_pp']:+.3f}pp vs headline "
+                  f"{live['return_pct']:+.3f}% — gap {gap:.3f}pp")
+            missing = [r["label"] for r in sv["rows"] if r.get("return_pct") is None]
+            check("every sleeve has a time-weighted return", not missing,
+                  f"no return for {missing} — price history fetch failed" if missing
+                  else "", warn=True)
+        else:
+            check("sleeve attribution present", False,
+                  "live feed has no sleeves block — section 01 will render empty")
+
         # The book refreshes semi-annually. Two forced rebalances fired on day 4
         # (a Sunday, at stale prices) to resync the live book after a mid-flight
         # config change, and nothing here noticed. An off-schedule refresh is not

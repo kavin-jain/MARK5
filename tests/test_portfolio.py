@@ -469,3 +469,60 @@ class TestIntegration:
         assert -1.0 < m["cagr"] < 2.0          # sane range, not absurd
         assert -1.0 <= m["max_dd"] <= 0.0
         assert out["nav_net"].iloc[0] == pytest.approx(1.0, abs=0.2)
+
+
+class TestSleeveAttribution:
+    """The public page splits the headline into three sleeves. The split must
+    RECONCILE — if the parts do not sum to the whole, the page is lying."""
+
+    def _export(self):
+        p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                         "data", "paper", "paper_export.json")
+        if not os.path.exists(p):
+            pytest.skip("no live paper export — run scripts/paper_track.py export")
+        import json
+        return json.load(open(p))
+
+    def test_sleeve_impacts_sum_to_headline(self):
+        e = self._export()
+        s = e.get("sleeves")
+        if not s:
+            pytest.skip("export predates sleeve attribution")
+        # cash-on-cash impacts must reconstruct the headline return exactly
+        assert s["total_impact_pp"] == pytest.approx(e["return_pct"], abs=0.005)
+
+    def test_value_and_capital_bridge(self):
+        e = self._export()
+        s = e.get("sleeves")
+        if not s:
+            pytest.skip("export predates sleeve attribution")
+        val = sum(r["value_inr"] for r in s["rows"]) + s["cash_inr"]
+        inv = sum(r["invested_inr"] for r in s["rows"]) + s["cash_inr"]
+        assert val == pytest.approx(e["nav"], abs=1.0)        # NAV = values + cash
+        assert inv == pytest.approx(e["capital"], abs=1.0)    # capital = invested + cash
+
+    def test_weights_sum_to_full_book(self):
+        e = self._export()
+        s = e.get("sleeves")
+        if not s:
+            pytest.skip("export predates sleeve attribution")
+        w = sum(r["weight_pct"] for r in s["rows"])
+        assert w + s["cash_inr"] / e["nav"] * 100 == pytest.approx(100.0, abs=0.05)
+
+    def test_time_weighted_return_is_not_the_naive_one(self):
+        """Regression guard for RESEARCH_LOG 5a: a rebalance sweeps idle cash into
+        the equity sleeve, and the naive holdings-vs-entry figure counts that
+        deposit as profit. The reported return must be the flow-neutral one."""
+        e = self._export()
+        s = e.get("sleeves")
+        if not s or not e.get("rebalances"):
+            pytest.skip("no rebalance yet — the two measures cannot diverge")
+        eq = next(r for r in s["rows"] if r["key"] == "eq")
+        naive_num = sum(h["pnl"] for h in e["holdings"]
+                        if h["ticker"] not in ("GOLDBEES", "MON100"))
+        naive_den = sum(h["value"] - h["pnl"] for h in e["holdings"]
+                        if h["ticker"] not in ("GOLDBEES", "MON100"))
+        naive = naive_num / naive_den * 100
+        assert eq["return_pct"] != pytest.approx(naive, abs=0.05), (
+            "equity sleeve is reporting the naive entry-price return; a rebalance "
+            "has reset entry prices and swept cash in, so this overstates it")

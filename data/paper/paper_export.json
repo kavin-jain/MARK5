@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-03T13:57:43+00:00",
+ "generated": "2026-08-03T20:15:43+05:30",
  "mode": "PAPER \u2014 no real money; all prices, quantities and costs are real",
  "start_date": "2026-07-22",
  "days_live": 12,
@@ -16,6 +16,53 @@
  "tax_liability": 0.0,
  "realised_pnl": -1732.8946754525493,
  "rebalances": 2,
+ "sleeves": {
+  "rows": [
+   {
+    "key": "eq",
+    "label": "Indian equity",
+    "passive": false,
+    "role": "Factor-ranked stock selection \u2014 this is the system",
+    "n_holdings": 20,
+    "value_inr": 257585.240524292,
+    "invested_inr": 252510.42999999993,
+    "weight_pct": 51.55360875866115,
+    "pnl_inr": 5074.810524292057,
+    "nav_impact_pp": 1.0149621048584114,
+    "return_pct": 1.9859952710647777
+   },
+   {
+    "key": "Gold ETF",
+    "label": "Gold ETF",
+    "passive": true,
+    "role": "Passive ETF \u2014 anyone can buy this",
+    "n_holdings": 1,
+    "value_inr": 123123.00224304199,
+    "invested_inr": 125430.63999999998,
+    "weight_pct": 24.642076051833957,
+    "pnl_inr": -2307.6377569579927,
+    "nav_impact_pp": -0.46152755139159857,
+    "return_pct": -1.577973193762927
+   },
+   {
+    "key": "US Nasdaq-100",
+    "label": "US Nasdaq-100",
+    "passive": true,
+    "role": "Passive ETF \u2014 anyone can buy this",
+    "n_holdings": 1,
+    "value_inr": 118924.65460205078,
+    "invested_inr": 122046.37999999999,
+    "weight_pct": 23.801810626392793,
+    "pnl_inr": -3121.725397949209,
+    "nav_impact_pp": -0.6243450795898418,
+    "return_pct": -2.4703160320506234
+   }
+  ],
+  "cash_inr": 12.513934662822408,
+  "total_pnl_inr": -354.55263061514415,
+  "total_impact_pp": -0.0709105261230289,
+  "method": "NAV impact is cash-on-cash and sums exactly to the headline. Return % is time-weighted and chain-linked across rebalances, so cash swept in at a rebalance is never counted as profit."
+ },
  "holdings": [
   {
    "ticker": "GOLDBEES",
