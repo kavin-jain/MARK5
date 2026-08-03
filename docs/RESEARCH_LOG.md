@@ -608,14 +608,23 @@ broken. Script: `scripts/paper_diagnosis.py` → `reports/paper_diagnosis.json`.
 
 | sleeve | weight | return | NAV impact |
 |---|---:|---:|---:|
-| Indian equity (the system) | 51.6% | **+2.73%** | +1.37pp |
-| Gold ETF (passive) | 24.6% | −1.84% | −0.46pp |
-| US Nasdaq-100 (passive) | 23.8% | −2.59% | −0.63pp |
+| Indian equity (the system) | 51.6% | +1.99% | +1.37pp |
+| Gold ETF (passive) | 24.6% | **−1.84%** | **−0.46pp** |
+| US Nasdaq-100 (passive) | 23.8% | **−2.59%** | **−0.63pp** |
 
-The equity sleeve **beat the Nifty by +0.35pp**. The shortfall is entirely the 50%
-that is deliberately *not* Indian equity, in a window where Nifty rallied and both
-diversifiers fell. This is the designed behaviour of a beta-0.61 book, priced in at
-`4h`'s allocation decision — not a malfunction.
+The shortfall is the 50% that is deliberately *not* Indian equity, in a window where
+Nifty rallied and both diversifiers fell together: **−1.09pp of the −2.45pp** comes
+from those two sleeves alone. This is the designed behaviour of a beta-0.61 book,
+priced in at `4h`'s allocation decision — not a malfunction.
+
+**Measurement trap, worth remembering.** The equity sleeve's return is **+1.99%**
+time-weighted, i.e. **−0.40pp vs the Nifty** — it lagged slightly. The naive figure
+(sum holdings' P&L against stored entry price) reads **+2.73%** and would have made
+the sleeve look like it *beat* the index by +0.35pp. It is wrong: the day-4 rebalance
+reset most entry prices, so it measures ~8 days of a rising market against a 12-day
+benchmark, and it also counts ₹18,639 of swept-in idle cash as performance. Any
+sleeve-level attribution after a rebalance must be **chain-linked across the flow**.
+`paper_diagnosis.py` now does this and prints both numbers so the trap stays visible.
 
 **Is −2.45pp abnormal?** Over 2,567 historical 12-day windows of the deployed
 50/25/25 blend vs Nifty — *assuming zero selection skill* — the distribution is
@@ -623,6 +632,11 @@ mean +0.17pp, σ 1.65pp, 5th pct −2.36pp. The live reading sits at the **5th
 percentile**: roughly **1 window in 22**, from allocation alone. Unpleasant,
 unremarkable, and far too short to carry information. 10 sessions cannot measure an
 edge that needs years; **KEEP** the book running untouched.
+
+For scale: at the deployed 14.9% vol, one standard deviation of 12-day *relative*
+return is ~1.65pp, so −2.45pp is ~1.5σ. Detecting the backtested +10pp/yr edge at
+95% confidence needs on the order of **3–5 years** of live data. Any conclusion drawn
+from 10 sessions — in either direction — is noise-reading.
 
 ### The real defect: two forced rebalances on day 4 — KILL the practice
 

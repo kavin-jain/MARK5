@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-03T20:03:29",
+ "generated": "2026-08-03T20:09:44",
  "days_live": 12,
  "sessions": 10,
  "book_return_pct": -0.07091773919049027,
@@ -25,7 +25,10 @@
    "nav_impact_pp": -0.6323148240719765
   }
  },
- "selection_vs_index_pp": 0.3487879277145889,
+ "equity_sleeve_twr_pct": 1.9859952710647777,
+ "equity_sleeve_naive_pct": 2.730266605821996,
+ "selection_vs_index_pp": -0.3954834070426294,
+ "twr_note": "Time-weighted and chain-linked across the day-4 rebalance. The naive holdings-vs-entry figure reads higher because that rebalance reset entry prices, shortening the window it covers.",
  "noise_test": {
   "windows": 2567,
   "mean_pp": 0.16660973166991613,

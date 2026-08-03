@@ -51,6 +51,62 @@ def load_live():
     return book, exp, nav, led
 
 
+def equity_sleeve_twr(book, exp, nav, led):
+    """Flow-neutral time-weighted return of the equity sleeve over the live window.
+
+    The naive figure — summing holdings' P&L against their stored entry price — is
+    WRONG here, and flatteringly so. The day-4 rebalance reset most entry prices, so
+    that number spans ~8 days of a rising market while the benchmark spans all 12.
+    It read +2.73% against a true +1.99%.
+
+    So reconstruct the sleeve's rupee value each day as
+        NAV - cash - (ETF quantities x ETF closes)
+    replaying quantities and cash from the append-only ledger, then chain-link the
+    sub-period returns across each rebalance. Chain-linking is what removes the
+    Rs 18,639 of idle cash the rebalance swept in: a deposit is not performance.
+    """
+    import yfinance as yf
+    ETF = ["GOLDBEES", "MON100"]
+    px = yf.download([f"{t}.NS" for t in ETF], start="2026-07-21", end="2026-08-05",
+                     auto_adjust=True, progress=False, threads=False)["Close"]
+    px.index = px.index.tz_localize(None)
+
+    qty, cash, states = {t: 0 for t in ETF}, float(exp["capital"]), {}
+    for d in sorted(set(led["date"])):
+        for _, r in led[led["date"] == d].iterrows():
+            sgn = 1 if r["action"] == "BUY" else -1
+            cash -= sgn * float(r["value_inr"]) + float(r["cost_inr"])
+            if r["ticker"] in ETF:
+                qty[r["ticker"]] += sgn * int(r["qty"])
+        states[pd.Timestamp(d)] = (dict(qty), cash)
+
+    keys = sorted(states)
+    dates = pd.to_datetime(nav["date"])
+    series = []
+    for i, d in enumerate(dates):
+        q, csh = states[max(k for k in keys if k <= d)]
+        etf = sum(q[t] * float(px[f"{t}.NS"].reindex([d], method="ffill").iloc[0])
+                  for t in ETF)
+        series.append(float(nav["nav_inr"].iloc[i]) - csh - etf)
+
+    # Chain-link across rebalance dates — the only points where cash enters or
+    # leaves the sleeve. A leg ends on the bar BEFORE its rebalance, so the flow
+    # itself never lands inside a return.
+    breaks = sorted({pd.Timestamp(r["date"]) for r in book.get("rebalances", [])}
+                    & set(dates))
+    cuts = [0] + [int((dates == b).argmax()) for b in breaks] + [len(series)]
+    twr, legs, flow = 1.0, [], 0.0
+    for a, b in zip(cuts[:-1], cuts[1:]):
+        if b - 1 <= a:
+            continue
+        r = series[b - 1] / series[a] - 1
+        twr *= 1 + r
+        legs.append((str(dates.iloc[a].date()), str(dates.iloc[b - 1].date()), r))
+    for i in [int((dates == b).argmax()) for b in breaks]:
+        flow += series[i] - series[i - 1]
+    return (twr - 1) * 100, legs, flow, series
+
+
 def sleeve_split(exp):
     """Mark-to-market P&L grouped into the three sleeves."""
     passive = {"GOLDBEES": "gold", "MON100": "us"}
@@ -133,14 +189,22 @@ def main():
           f"{'':>10}{(exp['nav']-cap)/cap*100:>12.2f}pp")
 
     # ------------------------------------------------------------ 2. skill
-    eq_ret = sl["eq"][1] / (sl["eq"][0] - sl["eq"][1]) * 100
+    naive = sl["eq"][1] / (sl["eq"][0] - sl["eq"][1]) * 100
     bench_ret = exp["benchmark_return_pct"]
+    eq_ret, legs, flow, _ = equity_sleeve_twr(book, exp, nav, led)
     print("\n" + "-" * 86)
     print("  2. DID THE STOCK PICKING WORK?  (the only skill measure here)")
     print("-" * 86)
-    print(f"  Indian equity sleeve            {eq_ret:>+8.2f}%")
-    print(f"  Nifty 50 TRI over same window   {bench_ret:>+8.2f}%")
+    for a, b, r in legs:
+        print(f"    leg {a} -> {b}          {r*100:>+8.2f}%")
+    print(f"  {'external flow chained out':<32}Rs {flow:>+9,.0f}"
+          f"   (idle cash swept in; not performance)")
+    print(f"  {'equity sleeve, time-weighted':<32}{eq_ret:>+8.2f}%")
+    print(f"  {'Nifty 50 TRI, same 12 days':<32}{bench_ret:>+8.2f}%")
     print(f"  {'SELECTION vs index':<32}{eq_ret-bench_ret:>+8.2f}pp")
+    print(f"\n  NOT {naive:+.2f}% — that is the naive holdings-vs-entry figure, and it")
+    print(f"  flatters. The day-4 rebalance reset most entry prices, so it measures")
+    print(f"  ~8 days of a rising market against a 12-day benchmark.")
 
     # ------------------------------------------------------------ 3. noise
     rel = historical_relative(days)
@@ -216,7 +280,12 @@ def main():
         "sleeves": {k: {"value": sl[k][0], "pnl": sl[k][1],
                         "return_pct": sl[k][1] / (sl[k][0] - sl[k][1]) * 100,
                         "nav_impact_pp": sl[k][1] / cap * 100} for k in sl},
+        "equity_sleeve_twr_pct": eq_ret,
+        "equity_sleeve_naive_pct": naive,
         "selection_vs_index_pp": eq_ret - bench_ret,
+        "twr_note": ("Time-weighted and chain-linked across the day-4 rebalance. The "
+                     "naive holdings-vs-entry figure reads higher because that "
+                     "rebalance reset entry prices, shortening the window it covers."),
         "noise_test": {
             "windows": int(len(rel)), "mean_pp": float(rel.mean()),
             "std_pp": float(rel.std(ddof=1)),
