@@ -88,14 +88,20 @@ def main():
     print("\nAUTOMATION")
     try:
         out = subprocess.run(["gh", "run", "list", "--workflow", "refresh.yml",
-                              "--limit", "3", "--json", "conclusion,createdAt,status"],
+                              "--limit", "5", "--json", "conclusion,createdAt,status"],
                              capture_output=True, text=True, cwd=_ROOT, timeout=60).stdout
         runs = json.loads(out) if out.strip() else []
-        if not runs:
+        # This health check runs as a step inside the very refresh.yml run it is
+        # querying, so `gh run list` always returns that run itself, in progress,
+        # sorted first, with conclusion == "" rather than "success" — an
+        # always-FAIL every single day regardless of whether refresh actually
+        # succeeded. Grade the last COMPLETED run instead of runs[0].
+        completed = [r for r in runs if r.get("status") == "completed"]
+        if not completed:
             check("refresh workflow has run", False,
-                  "no runs yet — first fire is the next scheduled weekday 17:00 IST", warn=True)
+                  "no completed runs yet — first fire is the next scheduled weekday 17:00 IST", warn=True)
         else:
-            last = runs[0]
+            last = completed[0]
             check("last refresh run succeeded",
                   last.get("conclusion") in ("success", None),
                   f"{last.get('conclusion')} at {last.get('createdAt','')[:16]}")
