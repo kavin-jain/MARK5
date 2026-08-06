@@ -94,7 +94,14 @@ class PortfolioConstructor:
             return list(ranked.index)
         rank_of = {t: i for i, t in enumerate(ranked.index)}
         exit_rank = int(cfg.n_hold * cfg.buffer_mult)
-        keep = [t for t in currently_held if rank_of.get(t, 10**9) < exit_rank][:cfg.n_hold]
+        # Sort survivors by score BEFORE truncating. `currently_held` arrives in the
+        # backtester's ticker order, which is alphabetical, so the raw slice would
+        # keep A-names over better-scoring Z-names whenever more than n_hold holdings
+        # survive the buffer. Latent rather than live — the book never holds more than
+        # n_hold — but it would fire silently the moment n_hold is reduced or a run
+        # switches out of equal_weight, and "sorted by score" is what the line meant.
+        keep = sorted((t for t in currently_held if rank_of.get(t, 10**9) < exit_rank),
+                      key=lambda t: rank_of[t])[:cfg.n_hold]
         adds = [t for t in ranked.index if t not in keep][:max(0, cfg.n_hold - len(keep))]
         return (keep + adds)[:cfg.n_hold]
 

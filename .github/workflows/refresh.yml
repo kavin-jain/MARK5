@@ -46,15 +46,24 @@ jobs:
         # It silently drifted 4 days and kept serving a superseded headline.
         run: python docs/build_dashboard.py
 
-      - name: Health check (fails the run if an invariant broke)
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python scripts/healthcheck.py || echo "::warning::health check reported failures"
-
       - name: Commit if anything moved
+        # Runs BEFORE the health check, deliberately. The ledger and NAV log are
+        # append-only evidence: a day's mark that is computed but never committed
+        # is a hole in the record that no later run backfills. Recording is
+        # unconditional; judging what was recorded happens next.
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/data/mark6.json docs/index.html data/paper/
           git diff --staged --quiet || git commit -m "chore: daily live refresh [skip ci]"
           git push
+
+      - name: Health check (fails the run if an invariant broke)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        # No `|| echo`. healthcheck.py exits 1 on any FAIL and that is the whole
+        # point of it: this step was named "fails the run if an invariant broke"
+        # while swallowing the exit code, so 20+ checks could not stop anything.
+        # A guard that cannot fail is decoration. Now the run goes red and the
+        # failure is visible, without costing the day's mark.
+        run: python scripts/healthcheck.py

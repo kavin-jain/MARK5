@@ -23,8 +23,12 @@ Known approximations (all documented, direction stated):
   - Dividends: input closes are dividend-adjusted (total-return), so dividends
     compound in the book and are taxed as capital gains on sale rather than at
     slab rates as income. Flatters the strategy by roughly 0.1–0.3pp/yr.
-  - The LTCG ₹1.25L annual exemption is NOT modelled (NAV-unit simulation has no
-    rupee scale). Conservative — real after-tax returns would be slightly higher.
+  - The LTCG ₹1.25L annual exemption (Sec 112A) IS implemented, but only fires
+    when `capital_inr` is set — a NAV-unit run has no rupee scale for a rupee
+    threshold to mean anything, so it is off in the scale-free default the public
+    headline uses. That default is therefore CONSERVATIVE: at ₹5L of real capital
+    the exemption is worth about +0.6pp/yr (reports/ltcg_exemption_system.json).
+    Do not describe it as "not modelled" — it is not *enabled*, which is different.
   - Terminal liquidation tax used to be written into the final NAV point, which
     put a one-day tax cliff inside the return series used for Sharpe/drawdown.
     FIXED: it is a liquidation cost, not a market return, so risk statistics now

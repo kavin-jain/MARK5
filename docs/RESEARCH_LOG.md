@@ -667,6 +667,100 @@ events are **waived by count, never deleted**, so the guard watches the next one
 Deploy config to the engine; the book adopts it at its next scheduled refresh
 (~2027-01-24). Otherwise every research idea silently rewrites the track record.
 
+## 5b. Full-repo audit — measurement defects, not strategy defects (2026-08-06)
+
+A file-by-file audit of all 99 tracked files. Every finding below is a **correctness**
+bug, not a parameter. None of them was found by looking for better returns; three of
+them improved returns anyway, which is the pattern this project keeps rediscovering:
+**on this system, measurement error has been larger than the alpha being measured.**
+
+### B1 — Exit tax was inside the return series. ✅ FIXED **[H]**
+Eight call sites did `net.iloc[-1] = nav.iloc[-1] - tax` and passed the mutated series
+to `metrics()`, which derives vol/Sharpe/Sortino from `pct_change`. That injected one
+artificial −13% observation. Effect on the deployed book: vol 14.86 → **14.27%**,
+Sharpe (excess) 0.97 → **1.10**, Sortino 1.28 → **1.50**; MaxDD and CAGR unaffected.
+The public equity and drawdown charts ended in a −13%/−14.5% cliff that never happened.
+Fixed by `core.portfolio.metrics_after_exit_tax` (risk stats from the gross series,
+only CAGR net). The engine docstring had this filed as *"conservative — it can only
+worsen those statistics"*, which is exactly why it survived: known, mislabelled as
+safe, never revisited. **A documented approximation is not automatically a harmless one.**
+
+### B2 — Liquidity screen used split-adjusted price × raw volume. ✅ FIXED **[H]**
+`build_pit_cache.py` wrote an ADJUSTED close beside a RAW volume; `universe.py` then
+computed `turnover = close * volume`. For any name with a later split or bonus, its
+historical rupee turnover was divided by the cumulative future factor.
+
+Measured on the cache: **30.4% of symbols affected, median 75% understatement, worst
+134×.** NESTLEIND's early-2016 turnover read **₹0.79cr/day against a true ₹17.38cr**.
+The bias is not random — companies split *because* they compounded — so a
+top-N-by-turnover screen systematically **excluded future winners in exactly the years
+before they ran**. Correcting it changes 14–20 eligible names per rebalance and newly
+admits BSE, CDSL, DIXON, APLAPOLLO, ANGELONE, CAMS, MCX, AFFLE.
+
+Effect: **+0.61pp CAGR (21.22 → 21.83%), Sharpe 1.11 → 1.13.** The true rupee turnover
+was already in the bhavcopy and already read by `build_pit_cache.py` for one filter —
+then discarded. Now carried through as its own column.
+
+*Direction matters:* this bug made the backtest CONSERVATIVE, which is why a decade of
+suspicion aimed at inflated results never found it.
+
+### B3 — Published artifacts ran a different universe screen than the page. ✅ FIXED **[H]**
+`export_dashboard.py` hardcodes `top_n_liquid=300`. `run_mark6.py`,
+`institutional_report.py` and `overfitting_analysis.py` read `MARK5_TOP_N` and
+defaulted to **0** — the percentile screen. Forget the env var and the page's headline,
+its linked institutional report, its linked MARK6 report and its DSR/PBO panel each
+describe a different candidate universe. Defaults now match the deployed value.
+
+### B4 — Hand-excluded blowups under a survivorship-free claim. ✅ FIXED **[M]**
+`STRUCTURAL_EXCLUDE` removed YESBANK and IDEA, justified as "a-priori, NOT
+performance-based" — but the stated reasons (RBI moratorium, AGR judgement) are
+March-2020 and October-2019 facts applied from 2016-01-01. Both clear the liquidity
+screen easily (₹228cr and ₹91cr/day). `scripts/exclusion_bias_test.py` priced it:
+**±0.06pp CAGR** either way, because the engine never selected them. The exclusion
+bought nothing and cost the claim. Removed; only ETF/fund type-exclusions remain.
+
+### B5 — The health check could not fail the run. ✅ FIXED **[H]**
+`refresh.yml` ran `python scripts/healthcheck.py || echo "::warning::..."` under a step
+literally named *"fails the run if an invariant broke"*. `sys.exit(1)` was swallowed, so
+22 checks could not stop anything. Same shape as the sector cap that was configured but
+dead until v7.3, and the `--force` guard nothing looked at. Now unguarded — and moved
+AFTER the commit step, so a broken invariant turns the run red without costing that
+day's append-only mark.
+
+### B6 — Stale build artifacts stayed in the universe. ✅ FIXED **[M]**
+`build_pit_cache.py` wrote into `data/pit_cache/` without clearing it, and
+`discover_tickers()` globs that directory. Five symbols rejected by the current build's
+filters were still being traded by every backtest, left over from an earlier run. The
+cache directory must mean "what this build decided", not "the union of every build".
+
+### Cumulative effect of B1+B2, zero strategy change
+CAGR **21.16 → 21.83%**, Sharpe (excess) **0.97 → 1.13**, Sortino **1.28 → 1.55**,
+vol **14.86 → 14.39%**. Every basis point came from making the code more correct, not
+more aggressive. This is the third time (after P11 FY-netting and P12) that the binding
+constraint was the ruler rather than the strategy.
+
+### Checked and CLEARED (no defect)
+- **despike look-ahead.** `despike()` uses a *centred* rolling median, so it sees
+  forward. Empirically it drops **1 print across the entire PIT cache** (JETAIRWAYS
+  2019-06-19, 33.10 between 40.50 and 62.85 — a genuine data error that reverses). It is
+  not deleting real crashes. Theoretical concern, immaterial in practice.
+- **Factor causality.** `momentum/low_vol/trend/stability` are strictly backward-looking;
+  `_factor_panel` uses `.loc[:asof]` and executes at `asof+exec_lag`. Clean.
+- **Back-adjusted prices.** All four factors are ratio- or return-based, so the split
+  adjustment cancels. No level leak. (The *turnover* leak in B2 was the exception,
+  precisely because it multiplies an adjusted series by an unadjusted one.)
+- **Buffered selection ordering.** `select()` truncates `keep` in the backtester's
+  alphabetical ticker order rather than by score. LATENT only — the book never holds
+  more than `n_hold`, so the slice never bites. Hardened anyway.
+
+### STALE — recompute before quoting **[!]**
+Every `reports/*` artifact dated before 2026-08-06 was computed on the pre-fix metrics
+and pre-fix universe: `OVERFITTING_ANALYSIS.md` (feeds the page's DSR/PBO panel),
+`RISK_REPORT.md`, `nested_walkforward.json` (the page embeds this file whole),
+`attribution.json`, `sharpe_ceiling.json`, `capacity_analysis.json`, and the allocation
+studies. Their conclusions are probably directionally intact; their NUMBERS are not
+current and must not be quoted alongside the new headline.
+
 ## 5. 🔭 OPEN FRONTIERS — untested levers worth pursuing
 
 Ranked by plausible edge × feasibility. Each: hypothesis → how to test → realistic ceiling.

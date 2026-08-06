@@ -102,7 +102,7 @@ def main():
                                  factor_weights=WEIGHTS[wname])
         nav = Backtester(panel, PortfolioConstructor(cfg, sector_map=load_sector_map()),
                          BacktestConfig(rebal_bars=rb,
-                                        top_n_liquid=int(os.environ.get("MARK5_TOP_N", "0")))
+                                        top_n_liquid=int(os.environ.get("MARK5_TOP_N", "300")))
                          ).run(START, END)["nav_gross"]
         r = nav.pct_change(fill_method=None).fillna(0.0)
         if cal is None:

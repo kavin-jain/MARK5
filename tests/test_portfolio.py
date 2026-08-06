@@ -714,3 +714,54 @@ class TestPublishedArtifactsAgree:
         if not mm:
             pytest.skip("report format changed")
         assert float(mm.group(1)) == pytest.approx(r["headline"]["sharpe_excess"], abs=0.02)
+
+
+class TestTurnoverUnits:
+    """turnover must be RUPEES on a consistent basis. The PIT cache stores a
+    SPLIT-ADJUSTED close beside a RAW volume, so close*volume divides a name's
+    historical turnover by its cumulative future split factor. Companies split
+    because they compounded, so that quietly pushed future winners down a
+    top-N-by-liquidity screen in exactly the years before they ran (NESTLEIND
+    read Rs 0.79cr/day in 2016 against a true Rs 17.38cr)."""
+
+    _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    def _cache(self):
+        p = os.path.join(self._ROOT, "data", "pit_cache")
+        if not os.path.isdir(p):
+            pytest.skip("no point-in-time cache")
+        return p
+
+    def test_pit_cache_carries_true_turnover(self):
+        import glob
+        files = glob.glob(os.path.join(self._cache(), "*_daily.parquet"))
+        if not files:
+            pytest.skip("empty cache")
+        missing = [os.path.basename(f) for f in files[:200]
+                   if "turnover" not in pd.read_parquet(f).columns]
+        assert not missing, (
+            f"{len(missing)} cache files lack the turnover column — rebuild with "
+            f"scripts/build_pit_cache.py, or the liquidity screen silently reverts "
+            f"to the split-distorted close*volume proxy")
+
+    def test_panel_prefers_true_turnover_over_close_times_volume(self):
+        from core.portfolio import DataPanel
+        import glob
+        names = [os.path.basename(f).replace("_daily.parquet", "")
+                 for f in sorted(glob.glob(os.path.join(self._cache(), "*_daily.parquet")))]
+        split = [n for n in ("NESTLEIND", "VBL", "NBCC") if n in names]
+        if not split:
+            pytest.skip("no known post-split name in cache")
+        os.environ["MARK5_CACHE"] = "data/pit_cache"
+        panel = DataPanel(split, "2026-07-21", freshness="off")
+        proxy = (panel.close * panel.volume).rolling(126, min_periods=40).median()
+        for t in panel.tickers:
+            early = panel.turnover[t].dropna()
+            if early.empty:
+                continue
+            head = early.iloc[:len(early) // 4]
+            ph = proxy[t].reindex(head.index)
+            # the true series must be materially LARGER early on, never smaller
+            assert head.median() >= ph.median(), (
+                f"{t}: panel turnover is below the close*volume proxy — the "
+                f"split-adjusted product is being used")

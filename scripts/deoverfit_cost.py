@@ -28,7 +28,8 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, BacktestConfig,
-                            metrics_after_exit_tax, load_ohlcv, load_nifty, load_sector_map)
+                            metrics_after_exit_tax, load_ohlcv, load_nifty, load_sector_map,
+                            load_delivery_factors)
 
 REPORTS = os.path.join(_ROOT, "reports")
 START, END = "2016-01-01", "2026-07-21"
@@ -81,12 +82,18 @@ def main():
     print(f"  universe {len(panel.tickers)} names · {len(WEIGHTS)} configs · "
           f"{START}..{END}\n", flush=True)
 
+    # mirror export_dashboard.py: the deployed v7.7 blend carries deliv_chg @10%
+    dfac = load_delivery_factors(universe=panel.tickers)
     navs = {}
     for name, fw in WEIGHTS.items():
+        fw = dict(fw)
+        if dfac:
+            fw["deliv_chg"] = 0.10
         cfg = ConstructionConfig(mode="factor_tilt", n_hold=20, base_weighting="inverse_vol",
                                  tilt_strength=1.5, max_weight=0.08, factor_weights=fw)
         run = Backtester(panel, PortfolioConstructor(cfg, sector_map=smap),
-                         BacktestConfig(rebal_bars=126, top_n_liquid=300)).run(START, END)
+                         BacktestConfig(rebal_bars=126, top_n_liquid=300),
+                         extra_factors=dfac).run(START, END)
         navs[name] = run["nav_gross"]
         c = metrics_after_exit_tax(navs[name], TAX)["cagr"] * 100
         print(f"    {name:<12} equity sleeve {c:+6.2f}% net", flush=True)

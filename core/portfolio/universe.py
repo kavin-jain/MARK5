@@ -13,12 +13,24 @@ Eligibility at date T:
   3. Priced      : has a real (non-stale) print within `max_stale_days` of T
 
 This makes universe membership a point-in-time decision that naturally adds names
-as they list/grow liquid. HONEST LIMIT: the CANDIDATE list is whatever the local
-cache holds — in practice today's surviving index constituents — so fully-delisted
-names are absent and headline returns carry residual survivorship bias (estimated
-~1-2pp/yr; see README and scripts/survivorship_validation.py, which bounds it via
-failure injection on the equal-weight basket). The backtester adds a stale-print
-force-exit so suspended names cannot silently compound at 0%.
+as they list/grow liquid.
+
+SURVIVORSHIP DEPENDS ENTIRELY ON WHICH CACHE IS ACTIVE, so state which you ran:
+  data/pit_cache  (MARK5_CACHE=data/pit_cache) — rebuilt from NSE bhavcopy by
+      scripts/build_pit_cache.py. 1341 symbols of which 185 delist inside the
+      window and are held until they stop trading. NO survivorship haircut applies.
+      This is what the public page and the reports are generated from.
+  data/cache      (the default) — yfinance, today's survivors only. Headline
+      carries residual survivorship bias, historically estimated ~1-2pp/yr, though
+      the measured gap between the two caches on the deployed config is ~0.4pp.
+      scripts/survivorship_validation.py bounds it by failure injection.
+
+Never assert one of those in a report without deriving it: three published
+artifacts once carried the survivor-biased sentence while being generated from the
+point-in-time cache. Count `(~panel.close.iloc[-20:].notna().any()).sum()` instead.
+
+The backtester adds a stale-print force-exit so suspended names cannot silently
+compound at 0%.
 """
 from __future__ import annotations
 
@@ -42,11 +54,18 @@ if not os.path.isabs(CACHE):
 # silently drops the benchmark and every "vs Nifty" figure becomes n/a.
 BENCH_CACHE = os.path.join(_ROOT, "data", "cache")
 
-# Names that are structurally inappropriate for an equity-quality basket
-# (a-priori exclusions, NOT performance-based — documented to avoid snooping).
+# Instruments that are not equity single names at all. This is a TYPE exclusion,
+# knowable on day one, and the only kind that can sit here honestly.
+#
+# YESBANK and IDEA used to be listed above these, justified as "a-priori, NOT
+# performance-based" — but the stated reasons (RBI moratorium, AGR judgement) are
+# March-2020 and October-2019 facts being applied from 2016-01-01. That is
+# look-ahead, and it sat directly under a page advertising a survivorship-free
+# universe. scripts/exclusion_bias_test.py priced it: restoring both names moves
+# the headline by -0.05pp CAGR and -0.86pp MaxDD, because the factor engine never
+# selected either one anyway. So the exclusion bought nothing and cost the claim.
+# Removed. If a future exclusion is genuinely needed, it must be point-in-time.
 STRUCTURAL_EXCLUDE = {
-    "YESBANK",   # RBI-administered bailout, permanent capital impairment
-    "IDEA",      # Vodafone-Idea: going-concern / AGR overhang, perennial dilution
     # ETFs cached for multi-asset tests — NOT equity single names, must never enter
     # the equity selection (LIQUIDBEES is ~cash: lowest vol -> inverse-vol would
     # massively overweight it and corrupt the book).
@@ -226,7 +245,7 @@ class DataPanel:
 
     def __init__(self, tickers: list[str], end: str, *, freshness: str = "warn"):
         """freshness: 'warn' (default) prints stale names, 'raise' aborts, 'off' skips."""
-        closes, vols = {}, {}
+        closes, vols, turns = {}, {}, {}
         last_dates = {}
         for t in tickers:
             df = load_ohlcv(t)
@@ -237,6 +256,14 @@ class DataPanel:
                 continue
             closes[t] = df["close"].astype(float)
             vols[t] = df["volume"].astype(float)
+            # Prefer the cache's own rupee turnover. close*volume is WRONG whenever
+            # close is split-adjusted and volume is not: it divides a name's early
+            # turnover by its cumulative future split factor, and since companies
+            # split because they compounded, that silently pushes future winners
+            # down the liquidity ranking in the years before they run. Rebuild the
+            # PIT cache (scripts/build_pit_cache.py) to populate this column.
+            if "turnover" in df.columns:
+                turns[t] = df["turnover"].astype(float)
             last_dates[t] = df.index[-1]
         if not closes:
             raise RuntimeError(
@@ -246,7 +273,16 @@ class DataPanel:
                 f"as having their DATA.")
         self.close = pd.DataFrame(closes).sort_index()
         self.volume = pd.DataFrame(vols).reindex_like(self.close)
-        self.turnover = (self.close * self.volume).rolling(126, min_periods=40).median()
+        # True rupee turnover where the cache carries it; fall back per-name to
+        # close*volume only for names that don't (mixed caches must not silently
+        # mix units — the fallback is on the same scale, just split-distorted).
+        rupees = (pd.DataFrame(turns).reindex_like(self.close)
+                  if turns else pd.DataFrame(index=self.close.index))
+        rupees = rupees.reindex(columns=self.close.columns)
+        self.turnover_source = ("bhavcopy" if len(turns) == len(closes)
+                                else f"mixed ({len(turns)}/{len(closes)} true)")
+        self.turnover = rupees.fillna(self.close * self.volume) \
+                              .rolling(126, min_periods=40).median()
         self.tickers = list(self.close.columns)
         self.stale_tickers = self._check_freshness(last_dates, freshness)
 

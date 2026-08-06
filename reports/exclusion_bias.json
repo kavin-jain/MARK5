@@ -1,0 +1,83 @@
+{
+ "generated": "2026-08-06",
+ "window": [
+  "2016-01-01",
+  "2026-07-21"
+ ],
+ "contested": [
+  "IDEA",
+  "YESBANK"
+ ],
+ "shipped": {
+  "label": "as shipped (blowups removed)",
+  "universe_size": 1341,
+  "full": {
+   "cagr": 0.20873228881658656,
+   "vol": 0.14572644832913773,
+   "sharpe": 1.497569585147978,
+   "sharpe_excess": 1.0653716606112398,
+   "sortino": 1.4568477836940383,
+   "max_dd": -0.22156153551403268,
+   "calmar": 0.9420962367511956,
+   "years": 10.55167693360712,
+   "rf_annual": 0.065,
+   "cagr_gross": 0.22511070642731745,
+   "gross_multiple": 8.51917718641387,
+   "net_multiple": 7.39130060845179
+  },
+  "equity_sleeve": {
+   "cagr": 0.1892164361407478,
+   "vol": 0.22057956877030582,
+   "sharpe": 0.9751043638192293,
+   "sharpe_excess": 0.6895717151288662,
+   "sortino": 0.9218292192035958,
+   "max_dd": -0.3976346789238143,
+   "calmar": 0.47585496479546524,
+   "years": 10.55167693360712,
+   "rf_annual": 0.065,
+   "cagr_gross": 0.20488622935919798,
+   "gross_multiple": 7.146879704810929,
+   "net_multiple": 6.22484774908929
+  },
+  "contested_held": [],
+  "touches": []
+ },
+ "honest": {
+  "label": "honest (blowups restored)",
+  "universe_size": 1342,
+  "full": {
+   "cagr": 0.20816058772636814,
+   "vol": 0.14567073747948536,
+   "sharpe": 1.4947152976623483,
+   "sharpe_excess": 1.0623520817705272,
+   "sortino": 1.4483872110851812,
+   "max_dd": -0.23011839583922222,
+   "calmar": 0.9045803877053122,
+   "years": 10.55167693360712,
+   "rf_annual": 0.065,
+   "cagr_gross": 0.2245192280400672,
+   "gross_multiple": 8.475877821282493,
+   "net_multiple": 7.354496148090119
+  },
+  "equity_sleeve": {
+   "cagr": 0.18812584696204082,
+   "vol": 0.22086669156016758,
+   "sharpe": 0.9698099516431159,
+   "sharpe_excess": 0.6846484903423472,
+   "sortino": 0.9129206950052265,
+   "max_dd": -0.40620078562421935,
+   "calmar": 0.4631351135201349,
+   "years": 10.55167693360712,
+   "rf_annual": 0.065,
+   "cagr_gross": 0.20375386342560353,
+   "gross_multiple": 7.07632430145428,
+   "net_multiple": 6.164875656236138
+  },
+  "contested_held": [],
+  "touches": []
+ },
+ "headline_effect_pp": {
+  "cagr": 0.057170109021842386,
+  "max_dd": 0.8556860325189541
+ }
+}

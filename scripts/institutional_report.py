@@ -133,7 +133,7 @@ def main():
         cfg.factor_weights = {**cfg.factor_weights, "deliv_chg": 0.10}
     run = Backtester(panel, PortfolioConstructor(cfg, sector_map=load_sector_map()),
                      BacktestConfig(rebal_bars=126,
-                                    top_n_liquid=int(os.environ.get('MARK5_TOP_N', '0'))),
+                                    top_n_liquid=int(os.environ.get('MARK5_TOP_N', '300'))),
                      extra_factors=dfac).run(START, END)
     eq_nav = run["nav_net"]
     trades = run["trades"]
@@ -156,7 +156,7 @@ def main():
     ew_run = Backtester(panel, PortfolioConstructor(
         ConstructionConfig(mode="equal_weight", base_weighting="equal")),
         BacktestConfig(rebal_bars=126,
-                       top_n_liquid=int(os.environ.get('MARK5_TOP_N', '0')))).run(START, END)
+                       top_n_liquid=int(os.environ.get('MARK5_TOP_N', '300')))).run(START, END)
     vs_ew_pp = (run["metrics"]["cagr"] - ew_run["metrics"]["cagr"]) * 100
 
     # ── trade ledger CSV (scaled to capital) + summary ────────────────────────

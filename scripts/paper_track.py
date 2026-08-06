@@ -87,7 +87,14 @@ def reconcile_corporate_actions(book) -> list[str]:
     for t, p in book["positions"].items():
         try:
             sp = yf.Ticker(f"{t}.NS").splits
-        except Exception:
+        except Exception as e:
+            # Silently skipping this leaves an unreconciled split looking like a
+            # 50-90% single-name loss. healthcheck.py catches the symptom (">30%
+            # suspicious move"), but only AFTER it has been marked and published.
+            # If yfinance is rate-limited every name skips at once and the whole
+            # reconciliation stops running with nothing in the log to show it.
+            print(f"  ⚠ split check FAILED for {t}: {type(e).__name__} — "
+                  f"corporate actions NOT reconciled for this name")
             continue
         if sp is None or not len(sp):
             continue
