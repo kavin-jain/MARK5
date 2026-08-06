@@ -1,0 +1,78 @@
+{
+  "generated": "2026-08-06T18:31:27.898224+00:00",
+  "window": [
+    "2016-01-01",
+    "2026-07-21"
+  ],
+  "config": "deployed (mom_heavy / n20 / tilt1.5 / r126 / deliv_chg)",
+  "return_ci": {
+    "MARK6 equity book": {
+      "mean_annual_pct": 23.434781051087292,
+      "vol_pct": 21.591155917680144,
+      "years": 10.325396825396826,
+      "se_pp": 6.719276579010634,
+      "lo95_pct": 10.265240954062946,
+      "hi95_pct": 36.60432114811164,
+      "t_stat": 3.487694065800443,
+      "p_value_gt0": 0.00024360260361167008
+    },
+    "Equal-weight universe": {
+      "mean_annual_pct": 14.170047003036801,
+      "vol_pct": 19.48335309275084,
+      "years": 10.325396825396826,
+      "se_pp": 6.0633177128564375,
+      "lo95_pct": 2.2861626590144097,
+      "hi95_pct": 26.05393134705919,
+      "t_stat": 2.3370121234107772,
+      "p_value_gt0": 0.009719276856818171
+    },
+    "Nifty 50 TRI": {
+      "mean_annual_pct": 12.71664243451823,
+      "vol_pct": 14.7393018033731,
+      "years": 10.214285714285714,
+      "se_pp": 4.611825971456308,
+      "lo95_pct": 3.67762962749742,
+      "hi95_pct": 21.75565524153904,
+      "t_stat": 2.757398590758751,
+      "p_value_gt0": 0.0029131641127239094
+    }
+  },
+  "active": [
+    {
+      "benchmark": "Equal-weight same universe (SELECTION SKILL)",
+      "active_return_pp": 9.264734048050494,
+      "tracking_error_pp": 11.023624801601073,
+      "information_ratio": 0.8404435215089036,
+      "years_observed": 10.325396825396826,
+      "t_stat": 2.7006102367607547,
+      "p_value": 0.003460619801918252,
+      "significant_95": true,
+      "years_to_95pct_significance": 3.830341059662679
+    },
+    {
+      "benchmark": "Nifty 50 TRI (WHOLE PACKAGE)",
+      "active_return_pp": 10.609118679777668,
+      "tracking_error_pp": 16.08160770122306,
+      "information_ratio": 0.659705103922589,
+      "years_observed": 10.19047619047619,
+      "t_stat": 2.105945284486664,
+      "p_value": 0.017604552720921984,
+      "significant_95": true,
+      "years_to_95pct_significance": 6.216627216090731
+    }
+  ],
+  "bootstrap": {
+    "median_pct": 24.624511840421537,
+    "lo95_pct": 8.037480227226055,
+    "hi95_pct": 42.101919578513744,
+    "p_negative": 0.001,
+    "p_below_nifty_11pct": 0.0545
+  },
+  "live": {
+    "observations": 11,
+    "days": 15,
+    "ir_used": 0.8404435215089036,
+    "years_needed": 3.830341059662679,
+    "information_pct": 1.0721698451207415
+  }
+}

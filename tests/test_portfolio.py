@@ -765,3 +765,67 @@ class TestTurnoverUnits:
             assert head.median() >= ph.median(), (
                 f"{t}: panel turnover is below the close*volume proxy — the "
                 f"split-adjusted product is being used")
+
+
+class TestSignificanceMath:
+    """The certainty numbers decide whether real money moves, so the estimators
+    behind them get checked the same way any other money path does."""
+
+    def _mod(self):
+        import importlib.util
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        p = os.path.join(root, "scripts", "significance_analysis.py")
+        if not os.path.exists(p):
+            pytest.skip("no significance_analysis.py")
+        spec = importlib.util.spec_from_file_location("sig", p)
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        return m
+
+    def test_confidence_interval_widens_with_volatility(self):
+        """SE of an annualised mean is vol/sqrt(years). Doubling vol must roughly
+        double the band — if it does not, the interval is not measuring risk."""
+        sig = self._mod()
+        idx = pd.bdate_range("2016-01-01", periods=252 * 5)
+        rng = np.random.default_rng(1)
+        lo = sig.return_ci(pd.Series(rng.normal(0.0005, 0.006, len(idx)), index=idx))
+        hi = sig.return_ci(pd.Series(rng.normal(0.0005, 0.012, len(idx)), index=idx))
+        assert 1.6 < hi["se_pp"] / lo["se_pp"] < 2.4, (lo["se_pp"], hi["se_pp"])
+
+    def test_years_to_significance_falls_as_edge_strengthens(self):
+        """T = (1.645/IR)^2. A stronger edge must need strictly less data."""
+        sig = self._mod()
+        idx = pd.bdate_range("2016-01-01", periods=252 * 6)
+        rng = np.random.default_rng(2)
+        noise = rng.normal(0, 0.08 / np.sqrt(252), len(idx))
+        zero = pd.Series(0.0, index=idx)
+        weak = sig.active_stats(pd.Series(0.02 / 252 + noise, index=idx), zero, "weak")
+        strong = sig.active_stats(pd.Series(0.10 / 252 + noise, index=idx), zero, "strong")
+        assert strong["information_ratio"] > weak["information_ratio"]
+        assert strong["years_to_95pct_significance"] < weak["years_to_95pct_significance"]
+
+    def test_no_edge_never_reports_significance(self):
+        """A benchmark differenced against itself has exactly zero active return.
+        If that ever reads significant, the test is manufacturing skill."""
+        sig = self._mod()
+        idx = pd.bdate_range("2016-01-01", periods=252 * 5)
+        r = pd.Series(np.random.default_rng(3).normal(0.0004, 0.011, len(idx)), index=idx)
+        st = sig.active_stats(r, r.copy(), "self")
+        assert not st["significant_95"]
+        assert st["years_to_95pct_significance"] == float("inf")
+
+    def test_dashboard_publishes_the_error_bar_around_its_headline(self):
+        """A point CAGR without its interval reads as a forecast. If the feed ships
+        a certainty block at all, the band must bracket the point estimate."""
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        p = os.path.join(root, "docs", "data", "mark6.json")
+        if not os.path.exists(p):
+            pytest.skip("no dashboard export")
+        import json
+        c = json.load(open(p))["research"].get("certainty")
+        if not c:
+            pytest.skip("no certainty block")
+        lo, hi = c["equity_book_ci95_pct"]
+        assert lo < c["equity_book_point_pct"] < hi, c
+        assert 0 <= c["live_evidence_accumulated_pct"] <= 100
+        assert c["years_of_live_data_to_prove_it"] > 0

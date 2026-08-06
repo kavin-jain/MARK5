@@ -69,6 +69,42 @@ def series_for_chart(s, step=5):
     return [[s.index[i].strftime("%Y-%m-%d"), round(float(s.iloc[i]), 4)] for i in idx]
 
 
+def _certainty_block() -> dict:
+    """How much of the headline is knowable, from significance_analysis.py.
+
+    A CAGR is a point estimate off one sample path. Publishing it without its
+    standard error invites reading noise as a forecast, so the feed carries the
+    confidence interval, the information ratio behind the edge, and how much of
+    the data needed for a verdict the live track has actually accumulated.
+    """
+    p = os.path.join(REPORTS, "significance_analysis.json")
+    if not os.path.exists(p):
+        return {}
+    s = json.load(open(p))
+    eq = s.get("return_ci", {}).get("MARK6 equity book", {})
+    sel = next((a for a in s.get("active", []) if "SELECTION" in a.get("benchmark", "")), {})
+    bs, live = s.get("bootstrap", {}), s.get("live", {})
+    return {
+        "equity_book_ci95_pct": [round(eq.get("lo95_pct", 0), 1), round(eq.get("hi95_pct", 0), 1)],
+        "equity_book_point_pct": round(eq.get("mean_annual_pct", 0), 1),
+        "years_observed": round(eq.get("years", 0), 1),
+        "selection_information_ratio": round(sel.get("information_ratio", 0), 3),
+        "selection_t_stat": round(sel.get("t_stat", 0), 2),
+        "selection_p_value": round(sel.get("p_value", 1), 4),
+        "years_of_live_data_to_prove_it": round(sel.get("years_to_95pct_significance", 0), 1),
+        "live_evidence_accumulated_pct": round(live.get("information_pct", 0), 1),
+        "p_true_cagr_negative_pct": round(bs.get("p_negative", 0) * 100, 1),
+        "p_true_cagr_below_nifty_pct": round(bs.get("p_below_nifty_11pct", 0) * 100, 1),
+        "honest_expectation": ("The 1/N ensemble, not the headline config: PBO and a negative "
+                               "in-sample/out-of-sample rank correlation both say the fitted "
+                               "choice does not generalise. reports/deoverfit_cost.json prices "
+                               "that at about -1.9pp CAGR for a better drawdown."),
+        "note": ("The interval is the 95% band on the TRUE mean return, from vol/sqrt(years). "
+                 "It is wide because equity vol is large and a decade is short — that is a "
+                 "fact about the evidence, not a flaw in the estimate."),
+    }
+
+
 def main():
     end = END or str(pd.Timestamp.today().date())
     panel = DataPanel(discover_tickers(), end, freshness="off")
@@ -188,12 +224,18 @@ def main():
             "trades": trades,
             "validation": {
                 "dsr_pct": ov.get("dsr"), "pbo_pct": ov.get("pbo"), "trials": ov.get("trials"),
-                "pbo_reading": ("PBO above the conventional 20% bar is a FAIL: picking the "
-                                "in-sample-best variant from this family overfits. The deployed "
-                                "config was chosen on walk-forward consistency instead."),
+                "pbo_reading": ("PBO above the conventional 20% bar is a FAIL, and above 50% it "
+                                "is worse than a coin flip: across train/test splits the "
+                                "in-sample-best variant of this family lands BELOW the "
+                                "out-of-sample median more often than not. Read with "
+                                "nested_wf.is_oos_rank_corr, which is negative. Together they say "
+                                "the factor FAMILY has an edge but this particular "
+                                "parameterisation is not demonstrably the right member of it — "
+                                "quote certainty.honest_expectation, not the headline."),
                 "nested_wf": (json.load(open(os.path.join(REPORTS, "nested_walkforward.json")))
                               if os.path.exists(os.path.join(REPORTS, "nested_walkforward.json")) else {}),
             },
+            "certainty": _certainty_block(),
             "limitations": [
                 "Never traded with real money. The live panel starts from the day it was opened.",
                 "Backtest trades are simulated at next-day closing prices; real fills differ.",

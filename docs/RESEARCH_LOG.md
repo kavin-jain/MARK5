@@ -761,6 +761,51 @@ and pre-fix universe: `OVERFITTING_ANALYSIS.md` (feeds the page's DSR/PBO panel)
 studies. Their conclusions are probably directionally intact; their NUMBERS are not
 current and must not be quoted alongside the new headline.
 
+## 5c. How certain can we be? Significance analysis (2026-08-07)
+
+`scripts/significance_analysis.py` (new). Every other report answers *what did it
+return*; this one answers *how much of that is knowable*. Post-fix PIT universe,
+gross daily series (terminal tax excluded — it is a cost, not a return).
+
+| Question | Answer | Reading |
+|---|---|---|
+| 95% CI on the equity book's TRUE mean return | **+10.3% … +36.6%** (point +23.4%, ±13.2pp) | [H] A decade of daily data still leaves a ±13pp band. SE = vol/√years, and 21% vol over 10.3 years cannot do better. **The point estimate is not a forecast.** |
+| Selection skill vs equal-weight of the SAME universe | active **+9.26pp/yr**, TE 11.0pp, **IR 0.840**, t=2.70, p=0.0035 | ✅ **[H] SIGNIFICANT.** The factor tilt genuinely beats equal-weighting the same names. Economically motivated (momentum = most-replicated anomaly in finance), not just fitted. |
+| Whole package vs Nifty 50 TRI | active +10.61pp/yr, TE 16.1pp, IR 0.660, t=2.11, p=0.018 | ✅ [H] Significant, but half of it is a size/concentration tilt, not skill. |
+| Years of LIVE data needed to prove the edge from scratch | **3.8 years** (vs EW), 6.2 (vs Nifty) | [H] T = (1.645/IR)². This is the honest cost of proof. |
+| What the live track is worth today | 11 observations / 15 days = **1.1%** of that | ❌ [H] The live panel proves *nothing yet* and will not for years. It is an integrity record, not evidence. |
+| Block-bootstrap band on CAGR (2000 draws, 21-day blocks) | median +24.6%, 95% [+8.0%, +42.1%] | [H] P(true CAGR<0) = **0.1%**; P(true CAGR < Nifty) = **5.5%**. |
+
+**The central tension, stated plainly.** DSR 98.9% says the Sharpe survives 124 trials.
+PBO **59.6%** and `nested_walkforward.is_oos_rank_corr = −0.126` say picking the
+in-sample-best member of that family is *worse than picking at random*. Both are true and
+they are not contradictory: **the factor FAMILY has a real edge; this specific
+parameterisation is not demonstrably the right member of it.** The resolution is not to
+abandon the strategy — it is to stop betting on the fitted point. That is exactly the 1/N
+ensemble (`reports/deoverfit_cost.json`): −1.92pp CAGR, −0.015 Sharpe, **better MaxDD
+(−20.95% vs −22.16%)**. Quote the ensemble as the expectation; the deployed figure is an
+upper bound.
+
+**Drawdown honesty.** The page's −23.78% MaxDD is the *blended* 50/25/25 book. The equity
+sleeve alone — "the system" — drew down **−41.7%** full-period. Anyone sizing a position
+must size against −41.7%, not −23.78%.
+
+**What is NOT a blocker (checked, cleared).** Capacity: at ₹5cr the modelled impact drag is
+0.24%/yr, worst-name participation 16.8% of ADV (`capacity_analysis.json`) — retail size is
+nowhere near the limit. Live pricing: the +3.84% print on 2026-08-06 was verified
+name-by-name against the prior mark and is real Q1-earnings dispersion (NAVINFLUOR +14.5%,
+ATHERENERG +14.2% over 3 sessions), not a stale or bad quote.
+
+**Defect found.** `refresh.yml` ran green on 2026-08-04 and 2026-08-05 and appended no NAV
+row, so the 08-06 bar silently carries three sessions of movement. The ledger is honest but
+*gappy*; a green run that records nothing is the failure mode the 5b health-check reorder
+was meant to catch and does not.
+
+**Stale comment.** `run_mark6.py` carries a comment crediting `n_hold=12` (8/8 walk-forward,
+P5) directly above a config that sets `n_hold=20`. The code is defensible under PBO 59.6%
+(more names = less selection risk) but the comment documents a different system than the one
+that runs.
+
 ## 5. 🔭 OPEN FRONTIERS — untested levers worth pursuing
 
 Ranked by plausible edge × feasibility. Each: hypothesis → how to test → realistic ceiling.

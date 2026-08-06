@@ -1,5 +1,5 @@
 {
- "generated": "2026-08-06T23:46:09+05:30",
+ "generated": "2026-08-07T00:03:38+05:30",
  "disclaimer": "PAPER MODE. The live panel is a real-price paper book with no money at risk. The research panel is a historical simulation: real prices, simulated trades. Neither is investment advice.",
  "live": {
   "generated": "2026-08-06T23:11:04+05:30",
@@ -433,7 +433,7 @@
  "research": {
   "period": {
    "start": "2016-01-01",
-   "end": "2026-08-06",
+   "end": "2026-08-07",
    "years": 10.6
   },
   "universe": {
@@ -16618,10 +16618,10 @@
    }
   ],
   "validation": {
-   "dsr_pct": 96.1,
-   "pbo_pct": 42.4,
+   "dsr_pct": 98.9,
+   "pbo_pct": 59.6,
    "trials": 124.0,
-   "pbo_reading": "PBO above the conventional 20% bar is a FAIL: picking the in-sample-best variant from this family overfits. The deployed config was chosen on walk-forward consistency instead.",
+   "pbo_reading": "PBO above the conventional 20% bar is a FAIL, and above 50% it is worse than a coin flip: across train/test splits the in-sample-best variant of this family lands BELOW the out-of-sample median more often than not. Read with nested_wf.is_oos_rank_corr, which is negative. Together they say the factor FAMILY has an edge but this particular parameterisation is not demonstrably the right member of it \u2014 quote certainty.honest_expectation, not the headline.",
    "nested_wf": {
     "chained_oos_selection": 0.21850132204536488,
     "chained_oos_deployed": 0.2938535572019496,
@@ -16648,6 +16648,23 @@
     ],
     "verdict": "Config selection adds nothing; the honest deployment is a fixed, economically-motivated config (or the 1/N ensemble), NOT a learned choice."
    }
+  },
+  "certainty": {
+   "equity_book_ci95_pct": [
+    10.3,
+    36.6
+   ],
+   "equity_book_point_pct": 23.4,
+   "years_observed": 10.3,
+   "selection_information_ratio": 0.84,
+   "selection_t_stat": 2.7,
+   "selection_p_value": 0.0035,
+   "years_of_live_data_to_prove_it": 3.8,
+   "live_evidence_accumulated_pct": 1.1,
+   "p_true_cagr_negative_pct": 0.1,
+   "p_true_cagr_below_nifty_pct": 5.5,
+   "honest_expectation": "The 1/N ensemble, not the headline config: PBO and a negative in-sample/out-of-sample rank correlation both say the fitted choice does not generalise. reports/deoverfit_cost.json prices that at about -1.9pp CAGR for a better drawdown.",
+   "note": "The interval is the 95% band on the TRUE mean return, from vol/sqrt(years). It is wide because equity vol is large and a decade is short \u2014 that is a fact about the evidence, not a flaw in the estimate."
   },
   "limitations": [
    "Never traded with real money. The live panel starts from the day it was opened.",
