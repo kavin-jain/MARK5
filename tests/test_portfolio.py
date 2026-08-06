@@ -829,3 +829,40 @@ class TestSignificanceMath:
         assert lo < c["equity_book_point_pct"] < hi, c
         assert 0 <= c["live_evidence_accumulated_pct"] <= 100
         assert c["years_of_live_data_to_prove_it"] > 0
+
+
+class TestPBOCalibration:
+    """PBO is read as if 0% were the target. It is not: the estimator returns ~50%
+    when every candidate is equally good, because it is then ranking noise. These
+    pin the calibration so nobody 'fixes' a healthy number by mutilating the book."""
+
+    def _mod(self):
+        import importlib.util
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        p = os.path.join(root, "scripts", "pbo_calibration.py")
+        if not os.path.exists(p):
+            pytest.skip("no pbo_calibration.py")
+        spec = importlib.util.spec_from_file_location("pbocal", p)
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        return m
+
+    def test_identical_strategies_score_near_fifty_percent(self):
+        """The null. If this drifts to 0, PBO has stopped measuring selection risk."""
+        cal = self._mod().calibrate(T=1300, N=25, trials=6, seed=5)
+        assert 0.30 < cal["null_all_identical"]["pbo_mean"] < 0.75
+
+    def test_a_real_edge_scores_low_and_true_overfitting_scores_high(self):
+        """The estimator must separate the two worlds it exists to tell apart."""
+        cal = self._mod().calibrate(T=1300, N=25, trials=6, seed=6)
+        assert cal["one_real_edge"]["pbo_mean"] < 0.25
+        assert cal["genuinely_overfit"]["pbo_mean"] > 0.70
+        assert (cal["genuinely_overfit"]["pbo_mean"]
+                > cal["null_all_identical"]["pbo_mean"]
+                > cal["one_real_edge"]["pbo_mean"])
+
+    def test_sharpe_standard_error_shrinks_with_sample_length(self):
+        """The whole case for extending history rests on this being true."""
+        se = self._mod().sharpe_se
+        assert se(1.05, 19.5) < se(1.05, 10.3)
+        assert abs(se(1.05, 10.3) - 0.388) < 0.01

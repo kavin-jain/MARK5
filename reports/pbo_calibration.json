@@ -1,0 +1,30 @@
+{
+  "calibration": {
+    "null_all_identical": {
+      "pbo_mean": 0.50625,
+      "pbo_sd": 0.16130433892302004,
+      "pbo_lo": 0.2778138528138528,
+      "pbo_hi": 0.7798701298701298
+    },
+    "genuinely_overfit": {
+      "pbo_mean": 0.9994588744588743,
+      "pbo_sd": 0.002067637789452685,
+      "pbo_lo": 0.9978354978354979,
+      "pbo_hi": 1.0
+    },
+    "one_real_edge": {
+      "pbo_mean": 0.013041125541125543,
+      "pbo_sd": 0.021612461982821452,
+      "pbo_lo": 0.0,
+      "pbo_hi": 0.047943722943722865
+    }
+  },
+  "observed_pbo": 0.596,
+  "sharpe_se_annual": 0.3877523991891257,
+  "assumptions": {
+    "T": 2600,
+    "N": 70,
+    "rho": 0.93
+  },
+  "verdict": "VERDICT: the measured PBO is within the NULL band \u2014 it is what a set of statistically indistinguishable configs reads as, NOT evidence of overfitting. Driving it lower by tuning is not possible and not meaningful; the only real fix is to stop selecting (deploy the ensemble)."
+}
