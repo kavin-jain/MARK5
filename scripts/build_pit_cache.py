@@ -36,17 +36,58 @@ OUT = os.path.join(_ROOT, "data", "pit_cache")
 UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
       "Accept": "*/*", "Accept-Language": "en-US,en;q=0.9"}
 
-RE_SPLIT = re.compile(r"from\s+rs?\.?\s*([\d.]+)\s*/?-?\s*per\s+share\s+to\s+"
-                      r"(?:rs?|re)\.?\s*([\d.]+)", re.I)
+# `[\d.]+` also matches a bare "." — pre-2016 NSE subjects contain strings like
+# "Dividend Rs. . Per Share", which reached float() and killed a 20-year build.
+# Every numeric group therefore requires at least one DIGIT. A subject that still
+# does not match is counted as unparsed and reported rather than silently dropped:
+# a missed split injects a fake 50-90% move straight into the momentum factor.
+_NUM = r"(\d*\.?\d+)"
+RE_SPLIT = re.compile(r"from\s+rs?\.?\s*" + _NUM + r"\s*/?-?\s*per\s+share\s+to\s+"
+                      r"(?:rs?|re)\.?\s*" + _NUM, re.I)
 RE_BONUS = re.compile(r"bonus\s+(\d+)\s*:\s*(\d+)", re.I)
-RE_DIV = re.compile(r"dividend.*?rs\.?\s*([\d.]+)", re.I | re.S)
+RE_DIV = re.compile(r"dividend.*?rs\.?\s*" + _NUM, re.I | re.S)
+
+
+def _ca_coverage() -> tuple:
+    """(start, end, events) already on disk. Old caches are bare lists with no
+    coverage record; infer it from the events so they still work."""
+    if not os.path.exists(CA_CACHE):
+        return None, None, []
+    raw = json.load(open(CA_CACHE))
+    if isinstance(raw, dict):
+        return raw.get("covers_from"), raw.get("covers_to"), raw.get("events", [])
+    dates = pd.to_datetime(pd.Series([r.get("exDate", "") for r in raw]),
+                           errors="coerce", dayfirst=True).dropna()
+    if dates.empty:
+        return None, None, raw
+    return f"{dates.min():%Y-%m-%d}", f"{dates.max():%Y-%m-%d}", raw
 
 
 def fetch_corporate_actions(start="2016-01-01", end="2026-06-09") -> list:
-    """NSE CA API, monthly chunks. Cached — the API needs warm cookies and is slow."""
-    if os.path.exists(CA_CACHE):
-        return json.load(open(CA_CACHE))
+    """NSE CA API, monthly chunks. Cached — the API needs warm cookies and is slow.
+
+    The cache is RANGE-AWARE. It used to return whatever was on disk regardless of
+    the window asked for, so widening the backtest silently produced UNADJUSTED
+    prices outside the cached span — every split in those years becoming a fake
+    50-90% crash straight into the momentum factor. Same failure family as BUG2
+    and BUG3 in the research log: a fetch trusted without checking what it covers.
+    Missing months are now fetched and merged.
+    """
     import time
+    have_from, have_to, cached = _ca_coverage()
+    want_from, want_to = pd.Timestamp(start), pd.Timestamp(end)
+    gaps = []
+    if cached and have_from:
+        if want_from < pd.Timestamp(have_from):
+            gaps.append((want_from, pd.Timestamp(have_from) - pd.Timedelta(days=1)))
+        if want_to > pd.Timestamp(have_to):
+            gaps.append((pd.Timestamp(have_to) + pd.Timedelta(days=1), want_to))
+        if not gaps:
+            return cached
+        print(f"  cache covers {have_from}..{have_to}; fetching {len(gaps)} missing "
+              f"span(s) {[(f'{a:%Y-%m}', f'{b:%Y-%m}') for a, b in gaps]}", flush=True)
+    else:
+        gaps = [(want_from, want_to)]
 
     def warm():
         op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor())
@@ -56,9 +97,10 @@ def fetch_corporate_actions(start="2016-01-01", end="2026-06-09") -> list:
         return op
 
     op, out, failed = warm(), [], []
-    months = pd.date_range(start, end, freq="MS")
-    for i, m0 in enumerate(months, 1):
-        m1 = min(m0 + pd.offsets.MonthEnd(0), pd.Timestamp(end))
+    months = [(m, hi) for lo, hi in gaps
+              for m in pd.date_range(lo, hi, freq="MS").union([lo])]
+    for i, (m0, hi) in enumerate(months, 1):
+        m1 = min(m0 + pd.offsets.MonthEnd(0), hi)
         url = ("https://www.nseindia.com/api/corporates-corporateActions?index=equities"
                f"&from_date={m0:%d-%m-%Y}&to_date={m1:%d-%m-%Y}")
         # a transient DNS/cookie blip must not silently drop a month of corporate
@@ -83,8 +125,13 @@ def fetch_corporate_actions(start="2016-01-01", end="2026-06-09") -> list:
         sys.exit(f"ABORT: {len(failed)} months of corporate actions could not be fetched "
                  f"({failed[:6]}). Adjusting prices with missing splits would inject fake "
                  f"returns into the factors — re-run when the network is stable.")
-    json.dump(out, open(CA_CACHE, "w"))
-    return out
+    merged = cached + out
+    lo = min([d for d in [have_from, f"{want_from:%Y-%m-%d}"] if d])
+    hi = max([d for d in [have_to, f"{want_to:%Y-%m-%d}"] if d])
+    json.dump({"covers_from": lo, "covers_to": hi, "events": merged},
+              open(CA_CACHE, "w"))
+    print(f"  corporate actions now cover {lo}..{hi} ({len(merged):,} records)", flush=True)
+    return merged
 
 
 def parse_events(records: list) -> dict:
@@ -150,7 +197,12 @@ def main():
                     help="keep symbols whose PEAK 126d median daily turnover ever "
                          "reached this many crore (keeps the cache tractable)")
     ap.add_argument("--min-days", type=int, default=300)
+    ap.add_argument("--out", default=None,
+                    help="write the cache here (default: data/pit_cache). Build a "
+                         "widened panel to a new directory and A/B it against the "
+                         "live one before replacing numbers everything depends on.")
     args = ap.parse_args()
+    globals()["OUT"] = args.out or OUT
 
     files = sorted(glob.glob(os.path.join(RAW, "*.parquet")))
     if len(files) < 500:
@@ -167,8 +219,14 @@ def main():
     eod = pd.concat(frames, ignore_index=True)
     print(f"  {len(eod):,} symbol-days, {eod.symbol.nunique():,} distinct symbols")
 
-    print("Fetching corporate actions (cached after first run)...", flush=True)
-    events = parse_events(fetch_corporate_actions())
+    # Derive the CA window from the data actually loaded. Hardcoding it is how the
+    # cache came to cover 2016+ while the price panel started in 2014, leaving two
+    # warmup years unadjusted.
+    ca_from = f"{eod['date'].min() - pd.Timedelta(days=35):%Y-%m-%d}"
+    ca_to = f"{eod['date'].max():%Y-%m-%d}"
+    print(f"Fetching corporate actions for {ca_from}..{ca_to} "
+          f"(cached, incremental)...", flush=True)
+    events = parse_events(fetch_corporate_actions(ca_from, ca_to))
     print(f"  parsed events for {len(events):,} symbols")
 
     close = eod.pivot_table(index="date", columns="symbol", values="close", aggfunc="last")
