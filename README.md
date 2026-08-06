@@ -49,17 +49,17 @@ Everything below is reported with those two facts in force.
 
 | Metric | MARK6 (deployed) | Nifty 50 **TRI** B&H |
 |---|---:|---:|
-| Net CAGR | **+21.2%** | +10.9% |
-| Volatility (annualised) | 14.9% | 14.9% |
-| **Sharpe (excess of 6.5% risk-free)** | **0.97** | 0.36 |
-| Sharpe (raw, rf = 0) | 1.40 | 0.79 |
-| Sortino | 1.28 | 0.48 |
-| Max drawdown | **−23.8%** | −36.3% |
-| Calmar | **0.89** | 0.30 |
+| Net CAGR | **+21.83%** | +10.95% |
+| Volatility (annualised) | 14.39% | 14.7% |
+| **Sharpe (excess of 6.5% risk-free)** | **1.13** | 0.43 |
+| Sharpe (raw, rf = 0) | 1.57 | 0.79 |
+| Sortino | 1.55 | 0.58 |
+| Max drawdown | **-23.78%** | -36.34% |
+| Calmar | **0.92** | 0.30 |
 | Beta vs Nifty | 0.61 | 1.00 |
-| Excess return vs Nifty 50 TRI | **+10.2pp/yr** | — |
+| Excess return vs Nifty 50 TRI | **+10.88pp/yr** | — |
 
-₹5,00,000 → **₹38,17,000** over 10.6 years, net. 857 trades · 69% win rate · profit factor 3.28 · average hold 227 days.
+₹5,00,000 → **₹40,16,885** over 10.6 years, net. 879 trades · full ledger committed.
 
 **The equity sleeve alone** (the part this repo actually builds): +21.1% CAGR, **MaxDD −40.2%**, Calmar 0.52. It beats equal-weight of the same universe by **+9.6pp/yr** and does so in **8/8** rolling 3-year windows. It is also far too volatile to hold on its own — the multi-asset wrapper is what makes the system holdable, and that is a load-bearing fact, not a nicety.
 
@@ -69,10 +69,12 @@ India exempts the first **₹1.25 lakh of long-term equity gain per year** (Sec 
 
 | Total capital | Net CAGR | Excess Sharpe |
 |---|---:|---:|
-| Scale-free (the headline above) | +21.2% | 0.97 |
+| Scale-free (the headline above) | +21.83% | 1.13 |
 | **₹5,00,000 — the live paper book** | **+21.8%** | **1.01** |
 | ₹25,00,000 | +21.3% | 0.98 |
 | ₹5,00,00,000 (institutional) | +21.2% | 0.97 |
+
+> ⚠ **Recompute before quoting.** The capital table above comes from `reports/ltcg_exemption_system.json`, which predates the 2026-08-06 measurement fixes (RESEARCH_LOG 5b) — the scale-free row is now +21.83% / 1.13. The *shape* of the effect stands; the exact rows do not.
 
 Both figures are correct and answer different questions. The scale-free number is the right one for institutional capacity; the capital-aware number is what a ₹5 lakh book actually experiences. **The headline understates a small book by +0.6pp — and at that size the excess Sharpe crosses 1.00.**
 
@@ -122,9 +124,9 @@ three sleeves if perfectly uncorrelated ......  1.278
 
 **4 · Capacity is ~₹10–25 crore, not unlimited.** Modelled with the square-root impact law on 20-day median rupee turnover: every position stays under 10% of a day's volume to ₹1cr; ≤5% of positions breach it to ₹10cr. At the ₹5cr headline, worst-case participation is 16.8% and modelled impact drag is 0.24%/yr — which the backtest does **not** charge. Beyond ₹50cr the strategy breaks down (26% of positions over the limit).
 
-**5 · The gold sleeve's contribution is regime-conditional.** Gold earned 17.65%/yr over this sample — an exceptional decade. Force it to a normal 4% excess return, keeping its real volatility and correlations, and the best possible allocation of these three assets reaches only Sharpe 0.97. The *diversification* benefit (equity–gold correlation **0.005**) is structural and survives; the *return* contribution may not.
+**5 · The gold sleeve's contribution is regime-conditional.** Gold earned 17.65%/yr over this sample — an exceptional decade. Force it to a normal 4% excess return, keeping its real volatility and correlations, and the best possible allocation of these three assets reaches only Sharpe 0.97 (from `sharpe_ceiling.py`, pre-2026-08-06 basis — recompute). The *diversification* benefit (equity–gold correlation **0.005**) is structural and survives; the *return* contribution may not.
 
-**6 · The live track record is 4 days old.** It is real — real prices, whole shares, real Zerodha costs, an append-only ledger — and it is far too short to mean anything. Judge it in 2027, not now.
+**6 · The live track record is 15 days old.** It is real — real prices, whole shares, real Zerodha costs, an append-only ledger — and it is far too short to mean anything. Judge it in 2027, not now.
 
 **7 · Fat tails are real.** Daily skew −1.00, kurtosis 9.91 (normal = 3). The 99% one-day historical VaR is −2.83% against a parametric −2.05%: a normal model **understates the bad days by ~40%**. 21-day 99% CVaR is −13.4%. Worst rolling 1-year return −15.8%; 12% of rolling 1-year windows were negative.
 
@@ -164,7 +166,7 @@ It degrades safely — if the (gitignored, 130MB) archive is absent, every scrip
 
 ## Survivorship: solved, not caveated
 
-The universe is rebuilt point-in-time from **3,064 days of NSE daily bhavcopy — 1,341 symbols, including those that stopped trading** — so delisted names are present until the day they delist. This is the fix, not an estimate.
+The universe is rebuilt point-in-time from **3,093 days of NSE daily bhavcopy — 1,337 symbols, 180 of which stopped trading inside the window** — so delisted names are present until the day they delist. This is the fix, not an estimate.
 
 It mattered, and mostly in a direction people do not expect:
 
@@ -221,7 +223,7 @@ Most hypotheses in this project **failed**, and the kill list is the point. Full
 
 ```
 NSE bhavcopy ─► PIT universe ─► Causal factors ─► Portfolio constructor ─► Tax-aware backtester
-  (1,341 syms,    (top-300 by      (momentum /      (inverse-vol, rank      (FIFO lots, FY netting,
+  (1,337 syms,    (top-300 by      (momentum /      (inverse-vol, rank      (FIFO lots, FY netting,
    incl. dead)     turnover)        low-vol /        scores, name +          Sec 112A, next-close
                                     trend /          sector caps)            execution, costs)
                                     stability)                │
@@ -244,7 +246,7 @@ NSE bhavcopy ─► PIT universe ─► Causal factors ─► Portfolio construc
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/pytest tests/                     # 35 tests: causality, FIFO, FY netting,
+.venv/bin/pytest tests/                     # 54 tests: causality, FIFO, FY netting,
                                             # exec-lag, cash constraint, DSR/PBO sanity
 
 # rebuild the survivorship-free universe from NSE bhavcopy (slow, ~1h)
@@ -270,7 +272,7 @@ export MARK5_CACHE=data/pit_cache MARK5_TOP_N=300     # the deployed universe sc
 Every quantitative claim in this README is emitted by one of these scripts. Nothing is hand-typed.
 
 ### Evidence
-- [`reports/INSTITUTIONAL_REPORT.md`](reports/INSTITUTIONAL_REPORT.md) — performance, 857-trade ledger, stress tests, Monte Carlo
+- [`reports/INSTITUTIONAL_REPORT.md`](reports/INSTITUTIONAL_REPORT.md) — performance, 879-trade ledger, stress tests, Monte Carlo
 - [`reports/RISK_REPORT.md`](reports/RISK_REPORT.md) — VaR/CVaR, factor exposures, drawdown attribution
 - [`reports/trade_ledger.csv`](reports/trade_ledger.csv) — every simulated trade, committed
 - [`reports/OVERFITTING_ANALYSIS.md`](reports/OVERFITTING_ANALYSIS.md) — DSR & PBO
@@ -281,16 +283,16 @@ Every quantitative claim in this README is emitted by one of these scripts. Noth
 
 ## Honest disclaimers
 
-- **PAPER MODE ONLY.** This has never traded real money. By its own rule it must track its backtest for 6–12 months before anyone considers funding it. The live record is currently **4 days old** and means nothing yet.
+- **PAPER MODE ONLY.** This has never traded real money. By its own rule it must track its backtest for 6–12 months before anyone considers funding it. The live record is currently **15 days old** and means nothing yet.
 - **The equity sleeve's honest max drawdown is −40%** (−54% at matched historical breadth). The multi-asset wrapper reduces the deployed system to −24%, but this book is volatile and you must be able to hold it.
-- **Excess Sharpe 0.97 is strong-institutional tier, not hedge-fund tier**, and the measured unlevered ceiling under Indian tax is ~1.00. Claiming more would be dishonest.
+- **Excess Sharpe 1.13 is strong-institutional tier, not hedge-fund tier.** It rose from 0.97 on 2026-08-06 purely by removing two measurement errors (exit tax inside the return series; split-adjusted price times raw volume in the liquidity screen) — no strategy change. See RESEARCH_LOG 5b.
 - **The stock-selection alpha is not statistically significant** once known factors are controlled for (t = 1.61).
 - **The newest factor (`deliv_chg`) is provisional**: strong portfolio evidence over six post-2020 years, an insignificant underlying IC, and an effect size larger than theory explains. The system's demonstrated strengths are factor harvesting, tax discipline and diversification.
 - The edge was measured in a single decade (2016–2026) that was kind to Indian equities, gold and US tech. Regimes change, and the first three walk-forward windows show what that looks like.
 - **Not investment advice, and not tax advice.** The tax modelling reflects Indian law as implemented in this engine; real-money use requires a qualified professional.
 
 ## Tech stack
-Python 3.12 · NumPy / pandas / SciPy · NSE bhavcopy + corporate actions + delivery archive · yfinance (live marks) · pytest · 35-test CI
+Python 3.12 · NumPy / pandas / SciPy · NSE bhavcopy + corporate actions + delivery archive · yfinance (live marks) · pytest · 54-test CI
 
 ---
 
