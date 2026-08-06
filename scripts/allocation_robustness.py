@@ -41,7 +41,7 @@ sys.path.insert(0, _ROOT)
 
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, BacktestConfig,
-                            load_ohlcv, metrics, load_sector_map)
+                            load_ohlcv, metrics, metrics_after_exit_tax, load_sector_map)
 
 START, END = "2016-01-01", "2026-07-21"
 TD, RF, TAX = 252, 0.065, 0.15
@@ -96,7 +96,7 @@ def risk_contributions(w, S):
     return (w * (S @ w)) / var if var > 0 else np.zeros_like(w)
 
 
-def blend(R, w, rebal=TD, tax=TAX):
+def blend(R, w, rebal=TD):
     cur = {k: w[i] for i, k in enumerate(KEYS)}
     nav, out = 1.0, {}
     for i, d in enumerate(R.index):
@@ -109,10 +109,7 @@ def blend(R, w, rebal=TD, tax=TAX):
         if i > 0 and i % rebal == 0:
             tot = sum(cur.values())
             cur = {k: tot * w[j] for j, k in enumerate(KEYS)}
-    s = pd.Series(out)
-    net = s.copy()
-    net.iloc[-1] = s.iloc[-1] - max(0.0, s.iloc[-1] - 1) * tax
-    return net
+    return pd.Series(out)          # GROSS of exit tax; see metrics_after_exit_tax
 
 
 def main():
@@ -147,7 +144,7 @@ def main():
     print(f"\n  Deployed 50/25/25 puts {rc_d[0]*100:.0f}% of the portfolio's RISK in the "
           f"equity sleeve\n  while calling it 50% of the capital. ERC would hold "
           f"{w_erc[0]*100:.0f}% equity / {w_erc[1]*100:.0f}% gold / {w_erc[2]*100:.0f}% US.")
-    m_erc, m_dep = metrics(blend(R, w_erc)), metrics(blend(R, np.array(DEPLOYED)))
+    m_erc, m_dep = metrics_after_exit_tax(blend(R, w_erc), TAX), metrics_after_exit_tax(blend(R, np.array(DEPLOYED)), TAX)
     print(f"\n  {'':<14}{'CAGR':>9}{'shExc':>8}{'vol':>7}{'MaxDD':>8}{'Calmar':>8}")
     print(f"  {'deployed':<14}{m_dep['cagr']*100:>+8.2f}%{m_dep['sharpe_excess']:>8.2f}"
           f"{m_dep['vol']*100:>6.1f}%{m_dep['max_dd']*100:>+7.1f}%{m_dep['calmar']:>8.2f}")
@@ -175,7 +172,7 @@ def main():
     stress_rows = []
     for w in grid:
         w = np.array(w)
-        a, b = metrics(blend(R, w)), metrics(blend(Rs, w))
+        a, b = metrics_after_exit_tax(blend(R, w), TAX), metrics_after_exit_tax(blend(Rs, w), TAX)
         lab = f"{w[0]*100:.0f}/{w[1]*100:.0f}/{w[2]*100:.0f}"
         tag = "  <- ERC" if np.allclose(w, w_erc) else (
               "  <- deployed" if np.allclose(w, DEPLOYED) else "")
@@ -186,7 +183,7 @@ def main():
         stress_rows.append({"weights": [float(x) for x in w],
                             "realised": {k: float(v) for k, v in a.items()},
                             "gold_haircut": {k: float(v) for k, v in b.items()}})
-    base_h = metrics(blend(Rs, np.array(DEPLOYED)))
+    base_h = metrics_after_exit_tax(blend(Rs, np.array(DEPLOYED)), TAX)
     best_h = max(stress_rows, key=lambda r: r["gold_haircut"]["sharpe_excess"])
     print(f"\n  Under the haircut the deployed book scores Sharpe "
           f"{base_h['sharpe_excess']:.2f} / Calmar {base_h['calmar']:.2f};")

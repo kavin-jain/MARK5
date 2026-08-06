@@ -35,7 +35,7 @@ sys.path.insert(0, _ROOT)
 
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, BacktestConfig,
-                            load_ohlcv, metrics, load_sector_map)
+                            load_ohlcv, metrics, metrics_after_exit_tax, load_sector_map)
 
 START, END = "2016-01-01", "2026-07-21"
 TD, RF = 252, 0.065
@@ -88,10 +88,9 @@ def blend_costed(R, w, rebal):
             tax_paid += tax / tot if tot > 0 else 0.0
             cur = {k: tgt[k] * (1 - drag) for k in KEYS}
             basis = dict(cur)
-    s = pd.Series(out)
-    net = s.copy()
-    net.iloc[-1] = s.iloc[-1] - max(0.0, s.iloc[-1] - 1) * TERMTAX
-    return net, traded, tax_paid
+    # GROSS of exit tax — priced by metrics_after_exit_tax at the measurement
+    # site, so it never enters the return series.
+    return pd.Series(out), traded, tax_paid
 
 
 def main():
@@ -121,13 +120,13 @@ def main():
     for name, w in (("deployed 50/25/25", DEPLOYED), ("risk-parity 29/45/26", ERC)):
         for cad in CADENCES:
             nav, turn, tax = blend_costed(R, w, cad)
-            m = metrics(nav)
+            m = metrics_after_exit_tax(nav, TERMTAX)
             wf = []
             for a, b in windows:
                 seg = R.loc[a:b]
                 if len(seg) < max(200, cad + 20):
                     continue
-                wf.append(metrics(blend_costed(seg, w, cad)[0]))
+                wf.append(metrics_after_exit_tax(blend_costed(seg, w, cad)[0], TERMTAX))
             res[(name, cad)] = {"m": m, "wf": wf, "turnover": turn, "tax": tax}
 
     base = res[("deployed 50/25/25", TD)]

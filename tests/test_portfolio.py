@@ -526,3 +526,191 @@ class TestSleeveAttribution:
         assert eq["return_pct"] != pytest.approx(naive, abs=0.05), (
             "equity sleeve is reporting the naive entry-price return; a rebalance "
             "has reset entry prices and swept cash in, so this overstates it")
+
+
+class TestTerminalTax:
+    """Exit tax is a liquidation COST, not a market return. Folding it into the
+    last NAV bar (as export_dashboard once did) put a single -13% observation
+    into pct_change: it inflated vol, depressed Sharpe/Sortino, and drew a cliff
+    on the public charts that never happened in the market."""
+
+    def _nav(self):
+        idx = pd.bdate_range("2016-01-01", periods=2600)
+        return pd.Series(np.linspace(1.0, 8.0, len(idx)), index=idx)
+
+    def test_taxes_only_the_gain(self):
+        from core.portfolio import metrics_after_exit_tax
+        m = metrics_after_exit_tax(self._nav(), 0.15)
+        assert m["net_multiple"] == pytest.approx(8.0 - 7.0 * 0.15)   # 1.0 is capital
+
+    def test_no_tax_on_a_loss(self):
+        """No gain, no tax. The multiple is measured off the FIRST bar, so a book
+        that merely got scaled is still a gain — it has to actually end lower."""
+        from core.portfolio import metrics_after_exit_tax
+        idx = pd.bdate_range("2016-01-01", periods=2600)
+        s = pd.Series(np.linspace(8.0, 4.0, len(idx)), index=idx)   # halves
+        m = metrics_after_exit_tax(s, 0.15)
+        assert m["gross_multiple"] == pytest.approx(0.5)
+        assert m["net_multiple"] == pytest.approx(m["gross_multiple"])
+        assert m["cagr"] == pytest.approx(m["cagr_gross"])
+
+    def test_risk_stats_match_the_untaxed_series(self):
+        """The whole point: vol/Sharpe/MaxDD must be blind to the exit tax."""
+        from core.portfolio import metrics, metrics_after_exit_tax
+        s = self._nav()
+        before, g = s.copy(), metrics(s)
+        m = metrics_after_exit_tax(s, 0.15)
+        pd.testing.assert_series_equal(s, before)                # no mutation
+        for k in ("vol", "sharpe_excess", "sortino", "max_dd"):
+            assert m[k] == pytest.approx(g[k], rel=1e-12)
+        assert m["cagr"] < g["cagr"]                             # only CAGR is net
+
+    def test_dashboard_curves_are_gross_and_symmetric(self):
+        """Both plotted lines must carry the same tax treatment, else the chart
+        and the stat block describe different benchmarks."""
+        import json
+        p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                         "docs", "data", "mark6.json")
+        if not os.path.exists(p):
+            pytest.skip("no dashboard export — run scripts/export_dashboard.py")
+        r = json.load(open(p))["research"]
+        tt = r.get("terminal_tax")
+        if not tt:
+            pytest.skip("export predates the terminal-tax split")
+        assert tt["curves_are_gross"] is True
+        # the plotted endpoints are the GROSS multiples, on both lines
+        assert r["equity_curve"][-1][1] == pytest.approx(tt["system_gross_multiple"], abs=1e-3)
+        assert r["benchmark_curve"][-1][1] == pytest.approx(tt["benchmark_gross_multiple"], abs=1e-3)
+        # and the headline CAGRs are the NET ones, on both lines
+        yrs = r["period"]["years"]
+        assert r["headline"]["cagr"] / 100 == pytest.approx(
+            tt["system_net_multiple"] ** (1 / yrs) - 1, abs=2e-3)
+        assert r["benchmark"]["cagr"] / 100 == pytest.approx(
+            tt["benchmark_net_multiple"] ** (1 / yrs) - 1, abs=2e-3)
+
+    def test_no_cliff_in_the_plotted_series(self):
+        import json
+        p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                         "docs", "data", "mark6.json")
+        if not os.path.exists(p):
+            pytest.skip("no dashboard export — run scripts/export_dashboard.py")
+        r = json.load(open(p))["research"]
+        if not r.get("terminal_tax"):
+            pytest.skip("export predates the terminal-tax split")
+        for key in ("equity_curve", "benchmark_curve"):
+            a, b = r[key][-2][1], r[key][-1][1]
+            assert b / a - 1 > -0.10, f"{key} ends in a >10% cliff — tax leaked into the chart"
+
+
+class TestRebalanceDisclosure:
+    """A page that says 'append-only ledger' while hiding that the book was
+    rebuilt on day 4 is committing the failure it claims to defend against."""
+
+    def _export(self):
+        p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                         "data", "paper", "paper_export.json")
+        if not os.path.exists(p):
+            pytest.skip("no live paper export — run scripts/paper_track.py export")
+        import json
+        return json.load(open(p))
+
+    def test_every_rebalance_is_published(self):
+        e = self._export()
+        ev = e.get("rebalance_events")
+        if ev is None:
+            pytest.skip("export predates rebalance disclosure")
+        assert len(ev) == e["rebalances"], "count and event list disagree"
+
+    def test_off_cadence_rebalances_are_flagged(self):
+        from scripts.paper_track import REBAL_DAYS
+        e = self._export()
+        ev = e.get("rebalance_events")
+        if not ev:
+            pytest.skip("no rebalance yet")
+        for r in ev:
+            assert r["off_cadence"] == (r["day_of_book"] < REBAL_DAYS)
+            assert r["trades"] > 0 and r["date"]
+
+
+class TestEngineTerminalTax:
+    """Root-cause guard for the same defect one level down: Backtester.run once
+    fed metrics() a NAV whose last bar had the exit tax subtracted, so every
+    report in this repo inherited an inflated vol and a depressed Sharpe."""
+
+    def _run(self):
+        from core.portfolio import Backtester, BacktestConfig
+        panel = _synthetic_panel(seed=3)
+        con = PortfolioConstructor(ConstructionConfig(mode="equal_weight",
+                                                      base_weighting="equal"))
+        return Backtester(panel, con,
+                          BacktestConfig(rebal_bars=252, warmup_skip=0)
+                          ).run("2016-01-01", "2019-06-01")
+
+    def test_risk_metrics_ignore_the_tax_bar(self):
+        out = self._run()
+        from core.portfolio import metrics
+        m, gross = out["metrics"], out["nav_gross"]
+        assert m["vol"] == pytest.approx(metrics(gross)["vol"], rel=1e-9)
+        assert m["max_dd"] == pytest.approx(metrics(gross)["max_dd"], rel=1e-9)
+        assert m["sharpe_excess"] == pytest.approx(metrics(gross)["sharpe_excess"], rel=1e-9)
+
+    def test_cagr_is_net_of_terminal_tax(self):
+        out = self._run()
+        m = out["metrics"]
+        if m["terminal_tax"] <= 0:
+            pytest.skip("no terminal gain to tax in this fixture")
+        assert m["cagr"] < m["cagr_gross"]
+        yrs = (out["nav_net"].index[-1] - out["nav_net"].index[0]).days / 365.25
+        assert m["cagr"] == pytest.approx(
+            (out["nav_net"].iloc[-1] / out["nav_net"].iloc[0]) ** (1 / yrs) - 1, rel=1e-9)
+
+    def test_calmar_uses_net_cagr_over_gross_drawdown(self):
+        out = self._run()
+        m = out["metrics"]
+        if not m["max_dd"]:
+            pytest.skip("no drawdown in this fixture")
+        assert m["calmar"] == pytest.approx(m["cagr"] / abs(m["max_dd"]), rel=1e-9)
+
+
+class TestPublishedArtifactsAgree:
+    """The page links its own reports as evidence. When a report asserts something
+    the page denies, the reader cannot tell which is true — and the page loses the
+    only thing it is selling. These guard the claims that once disagreed."""
+
+    _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    def _json(self):
+        p = os.path.join(self._ROOT, "docs", "data", "mark6.json")
+        if not os.path.exists(p):
+            pytest.skip("no dashboard export")
+        import json
+        return json.load(open(p))["research"]
+
+    def _md(self, name):
+        p = os.path.join(self._ROOT, "reports", name)
+        if not os.path.exists(p):
+            pytest.skip(f"no {name}")
+        return open(p).read()
+
+    @pytest.mark.parametrize("report", ["MARK6_REPORT.md", "INSTITUTIONAL_REPORT.md"])
+    def test_survivorship_claim_matches_the_dashboard(self, report):
+        r, txt = self._json(), self._md(report)
+        n = r["universe"]["delisted_included"]
+        inflated = "inflated an estimated ~1-2pp" in txt or "subtract ~1-2pp" in txt
+        if n > 0:
+            assert not inflated, (
+                f"{report} still claims a survivorship haircut, but the dashboard "
+                f"reports {n} delisted names in the point-in-time universe")
+            assert str(n) in txt, f"{report} does not state the {n} delisted names"
+        else:
+            assert inflated, (
+                f"dashboard universe has no delisted names, so {report} must keep "
+                f"the survivorship caveat")
+
+    def test_sharpe_agrees_between_page_and_institutional_report(self):
+        import re
+        r, txt = self._json(), self._md("INSTITUTIONAL_REPORT.md")
+        mm = re.search(r"Sharpe \(excess of 6\.5% risk-free\)\*\* \| \*\*([\d.]+)\*\*", txt)
+        if not mm:
+            pytest.skip("report format changed")
+        assert float(mm.group(1)) == pytest.approx(r["headline"]["sharpe_excess"], abs=0.02)

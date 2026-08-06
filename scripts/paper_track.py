@@ -536,6 +536,25 @@ def _sleeve_twr(book, led):
     return out
 
 
+def rebalance_events(book) -> list[dict]:
+    """Every reconstitution of the book, with the ones that fired early flagged.
+
+    An off-cadence rebalance resets entry prices and re-picks names mid-flight, so
+    the window either side of it is not one continuous test of one book. That has
+    to be visible on the page, not buried in the diagnosis JSON.
+    """
+    start = pd.Timestamp(book["start_date"])
+    out = []
+    for r in book.get("rebalances", []):
+        age = (pd.Timestamp(r["date"]) - start).days
+        out.append({"date": r["date"], "signal_asof": r.get("signal_asof"),
+                    "trades": r.get("trades", 0),
+                    "realised_pnl": r.get("realised_pnl", 0.0),
+                    "day_of_book": age,
+                    "off_cadence": age < REBAL_DAYS})
+    return out
+
+
 def cmd_export():
     """Emit the JSON the public dashboard reads. Real data only."""
     book, nav, ret, days, detail, bench = cmd_status(quiet=True)
@@ -561,6 +580,11 @@ def cmd_export():
            "tax_liability": net_fy_tax(book),
            "realised_pnl": book.get("realised_pnl", 0.0),
            "rebalances": len(book.get("rebalances", [])),
+           # Every reconstitution, dated. A track record that says "append-only
+           # ledger" while silently hiding that the book was rebuilt on day 4 is
+           # the same failure it claims to defend against, so the events ship
+           # with the data and the page can render them on the NAV chart.
+           "rebalance_events": rebalance_events(book),
            # the blended headline hides that half the book is passive ETFs
            "sleeves": sleeve_attribution(book, detail, nav),
            "holdings": detail, "nav_history": hist}

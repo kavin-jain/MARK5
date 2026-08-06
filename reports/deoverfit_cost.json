@@ -1,0 +1,38 @@
+{
+ "generated": "2026-08-06",
+ "window": [
+  "2016-01-01",
+  "2026-07-21"
+ ],
+ "nifty_cagr_pct": 10.948663931048209,
+ "books": [
+  {
+   "name": "deployed (mom_heavy)",
+   "cagr": 20.873228881658655,
+   "sharpe": 1.0653716606112398,
+   "vol": 14.572644832913772,
+   "max_dd": -22.156153551403268,
+   "calmar": 0.9420962367511956,
+   "eq_only_cagr": 18.921643614074778
+  },
+  {
+   "name": "neutral (blend)",
+   "cagr": 18.398082265942286,
+   "sharpe": 1.0221153562728573,
+   "vol": 12.836573889213652,
+   "max_dd": -21.436973912959946,
+   "calmar": 0.8582406425759344,
+   "eq_only_cagr": 15.330873821695468
+  },
+  {
+   "name": "1/N ensemble",
+   "cagr": 18.957401087890613,
+   "sharpe": 1.0502683084359448,
+   "vol": 12.980722319308915,
+   "max_dd": -20.953885949869,
+   "calmar": 0.9047200663993845,
+   "eq_only_cagr": 16.017226355184345
+  }
+ ],
+ "verdict": "Deployed config was chosen with full-sample knowledge. Quote the neutral or ensemble figure as the honest expectation; the deployed figure is an upper bound, not a forecast."
+}

@@ -44,7 +44,7 @@ sys.path.insert(0, _ROOT)
 
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, BacktestConfig,
-                            metrics, tranched_run, load_ohlcv)
+                            metrics, metrics_after_exit_tax, tranched_run, load_ohlcv)
 from core.portfolio import factors as F
 
 START, END = "2016-01-01", "2026-07-21"
@@ -88,10 +88,7 @@ def wrap(eq_nav):
         if i > 0 and i % TD == 0:
             tot = sum(cur.values())
             cur = {k: tot * sl[k] for k in sl}
-    s = pd.Series(out)
-    net = s.copy()
-    net.iloc[-1] = s.iloc[-1] - max(0.0, s.iloc[-1] - 1) * TAX
-    return net
+    return pd.Series(out)          # GROSS of exit tax; see metrics_after_exit_tax
 
 
 # ── R: rank-transform composite ──────────────────────────────────────────────
@@ -170,7 +167,8 @@ def run_one(spec, s, e):
                              stagger_bars=spec.get("stagger"))
         else:
             r = bt.run(s, e)
-        return metrics(r["nav_net"]), metrics(wrap(r["nav_gross"])), r["metrics"]
+        return (metrics(r["nav_net"]), metrics_after_exit_tax(wrap(r["nav_gross"]), TAX),
+                r["metrics"])
     except Exception as ex:
         print(f"    ! {spec['name']} {s}: {type(ex).__name__}: {ex}")
         return None, None, None

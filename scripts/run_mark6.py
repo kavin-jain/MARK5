@@ -18,7 +18,6 @@ from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, BacktestConfig, metrics,
                             load_nifty, load_sector_map, load_delivery_factors)
 
-CACHE = os.path.join(_ROOT, "data", "cache")
 REPORTS = os.path.join(_ROOT, "reports")
 END = "2026-07-21"
 LTCG = 0.125
@@ -54,7 +53,13 @@ def main():
     print("Loading data panel (this builds factors once)...", flush=True)
     tickers = discover_tickers()
     panel = DataPanel(tickers, END)
-    print(f"  universe: {len(panel.tickers)} names\n", flush=True)
+    # Names with no print in the last 20 bars have delisted inside the window. If
+    # they are here, the run is survivorship-free and the old blanket caveat is
+    # false; if they are absent, it is true. Deriving it stops the report from
+    # contradicting the dashboard, which reads the same fact off the same panel.
+    delisted = int((~panel.close.iloc[-20:].notna().any()).sum())
+    print(f"  universe: {len(panel.tickers)} names ({delisted} delisted in-window) "
+          f"from {os.environ.get('MARK5_CACHE', 'data/cache')}\n", flush=True)
 
     # the strategy and the honest benchmark.
     # n_hold=12 + tilt_strength=1.5 validated 2026-06-08: beats the old n_hold=20
@@ -87,7 +92,9 @@ def main():
                        BacktestConfig(rebal_bars=126, min_turnover=min_turn,
                                       top_n_liquid=int(os.environ.get('MARK5_TOP_N', '0'))))
 
-    results = {"config": factor_cfg.__dict__, "windows": {}}
+    results = {"config": factor_cfg.__dict__, "windows": {},
+               "universe": {"symbols": len(panel.tickers), "delisted_included": delisted,
+                            "cache": os.environ.get("MARK5_CACHE", "data/cache")}}
 
     # ── full period + the two canonical sub-windows ──────────────────────────
     windows = [("2016-01-01", END, "FULL 2016-2026"),
@@ -170,12 +177,20 @@ def _write_md(r):
     for w in r["walk_forward"]:
         L.append(f"| {w['window']} | {w['factor']*100:+.1f}% | {w['ew']*100:+.1f}% | "
                  f"{w['nifty']*100:+.1f}% | {w['vs_nifty']:+.1f}pp |")
-    L += ["", "## Honest caveats", "",
-          "- Survivorship: the candidate universe is today's surviving constituents "
-          "(fully-delisted names absent), so headline CAGR is inflated an estimated "
-          "~1-2pp/yr. `survivorship_validation.py` bounds this via failure injection "
-          "on the equal-weight basket; the concentrated momentum book has NOT been "
-          "separately failure-injected.",
+    u = r.get("universe", {})
+    if u.get("delisted_included"):
+        surv = (f"- Survivorship: none. The universe is point-in-time ({u['symbols']} symbols "
+                f"from `{u['cache']}`), and **{u['delisted_included']}** of them delisted inside "
+                "the window — they are held until the day they stop trading, so their failure is "
+                "priced in. The concentrated momentum book has still NOT been separately "
+                "failure-injected by `survivorship_validation.py`.")
+    else:
+        surv = (f"- Survivorship: PRESENT. This run used `{u.get('cache', 'data/cache')}`, whose "
+                f"{u.get('symbols', '?')} symbols are today's survivors with no delisted names, so "
+                "headline CAGR is inflated an estimated ~1-2pp/yr. Re-run with "
+                "`MARK5_CACHE=data/pit_cache` for the honest number. `survivorship_validation.py` "
+                "bounds the bias via failure injection on the equal-weight basket.")
+    L += ["", "## Honest caveats", "", surv,
           "- Drawdowns are equity-level (~-30 to -40%); inverse-vol weighting reduces "
           "but cannot eliminate them. The 5% hard-stop design is incompatible with "
           "equity returns and was proven to destroy the edge.",

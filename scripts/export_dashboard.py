@@ -26,19 +26,20 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, BacktestConfig,
-                            load_ohlcv, load_nifty, metrics, load_sector_map,
-                            load_delivery_factors)
+                            load_ohlcv, load_nifty, metrics, metrics_after_exit_tax,
+                            load_sector_map, load_delivery_factors)
 
 REPORTS = os.path.join(_ROOT, "reports")
 PAPER = os.path.join(_ROOT, "data", "paper")
 OUT = os.path.join(_ROOT, "docs", "data", "mark6.json")
 START, END = "2016-01-01", None          # END=None -> latest available bar
-TD, TAX = 252, 0.15
+TD, TAX = 252, 0.15      # TAX = blended exit rate on the 3-sleeve book (eq/gold/US)
+NIFTY_TAX = 0.125        # Sec 112A LTCG on the all-equity benchmark
 MOM = {"momentum": .45, "low_vol": .15, "trend": .25, "stability": .15}
 
 
 def wrap(eq_nav, sleeves):
-    """Deployed 50/25/25 blend, annual sleeve rebalance, terminal tax."""
+    """Deployed 50/25/25 blend, annual sleeve rebalance. GROSS of exit tax."""
     cal = eq_nav.index
     ser = {"eq": eq_nav.pct_change(fill_method=None).fillna(0.0)}
     for k, w in sleeves.items():
@@ -57,10 +58,7 @@ def wrap(eq_nav, sleeves):
         if i > 0 and i % TD == 0:
             tot = sum(cur.values())
             cur = {k: tot * sleeves[k] for k in sleeves}
-    s = pd.Series(out)
-    net = s.copy()
-    net.iloc[-1] = s.iloc[-1] - max(0.0, s.iloc[-1] - 1) * TAX
-    return net
+    return pd.Series(out)
 
 
 def series_for_chart(s, step=5):
@@ -87,14 +85,16 @@ def main():
                      BacktestConfig(rebal_bars=126, top_n_liquid=300),
                      extra_factors=dfac).run(START, end)
     eq = run["nav_gross"]
+    # Both curves are GROSS of exit tax so the chart compares like with like, and
+    # both CAGRs are NET of it so the headline stays conservative. Previously the
+    # headline used a taxed Nifty while the plotted line was untaxed — the chart
+    # and the stat block disagreed by ~1pp on the benchmark.
     sys_nav = wrap(eq, {"eq": .5, "GOLDBEES": .25, "MON100": .25})
-    m = metrics(sys_nav)
+    m = metrics_after_exit_tax(sys_nav, TAX)
 
     nifty = load_nifty(True).reindex(sys_nav.index, method="ffill")
     nifty_nav = nifty / nifty.iloc[0]
-    nn = nifty_nav.copy()
-    nn.iloc[-1] = nifty_nav.iloc[-1] - max(0.0, nifty_nav.iloc[-1] - 1) * 0.125
-    mn = metrics(nn)
+    mn = metrics_after_exit_tax(nifty_nav, NIFTY_TAX)
 
     # equal-weight of the same universe = the honest "did the engine earn its keep" line
     ew = Backtester(panel, PortfolioConstructor(
@@ -152,7 +152,8 @@ def main():
             "headline": {
                 "cagr": round(m["cagr"] * 100, 2), "sharpe_excess": round(m["sharpe_excess"], 2),
                 "sharpe_raw": round(m["sharpe"], 2), "vol": round(m["vol"] * 100, 2),
-                "max_dd": round(m["max_dd"] * 100, 2), "calmar": round(m["calmar"], 2),
+                "max_dd": round(m["max_dd"] * 100, 2),
+                "calmar": round(m["calmar"], 2),
                 "sortino": round(m["sortino"], 2),
                 "excess_vs_nifty": round((m["cagr"] - mn["cagr"]) * 100, 2),
                 "engine_alpha_vs_ew": round((run["metrics"]["cagr"] - ew["metrics"]["cagr"]) * 100, 2),
@@ -162,6 +163,22 @@ def main():
                           "cagr": round(mn["cagr"] * 100, 2),
                           "sharpe_excess": round(mn["sharpe_excess"], 2),
                           "max_dd": round(mn["max_dd"] * 100, 2)},
+            # Charts are gross of exit tax on BOTH lines; CAGRs above are net on
+            # both. Published so the page can say which, instead of the reader
+            # having to reconcile a chart against a stat block that disagreed.
+            "terminal_tax": {
+                "applies_to": "cagr, excess_vs_nifty, calmar",
+                "curves_are_gross": True,
+                "system_rate_pct": round(TAX * 100, 1),
+                "benchmark_rate_pct": round(NIFTY_TAX * 100, 1),
+                "system_gross_multiple": round(m["gross_multiple"], 4),
+                "system_net_multiple": round(m["net_multiple"], 4),
+                "benchmark_gross_multiple": round(mn["gross_multiple"], 4),
+                "benchmark_net_multiple": round(mn["net_multiple"], 4),
+                "note": ("One-off tax on liquidating everything on the last bar. It is a "
+                         "cost, not a market return, so it is excluded from vol, Sharpe, "
+                         "Sortino and the drawdown series and applied only to CAGR."),
+            },
             "equity_curve": series_for_chart(sys_nav),
             "benchmark_curve": series_for_chart(nifty_nav),
             "drawdown": series_for_chart(dd),
@@ -183,6 +200,10 @@ def main():
                 "Measured over 2016-2026, a decade kind to Indian equities, gold and US tech.",
                 "Corporate-action feed lacks demergers, so 67 affected symbols are excluded.",
                 "Modelled costs (0.49% round trip) exceed real Zerodha delivery costs.",
+                ("The Sec 112A ₹1.25L/yr LTCG exemption is not modelled — the engine runs "
+                 "in NAV units and has no rupee scale. Worth roughly +0.6pp/yr at ₹5L of "
+                 "real capital (reports/ltcg_exemption_system.json), so the headline "
+                 "understates an actual retail book rather than flattering it."),
             ],
         },
     }

@@ -23,7 +23,7 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, BacktestConfig,
-                            load_ohlcv, load_nifty, metrics)
+                            load_ohlcv, load_nifty, metrics, metrics_after_exit_tax)
 
 END = "2026-06-09"
 TAX = 0.15
@@ -66,14 +66,11 @@ def wrap(eq_ret, gold, us, w=(0.50, 0.25, 0.25)):
             tot = sum(cur.values())
             for s in cur:
                 cur[s] = tot * weights[s]
-    nav_s = pd.Series(out)
-    n = nav_s.copy(); g = nav_s.iloc[-1] - 1
-    n.iloc[-1] = nav_s.iloc[-1] - max(0, g) * TAX
-    return n
+    return pd.Series(out)          # GROSS of exit tax; priced in report()
 
 
-def report(label, nav):
-    m = metrics(nav)
+def report(label, nav, tax=TAX):
+    m = metrics_after_exit_tax(nav, tax)
     print(f"  {label:<26}{m['cagr']*100:>+7.1f}%{m['sharpe']:>8.2f}"
           f"{m['max_dd']*100:>+7.1f}%{m['calmar']:>8.2f}")
     return m
@@ -93,10 +90,7 @@ def main():
         report("A mom-factor book (system)", wrap(book_ret(panel, mom_cfg, start, END, cal), gold, us))
         report("B equal-weight universe", wrap(book_ret(panel, ew_cfg, start, END, cal), gold, us))
         report("C Nifty50 index sleeve", wrap(nf, gold, us))
-        nf_nav = (1 + nf).cumprod()
-        g = nf_nav.iloc[-1] - 1; nf_net = nf_nav.copy()
-        nf_net.iloc[-1] = nf_nav.iloc[-1] - max(0, g) * 0.125
-        report("D pure Nifty50 B&H (no wrap)", nf_net)
+        report("D pure Nifty50 B&H (no wrap)", (1 + nf).cumprod(), tax=0.125)
 
     # rolling 3-yr walk-forward: A vs B inside the wrapper (the decisive robustness view)
     print("\nROLLING 3-YR WALK-FORWARD — system(A) minus EW-universe(B), inside wrapper:")

@@ -25,9 +25,12 @@ Known approximations (all documented, direction stated):
     slab rates as income. Flatters the strategy by roughly 0.1–0.3pp/yr.
   - The LTCG ₹1.25L annual exemption is NOT modelled (NAV-unit simulation has no
     rupee scale). Conservative — real after-tax returns would be slightly higher.
-  - Terminal liquidation tax is applied to the final NAV point, which puts a
-    one-day tax cliff inside the return series used for Sharpe/drawdown.
-    Conservative — it can only worsen those statistics.
+  - Terminal liquidation tax used to be written into the final NAV point, which
+    put a one-day tax cliff inside the return series used for Sharpe/drawdown.
+    FIXED: it is a liquidation cost, not a market return, so risk statistics now
+    come from the gross series and only CAGR is net (see `metrics_after_exit_tax`).
+    The old treatment understated the deployed Sharpe by ~0.13 and overstated vol
+    by ~0.6pp.
 
 Design choices that make the numbers trustworthy:
   - Point-in-time eligibility every rebalance (no survivorship/look-ahead in
@@ -125,6 +128,31 @@ def metrics(nav: pd.Series, rf_annual: float = 0.065) -> dict:
     return {"cagr": cagr, "vol": vol, "sharpe": sharpe, "sharpe_excess": sharpe_excess,
             "sortino": sortino, "max_dd": dd, "calmar": calmar, "years": yrs,
             "rf_annual": rf_annual}
+
+
+def metrics_after_exit_tax(nav: pd.Series, rate: float, rf_annual: float = 0.065) -> dict:
+    """`metrics` for a book that is liquidated and taxed on its last bar.
+
+    Exit tax is a one-off liquidation COST, not a market return. Six call sites in
+    this repo used to subtract it from the final NAV and hand the mutated series
+    to metrics(), which derives vol/Sharpe/Sortino from pct_change — injecting one
+    large artificial down-day. On the deployed book that inflated vol by ~0.6pp,
+    cut Sharpe from 1.10 to 0.97, and drew a -13% cliff on the public equity and
+    drawdown charts that never happened in the market.
+
+    Risk statistics here come from the GROSS series; only CAGR is net, and Calmar
+    inherits it. Use this instead of mutating a NAV series by hand.
+    """
+    m = metrics(nav, rf_annual)
+    if not m:
+        return m
+    gross = float(nav.iloc[-1] / nav.iloc[0])
+    net = gross - max(0.0, gross - 1.0) * rate
+    m["cagr_gross"] = m["cagr"]
+    m["cagr"] = net ** (1.0 / m["years"]) - 1.0
+    m["calmar"] = m["cagr"] / abs(m["max_dd"]) if m["max_dd"] else 0.0
+    m["gross_multiple"], m["net_multiple"] = gross, net
+    return m
 
 
 def tranched_run(backtester, start: str, end: str, n_tranches: int = 3,
@@ -447,7 +475,17 @@ class Backtester:
         net = nav.copy()
         net.iloc[-1] = nav.iloc[-1] - term_tax
         yrs = (cal[-1] - cal[0]).days / 365.25
-        m = metrics(net, cfg.rf_annual)
+        # Risk metrics come from the GROSS series. Terminal tax is a one-off
+        # liquidation cost, not a market return: metrics() derives vol/Sharpe/
+        # Sortino from pct_change, so charging it against the last bar injected a
+        # large artificial down-day that inflated vol and depressed every
+        # risk-adjusted ratio. Drawdown likewise — paying tax is not a drawdown.
+        # Only CAGR is net, and Calmar inherits it.
+        m = metrics(nav, cfg.rf_annual)
+        m["cagr_gross"] = m["cagr"]
+        m["cagr"] = (net.iloc[-1] / net.iloc[0]) ** (1 / yrs) - 1
+        m["calmar"] = m["cagr"] / abs(m["max_dd"]) if m["max_dd"] else 0.0
+        m["terminal_tax"] = term_tax
         m.update({"turnover_yr": traded / yrs / nav.mean(), "tax_paid": tax_paid + term_tax,
                   "n_rebalances": n_rebal, "avg_holdings": np.mean([len(w) for w in weights_hist.values()]) if weights_hist else 0})
         return {"nav_net": net, "nav_gross": nav, "metrics": m, "weights": weights_hist,

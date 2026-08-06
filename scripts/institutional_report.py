@@ -24,7 +24,7 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, BacktestConfig,
-                            load_ohlcv, load_nifty, metrics, load_sector_map,
+                            load_ohlcv, load_nifty, metrics, metrics_after_exit_tax, load_sector_map,
                             load_delivery_factors)
 
 CACHE = os.path.join(_ROOT, "data", "cache")
@@ -106,6 +106,15 @@ def main():
     os.makedirs(REPORTS, exist_ok=True)
 
     panel = DataPanel(discover_tickers(), END)
+    # Derive the survivorship fact from the panel rather than asserting it. Names
+    # with no print in the last 20 bars delisted inside the window; if they are
+    # here the run is point-in-time and the old blanket "-1 to -2pp" caveat is
+    # simply false. Hardcoding it made this report contradict the dashboard,
+    # which reads the same fact off the same panel.
+    delisted = int((~panel.close.iloc[-20:].notna().any()).sum())
+    _cache = os.environ.get("MARK5_CACHE", "data/cache")
+    print(f"  universe: {len(panel.tickers)} names ({delisted} delisted in-window) "
+          f"from {_cache}", flush=True)
     # DEPLOYED CONFIG (2026-06-10 upgrade): momentum-heavy equity book
     # Factor weights: momentum 0.45 / low_vol 0.15 / trend 0.25 / stability 0.15
     # Validated OOS: +1.4pp avg walk-forward, beats 6/8 windows vs baseline blend.
@@ -136,16 +145,13 @@ def main():
     # 5-sleeve (+silver+gilt) hits 20%/Sharpe1.1 only in the 2022-26 window -> rejected as
     # overfit (silver/gilt have no pre-2022/2018 data; single precious-metals regime).
     nav = blend_nav(run["nav_gross"], cal, 0.50, 0.25, 0.25)
-    # apply terminal tax fairly
-    nav_net = nav.copy(); g = nav.iloc[-1] - 1; nav_net.iloc[-1] = nav.iloc[-1] - max(0, g) * TAX
-    m = metrics(nav_net)
+    # Exit tax priced on both sides, but kept OUT of the return series — it is a
+    # liquidation cost, not a market return (see metrics_after_exit_tax).
+    m = metrics_after_exit_tax(nav, TAX)
     # benchmark: Nifty TRI, taxed symmetrically (terminal LTCG on gains)
     nifty = nifty_series(cal); nifty_nav = nifty / nifty.iloc[0]
-    nifty_net = nifty_nav.copy()
-    ng = nifty_nav.iloc[-1] - 1
-    nifty_net.iloc[-1] = nifty_nav.iloc[-1] - max(0, ng) * 0.125
-    mn = metrics(nifty_net)
-    a, b = alpha_beta(nav_net.pct_change(), nifty_nav.pct_change())
+    mn = metrics_after_exit_tax(nifty_nav, 0.125)
+    a, b = alpha_beta(nav.pct_change(), nifty_nav.pct_change())
     # factor-engine alpha vs equal-weight of the SAME universe (computed, not quoted)
     ew_run = Backtester(panel, PortfolioConstructor(
         ConstructionConfig(mode="equal_weight", base_weighting="equal")),
@@ -170,8 +176,8 @@ def main():
                         t["held_days"], t["term"]])
 
     # ── yearly returns ────────────────────────────────────────────────────────
-    yr = nav_net.resample("YE").last().pct_change().dropna()
-    yr0 = nav_net.groupby(nav_net.index.year).apply(lambda s: s.iloc[-1] / s.iloc[0] - 1)
+    yr = nav.resample("YE").last().pct_change().dropna()
+    yr0 = nav.groupby(nav.index.year).apply(lambda s: s.iloc[-1] / s.iloc[0] - 1)
 
     # ── scenarios ─────────────────────────────────────────────────────────────
     scen = {"2018 NBFC/IL&FS": ("2018-08-01", "2019-02-28"),
@@ -180,13 +186,33 @@ def main():
             "2024-25 correction": ("2024-09-01", "2025-03-31")}
     scen_res = {}
     for name, (s, e) in scen.items():
-        seg = nav_net.loc[s:e]; nseg = nifty_nav.loc[s:e]
+        seg = nav.loc[s:e]; nseg = nifty_nav.loc[s:e]
         if len(seg) > 5:
             scen_res[name] = (seg.iloc[-1] / seg.iloc[0] - 1, nseg.iloc[-1] / nseg.iloc[0] - 1,
                               (seg / seg.cummax() - 1).min())
 
-    mc = monte_carlo(nav_net.pct_change())
-    mdd, peak, trough, recov = drawdown_stats(nav_net)
+    mc = monte_carlo(nav.pct_change())
+    mdd, peak, trough, recov = drawdown_stats(nav)
+
+    # ── survivorship: state what this run actually did, not a stock sentence ──
+    if delisted:
+        surv_head = (f"Universe eligibility is point-in-time and the candidate list is too: "
+                     f"{len(panel.tickers)} symbols from `{_cache}`, **{delisted}** of which "
+                     f"delisted inside the window and are held until they stop trading. No "
+                     f"survivorship haircut applies to the headline.")
+        surv_note = (f"Survivorship: none — {delisted} of {len(panel.tickers)} candidates "
+                     f"delisted in-window and their failure is priced in. Forward "
+                     f"expectation is still regime-dependent: single years have ranged "
+                     f"-15% to +45%.")
+    else:
+        surv_head = (f"Universe eligibility is point-in-time, but the candidate list "
+                     f"(`{_cache}`, {len(panel.tickers)} symbols, no delisted names) is "
+                     f"today's survivors — headline is inflated an estimated ~1-2pp/yr by "
+                     f"residual survivorship. Re-run with `MARK5_CACHE=data/pit_cache`.")
+        surv_note = (f"Survivorship caveat: subtract ~1-2pp/yr from the headline for the "
+                     f"missing delisted names; realistic forward expectation is "
+                     f"~{(m['cagr']-0.02)*100:.0f}-{m['cagr']*100:.0f}% CAGR over a full "
+                     f"cycle, with single years anywhere from -15% to +40%.")
 
     # ── write report ──────────────────────────────────────────────────────────
     L = []
@@ -198,10 +224,10 @@ def main():
       f"**Mode:** PAPER. **Period:** {START} → {END}. All figures **net of Indian tax "
       f"(LTCG 12.5% / STCG 20%) + 0.29% costs + 0.10% slippage**. Benchmark is **Nifty 50 "
       f"total-return** (dividends reinvested), taxed at terminal LTCG like the strategy. "
-      f"Universe eligibility is point-in-time, but the candidate list is today's survivors — "
-      f"headline is inflated an estimated ~1-2pp/yr by residual survivorship.\n")
+      f"{surv_head}\n")
 
     A("## 1. Headline performance\n")
+
     A("| Metric | MARK6 (deployed) | Nifty50 TRI B&H |")
     A("|---|---|---|")
     A(f"| Net CAGR | **{m['cagr']*100:+.1f}%** | {mn['cagr']*100:+.1f}% |")
@@ -216,7 +242,7 @@ def main():
     A(f"| Factor+refresh alpha (vs equal-weight same universe, computed) | **{vs_ew_pp:+.1f}pp/yr** | — |")
     A(f"| Beta vs Nifty | {b:.2f} | 1.00 |")
     A(f"| Max-DD recovery | {recov} days | — |")
-    A(f"\n₹{cap:,.0f} → **₹{cap*nav_net.iloc[-1]:,.0f}** over {m['years']:.1f} years (net).\n")
+    A(f"\n₹{cap:,.0f} → **₹{cap*m["net_multiple"]:,.0f}** over {m['years']:.1f} years (net).\n")
 
     A("## 2. Trade ledger (evidence)\n")
     A(f"- Total trades: **{len(trades)}** ({sum(1 for t in trades if t['side']=='BUY')} buys, "
@@ -276,10 +302,7 @@ def main():
       f"factor ranking + 6-mo refresh contributes {vs_ew_pp:+.1f}pp/yr above "
       f"equal-weight of the same universe — the rest is asset allocation any "
       f"multi-asset fund also captures.)")
-    A(f"- Survivorship caveat: subtract ~1-2pp/yr from the headline for the missing "
-      f"delisted names; the realistic forward expectation is "
-      f"~{(m['cagr']-0.02)*100:.0f}-{m['cagr']*100:.0f}% CAGR over a full cycle, "
-      f"with single years anywhere from -15% to +40%.")
+    A(f"- {surv_note}")
     A("- It is not a Sharpe-2 machine (that needs leverage/infrastructure unavailable at retail).")
     A("- Drawdowns of -25 to -35% are real and unavoidable; the Monte Carlo bad-luck tail is the "
       "honest risk you must be able to hold through.")

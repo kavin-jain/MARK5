@@ -41,7 +41,7 @@ sys.path.insert(0, _ROOT)
 
 from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, BacktestConfig,
-                            load_ohlcv, load_nifty, metrics, load_sector_map)
+                            load_ohlcv, load_nifty, metrics, metrics_after_exit_tax, load_sector_map)
 
 START, END = "2016-01-01", "2026-07-21"
 TD, RF, TAX = 252, 0.065, 0.15
@@ -56,7 +56,7 @@ GRID = [(.50, .25, .25), (.40, .30, .30), (.34, .33, .33), (.30, .40, .30),
         (.20, .50, .30), (.35, .40, .25)]
 
 
-def blend(R: pd.DataFrame, w, rebal=TD, tax=TAX):
+def blend(R: pd.DataFrame, w, rebal=TD):
     """Fixed-weight sleeve blend, rebalanced every `rebal` bars, terminal tax.
     Identical mechanics to scripts/export_dashboard.py so results are comparable."""
     cur = {k: w[i] for i, k in enumerate(KEYS)}
@@ -72,10 +72,7 @@ def blend(R: pd.DataFrame, w, rebal=TD, tax=TAX):
         if i > 0 and i % rebal == 0:
             tot = sum(cur.values())
             cur = {k: tot * w[j] for j, k in enumerate(KEYS)}
-    s = pd.Series(out)
-    net = s.copy()
-    net.iloc[-1] = s.iloc[-1] - max(0.0, s.iloc[-1] - 1) * tax
-    return net
+    return pd.Series(out)          # GROSS of exit tax; see metrics_after_exit_tax
 
 
 def max_sharpe_long_only(R: pd.DataFrame, seed=3):
@@ -170,13 +167,13 @@ def main():
     base_w = DEPLOYED
     res = {}
     for w in GRID:
-        full = metrics(blend(R, w))
+        full = metrics_after_exit_tax(blend(R, w), TAX)
         wf = []
         for s, e in windows:
             seg = R.loc[s:e]
             if len(seg) < 200:
                 continue
-            wf.append(metrics(blend(seg, w)))
+            wf.append(metrics_after_exit_tax(blend(seg, w), TAX))
         res[w] = {"full": full, "wf": wf}
     bwf = res[base_w]["wf"]
 
