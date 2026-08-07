@@ -24,7 +24,8 @@ from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             ConstructionConfig, Backtester, load_sector_map)
 from core.portfolio.stats import (deflated_sharpe_ratio, pbo_cscv,
                                    probabilistic_sharpe_ratio, _sharpe)
-START, END = "2016-01-01", "2026-07-21"
+START = os.environ.get("MARK5_START", "2016-01-01")
+END = os.environ.get("MARK5_END", "2026-07-21")
 REPORTS = os.path.join(_ROOT, "reports")
 
 WEIGHTS = {
@@ -134,7 +135,8 @@ def main():
          "enforced, FY-netting tax), using every strategy "
          "variant explored across the project as the trial set (factor-weight grid, "
          "rebalance frequencies, asymmetric exits, TLH, FIP, sleeve frequencies). "
-         "All on daily returns, 2016-2026.", "",
+         f"All on daily returns, {START[:4]}-{END[:4]}, universe "
+         f"`{os.environ.get('MARK5_CACHE', 'data/cache')}`.", "",
          "## Deflated Sharpe Ratio (is the Sharpe real, given how many we tried?)", "",
          f"- Strategy variants tried (N): **{dsr['n_trials']}**",
          f"- Observed Sharpe: **{ann(dsr['observed_sharpe_daily']):.2f}** annualised "

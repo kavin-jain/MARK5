@@ -40,8 +40,8 @@ from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
                             load_nifty, load_sector_map, load_delivery_factors)
 
 REPORTS = os.path.join(_ROOT, "reports")
-END = "2026-07-21"
-START = "2016-01-01"
+END = os.environ.get("MARK5_END", "2026-07-21")
+START = os.environ.get("MARK5_START", "2016-01-01")
 TRADING_DAYS = 252
 Z95 = 1.6448536269514722          # one-sided 95%
 Z975 = 1.959963984540054          # two-sided 95%
@@ -146,12 +146,32 @@ def main():
     # liquidation tax must not enter the daily returns (see metrics_after_exit_tax).
     s_ret = strat["nav_gross"].pct_change(fill_method=None).dropna()
     e_ret = ew["nav_gross"].pct_change(fill_method=None).dropna()
+    # COVERAGE GUARD. load_nifty silently returns whatever history it has, so
+    # asking for 2007 against a series that starts in 2015 yields a benchmark
+    # computed on a different window than the strategy — the strategy meets the
+    # 2008 crash, the benchmark does not, and the active return is meaningless.
+    # Same failure as BUG3 in the research log. Drop the benchmark rather than
+    # publish a mismatched one.
     nifty = load_nifty(total_return=True)
-    n_ret = nifty.loc[START:END].pct_change(fill_method=None).dropna() if nifty is not None \
-        else pd.Series(dtype=float)
+    n_ret = pd.Series(dtype=float)
+    if nifty is not None and len(nifty):
+        lag_days = (nifty.index.min() - pd.Timestamp(START)).days
+        if lag_days > 45:
+            print(f"  WARNING: Nifty TRI starts {nifty.index.min():%Y-%m-%d}, "
+                  f"{lag_days}d after the requested start {START}. Dropping the "
+                  f"benchmark comparison rather than scoring against a shorter "
+                  f"window.", flush=True)
+            res_note = (f"Nifty TRI unavailable before {nifty.index.min():%Y-%m-%d}; "
+                        f"benchmark comparison omitted for this window.")
+        else:
+            n_ret = nifty.loc[START:END].pct_change(fill_method=None).dropna()
+            res_note = None
 
     res = {"generated": pd.Timestamp.utcnow().isoformat(), "window": [START, END],
-           "config": "deployed (mom_heavy / n20 / tilt1.5 / r126 / deliv_chg)"}
+           "config": "deployed (mom_heavy / n20 / tilt1.5 / r126 / deliv_chg)",
+           "cache": os.environ.get("MARK5_CACHE", "data/cache")}
+    if res_note:
+        res["benchmark_note"] = res_note
 
     print("\n" + "=" * 78)
     print("  1. HOW WELL DO WE EVEN KNOW THE RETURN?")
