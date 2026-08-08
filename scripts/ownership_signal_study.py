@@ -182,6 +182,152 @@ def report_winners(own):
     print("  (If institutions don't accumulate before the run -> they chase, can't be front-run)")
 
 
+# ══════════════════════════════════════════════════════════════════════════
+#  B1 — the test the original K7 verdict never ran
+#
+#  Two things are wrong with everything above, and they push in the same
+#  direction (toward a flattering number that is then read as "no edge"):
+#
+#  1. collect() POOLS every ticker and every date into one list and takes a
+#     single Spearman over the pool. That is not an information coefficient.
+#     IC in the Fundamental Law is CROSS-SECTIONAL — computed within a date,
+#     then averaged across dates. Pooling mixes the market's own drift into
+#     the statistic: in a quarter where everything rose, every name has a
+#     positive forward return regardless of who was accumulating it.
+#
+#  2. It scores RAW IC. Mandate §4 Group B: "each was judged on raw IC, never
+#     on IC orthogonal to momentum. A weak signal correlated with a strong one
+#     adds no information and dilutes the strong one. The method was wrong, so
+#     some of these verdicts may be wrong."
+#
+#  HYPOTHESIS   Institutional accumulation carries information the existing
+#               momentum composite does not already contain.
+#  FALSIFIED IF mean cross-sectional residual IC < 0.03, or its t-stat < 3.0
+#               (Harvey, Liu & Zhu 2016 — the profession has already tried
+#               thousands of factors, so 2.0 is not a hurdle any more).
+#
+#  Both bars are pre-registered here, before the fetch finished, and both must
+#  clear. A pass on IC with t < 3.0 is a pass on noise.
+# ══════════════════════════════════════════════════════════════════════════
+ORTHO_IC_BAR = 0.03
+ORTHO_T_BAR = 3.0
+
+
+def _spearman(a, b):
+    d = pd.concat([a, b], axis=1).dropna()
+    if len(d) < 20:
+        return np.nan
+    return float(d.iloc[:, 0].rank().corr(d.iloc[:, 1].rank()))
+
+
+def _residualise(sig, base):
+    """sig with the part explained by `base` projected out (OLS residual).
+    What survives is information the existing composite does NOT already hold."""
+    d = pd.concat([sig, base], axis=1).dropna()
+    d.columns = ["s", "b"]
+    if len(d) < 20 or d["b"].std() == 0:
+        return pd.Series(dtype=float)
+    return d["s"] - (d["s"].cov(d["b"]) / d["b"].var()) * d["b"]
+
+
+def report_orthogonal_ic(own, signal="Institutions", fwd_bars=126):
+    """Cross-sectional IC of the ownership signal, raw and residual-to-momentum."""
+    import sys
+    sys.path.insert(0, _ROOT)
+    from core.portfolio import (DataPanel, discover_tickers, load_sector_map)
+    from core.portfolio.factors import FactorLibrary, composite_score
+    from core.portfolio import (PortfolioConstructor, ConstructionConfig,
+                                Backtester, BacktestConfig)
+
+    print("\n" + "=" * 78)
+    print(f"  B1. CROSS-SECTIONAL IC — Δ{signal}, raw AND orthogonal to momentum")
+    print(f"  falsified if residual IC < {ORTHO_IC_BAR} or t < {ORTHO_T_BAR}")
+    print("=" * 78)
+
+    end = os.environ.get("MARK5_END", "2026-07-21")
+    panel = DataPanel(discover_tickers(), end)
+    base_w = {"momentum": 0.45, "low_vol": 0.15, "trend": 0.25, "stability": 0.15}
+    bt = Backtester(panel, PortfolioConstructor(
+        ConstructionConfig(mode="factor_tilt", n_hold=20, factor_weights=base_w),
+        sector_map=load_sector_map()),
+        BacktestConfig(rebal_bars=fwd_bars, top_n_liquid=300))
+    close = panel.close
+
+    # signal as a per-ticker step series of QoQ change, read as-of each date so
+    # only what was actually disclosed by then is ever used
+    chg = {t: df[signal].diff().dropna() for t, df in own.items() if signal in df.columns}
+    if not chg:
+        print(f"  no {signal} data")
+        return None
+
+    all_disc = sorted({d for s in chg.values() for d in s.index})
+    if len(all_disc) < 8:
+        print(f"  only {len(all_disc)} disclosure dates — cannot form a panel")
+        return None
+    # evaluate on a quarterly grid spanning the disclosure history
+    grid = pd.DatetimeIndex(all_disc)
+    cal = panel.trading_calendar(str(grid[0].date()), end)
+    dates = [d for d in pd.DatetimeIndex(cal) if d >= grid[0]][::63]
+
+    raw, res, corr, base_ics, ns = [], [], [], [], []
+    for d in dates:
+        fi = close.index.searchsorted(d)
+        if fi + fwd_bars >= len(close.index):
+            continue
+        elig = [t for t in panel.eligible(d, 252, 0.0, top_n=300) if t in close.columns]
+        if len(elig) < 50:
+            continue
+        sig = pd.Series({t: chg[t].loc[:d].iloc[-1] for t in elig
+                         if t in chg and len(chg[t].loc[:d])}).dropna()
+        if len(sig) < 30:
+            continue
+        fwd = (close.iloc[fi + fwd_bars] / close.iloc[fi] - 1).reindex(elig).dropna()
+        panels = {f: pd.Series({t: bt._factors[t].loc[:d].iloc[-1].get(f, np.nan)
+                                for t in elig if not bt._factors[t].loc[:d].empty})
+                  for f in FactorLibrary.DEFAULT_FACTORS}
+        base = composite_score(panels, base_w, rank_transform=True)
+        base_ics.append(_spearman(base, fwd))
+        raw.append(_spearman(sig, fwd))
+        corr.append(_spearman(sig, base.reindex(sig.index)))
+        r = _residualise(sig, base.reindex(sig.index))
+        if len(r):
+            res.append(_spearman(r, fwd))
+        ns.append(len(sig))
+
+    if len(res) < 5:
+        print(f"  only {len(res)} usable cross-sections — not enough to conclude")
+        return None
+
+    def stat(v):
+        v = np.array([x for x in v if np.isfinite(x)])
+        m, se = v.mean(), v.std(ddof=1) / np.sqrt(len(v))
+        return m, (m / se if se else np.nan), len(v)
+
+    bm, bt_, _ = stat(base_ics)
+    rm, rt, _ = stat(raw)
+    om, ot, n = stat(res)
+    cm = np.nanmean(corr)
+
+    print(f"  {len(dates)} candidate dates -> {n} usable cross-sections, "
+          f"median {int(np.median(ns))} names each\n")
+    print(f"  {'':28}{'mean IC':>10}{'t-stat':>9}")
+    print(f"  {'existing momentum composite':28}{bm:>+10.4f}{bt_:>9.2f}")
+    print(f"  {'Δ' + signal + ' (raw)':28}{rm:>+10.4f}{rt:>9.2f}")
+    print(f"  {'Δ' + signal + ' (residual)':28}{om:>+10.4f}{ot:>9.2f}")
+    print(f"\n  correlation of the signal to the existing composite: {cm:+.3f}")
+
+    ok = abs(om) >= ORTHO_IC_BAR and abs(ot) >= ORTHO_T_BAR
+    verdict = (f"SUPPORTED — Δ{signal} carries residual IC {om:+.4f} (t={ot:.2f}) "
+               f"that momentum does not already own"
+               if ok else
+               f"FALSIFIED — residual IC {om:+.4f} (t={ot:.2f}) is below the "
+               f"pre-registered bar ({ORTHO_IC_BAR}, t {ORTHO_T_BAR})")
+    print(f"\n  B1 VERDICT: {verdict}")
+    return {"base_ic": bm, "raw_ic": rm, "residual_ic": om, "t_residual": ot,
+            "corr_to_base": cm, "n_cross_sections": n, "verdict": verdict,
+            "bars": {"ic": ORTHO_IC_BAR, "t": ORTHO_T_BAR}}
+
+
 def main():
     src = DEEP if (os.path.isdir(DEEP) and glob.glob(os.path.join(DEEP, "*.json"))) else SCREENER
     own = load_ownership(src)
@@ -197,6 +343,11 @@ def main():
     report_terciles(rows, "Institutions", "1y")
     report_terciles(rows, "FIIs", "1y")
     report_winners(own)
+    ortho = report_orthogonal_ic(own, "Institutions")
+    if ortho:
+        os.makedirs(os.path.join(_ROOT, "reports"), exist_ok=True)
+        json.dump(ortho, open(os.path.join(_ROOT, "reports",
+                  "ownership_orthogonal_ic.json"), "w"), indent=1, default=float)
 
     print("\n" + "=" * 78)
     print("  VERDICT")
