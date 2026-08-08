@@ -866,3 +866,66 @@ class TestPBOCalibration:
         se = self._mod().sharpe_se
         assert se(1.05, 19.5) < se(1.05, 10.3)
         assert abs(se(1.05, 10.3) - 0.388) < 0.01
+
+
+class TestSectorNeutralRanking:
+    """Sector-neutral scoring changes WHICH names are picked, unlike the sector
+    cap which only trims exposure afterwards. It exists to convert nominal breadth
+    into independent breadth (IR = IC*sqrt(BR)*TC), so it must actually reach
+    across sectors — and must not manufacture noise out of tiny ones."""
+
+    _MAP = {**{c: "IT" for c in "ABCDE"}, **{c: "BANK" for c in "FGHIJ"}, "K": "SOLO"}
+    _SCORES = pd.Series({"A": 5., "B": 4., "C": 3., "D": 2., "E": 1.,
+                         "F": .5, "G": .4, "H": .3, "I": .2, "J": .1, "K": 9.})
+
+    def _con(self, neutral, n=4):
+        return PortfolioConstructor(
+            ConstructionConfig(n_hold=n, sector_neutral=neutral), sector_map=self._MAP)
+
+    def test_it_reaches_sectors_the_raw_ranking_never_would(self):
+        raw = self._con(False).select(self._SCORES, [])
+        neu = self._con(True).select(self._SCORES, [])
+        assert not any(t in "FGHIJ" for t in raw), raw
+        assert any(t in "FGHIJ" for t in neu), neu
+
+    def test_undersized_sectors_are_left_alone(self):
+        """A z-score over one observation is noise, not a signal."""
+        out = self._con(True)._neutralise(self._SCORES)
+        assert out["K"] == self._SCORES["K"]
+
+    def test_unmapped_names_are_pooled_and_neutralised_not_left_raw(self):
+        """The sector map covers ZERO of the 258 names that delisted in-window, so
+        the unmapped pool IS the dead-company cohort. Leaving it on raw scores
+        while mapped names carry z-scores would rank two incompatible scales
+        against each other, biased precisely along the survivorship axis."""
+        smap = {c: "IT" for c in "ABCDE"}                 # F..J deliberately unmapped
+        con = PortfolioConstructor(
+            ConstructionConfig(n_hold=4, sector_neutral=True), sector_map=smap)
+        scores = pd.Series({"A": 5., "B": 4., "C": 3., "D": 2., "E": 1.,
+                            "F": .5, "G": .4, "H": .3, "I": .2, "J": .1})
+        out = con._neutralise(scores)
+        mapped = out[list("ABCDE")]
+        unmapped = out[list("FGHIJ")]
+        assert abs(mapped.mean()) < 1e-9, mapped
+        assert abs(unmapped.mean()) < 1e-9, unmapped   # pooled group also centred
+        assert abs(mapped.std() - unmapped.std()) < 0.5, (mapped.std(), unmapped.std())
+
+    def test_disabled_is_an_exact_passthrough(self):
+        """The flag must be inert when off, or every existing result shifts."""
+        out = self._con(False)._neutralise(self._SCORES)
+        pd.testing.assert_series_equal(out, self._SCORES)
+
+    def test_no_sector_map_is_an_exact_passthrough(self):
+        """Enabling neutralisation without a map must not silently do nothing
+        different from what the caller expects, nor crash."""
+        c = PortfolioConstructor(ConstructionConfig(n_hold=4, sector_neutral=True))
+        pd.testing.assert_series_equal(c._neutralise(self._SCORES), self._SCORES)
+
+    def test_weights_are_tilted_by_the_same_scores_used_to_select(self):
+        """If select() neutralises but target_weights() tilts on raw scores, names
+        chosen for their within-sector rank get sized by their market-wide rank."""
+        con = self._con(True)
+        vol = pd.Series(0.02, index=self._SCORES.index)
+        w = con.target_weights(self._SCORES, vol, [])
+        assert set(w.index) == set(con.select(self._SCORES, []))
+        assert abs(w.sum() - 1.0) < 1e-9

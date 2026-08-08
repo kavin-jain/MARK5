@@ -41,6 +41,10 @@ class ConstructionConfig:
     rank_transform: bool = True           # score on cross-sectional RANKS, not raw factor
                                           # values (v7.3 P17: MaxDD 7/8 windows, return
                                           # unchanged). False reproduces pre-v7.3.
+    sector_neutral: bool = False          # score WITHIN sector instead of across the
+                                          # market. Distinct from max_sector_weight,
+                                          # which caps exposure after the fact; this
+                                          # changes what gets picked. See _neutralise.
 
 
 def _cap_weights(w: pd.Series, max_weight: float) -> pd.Series:
@@ -85,10 +89,53 @@ class PortfolioConstructor:
         self.cfg = config
         self.sector_map = sector_map or {}
 
+    def _neutralise(self, composite: pd.Series) -> pd.Series:
+        """Score WITHIN sector rather than across the whole market.
+
+        Grinold's law counts INDEPENDENT bets: IR = IC * sqrt(BR) * TC. A momentum
+        book clusters in whatever sector is running, so nominal breadth badly
+        overstates real breadth — twenty names driven by one sector move is closer
+        to one bet than twenty. Demeaning the score inside each sector strips that
+        common factor out, leaving the idiosyncratic component the ranking is
+        actually supposed to be measuring.
+
+        This is NOT max_sector_weight. That caps exposure after selection; this
+        changes which names get selected at all.
+
+        UNMAPPED NAMES ARE NEUTRALISED TOO, as one pooled group. This is not a
+        detail. `config/sector_map.json` is built from today's listed universe and
+        covers ZERO of the 258 names that delisted inside the backtest window — it
+        carries the same survivorship shape the price data was rebuilt to remove.
+        Leaving that pool on raw scores while mapped names carry within-sector
+        z-scores would rank two incompatible scales against each other, and the
+        unmapped side would be exactly the dead companies. Pooling them keeps every
+        score on a comparable scale; it does NOT recover the missing sector
+        information, and that limit is recorded in the research plan rather than
+        papered over.
+
+        Sectors with fewer than `min_members` names are left untouched: a z-score
+        over two observations is noise, and neutralising it would inject exactly
+        the randomness this is meant to remove.
+        """
+        if not self.cfg.sector_neutral or not self.sector_map or composite.empty:
+            return composite
+        sec = pd.Series([self.sector_map.get(t, "__unmapped__") for t in composite.index],
+                        index=composite.index)
+        min_members = 5
+        out = composite.astype(float).copy()
+        for _, idx in composite.groupby(sec).groups.items():
+            if len(idx) < min_members:
+                continue
+            block = composite.loc[idx].astype(float)
+            sd = block.std()
+            out.loc[idx] = (block - block.mean()) / (sd if sd and sd > 1e-12 else 1.0)
+        return out
+
     def select(self, composite: pd.Series, currently_held: list[str]) -> list[str]:
         """Buffered selection: keep held names still in the top n_hold*buffer_mult,
         fill the rest with the highest-scoring new names. Cuts turnover -> LTCG."""
         cfg = self.cfg
+        composite = self._neutralise(composite)
         ranked = composite.sort_values(ascending=False)
         if cfg.mode == "equal_weight":
             return list(ranked.index)
@@ -112,6 +159,10 @@ class PortfolioConstructor:
         picks = self.select(composite, currently_held)
         if not picks:
             return pd.Series(dtype=float)
+        # select() neutralises internally; the tilt below reads `composite` directly,
+        # so it must see the same scores or weights would be tilted by raw scores
+        # while the names were chosen by neutralised ones.
+        composite = self._neutralise(composite)
 
         # base weighting
         if cfg.base_weighting == "inverse_vol" and recent_vol is not None:

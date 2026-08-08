@@ -139,6 +139,18 @@ breadth into independent breadth.
 **Note.** The repo has a sector *cap* (30%) but no sector *neutralisation*. These
 are different things and only the cap has been tested.
 
+**KNOWN LIMITATION, recorded before the result.** `config/sector_map.json` holds
+500 tickers across 19 sectors with >=5 members, but it was built from today's
+listed universe and covers **zero of the 258 names that delisted inside the
+window**. It carries the same survivorship shape the price cache was rebuilt to
+remove. Unmapped names are therefore pooled and neutralised as one group so that
+every score stays on a comparable scale — mixing within-sector z-scores against
+raw scores would rank two different units, biased exactly along the survivorship
+axis. Pooling fixes the scale; it does not recover the missing sector labels. **Any
+P2.2 result is a LOWER BOUND on what full sector coverage would deliver, and must
+be reported as such.** A first version of the implementation skipped the unmapped
+pool entirely; that run was discarded before its numbers were read.
+
 ### P2.3 — Direct measurement of the transfer coefficient
 
 **Hypothesis.** Current TC is below 0.6, and the largest single leak is
