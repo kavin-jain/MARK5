@@ -46,7 +46,36 @@ breadth change buys. Its status should be upgraded from PROVISIONAL to KEEP in t
 research log: residual IC +0.0444 after the momentum composite is projected out,
 and it is *negatively* correlated with that composite.
 
-### 4. The 1/N ensemble  *(P5.2, approved 2026-08-08)*
+### 4. Equal weights, five sleeves  *(A2, R2, FX-cleared 2026-08-09)*
+
+**Supersedes the searched 30/30/10/30.** Two findings drove this:
+
+- **A2:** naive equal weights beat the searched allocation on 5-year worst
+  (+11.88% vs +10.62%) and median (+17.46% vs +16.01%). The search bought 1.9pp of
+  drawdown for 1.45pp of return. Nothing fitted means nothing to overfit.
+- **R2:** adding short-duration treasuries (SHY) as a fifth equal sleeve cuts
+  MaxDD −17.09% → −13.09% and lifts Calmar 0.95 → 1.09.
+
+**FX-frozen control test (the one that mattered).** SHY is a USD asset, so the
+5-sleeve book is 80% USD against the 4-sleeve's 75% — the improvement could have
+been more short-INR exposure rather than diversification. Tested against a
+4-sleeve control re-weighted to the *same* 80% USD:
+
+| Book | USD% | MaxDD live | MaxDD frozen |
+|---|---|---|---|
+| 4-sleeve | 75% | −17.96% | −31.91% |
+| 4-sleeve CONTROL | 80% | −15.75% | −29.32% |
+| **5-sleeve** | 80% | **−12.79%** | **−24.72%** |
+
+At identical currency exposure the fifth sleeve is still worth **4.60pp** of
+drawdown, and the advantage GROWS when FX is frozen (+7.19pp vs +5.17pp). Real
+diversification, not a currency artefact.
+
+**Standing caveat (A1).** Freezing FX costs the whole book ~3.7pp of CAGR and
+roughly doubles its drawdown. The five-sleeve structure is genuine, and the book is
+*also* structurally short the rupee. Both are true and both must be disclosed.
+
+### 5. The 1/N ensemble  *(P5.2, approved 2026-08-08)*
 
 Removes config selection entirely, so PBO stops applying. Priced at −1.92pp CAGR
 for a better drawdown (−20.95% vs −22.16%). Land it together with the above so the
@@ -58,6 +87,9 @@ book is reconstituted once, not twice.
 
 | Item | Verdict | Why |
 |---|---|---|
+| **Rebalance tolerance band** (R1) | ❌ FALSIFIED | Every band worse on CAGR *and* drawdown. Bands trigger because weights drifted, which happens most in volatile markets, so they rebalance repeatedly into a falling asset where the calendar does it once. |
+| **Commodities sleeve** (R2) | ❌ FALSIFIED | CAGR −1.5pp, Sharpe 1.43→1.31, MaxDD −17.1%→−21.7%. |
+| **Developed / emerging ex-US sleeves** (R2) | ❌ REJECTED PRE-TEST | 81% and 78% correlated with the existing US sleeve — the F7 silver mistake in a different costume. |
 | **Sector-neutral ranking** (P2.2) | ❌ FALSIFIED 0/6 | Cut IR roughly in half at every size. Sector rotation is part of what momentum captures in India; neutralising it removes signal, not noise. |
 | **LTCG exit deferral** (P4.1) | ❌ FALSIFIED | Worked as designed — tax −17%, long-term winners 36%→47% — and still lost 0.23pp net. The saving is smaller than the cost of holding the deranked name to collect it. |
 | **Silver sleeve** (P1.3) | ❌ FALSIFIED | 79% correlated with gold. A gold proxy, not a sleeve. |
