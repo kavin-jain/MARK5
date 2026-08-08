@@ -1,0 +1,35 @@
+{
+  "window": [
+    "2019-11-01",
+    "2026-07-21"
+  ],
+  "base_ic": 0.0654742393102896,
+  "signals": {
+    "deliv_chg": {
+      "raw_ic": 0.04679077132012575,
+      "corr_to_base": -0.06904796827078916,
+      "residual_ic": 0.04440704782493136,
+      "n_dates": 12
+    },
+    "deliv_per_z": {
+      "raw_ic": 0.009677749936731707,
+      "corr_to_base": 0.026166644869925346,
+      "residual_ic": 0.0031822147388399728,
+      "n_dates": 12
+    }
+  },
+  "verdict": "SUPPORTED \u2014 deliv_chg carries residual IC >= 0.03",
+  "ablation": {
+    "with deliv_chg": {
+      "ir": 0.5801079810991108,
+      "cagr": 0.2633098226076489,
+      "max_dd": -0.35363632460697336
+    },
+    "without": {
+      "ir": 0.44424283090117667,
+      "cagr": 0.24657319319205917,
+      "max_dd": -0.35502312641784184
+    }
+  },
+  "deliv_chg_ir_contribution": 0.1358651501979341
+}

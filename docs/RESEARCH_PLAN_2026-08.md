@@ -264,6 +264,34 @@ in the composite.
 Group B verdicts were produced by a method that could not distinguish "no
 information" from "no *incremental* information". This tests the distinction.
 
+**RESULT 2026-08-09 — SUPPORTED, and it is the first positive IC finding here.**
+
+Window 2019-11 to 2026-07 (delivery data starts 2019-10), 126-bar forward horizon.
+
+| Signal | raw IC | corr to composite | **residual IC** |
+|---|---|---|---|
+| existing composite | +0.0655 | — | — |
+| **`deliv_chg`** | +0.0468 | **−0.069** | **+0.0444** |
+| `deliv_per_z` | +0.0097 | +0.026 | +0.0032 |
+
+`deliv_chg` retains **95% of its IC** after the momentum composite is projected
+out, and is NEGATIVELY correlated with it. It is not a momentum echo; it is new
+information. `deliv_per_z` is noise, which independently reproduces the earlier
+decision to prefer `deliv_chg` — a useful control.
+
+**P3.2 ablation: KEEP.** Removing `deliv_chg` drops IR 0.580 → 0.444. It
+contributes **+0.136 IR**, twice what the entire breadth sweep bought (+0.069).
+
+**SCOPE LIMIT.** The original P3.1 named ownership flow, fundamental quality, FIP
+and candlestick. **None of that data is in the repo** — no shareholding directory,
+fundamentals API quota-blocked (K17), `data/sentiment/scores` empty, F&O features
+cover only 64 tickers. So the Group B verdicts remain FORMALLY UNTESTED. What is
+established is narrower and stronger: **the orthogonalisation method works, and it
+found real incremental information in the one non-price signal available.** That
+raises, not lowers, the case for re-fetching the Group B data and re-testing it
+properly — K7 (ownership) in particular was killed on raw IC, which is exactly the
+error this method corrects.
+
 ### P3.2 — Remove `deliv_chg`
 
 **Hypothesis.** Dropping the provisional delivery factor costs less than 0.3pp of
@@ -291,6 +319,28 @@ worst possible tax zone. Direct saving if deferred: **₹1,51,800**.
 **Not a re-run of K3/K18/K20.** Those changed rebalance *frequency* or harvested
 losses. This changes only the *exit condition for profitable lots*, leaving cadence
 untouched.
+
+**RESULT 2026-08-08 — FALSIFIED.** The mechanism worked exactly as designed and
+still lost money.
+
+| defer_mult | net CAGR | turnover | tax paid | winning sells long-term |
+|---|---|---|---|---|
+| **1.0 (off)** | **+12.05%** | 281% | 1.551 | 36% |
+| 1.5 | +11.53% | 265% | 1.337 | 40% |
+| 2.0 | +11.53% | 253% | 1.285 | 43% |
+| 3.0 | +11.81% | 246% | 1.343 | 47% |
+
+Tax paid fell **17%** and long-term winners rose 36% → 47%, so the rule did what
+it was built to do. Net CAGR still fell **0.23pp**, and it loses 2 of 4 windows —
+worst in the crisis (−4.24% → −5.30%).
+
+**Why the prediction was wrong.** The ₹1,51,800 saving was computed in isolation.
+It never priced the opportunity cost of holding a deranked name for the extra six
+months required to collect it. That cost exceeds the 7.5pp tax differential.
+
+**Generalisable lesson.** A tax saving is not free if collecting it requires
+holding a worse asset. Any future tax-motivated change must be priced against the
+return of the position it forces you to keep, not against the tax bill alone.
 
 ---
 
@@ -339,3 +389,6 @@ route and the plan must be revised rather than pushed.
 | 2026-08-08 | P2.1 | SUPPORTED — IR 0.365→0.433 at n_hold=60; P5's n=12 falsified; gain only ~25% of theory |
 | 2026-08-08 | P2.2 | **FALSIFIED 0/6** — sector-neutral cut IR roughly in half at every size |
 | 2026-08-08 | P1.1b | SUPPORTED — real LTGILTBEES beats the proxy (Sharpe 1.77 vs 1.62); but proxy/real corr only 17%, so pre-2018 stays proxy-dependent |
+| 2026-08-08 | P4.1 | **FALSIFIED** — tax paid −17%, long-term winners 36%→47%, but net CAGR −0.23pp. Saving < opportunity cost of holding the deranked name |
+| 2026-08-09 | P3.1 | **SUPPORTED** — `deliv_chg` residual IC +0.0444 (95% of raw), negatively correlated with the composite. Method validated |
+| 2026-08-09 | P3.2 | KEEP — `deliv_chg` contributes +0.136 IR; dropping it is a mistake |
