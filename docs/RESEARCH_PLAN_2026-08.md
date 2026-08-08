@@ -82,11 +82,35 @@ strengthens exactly when needed. Gold only moves −2% → −11%.
 **Verdict: NOT falsified, but it is insurance with a premium (~1.2pp/yr CAGR), not
 free alpha.** It loses in inflationary rate shocks. 2 of 3 regimes improve Sharpe.
 
-**Still required before deployment (P1.1b):** the numbers above use TLT×USDINR as a
-proxy. Re-run on instruments an Indian retail investor can actually buy —
-LTGILTBEES (2018+), Bharat Bond ETFs (2019+) — and quantify the substitution error
-against the proxy over the overlapping window. Indian and US curves are different
-instruments and this is an unquantified risk.
+**P1.1b RESULT 2026-08-08 — SUPPORTED on the real instrument.**
+
+Overlap window 2018-05-11 to 2026-07-21 (7.0y), covering the 2020 COVID crash and
+the 2022 inflation rate shock. `LTGILTBEES` is the buyable instrument.
+
+| Book | CAGR | Sharpe | Vol | MaxDD | Calmar |
+|---|---|---|---|---|---|
+| No bonds (deployed) | +23.11% | 1.60 | 16.1% | −21.68% | 1.07 |
+| 25% bonds — TLT proxy | +19.02% | 1.62 | 13.2% | −18.31% | 1.04 |
+| **25% bonds — LTGILTBEES** | **+19.54%** | **1.77** | **12.2%** | **−16.39%** | **1.19** |
+
+**The two bond series correlate only 17%.** They are not the same asset:
+
+| | CAGR | Vol | MaxDD | COVID Feb-Apr 20 |
+|---|---|---|---|---|
+| TLT × USDINR | +2.97% | 18.2% | −43.94% | **+20.61%** |
+| LTGILTBEES | +7.25% | 12.9% | −22.80% | +5.13% |
+
+The proxy's crisis hedge WAS inflated by the FX leg, exactly as suspected — 20.6%
+vs 5.1% through COVID. But the domestic gilt is a better core holding (higher
+return, lower vol, half the drawdown), so the net portfolio effect is **better**
+with the real instrument, not worse. Correlation to the equity sleeve is +2% for
+the gilt vs −7% for the proxy: the gilt diversifies by being uncorrelated rather
+than by being a crisis hedge.
+
+**LIMIT, stated plainly.** At 17% correlation the 2007-2018 portion of the 19-year
+result remains proxy-dependent — LTGILTBEES did not exist before 2018. What is
+proven on real, buyable data is 7 years spanning two stress events. That is not
+2008 and must not be described as if it were.
 
 ### P1.2 — Allocation optimisation
 
@@ -314,3 +338,4 @@ route and the plan must be revised rather than pushed.
 | 2026-08-08 | P1.3 | **FALSIFIED** — silver 79% correlated with gold, redundant |
 | 2026-08-08 | P2.1 | SUPPORTED — IR 0.365→0.433 at n_hold=60; P5's n=12 falsified; gain only ~25% of theory |
 | 2026-08-08 | P2.2 | **FALSIFIED 0/6** — sector-neutral cut IR roughly in half at every size |
+| 2026-08-08 | P1.1b | SUPPORTED — real LTGILTBEES beats the proxy (Sharpe 1.77 vs 1.62); but proxy/real corr only 17%, so pre-2018 stays proxy-dependent |
