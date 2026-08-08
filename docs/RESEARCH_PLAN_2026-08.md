@@ -21,8 +21,14 @@ process 10% · capacity 5%.
 | Today | **4.50** |
 | + 3 years live track record (running, no action available) | 5.90 |
 | + bond sleeve (P1) | **7.10** |
-| + breadth/transfer work succeeds (P2) | **7.45** |
+| + breadth/transfer work succeeds (P2) | ~~7.45~~ **7.22** *(measured, not projected)* |
 | 8.00 requires IR ≈ 0.85 | 8.00 |
+
+**REVISED 2026-08-08 after Phase 2.** Breadth delivered +0.12 composite, not +0.35.
+Sector-neutralisation delivered nothing. The honest projection with three years of
+live data and the bond sleeve is **~7.2, not 7.45**. Reaching 8.0 now requires IC
+itself to rise, which is the one thing 22 attempts have failed to move. P3.1 is
+the remaining shot and its prior should be revised DOWN, not up.
 
 Scoring frame is the full Fundamental Law (Clarke, de Silva & Thorley 2002):
 
@@ -128,6 +134,32 @@ way do not generalise here.
 free: each variant raises the multiple-testing penalty in DSR. Registering the
 hypothesis in advance is the mitigation; the sweep is 6 points, not a fishing net.
 
+**RESULT 2026-08-08 — SUPPORTED, but the gain is ~25% of what theory predicted.**
+
+| n_hold | IR | t | CAGR | effN |
+|---|---|---|---|---|
+| 12 | 0.360 | 1.57 | +12.64% | 11.3 |
+| 20 *(deployed)* | 0.365 | 1.59 | +12.05% | 18.6 |
+| 40 | 0.379 | 1.66 | +11.40% | 36.5 |
+| **60** | **0.433** | **1.90** | +11.49% | 54.0 |
+| 80 | 0.428 | 1.87 | +11.07% | 70.1 |
+| 100 | 0.415 | 1.81 | +10.79% | 84.2 |
+
+IR peaks at n_hold=60 exactly where pre-registered (60-80), then declines.
+**P5's concentrate-to-12 is falsified on 19 years — 12 is the WORST setting.**
+That finding was a 2016-2026 window artifact, as PBO predicted.
+
+But Grinold predicts IR x sqrt(3) = 0.63 for 20->60 holdings. Realised 0.433 —
+about a quarter of the theoretical gain. `effN` shows why it is NOT a weighting
+leak: 54 of 60 bets are effectively independent by weight. The bets are not
+independent by *return*. Sixty Indian midcaps still ride one market factor, so
+nominal breadth converts to real breadth at roughly 1:4 here.
+
+t=1.90, p=0.029 at n=60 clears the conventional 95% bar for the first time, but
+not the Harvey-Liu-Zhu t>3 hurdle for a new factor.
+
+**Composite effect: edge 4 -> 4.6, worth +0.12, not the +0.35 projected.**
+
 ### P2.2 — Sector-neutral ranking
 
 **Hypothesis.** Ranking within sector rather than across the whole market raises IR
@@ -150,6 +182,30 @@ axis. Pooling fixes the scale; it does not recover the missing sector labels. **
 P2.2 result is a LOWER BOUND on what full sector coverage would deliver, and must
 be reported as such.** A first version of the implementation skipped the unmapped
 pool entirely; that run was discarded before its numbers were read.
+
+**RESULT 2026-08-08 — FALSIFIED, 0 of 6.** Sector-neutral ranking did not merely
+fail to help; it HURT at every size, roughly halving IR:
+
+| n_hold | raw IR | neutral IR | delta |
+|---|---|---|---|
+| 12 | 0.360 | 0.147 | −0.213 |
+| 20 | 0.365 | 0.114 | −0.251 |
+| 40 | 0.379 | 0.215 | −0.163 |
+| 60 | 0.433 | 0.200 | −0.234 |
+| 80 | 0.428 | 0.289 | −0.139 |
+| 100 | 0.415 | 0.254 | −0.161 |
+
+**Interpretation.** Forcing the book to buy the best name in a WEAK sector destroys
+more information than sector-clustering costs. The concentration is not a bug
+diluting breadth — **sector rotation is part of what momentum captures in India**,
+and neutralising it removes signal rather than noise.
+
+The survivorship hole above makes this a lower bound, so the true effect may be
+less negative. It does not plausibly flip from −0.2 to positive.
+
+**This was the author's high-confidence hypothesis and it was wrong. Recorded in
+full rather than reframed.** Do not re-test sector neutralisation without new
+evidence about WHY it should work here.
 
 ### P2.3 — Direct measurement of the transfer coefficient
 
@@ -256,3 +312,5 @@ route and the plan must be revised rather than pushed.
 | 2026-08-08 | P1.1 | NOT falsified — Sharpe 1.25→1.43, MaxDD −41.8%→−22.7%; fails in the 2022-26 rate shock |
 | 2026-08-08 | P1.2 | NOT falsified — 33 feasible allocations; best eq40/gold20/us15/bond25 |
 | 2026-08-08 | P1.3 | **FALSIFIED** — silver 79% correlated with gold, redundant |
+| 2026-08-08 | P2.1 | SUPPORTED — IR 0.365→0.433 at n_hold=60; P5's n=12 falsified; gain only ~25% of theory |
+| 2026-08-08 | P2.2 | **FALSIFIED 0/6** — sector-neutral cut IR roughly in half at every size |
