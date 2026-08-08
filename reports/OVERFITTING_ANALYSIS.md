@@ -1,6 +1,6 @@
 # MARK6 — Overfitting & Statistical-Significance Analysis
 
-Bailey & López de Prado tests on the DEPLOYED v7.5 config (momentum-heavy / n_hold=20 / tilt=1.5 / 126-bar refresh, rank-transformed scores, sector cap enforced, FY-netting tax), using every strategy variant explored across the project as the trial set (factor-weight grid, rebalance frequencies, asymmetric exits, TLH, FIP, sleeve frequencies). All on daily returns, 2016-2026.
+Bailey & López de Prado tests on the DEPLOYED v7.5 config (momentum-heavy / n_hold=20 / tilt=1.5 / 126-bar refresh, rank-transformed scores, sector cap enforced, FY-netting tax), using every strategy variant explored across the project as the trial set (factor-weight grid, rebalance frequencies, asymmetric exits, TLH, FIP, sleeve frequencies). All on daily returns, 2016-2026, universe `data/pit_cache`.
 
 ## Deflated Sharpe Ratio (is the Sharpe real, given how many we tried?)
 
