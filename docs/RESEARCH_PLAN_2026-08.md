@@ -350,12 +350,41 @@ No strategy change; these fix statistics that currently describe the wrong objec
 
 ### P5.1 — Grade the product, not the sleeve
 
-DSR is computed on the equity sleeve (Sharpe 0.63 over 19y) while the deployed book
-is the multi-asset blend (Sharpe 1.43). Mandate §3 requires grading the product.
-Trial dispersion must be recomputed at product level too: with half the book fixed
-and passive, config search can only move half the risk, so the luck ceiling is
-genuinely lower. **This is a correction, not a flattering re-basing — state the
-reasoning in the output so a reader can check it.**
+**RESULT 2026-08-09 — THE PREMISE WAS WRONG. Not deployed; sleeve-level retained.**
+
+Grading DSR/PBO at product level is **degenerate for this book**, and two of my own
+bugs had to be fixed before that became visible:
+
+1. *Mixed bases.* The 70 live trials were converted to product level but the 54
+   counted-only historical Sharpes were left at sleeve level. That inflated the
+   luck ceiling 0.32 → 1.22 and crushed DSR to 85.8% for purely arithmetic reasons.
+   Fixed by fitting the sleeve→product map on the 70 configs where both are observed.
+2. *Tie handling in `pbo_cscv`.* A rank exactly AT the out-of-sample median is a
+   tie, not degradation, but it was counted as "below". With half the book identical
+   across configs, 91% of splits tied at logit 0.00 — and the estimator reported
+   PBO 91% alongside a median logit of 0.00, a self-contradiction that was the tell.
+   Fixed to strict inequality; `tie_fraction` is now published.
+3. *Silent fetch failure.* `_passive_sleeves` would have turned a failed gold
+   download into an all-zero return series — a sleeve contributing nothing while
+   holding 25% of the book, with nothing looking broken. Guarded.
+
+After all three fixes the product-level run returns **DSR 100.0% with an expected
+max Sharpe from luck of exactly 0.00, and PBO 13.9% with a median logit of 0.00.**
+Those are not passes. They are the statistic collapsing: with 50% of every config
+being identical passive sleeves, the 70 candidates become indistinguishable, trial
+dispersion goes to zero, **no deflation is applied at all**, and the PBO splits are
+tie-dominated.
+
+**Resolution.** Mandate §3's "grade the product" governs PERFORMANCE statistics —
+Sharpe, drawdown, CAGR — where the product is what you own. DSR and PBO are
+statistics about CONFIG SELECTION, and the right object for those is the thing
+actually being selected: the equity sleeve. Config choice only moves half the
+product's risk, which is exactly why the product-level version carries no
+information. The published sleeve-level figures (DSR 98.9%, PBO 59.6%) stand.
+
+Attempt preserved at `reports/_p51_product_attempt.md`. The `MARK5_GRADE_PRODUCT`
+flag and the three fixes are kept — the fixes are correct regardless, and the
+tie-handling one affects every future PBO run.
 
 ### P5.2 — Deploy the 1/N ensemble
 
@@ -392,3 +421,4 @@ route and the plan must be revised rather than pushed.
 | 2026-08-08 | P4.1 | **FALSIFIED** — tax paid −17%, long-term winners 36%→47%, but net CAGR −0.23pp. Saving < opportunity cost of holding the deranked name |
 | 2026-08-09 | P3.1 | **SUPPORTED** — `deliv_chg` residual IC +0.0444 (95% of raw), negatively correlated with the composite. Method validated |
 | 2026-08-09 | P3.2 | KEEP — `deliv_chg` contributes +0.136 IR; dropping it is a mistake |
+| 2026-08-09 | P5.1 | **PREMISE WRONG** — product-level DSR/PBO is degenerate (sr*=0.00, ties dominate). Sleeve level is correct for selection statistics. 3 real bugs fixed en route |

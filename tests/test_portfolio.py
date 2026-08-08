@@ -982,3 +982,45 @@ class TestLTCGDeferral:
                           if sum(mv - c for mv, c, e in lots[t]
                                  if (d - e).days < 365) > 0)
         assert defer == {"WIN"}, defer
+
+
+class TestPBOTieHandling:
+    """PBO counts splits where the in-sample winner lands BELOW the out-of-sample
+    median. A rank sitting exactly AT the median is a tie, not degradation.
+    Counting ties as 'below' inflates PBO precisely when candidates are
+    near-identical — which is when they tie. Grading a book that is half fixed
+    passive sleeves produced PBO 91% alongside a median logit of 0.00, a
+    self-contradiction that was the tell."""
+
+    def _pbo(self, M):
+        from core.portfolio.stats import pbo_cscv
+        return pbo_cscv(M, n_splits=12)
+
+    def test_identical_strategies_are_all_ties_not_all_failures(self):
+        rng = np.random.default_rng(0)
+        base = rng.normal(0.0004, 0.01, (2600, 1))
+        r = self._pbo(np.repeat(base, 30, axis=1))
+        assert r["tie_fraction"] > 0.95, r
+        assert r["pbo"] < 0.05, r
+
+    def test_the_fix_does_not_deflate_a_genuine_measurement(self):
+        """The ~50% null needs CORRELATED candidates — the way real config variants
+        relate. With independent columns one has the best full-sample Sharpe by
+        sampling luck and wins both in- and out-of-sample, so PBO is legitimately
+        low there; that is a property of the statistic, not of this fix. What must
+        hold is that distinguishable candidates do NOT collapse to all-ties the way
+        identical ones do."""
+        rng = np.random.default_rng(1)
+        r = self._pbo(rng.normal(0.0004, 0.01, (2600, 30)))
+        assert r["tie_fraction"] < 0.05, r
+        # near-identical family: the honest ~50% null
+        common = rng.normal(0, 1 / np.sqrt(252), 2600)
+        idio = rng.normal(0, 1 / np.sqrt(252), (2600, 30))
+        M = np.sqrt(0.93) * common[:, None] + np.sqrt(0.07) * idio
+        n = self._pbo(M)
+        assert 0.25 < n["pbo"] < 0.80, n
+
+    def test_tie_fraction_is_always_published(self):
+        """The condition must be visible, not buried inside the headline number."""
+        rng = np.random.default_rng(2)
+        assert "tie_fraction" in self._pbo(rng.normal(0, 0.01, (1300, 10)))

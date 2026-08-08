@@ -81,6 +81,55 @@ def _session_trial_sharpes():
 EXTRA_TRIAL_SHARPES_ANN = _LEGACY_SHARPES_ANN + _session_trial_sharpes()
 
 
+_SLEEVES = None
+
+
+def _passive_sleeves(panel):
+    """Daily INR returns for the two PASSIVE sleeves, aligned to the panel calendar.
+
+    Uses the underlying assets in INR (gold spot, Nasdaq-100, each x USDINR) rather
+    than GOLDBEES/MON100, whose cached history starts in 2015 and cannot cover the
+    research window. Ignores ETF expense (~0.5%/yr), tracking error and the premium
+    Indian international ETFs trade at, so the passive legs are modelled slightly
+    generously — stated here because it flatters the product-level numbers a little.
+    """
+    import yfinance as yf
+
+    def px(sym):
+        h = yf.download(sym, start="2006-11-01", end="2026-07-22",
+                        auto_adjust=True, progress=False)["Close"]
+        if hasattr(h, "columns"):
+            h = h.iloc[:, 0]
+        h = h.dropna()
+        h.index = pd.to_datetime(h.index).tz_localize(None).normalize()
+        return h[~h.index.duplicated()]
+
+    idx = panel.close.index
+    raw_fx = px("USDINR=X")
+    if len(raw_fx) < 1000:
+        sys.exit(f"ABORT: USDINR returned {len(raw_fx)} rows. A short or empty fetch "
+                 f"would ffill/bfill into a constant series and silently model a "
+                 f"zero-return sleeve.")
+    fx = raw_fx.reindex(idx).ffill().bfill()
+    out = {}
+    for key, sym in (("gold", "GC=F"), ("us", "^NDX")):
+        raw = px(sym)
+        # A failed download reindexes to all-NaN, survives ffill/bfill, and becomes
+        # a 0.0% daily return after fillna — i.e. a sleeve that silently contributes
+        # nothing while still taking 25% of the book. Every statistic downstream
+        # would be wrong and nothing would look broken. Same family as BUG2/BUG3.
+        if len(raw) < 1000 or raw.index.max() < pd.Timestamp("2026-01-01"):
+            sys.exit(f"ABORT: {sym} returned {len(raw)} rows ending "
+                     f"{raw.index.max() if len(raw) else 'never'}. Refusing to model "
+                     f"a passive sleeve from an incomplete fetch.")
+        s = (raw.reindex(idx).ffill() * fx).ffill().bfill()
+        r = s.pct_change(fill_method=None).fillna(0.0)
+        if float(r.std()) < 1e-9:
+            sys.exit(f"ABORT: {sym} sleeve has zero variance after alignment.")
+        out[key] = r
+    return out
+
+
 def main():
     panel = DataPanel(discover_tickers(), END)
     from core.portfolio import BacktestConfig
@@ -96,7 +145,13 @@ def main():
     print(f"Running {len(grid)} strategy trials to assemble the returns matrix...", flush=True)
 
     rets, sharpes, labels, deployed_ret = {}, [], [], None
+    sleeve_sharpes = []
     cal = None
+    global _SLEEVES
+    if os.environ.get("MARK5_GRADE_PRODUCT") == "1":
+        _SLEEVES = _passive_sleeves(panel)
+        print("  grading the PRODUCT (50/25/25 equity/gold/US), not the equity sleeve",
+              flush=True)
     for wname, nh, tilt, rb in grid:
         cfg = ConstructionConfig(mode="factor_tilt", n_hold=nh, base_weighting="inverse_vol",
                                  tilt_strength=tilt, max_weight=max(0.08, 1.5 / nh),
@@ -109,6 +164,17 @@ def main():
         if cal is None:
             cal = r.index
         r = r.reindex(cal).fillna(0.0)
+        # P5.1. Optionally grade the PRODUCT rather than the equity sleeve. The
+        # deployed book is 50/25/25 equity/gold/US; statistics computed on the
+        # sleeve alone describe something nobody owns (Mandate §3). This is a
+        # correction, not a flattering re-basing, and it cuts BOTH ways: with half
+        # the book fixed and passive, a config search can only move half the risk,
+        # so the luck ceiling SR0 genuinely falls — but so does the deployed
+        # strategy's own excess over that ceiling.
+        r_sleeve = r                      # equity-sleeve returns, before blending
+        if _SLEEVES is not None:
+            r = 0.50 * r + 0.25 * _SLEEVES["gold"] + 0.25 * _SLEEVES["us"]
+        sleeve_sharpes.append(_sharpe(r_sleeve.values))
         lab = f"{wname}|n{nh}|t{tilt}|r{rb}"
         rets[lab] = r.values
         sharpes.append(_sharpe(r.values))
@@ -116,7 +182,20 @@ def main():
         if (wname, nh, tilt, rb) == DEPLOYED:
             deployed_ret = r.values
     # count the un-regenerated research variants toward the luck ceiling
-    sharpes += [s / np.sqrt(252) for s in EXTRA_TRIAL_SHARPES_ANN]
+    # The counted-only historical trials are EQUITY-SLEEVE Sharpes. When grading
+    # the product they must be mapped to the same basis, or the trial dispersion
+    # mixes two units and the luck ceiling is nonsense — the first attempt at this
+    # left them unconverted, which inflated sr* from 0.32 to 1.22 and crushed DSR
+    # to 85.8% for purely arithmetic reasons. The map is FITTED on the 70 configs
+    # where both bases are observed, so it is measured rather than assumed.
+    extra = [s / np.sqrt(252) for s in EXTRA_TRIAL_SHARPES_ANN]
+    if _SLEEVES is not None and len(sleeve_sharpes) == len(sharpes) > 2:
+        b, a = np.polyfit(np.array(sleeve_sharpes), np.array(sharpes), 1)
+        rho = float(np.corrcoef(sleeve_sharpes, sharpes)[0, 1])
+        extra = [a + b * e for e in extra]
+        print(f"  mapped {len(extra)} counted-only trials to product basis "
+              f"(product = {a:.4f} + {b:.3f} x sleeve, r={rho:.3f})", flush=True)
+    sharpes += extra
     print(f"  done. {len(labels)} series + {len(EXTRA_TRIAL_SHARPES_ANN)} "
           f"counted-only trials = {len(sharpes)} total.\n", flush=True)
 

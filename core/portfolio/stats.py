@@ -83,7 +83,7 @@ def pbo_cscv(returns_matrix: np.ndarray, n_splits: int = 12) -> dict:
         return {"pbo": float("nan"), "n_combos": 0, "n_strategies": N}
     rows = np.array_split(np.arange(T), n_splits)
     groups = list(range(n_splits))
-    logits, n_below = [], 0
+    logits, n_below, n_tied = [], 0, 0
     combos = list(combinations(groups, n_splits // 2))
     for tr in combos:
         te = [g for g in groups if g not in tr]
@@ -97,11 +97,23 @@ def pbo_cscv(returns_matrix: np.ndarray, n_splits: int = 12) -> dict:
         rank = min(max(rank, 1e-6), 1 - 1e-6)
         lam = math.log(rank / (1 - rank))
         logits.append(lam)
-        if lam <= 0:
+        # STRICT inequality. A rank sitting exactly AT the out-of-sample median is
+        # a tie, and a tie is not evidence of degradation — PBO is defined as the
+        # probability the in-sample winner lands BELOW the median. Counting ties as
+        # "below" silently inflates the estimate whenever candidate strategies are
+        # near-identical, which is exactly when they tie: grading a book that is
+        # half fixed passive sleeves made 91% of splits tie at logit 0.00 and
+        # reported PBO 91% alongside a median logit of 0.00, a self-contradiction
+        # that is the tell for this artefact. `tie_fraction` is published so the
+        # condition is visible rather than buried in the headline number.
+        if lam < -1e-12:
             n_below += 1
+        elif abs(lam) <= 1e-12:
+            n_tied += 1
     return {
         "pbo": n_below / len(combos),
         "n_combos": len(combos),
         "n_strategies": N,
         "median_logit": float(np.median(logits)),
+        "tie_fraction": n_tied / len(combos),
     }
