@@ -1,0 +1,50 @@
+name: Test the daily message
+
+# Manual only. Exists so the notification channel can be verified — after a token
+# rotation, a chat change, or a first-time setup — WITHOUT running the refresh job.
+#
+# That distinction matters. refresh.yml marks the book to market and commits to an
+# append-only record; firing it on a non-trading day to "just test something" would
+# stamp a weekend mark into the ledger, which Mandate §6 forbids outright. This job
+# only reads and only sends: no marking, no commit, no push, contents: read.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  notify-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install pandas numpy
+
+      - name: Send whatever the last recorded mark says
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NTFY_SERVER: ${{ secrets.NTFY_SERVER }}
+          NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+        # --no-health because the health check reaches the live feed and the GitHub
+        # API, and a red run here would say "the notification is broken" when the
+        # thing under test is only the delivery path.
+        run: python scripts/notify.py --send --no-health
+
+      - name: Confirm a channel was actually configured
+        # Without this the job passes green while sending nothing, which is the
+        # worst outcome: it certifies a channel that does not exist.
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] && [ -z "$NTFY_TOPIC" ]; then
+            echo "::error::No channel configured — set TELEGRAM_BOT_TOKEN+TELEGRAM_CHAT_ID or NTFY_TOPIC"
+            exit 1
+          fi

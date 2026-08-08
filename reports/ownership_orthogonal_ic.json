@@ -1,0 +1,13 @@
+{
+ "base_ic": 0.07061822474646044,
+ "raw_ic": -0.003517875651017313,
+ "residual_ic": -0.017890462009014143,
+ "t_residual": -0.6982586180128307,
+ "corr_to_base": 0.1828605616784606,
+ "n_cross_sections": 16,
+ "verdict": "FALSIFIED \u2014 residual IC -0.0179 (t=-0.70) is below the pre-registered bar (0.03, t 3.0)",
+ "bars": {
+  "ic": 0.03,
+  "t": 3.0
+ }
+}
