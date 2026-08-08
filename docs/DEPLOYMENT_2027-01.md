@@ -46,9 +46,42 @@ breadth change buys. Its status should be upgraded from PROVISIONAL to KEEP in t
 research log: residual IC +0.0444 after the momentum composite is projected out,
 and it is *negatively* correlated with that composite.
 
-### 4. Equal weights, five sleeves  *(A2, R2, FX-cleared 2026-08-09)*
+### 4. Equal weights, FOUR sleeves — 25% each  *(A2; owner decision 2026-08-09)*
 
-**Supersedes the searched 30/30/10/30.** Two findings drove this:
+**DECIDED: equity 25 / gold 25 / US equity 25 / long gilt 25.**
+
+| | CAGR | Sharpe | Vol | MaxDD | Calmar |
+|---|---|---|---|---|---|
+| **4-sleeve equal weight** | **+16.16%** | **1.43** | 11.2% | **−17.09%** | 0.95 |
+
+Rationale: A2 showed naive equal weights beat the searched 30/30/10/30 allocation
+on 5-year worst (+11.88% vs +10.62%) and median (+17.46% vs +16.01%). The search
+bought 1.9pp of drawdown for 1.45pp of return. **Nothing fitted means nothing to
+overfit** — which is the point of the whole exercise.
+
+### 4b. SHELVED — the fifth sleeve (US short-duration treasuries)
+
+**Tested, cleared, and deliberately NOT deployed. Revisit later.**
+
+R2 plus the FX-frozen control test showed the fifth sleeve is genuine
+diversification, not a currency artefact: at identical 80% USD exposure it is
+worth 4.60pp of drawdown, and the advantage GROWS when FX is frozen (+7.19pp vs
++5.17pp live). MaxDD −17.09% → −12.79%, Calmar 0.95 → 1.09.
+
+**Why it is shelved anyway: SHY is a US instrument.** Owning it from India needs
+the RBI Liberalised Remittance Scheme — legal and routine, but it adds paperwork,
+annual limits, and an operational dependency that conflicts with the owner's
+stated goal of a hands-off system. A domestic short-duration debt fund is NOT a
+substitute: it carries no dollar exposure, and the FX test showed the dollar
+exposure is where the benefit comes from.
+
+**Open question for later:** find a fifth sleeve that is genuinely uncorrelated,
+USD-denominated, and buyable from India without LRS friction — or decide the LRS
+route is acceptable. The evidence for adding it is already in hand; only the
+plumbing is missing.
+
+<!-- superseded detail retained for the record -->
+**The five-sleeve evidence.** Two findings drove it:
 
 - **A2:** naive equal weights beat the searched allocation on 5-year worst
   (+11.88% vs +10.62%) and median (+17.46% vs +16.01%). The search bought 1.9pp of
