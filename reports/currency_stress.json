@@ -1,0 +1,99 @@
+{
+  "crises": [
+    {
+      "episode": "2008 GFC",
+      "fx_move_pct": 28.975239102802576,
+      "book_live_pct": -2.4762297430283464,
+      "book_frozen_pct": -21.239517992411173,
+      "fx_contribution_pp": 18.763288249382825,
+      "book_frozen_dd": -0.3044716963268388,
+      "nifty_pct": -51.112567580776314
+    },
+    {
+      "episode": "2011 Euro debt",
+      "fx_move_pct": 19.240455769107157,
+      "book_live_pct": 25.8020024279324,
+      "book_frozen_pct": 9.888938750222277,
+      "fx_contribution_pp": 15.913063677710124,
+      "book_frozen_dd": -0.09122191843587202,
+      "nifty_pct": -24.40928227271342
+    },
+    {
+      "episode": "2013 Taper",
+      "fx_move_pct": 17.242533710248374,
+      "book_live_pct": 2.437324402931851,
+      "book_frozen_pct": -8.646385794267008,
+      "fx_contribution_pp": 11.083710197198858,
+      "book_frozen_dd": -0.12344200594571153,
+      "nifty_pct": -4.40131495362982
+    },
+    {
+      "episode": "2015-16 China",
+      "fx_move_pct": 10.310409312499779,
+      "book_live_pct": 2.3037890990358134,
+      "book_frozen_pct": -4.840588246343391,
+      "fx_contribution_pp": 7.144377345379205,
+      "book_frozen_dd": -0.08411287686347191,
+      "nifty_pct": -18.62512965861115
+    },
+    {
+      "episode": "2018 IL&FS",
+      "fx_move_pct": 11.464972870253366,
+      "book_live_pct": -2.5896192540712404,
+      "book_frozen_pct": -9.980843998522882,
+      "fx_contribution_pp": 7.391224744451642,
+      "book_frozen_dd": -0.16675137196045375,
+      "nifty_pct": 3.354655131442019
+    },
+    {
+      "episode": "2020 COVID",
+      "fx_move_pct": 5.261797622478848,
+      "book_live_pct": 6.25500882898109,
+      "book_frozen_pct": 2.2498915006708753,
+      "fx_contribution_pp": 4.005117328310215,
+      "book_frozen_dd": -0.15548621063300416,
+      "nifty_pct": -15.784213551046012
+    },
+    {
+      "episode": "2022 rate shock",
+      "fx_move_pct": 10.367737304197643,
+      "book_live_pct": -11.005840424684488,
+      "book_frozen_pct": -16.56421950885546,
+      "fx_contribution_pp": 5.558379084170971,
+      "book_frozen_dd": -0.18256135675017193,
+      "nifty_pct": 2.19282080786245
+    }
+  ],
+  "a1_verdict": "FALSIFIED \u2014 the crisis protection is mostly the rupee",
+  "a2": {
+    "3y": {
+      "searched": {
+        "worst": 0.06490120427614099,
+        "median": 0.16174959410379885,
+        "worst_dd": -0.17068150039512986,
+        "n": 178
+      },
+      "naive": {
+        "worst": 0.07705950428144481,
+        "median": 0.17618640022895615,
+        "worst_dd": -0.18987729662806974,
+        "n": 178
+      }
+    },
+    "5y": {
+      "searched": {
+        "worst": 0.10623079756052323,
+        "median": 0.16008466746602512,
+        "worst_dd": -0.17068150039512986,
+        "n": 154
+      },
+      "naive": {
+        "worst": 0.11879186290109178,
+        "median": 0.1745922599783022,
+        "worst_dd": -0.18987729662806974,
+        "n": 154
+      }
+    }
+  },
+  "a2_verdict": "FALSIFIED \u2014 naive equal weights are as good or better; drop the search"
+}

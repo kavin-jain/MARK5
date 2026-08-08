@@ -421,4 +421,52 @@ route and the plan must be revised rather than pushed.
 | 2026-08-08 | P4.1 | **FALSIFIED** — tax paid −17%, long-term winners 36%→47%, but net CAGR −0.23pp. Saving < opportunity cost of holding the deranked name |
 | 2026-08-09 | P3.1 | **SUPPORTED** — `deliv_chg` residual IC +0.0444 (95% of raw), negatively correlated with the composite. Method validated |
 | 2026-08-09 | P3.2 | KEEP — `deliv_chg` contributes +0.136 IR; dropping it is a mistake |
+| 2026-08-09 | A1 | **FALSIFIED** — crisis protection is ~90% rupee depreciation; book is ~40% short-INR |
+| 2026-08-09 | A2 | **FALSIFIED** — naive 25/25/25/25 beats the searched allocation on return and worst-window |
 | 2026-08-09 | P5.1 | **PREMISE WRONG** — product-level DSR/PBO is degenerate (sr*=0.00, ties dominate). Sleeve level is correct for selection statistics. 3 real bugs fixed en route |
+
+
+---
+
+## PHASE A — post-audit corrections (2026-08-09)
+
+### A1 — is the crisis protection real, or is it the rupee?
+
+**FALSIFIED.** The protection is mostly the rupee. Freezing USDINR at its
+pre-crisis level for each episode:
+
+| Episode | USDINR | Book live | Book FX-frozen | FX contribution | Nifty |
+|---|---|---|---|---|---|
+| 2008 GFC | +29.0% | −2.5% | **−21.2%** | **+18.8pp** | −51.1% |
+| 2011 Euro | +19.2% | +25.8% | +9.9% | +15.9pp | −24.4% |
+| 2013 Taper | +17.2% | +2.4% | −8.6% | +11.1pp | −4.4% |
+| 2015-16 China | +10.3% | +2.3% | −4.8% | +7.1pp | −18.6% |
+| 2018 IL&FS | +11.5% | −2.6% | −10.0% | +7.4pp | +3.4% |
+| 2020 COVID | +5.3% | +6.3% | +2.2% | +4.0pp | −15.8% |
+| 2022 rates | +10.4% | −11.0% | −16.6% | +5.6pp | +2.2% |
+
+Beats Nifty 4/7 with FX frozen, versus 6/7 live. **The "lost only 1.6% through the
+GFC" headline was ~90% currency.** This book must be described as carrying a ~40%
+unhedged short-INR position, not as asset diversification.
+
+It still helps materially — −21.2% against Nifty's −51.1%, drawdown −30.4% vs
+−59.9% — but the mechanism is currency, and the protection is conditional on the
+rupee falling in a crisis. It reliably has. It is not guaranteed to.
+
+*Method note: freezing FX is HARSHER than a real hedge, which would also earn the
+INR-USD forward premium (~3-5%/yr). The true hedged outcome sits between frozen
+and live; frozen is the pessimistic bound.*
+
+### A2 — does the searched allocation beat naive equal weights?
+
+**FALSIFIED.**
+
+| | 5y worst | 5y median | worst DD |
+|---|---|---|---|
+| Searched 30/30/10/30 | +10.62% | +16.01% | **−17.07%** |
+| **Naive 25/25/25/25** | **+11.88%** | **+17.46%** | −18.99% |
+
+Naive wins on return and on worst-window; the search bought only 1.9pp of
+drawdown. **Recommendation: drop the optimised weights and use equal weights.**
+Nothing fitted means nothing to overfit — and it is the third time this session
+that the simpler structure won.
