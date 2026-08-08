@@ -67,3 +67,23 @@ jobs:
         # A guard that cannot fail is decoration. Now the run goes red and the
         # failure is visible, without costing the day's mark.
         run: python scripts/healthcheck.py
+
+      - name: Send the daily message
+        # `always()` is the whole point. The 4-5 August outage went unnoticed for
+        # two days because nothing in this system ever spoke first; a notifier
+        # that stays silent exactly when the health check fails would recreate
+        # that hole, and worse, silence would start to mean "fine".
+        #
+        # notify.py runs healthcheck itself rather than reading the step above.
+        # Piping that step into a file would need `pipefail` to preserve its exit
+        # code, and a health check that cannot turn the run red is decoration.
+        # Twenty seconds of duplicated requests is the cheaper mistake.
+        if: always()
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          NTFY_SERVER: ${{ secrets.NTFY_SERVER }}
+          NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/notify.py --send

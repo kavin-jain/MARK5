@@ -1024,3 +1024,89 @@ class TestPBOTieHandling:
         """The condition must be visible, not buried inside the headline number."""
         rng = np.random.default_rng(2)
         assert "tie_fraction" in self._pbo(rng.normal(0, 0.01, (1300, 10)))
+
+
+# ══════════════════════════════════════════════════════════════════════════
+#  The daily message
+#
+#  Mandate §8 says how results are reported to the owner. The daily notification
+#  is the only artifact they will read every day, so the reporting rules are
+#  enforced here as tests rather than left to whoever edits the template next.
+# ══════════════════════════════════════════════════════════════════════════
+class TestDailyNotification:
+    @staticmethod
+    def _mod():
+        import importlib.util
+        p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                         "scripts", "notify.py")
+        spec = importlib.util.spec_from_file_location("notify", p)
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        return m
+
+    BOOK = {"days_live": 16, "capital": 500000.0, "nav": 519909.9,
+            "return_pct": 3.98, "benchmark_nav": 511834.21, "relative_pct": 1.615,
+            "max_drawdown_pct": -1.7248, "realised_pnl": -1732.89, "tax_liability": 0.0,
+            "generated": "2026-08-07T12:07:35+00:00",
+            "sleeves": {"rows": [
+                {"label": "Indian equity", "pnl_inr": 13787.7, "return_pct": 5.44},
+                {"label": "Gold ETF", "pnl_inr": 4139.4, "return_pct": 3.58}]},
+            "nav_history": [
+                {"date": "2026-07-22", "nav_inr": "499419.37", "bench_inr": ""},
+                {"date": "2026-08-06", "nav_inr": "519193.28", "bench_inr": "513224.34"},
+                {"date": "2026-08-07", "nav_inr": "519909.90", "bench_inr": "511834.21"}]}
+    OK = {"n": 24, "fails": 0, "warns": 0, "failing": []}
+
+    def test_indian_digit_grouping(self):
+        """The reader is Indian. Western grouping makes them convert in their head
+        every single day, and 519,910 vs 5,19,910 is exactly the kind of friction
+        that stops someone reading the message at all."""
+        g = self._mod()._grp
+        for raw, want in (("519910", "5,19,910"), ("100", "100"), ("1000", "1,000"),
+                          ("1234567", "12,34,567"), ("10000000", "1,00,00,000"),
+                          ("12", "12"), ("0", "0")):
+            assert g(raw) == want, f"{raw} -> {g(raw)}, want {want}"
+
+    def test_paper_and_realised_are_never_blended(self):
+        """Mandate §8: 'Distinguish paper gains from realised gains every time
+        money is discussed.' Both numbers must appear, separately."""
+        m = self._mod()
+        body = m.build(self.BOOK, self.OK)
+        assert "Rs 1,733" in body, body          # realised, on its own
+        assert "Rs 21,643" in body, body         # the paper remainder, on its own
+        assert "PAPER money" in body
+
+    def test_the_weakness_appears_on_a_good_day(self):
+        """§8: 'Volunteer the weakness before it is asked for.' This book is up
+        +3.98% in the fixture; the worst dip must still be in the message."""
+        body = self._mod().build(self.BOOK, self.OK)
+        assert "worst dip" in body and "-1.7%" in body, body
+
+    def test_relative_return_is_labelled_in_percentage_points(self):
+        """relative_pct is a difference of two percentages. Printing it as '%'
+        overstates it and is the same class of error as every defect in §0."""
+        body = self._mod().build(self.BOOK, self.OK)
+        assert "pp)" in body and "1.61" in body, body
+        assert "1.61%" not in body, body
+
+    def test_a_broken_day_still_produces_a_message_that_says_so(self):
+        """The 4-5 Aug outage went unseen because nothing spoke. A notifier that
+        goes quiet exactly when something breaks is worse than none at all."""
+        m = self._mod()
+        bad = m.build(self.BOOK, {"n": 24, "fails": 2, "warns": 0,
+                                  "failing": ["feed is stale", "ledger did not grow"]})
+        assert "FAILED" in bad and "feed is stale" in bad, bad
+
+    def test_a_missing_previous_mark_invents_no_move(self):
+        """With one mark there is no day-over-day change to report, and printing
+        one anyway would be fabricating a number."""
+        m = self._mod()
+        one = dict(self.BOOK, nav_history=self.BOOK["nav_history"][:1])
+        assert "SINCE" not in m.build(one, self.OK)
+
+    def test_no_channel_configured_is_not_an_error(self):
+        """CI must never go red because a token was never added."""
+        m = self._mod()
+        for k in ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "NTFY_TOPIC"):
+            os.environ.pop(k, None)
+        assert m.send("t", "b") is None
