@@ -1110,3 +1110,26 @@ class TestDailyNotification:
         for k in ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHAT_ID", "NTFY_TOPIC"):
             os.environ.pop(k, None)
         assert m.send("t", "b") is None
+
+    def test_a_token_can_never_reach_stdout(self):
+        """The bot token sits in the URL path of every Telegram call, so any
+        printed URL, traceback or redirect leaks it into the CI log — which is
+        public. GitHub masks registered secrets, but only exact strings it was
+        told about. This is the independent guard."""
+        m = self._mod()
+        # synthetic, same shape as a real one. Never put a live token in a test:
+        # the fixture outlives the credential and secret scanners flag the repo.
+        tok = "1234567890:" + "A" * 35
+        os.environ["TELEGRAM_BOT_TOKEN"] = tok
+        try:
+            leak = f"HTTP Error 404 for https://api.telegram.org/bot{tok}/sendMessage"
+            out = m.scrub(leak)
+            assert tok not in out, out
+            assert tok.split(":", 1)[1] not in out, out
+        finally:
+            os.environ.pop("TELEGRAM_BOT_TOKEN", None)
+
+    def test_scrub_is_safe_when_nothing_is_configured(self):
+        for k in ("TELEGRAM_BOT_TOKEN", "NTFY_TOKEN"):
+            os.environ.pop(k, None)
+        assert self._mod().scrub("plain error") == "plain error"

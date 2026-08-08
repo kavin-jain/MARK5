@@ -170,10 +170,53 @@ def build(L, hp):
 
 
 # ── transport ────────────────────────────────────────────────────────────
+def scrub(text):
+    """Never let a bot token reach stdout. The token lives in the URL path for
+    every Telegram call, so any code path that prints a URL — an exception, a
+    redirect, a traceback — leaks it into the CI log, where it is public. GitHub
+    masks registered secrets, but only the exact string, and only if it was
+    registered. This is the belt to that braces."""
+    tok = os.getenv("TELEGRAM_BOT_TOKEN")
+    s = str(text)
+    if tok:
+        s = s.replace(tok, "<TELEGRAM_BOT_TOKEN>")
+        if ":" in tok:                       # the numeric id half is also secret-ish
+            s = s.replace(tok.split(":", 1)[1], "<REDACTED>")
+    for k in ("NTFY_TOKEN",):
+        if os.getenv(k):
+            s = s.replace(os.environ[k], f"<{k}>")
+    return s
+
+
 def _post(url, data, headers):
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
     with urllib.request.urlopen(req, timeout=30) as r:
         return r.read().decode()
+
+
+def whoami():
+    """Print the chat_id for TELEGRAM_BOT_TOKEN, so setup is one command instead
+    of hand-parsing getUpdates JSON. Reads only; sends nothing."""
+    tok = os.getenv("TELEGRAM_BOT_TOKEN")
+    if not tok:
+        sys.exit("set TELEGRAM_BOT_TOKEN first (do not paste it into a file)")
+    try:
+        with urllib.request.urlopen(
+                f"https://api.telegram.org/bot{tok}/getUpdates", timeout=30) as r:
+            d = json.loads(r.read().decode())
+    except Exception as e:                                   # noqa: BLE001
+        sys.exit(f"could not reach Telegram: {scrub(e)}")
+    if not d.get("ok"):
+        sys.exit(f"Telegram rejected the token: {scrub(d.get('description', d))}")
+    seen = {}
+    for u in d.get("result", []):
+        c = (u.get("message") or u.get("channel_post") or {}).get("chat") or {}
+        if c.get("id"):
+            seen[c["id"]] = c.get("username") or c.get("title") or c.get("first_name") or "?"
+    if not seen:
+        sys.exit("No messages yet. Send your bot any message, then run this again.")
+    for cid, who in seen.items():
+        print(f"  TELEGRAM_CHAT_ID={cid}   ({who})")
 
 
 def send(title, body):
@@ -205,7 +248,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--send", action="store_true", help="actually deliver it")
     ap.add_argument("--no-health", action="store_true")
+    ap.add_argument("--whoami", action="store_true",
+                    help="print the chat_id for the configured bot, then exit")
     a = ap.parse_args()
+
+    if a.whoami:
+        return whoami()
 
     L = json.load(open(EXPORT))
     hp = {"n": 0, "fails": 0, "warns": 0, "failing": []} if a.no_health else health()
@@ -220,7 +268,7 @@ def main():
     except (urllib.error.URLError, urllib.error.HTTPError, OSError) as e:
         # A failed send must never fail the refresh job — the money record is the
         # deliverable, the notification is a convenience on top of it.
-        print(f"\n  notify: delivery FAILED ({e}) — the day's mark is still recorded",
+        print(f"\n  notify: delivery FAILED ({scrub(e)}) — the day's mark is still recorded",
               file=sys.stderr)
         return
     print(f"\n  notify: sent via {via}" if via else
