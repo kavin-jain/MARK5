@@ -929,3 +929,56 @@ class TestSectorNeutralRanking:
         w = con.target_weights(self._SCORES, vol, [])
         assert set(w.index) == set(con.select(self._SCORES, []))
         assert abs(w.sum() - 1.0) < 1e-9
+
+
+class TestLTCGDeferral:
+    """P4.1. Selling a winner at ~182 days costs 20% tax where waiting past 365
+    costs 12.5%. The backtest's 306 winning sells in the 6-10 month bucket carry
+    Rs 20.0 lakh of gains in exactly that trap. This must save tax WITHOUT becoming
+    a timing rule or a way to hold garbage."""
+
+    _S = pd.Series({f"T{i:02d}": 100 - i for i in range(40)})
+
+    def _con(self, mult):
+        return PortfolioConstructor(
+            ConstructionConfig(n_hold=10, buffer_mult=2.0, ltcg_defer_mult=mult))
+
+    def test_off_by_default_is_byte_identical(self):
+        """Default must not perturb a single existing result."""
+        held = ["T15", "T18", "T25"]
+        assert (self._con(1.0).select(self._S, held)
+                == self._con(1.0).select(self._S, held, defer_exit=frozenset(held)))
+
+    def test_a_drifting_winner_is_held_past_the_exit_bar(self):
+        """T25 sits outside the normal bar (10*2=20) but inside the widened one."""
+        held = ["T25"]
+        assert "T25" not in self._con(1.0).select(self._S, held)
+        assert "T25" in self._con(2.0).select(self._S, held, defer_exit=frozenset(held))
+
+    def test_a_collapsed_name_is_still_sold(self):
+        """Deferral widens the exit bar; it does not remove it. A name that has
+        genuinely collapsed still falls through, or this becomes a licence to
+        hold anything indefinitely for a tax reason."""
+        far = pd.Series({f"T{i:03d}": 200 - i for i in range(120)})
+        # widened bar is n_hold*buffer*mult = 10*2*2 = 40; rank 99 is far past it
+        assert "T099" not in self._con(2.0).select(far, ["T099"],
+                                                   defer_exit=frozenset(["T099"]))
+
+    def test_deferral_cannot_inflate_the_book(self):
+        """Deferred names compete for the same slots; n_hold is still the cap."""
+        held = [f"T{i:02d}" for i in range(15, 35)]
+        picks = self._con(3.0).select(self._S, held, defer_exit=frozenset(held))
+        assert len(picks) == 10
+
+    def test_engine_defers_only_gains_never_losses(self):
+        """A loss should be realised, not nursed: FY netting already absorbs it,
+        and deferring it would convert a useful offset into a dead position."""
+        import datetime as _dt
+        d = pd.Timestamp("2020-06-01")
+        lots = {"WIN": [[120.0, 100.0, d - pd.Timedelta(days=100)]],
+                "LOSE": [[80.0, 100.0, d - pd.Timedelta(days=100)]],
+                "OLD": [[120.0, 100.0, d - pd.Timedelta(days=400)]]}
+        defer = frozenset(t for t in lots
+                          if sum(mv - c for mv, c, e in lots[t]
+                                 if (d - e).days < 365) > 0)
+        assert defer == {"WIN"}, defer

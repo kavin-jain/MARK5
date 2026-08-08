@@ -448,7 +448,23 @@ class Backtester:
                     if elig:
                         comp, vol = self._factor_panel(d, elig)
                         held = [t for t in tickers if pos[t] > 0]
-                        tw = self.con.target_weights(comp, vol, held)
+                        # Names whose sale today would realise a SHORT-TERM gain,
+                        # taxed at 20% rather than the 12.5% that applies past 365
+                        # days. Measured per FIFO lot, because that is the order the
+                        # statute consumes them in and the order `sell` below uses.
+                        # Losses are never deferred: realising them early is correct
+                        # and FY netting already absorbs them.
+                        # Passed only when the rule is armed, so constructors with
+                        # the original three-argument signature keep working.
+                        if getattr(getattr(self.con, "cfg", None),
+                                   "ltcg_defer_mult", 1.0) > 1.0:
+                            defer = frozenset(
+                                t for t in held
+                                if sum(mv - cost for mv, cost, e in lots[t]
+                                       if (d - e).days < cfg.ltcg_days) > 0)
+                            tw = self.con.target_weights(comp, vol, held, defer)
+                        else:
+                            tw = self.con.target_weights(comp, vol, held)
                         weights_hist[d] = tw
                         if cfg.exec_lag <= 0:
                             execute(tw, d)

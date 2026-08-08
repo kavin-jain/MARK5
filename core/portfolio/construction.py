@@ -45,6 +45,9 @@ class ConstructionConfig:
                                           # market. Distinct from max_sector_weight,
                                           # which caps exposure after the fact; this
                                           # changes what gets picked. See _neutralise.
+    ltcg_defer_mult: float = 1.0          # widen the exit buffer by this factor for a
+                                          # holding whose sale would realise a SHORT-TERM
+                                          # gain (20% vs 12.5%). 1.0 = off. See select().
 
 
 def _cap_weights(w: pd.Series, max_weight: float) -> pd.Series:
@@ -131,9 +134,24 @@ class PortfolioConstructor:
             out.loc[idx] = (block - block.mean()) / (sd if sd and sd > 1e-12 else 1.0)
         return out
 
-    def select(self, composite: pd.Series, currently_held: list[str]) -> list[str]:
+    def select(self, composite: pd.Series, currently_held: list[str],
+               defer_exit: frozenset | set | None = None) -> list[str]:
         """Buffered selection: keep held names still in the top n_hold*buffer_mult,
-        fill the rest with the highest-scoring new names. Cuts turnover -> LTCG."""
+        fill the rest with the highest-scoring new names. Cuts turnover -> LTCG.
+
+        `defer_exit` names a subset of holdings whose sale would realise a
+        SHORT-TERM gain, taxed at 20% instead of the 12.5% that applies past 365
+        days. For those the exit bar widens by `ltcg_defer_mult`, so a name that
+        has merely drifted down the ranking is held to the long-term boundary
+        rather than sold just short of it. A name that has genuinely collapsed
+        still falls through the wider bar and is sold.
+
+        This is a TAX rule, not a timing rule: it never changes which names are
+        bought, never moves money to cash, and cannot defer a LOSS (losses are
+        better realised early, and FY netting already absorbs them). Deferred
+        names still compete for the same n_hold slots, so deferral cannot inflate
+        the book beyond its size.
+        """
         cfg = self.cfg
         composite = self._neutralise(composite)
         ranked = composite.sort_values(ascending=False)
@@ -141,22 +159,29 @@ class PortfolioConstructor:
             return list(ranked.index)
         rank_of = {t: i for i, t in enumerate(ranked.index)}
         exit_rank = int(cfg.n_hold * cfg.buffer_mult)
+        if defer_exit and cfg.ltcg_defer_mult > 1.0:
+            wide = int(cfg.n_hold * cfg.buffer_mult * cfg.ltcg_defer_mult)
+            bar = {t: (wide if t in defer_exit else exit_rank) for t in currently_held}
+        else:
+            bar = {}
         # Sort survivors by score BEFORE truncating. `currently_held` arrives in the
         # backtester's ticker order, which is alphabetical, so the raw slice would
         # keep A-names over better-scoring Z-names whenever more than n_hold holdings
         # survive the buffer. Latent rather than live — the book never holds more than
         # n_hold — but it would fire silently the moment n_hold is reduced or a run
         # switches out of equal_weight, and "sorted by score" is what the line meant.
-        keep = sorted((t for t in currently_held if rank_of.get(t, 10**9) < exit_rank),
+        keep = sorted((t for t in currently_held
+                       if rank_of.get(t, 10**9) < bar.get(t, exit_rank)),
                       key=lambda t: rank_of[t])[:cfg.n_hold]
         adds = [t for t in ranked.index if t not in keep][:max(0, cfg.n_hold - len(keep))]
         return (keep + adds)[:cfg.n_hold]
 
     def target_weights(self, composite: pd.Series, recent_vol: pd.Series,
-                       currently_held: list[str]) -> pd.Series:
+                       currently_held: list[str],
+                       defer_exit: frozenset | set | None = None) -> pd.Series:
         """Compute target weights for the selected holding set."""
         cfg = self.cfg
-        picks = self.select(composite, currently_held)
+        picks = self.select(composite, currently_held, defer_exit)
         if not picks:
             return pd.Series(dtype=float)
         # select() neutralises internally; the tilt below reads `composite` directly,
