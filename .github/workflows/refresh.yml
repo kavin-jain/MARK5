@@ -23,16 +23,38 @@ jobs:
           cache: pip
       - run: pip install pandas numpy yfinance pyarrow
 
-      - name: Rebalance, if the cadence says it is due
-        # Runs every weekday and declines on all but one of them. Without this
-        # step nothing ever called `rebalance`, so the book would have held its
-        # opening names forever and quietly stopped being a test of the system it
-        # claims to track. The cadence, weekend and trading-holiday guards live in
-        # paper_track.py, not here — one guard at the root, not one per caller.
+      - name: Is a rebalance due?
+        # Cheap: reads the book, touches no price data. Everything below keys off
+        # it, because the rebalance needs a ~200-name price panel that is
+        # GITIGNORED and therefore does not exist on a CI runner. Rebuilding it
+        # costs minutes — fine twice a year, absurd daily.
         #
-        # No --force. The cadence is the strategy; overriding it from a scheduled
+        # Without this split the job would have sailed through every day until
+        # January, then failed unattended on a missing cache, with the mark and
+        # commit steps stranded behind it. It was found by asking what this job
+        # would actually do on the one day it matters.
+        id: due
+        run: |
+          OUT=$(python scripts/paper_track.py rebalance --check)
+          echo "$OUT"
+          case "$OUT" in DUE*) echo "due=true" >> "$GITHUB_OUTPUT";;
+                         *)    echo "due=false" >> "$GITHUB_OUTPUT";; esac
+
+      - name: Rebuild the price cache (rebalance days only)
+        if: steps.due.outputs.due == 'true'
+        # config/universe_tickers.json is the pinned name list, committed for
+        # exactly this reason: it is what lets a cacheless runner rank the January
+        # book against the SAME opportunity set the book was opened with, instead
+        # of against whatever happens to be fetchable that morning.
+        run: python scripts/refetch_all.py
+
+      - name: Rebalance
+        if: steps.due.outputs.due == 'true'
+        # No --force. The cadence IS the strategy; overriding it from a scheduled
         # job would make every run a potential off-cadence rebalance, which
         # Mandate §6 forbids and which the ledger would then have to disclose.
+        # The weekend and trading-holiday guards live in paper_track.py — one
+        # guard at the root, not one per caller.
         run: python scripts/paper_track.py rebalance
 
       - name: Mark the paper book to market
@@ -99,3 +121,34 @@ jobs:
           NTFY_TOKEN: ${{ secrets.NTFY_TOKEN }}
           GH_TOKEN: ${{ github.token }}
         run: python scripts/notify.py --send
+
+      - name: Dead-man's switch
+        # The one failure this repo cannot detect from the inside: the job never
+        # running. Every guard here — 24 health checks, the notifier, the ledger
+        # watermark — is code that has to EXECUTE to protect anything. If GitHub
+        # disables this workflow (it does that to public repos after 60 days of
+        # inactivity), or the schedule breaks, or the repo is archived, all of it
+        # goes quiet together and silence is indistinguishable from a calm market.
+        #
+        # So the liveness signal is inverted and moved OUTSIDE GitHub: an external
+        # monitor expects a ping every day and alerts the owner when one does not
+        # arrive. Absence of a message becomes the alarm rather than the failure.
+        #
+        # always(), because the question is "did this run?", not "did it pass?" —
+        # a failing health check already reaches the owner through the message
+        # above, and double-alerting trains people to ignore both.
+        if: always()
+        env:
+          DEADMAN_URL: ${{ secrets.DEADMAN_URL }}
+        run: |
+          if [ -z "$DEADMAN_URL" ]; then
+            echo "::warning::DEADMAN_URL not set — nothing is watching whether this job runs"
+            exit 0
+          fi
+          SUFFIX=""
+          if [ "${{ job.status }}" != "success" ]; then SUFFIX="/fail"; fi
+          # Never fail the run on a ping problem: the monitor is a safety net, and
+          # a safety net that can knock down the thing it protects is a liability.
+          curl -fsS -m 15 --retry 3 "${DEADMAN_URL}${SUFFIX}" \
+            && echo "pinged${SUFFIX}" \
+            || echo "::warning::dead-man ping failed — the day's record is unaffected"

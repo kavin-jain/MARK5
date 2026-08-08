@@ -15,8 +15,13 @@ sys.path.insert(0, _ROOT)
 from core.portfolio.universe import discover_tickers
 
 CACHE = os.path.join(_ROOT, "data", "cache")
-START = "2015-01-01"
-END = "2026-06-10"            # uniform end
+START = os.environ.get("MARK5_REFETCH_START", "2015-01-01")
+# A HARDCODED end date is why the cache silently rotted to 61 days stale: the
+# constant stopped moving while the calendar did, and every later run refetched
+# to the same frozen day. The uniform-end property that this script exists to
+# guarantee is preserved by resolving "today" ONCE, here, and using it for every
+# ticker in the run — not by freezing it in the source.
+END = os.environ.get("MARK5_REFETCH_END") or str(pd.Timestamp.today().date())
 
 
 def normalize(df):

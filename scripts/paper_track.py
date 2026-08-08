@@ -626,6 +626,37 @@ LTCG, STCG = 0.125, 0.20
 LTCG_EXEMPTION = 125000.0   # Sec 112A, per person per fiscal year, listed Indian equity only
 
 
+def cmd_rebalance_check() -> bool:
+    """Is a rebalance due today? Answered from the book alone — no price cache.
+
+    This exists because of the shape of the failure it prevents. The rebalance
+    needs a ~200-name price panel that is gitignored and therefore ABSENT in CI;
+    building it costs minutes, which is unacceptable in a job that runs daily and
+    rebalances twice a year. So the daily job asks this question first, and only
+    pays for the data on the one day the answer is yes.
+
+    Getting this wrong is expensive and silent: the first rebalance falls due in
+    January, and without this the job would have discovered its missing cache
+    then — unattended, months after anyone was watching, with the mark-and-commit
+    steps sitting behind the failure.
+
+    Prints DUE / NOT-DUE and exits 0 either way; the workflow branches on stdout.
+    """
+    if not os.path.exists(BOOK):
+        print("NOT-DUE  (no book yet)")
+        return False
+    book = json.load(open(BOOK))
+    last = pd.Timestamp(book.get("last_rebalance", book["start_date"]))
+    due_in = REBAL_DAYS - (pd.Timestamp.today().normalize() - last.normalize()).days
+    weekend = pd.Timestamp.today().weekday() >= 5
+    if due_in > 0 or weekend:
+        print(f"NOT-DUE  ({due_in}d to go" + (", weekend" if weekend else "") +
+              f", next ~{(last + pd.Timedelta(days=REBAL_DAYS)).date()})")
+        return False
+    print(f"DUE  (last rebalance {last.date()}, cadence {REBAL_DAYS}d)")
+    return True
+
+
 def cmd_rebalance(force=False):
     """Refresh the equity book at real prices, logging every trade.
 
@@ -802,7 +833,10 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("init"); p.add_argument("--capital", type=float, default=500000)
     sub.add_parser("status"); sub.add_parser("export")
-    pr = sub.add_parser("rebalance"); pr.add_argument("--force", action="store_true")
+    pr = sub.add_parser("rebalance")
+    pr.add_argument("--force", action="store_true")
+    pr.add_argument("--check", action="store_true",
+                    help="print DUE/NOT-DUE from the book alone; touches no price data")
     a = ap.parse_args()
     if a.cmd == "init":
         if not (0 < a.capital <= 1e12):
@@ -811,7 +845,10 @@ def main():
     elif a.cmd == "status":
         cmd_status()
     elif a.cmd == "rebalance":
-        cmd_rebalance(a.force)
+        if a.check:
+            cmd_rebalance_check()
+        else:
+            cmd_rebalance(a.force)
     else:
         cmd_export()
 

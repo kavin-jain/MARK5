@@ -1,7 +1,7 @@
 {
- "description": "Version-pinned backtest candidate universe (survivorship-caveated: current liquid NIFTY Midcap/Nifty100 constituents as cached). A fresh clone runs scripts/refetch_all.py to rebuild data/cache from this list.",
- "pinned": "2026-07-22",
- "count": 203,
+ "description": "Version-pinned universe for rebuilding data/cache from scratch (scripts/refetch_all.py). CI has no cache \u2014 this list is what lets an unattended rebalance rank against the SAME opportunity set the book was opened with. Survivorship-caveated: names that delisted before the pin date are absent.",
+ "pinned": "2026-08-09",
+ "count": 205,
  "tickers": [
   "AARTIIND",
   "ABB",
@@ -97,6 +97,7 @@
   "HINDZINC",
   "HUDCO",
   "ICICIBANK",
+  "IDEA",
   "IDFCFIRSTB",
   "IEX",
   "IGL",
@@ -205,6 +206,7 @@
   "VBL",
   "VOLTAS",
   "WIPRO",
+  "YESBANK",
   "ZYDUSLIFE"
  ]
 }
