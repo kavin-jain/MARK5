@@ -23,6 +23,18 @@ jobs:
           cache: pip
       - run: pip install pandas numpy yfinance pyarrow
 
+      - name: Rebalance, if the cadence says it is due
+        # Runs every weekday and declines on all but one of them. Without this
+        # step nothing ever called `rebalance`, so the book would have held its
+        # opening names forever and quietly stopped being a test of the system it
+        # claims to track. The cadence, weekend and trading-holiday guards live in
+        # paper_track.py, not here — one guard at the root, not one per caller.
+        #
+        # No --force. The cadence is the strategy; overriding it from a scheduled
+        # job would make every run a potential off-cadence rebalance, which
+        # Mandate §6 forbids and which the ledger would then have to disclose.
+        run: python scripts/paper_track.py rebalance
+
       - name: Mark the paper book to market
         run: |
           python scripts/paper_track.py status

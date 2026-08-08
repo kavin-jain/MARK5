@@ -1067,14 +1067,24 @@ class TestDailyNotification:
                           ("12", "12"), ("0", "0")):
             assert g(raw) == want, f"{raw} -> {g(raw)}, want {want}"
 
-    def test_paper_and_realised_are_never_blended(self):
+    def test_unrealised_and_realised_are_never_blended(self):
         """Mandate §8: 'Distinguish paper gains from realised gains every time
         money is discussed.' Both numbers must appear, separately."""
         m = self._mod()
         body = m.build(self.BOOK, self.OK)
         assert "Rs 1,733" in body, body          # realised, on its own
-        assert "Rs 21,643" in body, body         # the paper remainder, on its own
-        assert "PAPER money" in body
+        assert "Rs 21,643" in body, body         # the unrealised remainder, on its own
+
+    def test_the_simulation_is_always_disclosed(self):
+        """The owner asked for wording that reads professionally when shown to
+        other people. That changed the WORDING, not whether it appears. An
+        unlabelled simulated track record is a misrepresentation to whoever is
+        shown it, so the disclosure is pinned here and cannot be dropped by an
+        edit that is only trying to tidy the layout."""
+        body = self._mod().build(self.BOOK, self.OK)
+        assert "Simulated execution" in body, body
+        assert "Model portfolio" in body, body
+        assert "Not investment advice" in body, body
 
     def test_the_weakness_appears_on_a_good_day(self):
         """§8: 'Volunteer the weakness before it is asked for.' This book is up
@@ -1133,3 +1143,44 @@ class TestDailyNotification:
         for k in ("TELEGRAM_BOT_TOKEN", "NTFY_TOKEN"):
             os.environ.pop(k, None)
         assert self._mod().scrub("plain error") == "plain error"
+
+    def test_rebalance_day_reports_the_fills_it_booked(self):
+        """The owner wants zero human steps, so this is a record of what the
+        system DID, not a list of what they must do. It reads from the ledger —
+        the authoritative record — rather than any summary that could disagree
+        with it."""
+        m = self._mod()
+        import csv as _csv, tempfile
+        rows = [{"timestamp": "", "date": "2026-08-07", "action": "SELL",
+                 "ticker": "TDPOWERSYS", "qty": "8", "price": "1113.60",
+                 "value_inr": "8908.80", "cost_inr": "10",
+                 "note": "exit · P&L -452 · held 4d · STCG accrued 0"},
+                {"timestamp": "", "date": "2026-08-07", "action": "BUY",
+                 "ticker": "NYKAA", "qty": "51", "price": "322.80",
+                 "value_inr": "16462.80", "cost_inr": "19", "note": "rebalance entry"},
+                {"timestamp": "", "date": "2026-01-01", "action": "BUY",
+                 "ticker": "OLDONE", "qty": "1", "price": "1.00",
+                 "value_inr": "1", "cost_inr": "0", "note": ""}]
+        with tempfile.NamedTemporaryFile("w", suffix=".csv", delete=False, newline="") as fh:
+            w = _csv.DictWriter(fh, fieldnames=list(rows[0]))
+            w.writeheader()
+            w.writerows(rows)
+            path = fh.name
+        old = m.LEDGER
+        m.LEDGER = path
+        try:
+            body = m.build(self.BOOK, self.OK)
+        finally:
+            m.LEDGER = old
+            os.unlink(path)
+        assert "THE SYSTEM REBALANCED ON 2026-08-07" in body, body
+        assert "TDPOWERSYS" in body and "NYKAA" in body, body
+        assert "OLDONE" not in body, "a fill from another date leaked in"
+        assert "2 orders" in body, body
+        # the book-level figures must survive the section that sits above them
+        assert "Rs 21,643" in body, "the trade loop clobbered the book's P&L"
+
+    def test_quiet_days_have_no_rebalance_section(self):
+        """Most days book nothing. An empty 'THE SYSTEM REBALANCED' heading would
+        train the reader to ignore the one that matters."""
+        assert "REBALANCED" not in self._mod().build(self.BOOK, self.OK)

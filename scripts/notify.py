@@ -10,9 +10,13 @@ Design rules, all of them consequences of Mandate §8:
 
   * No jargon. "worst dip" not "max drawdown", "if you had just bought the index"
     not "benchmark relative return". Every number carries its unit.
-  * Paper gains and realised gains are never blended into one figure.
+  * Unrealised and realised gains are never blended into one figure.
   * The weakness goes IN the message, not in a footnote — the worst dip and the
-    PAPER disclaimer appear every single day, including good days.
+    simulation disclosure appear every single day, including good days. The
+    wording is a tear-sheet footer rather than a warning label because this gets
+    shown to other people, but it is never absent: an unlabelled simulated track
+    record is not a professional artifact, it is a misrepresentation, and every
+    institution that publishes one labels it for exactly that reason.
   * A broken day still sends. A notifier that goes quiet exactly when something
     is wrong is worse than none, because silence starts to mean "fine".
 
@@ -31,6 +35,7 @@ With neither set it prints and exits 0, so CI never fails for want of a token.
   python3 scripts/notify.py --no-health  # skip the health subprocess
 """
 import argparse
+import csv
 import html
 import json
 import os
@@ -99,6 +104,21 @@ def health():
 
 # ── the message ──────────────────────────────────────────────────────────
 W = 36
+LEDGER = os.path.join(_ROOT, "data", "paper", "paper_ledger.csv")
+
+
+def todays_trades(asof):
+    """Fills booked on `asof`, straight from the append-only ledger.
+
+    Read from the ledger rather than from any summary, because the ledger is the
+    record — a summary can disagree with it, and if the two ever diverge the one
+    the owner is shown must be the one that is authoritative.
+    """
+    try:
+        with open(LEDGER) as fh:
+            return [r for r in csv.DictReader(fh) if r.get("date") == asof]
+    except (OSError, csv.Error):
+        return []
 
 
 def _row(label, value):
@@ -145,6 +165,24 @@ def build(L, hp):
             out.append(f"  {r['label'][:17]:<17}{rs(r['pnl_inr'], True):>10}"
                        f"{pct(r['return_pct'], 1):>7}")
 
+    # On a rebalance day this is the most important thing in the message: the
+    # system re-picked the book by itself and this is the record of what it did.
+    # Reported as completed fills, not as a to-do list — there is no human step.
+    tr = todays_trades(asof)
+    if tr:
+        out += ["", f"THE SYSTEM REBALANCED ON {asof}"]
+        for r in tr:
+            # NOT `pnl` — that name holds the book's profit and is used below.
+            # Shadowing it here would have crashed the message on precisely the
+            # one day it exists to report.
+            note, leg = r.get("note", ""), ""
+            if "P&L" in note:
+                leg = note.split("P&L", 1)[1].split("·")[0].strip()
+                leg = f"  {leg.replace('+', '+Rs ').replace('-', '-Rs ')}"
+            out.append(f"  {r['action'].lower():<5} {r['ticker'][:12]:<12}"
+                       f"{int(float(r['qty'])):>5} @ {float(r['price']):>9,.2f}{leg}")
+        out.append(f"  {len(tr)} orders · costs and tax already deducted")
+
     real = float(L.get("realised_pnl", 0.0))
     out += ["", "WORTH KNOWING",
             f"  · worst dip so far: {pct(L['max_drawdown_pct'], 1, False)} below its own"
@@ -154,7 +192,7 @@ def build(L, hp):
             f"\n    and can still go away."]
     if float(L.get("tax_liability", 0)) > 0:
         out.append(f"  · tax owed if it all ended today: {rs(L['tax_liability'])}")
-    out.append("  · PAPER money. Nothing real is invested.")
+    out.append("  · model portfolio — simulated execution")
 
     if hp["fails"] > 0:
         out += ["", f"⚠ SYSTEM  {hp['fails']} of {hp['n']} checks FAILED"]
@@ -165,7 +203,14 @@ def build(L, hp):
         out += ["", f"SYSTEM  all {hp['n']} checks passed"
                     + (f", {hp['warns']} warning(s)" if hp["warns"] else "")]
 
-    out.append(f"\n{PAGE}")
+    # Tear-sheet footer. Every institution that publishes a simulated track
+    # record labels it on the artifact itself, because the label is what makes it
+    # a track record rather than a claim. Wording is professional; the disclosure
+    # is not optional and test_the_simulation_is_always_disclosed enforces it.
+    out += ["", "─" * W,
+            "Model portfolio. Simulated execution at live",
+            "market prices, net of costs and Indian tax.",
+            "Not investment advice.", PAGE]
     return "\n".join(out)
 
 

@@ -70,6 +70,26 @@ def live_prices(tickers: list[str]) -> dict[str, float]:
     return out
 
 
+def last_session_date() -> pd.Timestamp | None:
+    """Date of the most recent NSE session that actually printed a close.
+
+    live_prices() takes the last non-NaN bar in a 7-day window and says nothing
+    about WHEN it was, so on a market holiday it happily returns Friday's close
+    as if it were today's. The weekday check catches Saturday and Sunday and
+    nothing else; Diwali, Holi and every other trading holiday fall on weekdays.
+    Booking fills at a stale close is the one thing an append-only ledger can
+    never take back, so the rebalance asks the index what day the market last
+    traded rather than assuming.
+    """
+    import yfinance as yf
+    try:
+        h = yf.download("^NSEI", period="10d", auto_adjust=True,
+                        progress=False)["Close"].dropna()
+    except Exception:                                        # noqa: BLE001
+        return None
+    return pd.Timestamp(h.index[-1]).normalize() if len(h) else None
+
+
 def reconcile_corporate_actions(book) -> list[str]:
     """Adjust held quantities for splits/bonuses that happened AFTER entry.
 
@@ -627,9 +647,26 @@ def cmd_rebalance(force=False):
     # rebalances once fired on a Sunday against Friday's closes: the ledger then
     # records fills at prices nobody could have traded at. There is no reason to
     # ever want that, so this guard has no override.
+    # Exit-code contract, now that CI runs this unattended every weekday:
+    #   0 = nothing to do, or done. 1 = something is actually wrong.
+    # "The market is shut" is the guard SUCCEEDING, not a failure. Signalling it
+    # as an error would fail the whole refresh job, and the steps that record the
+    # day's mark and commit it come after — so a correctly-declined rebalance
+    # would punch a hole in the append-only record it exists to protect.
+    # The refusal itself is unchanged and still has no override.
     if pd.Timestamp.today().weekday() >= 5:
-        sys.exit("ERROR: market closed today — every quote is stale. Refusing to "
-                 "book fills at prices that were never tradeable. Run on a session day.")
+        print("  declined — market closed today (weekend); every quote is stale. "
+              "Will retry on the next session.")
+        return
+    # …and the same for trading holidays, which are weekdays. Declining cannot
+    # block permanently: `due` still exceeds the cadence tomorrow, so it simply
+    # happens on the next real session.
+    sess = last_session_date()
+    if sess is None or sess != pd.Timestamp.today().normalize():
+        print(f"  declined — no NSE session printed today (last close "
+              f"{sess.date() if sess is not None else 'unknown'}). Refusing to book "
+              f"fills at a price nobody could have traded at. Will retry next session.")
+        return
     reconcile_corporate_actions(book)
 
     w_eq, asof, _ = target_book()
