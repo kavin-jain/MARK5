@@ -235,8 +235,28 @@ def scrub(text):
 
 def _post(url, data, headers):
     req = urllib.request.Request(url, data=data, headers=headers, method="POST")
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return r.read().decode()
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return r.read().decode()
+    except urllib.error.HTTPError as e:
+        # Telegram puts the ONLY useful part of a failure in the response body —
+        # "chat not found", "bot is not a member of the group chat", "not enough
+        # rights to send text messages". Letting HTTPError propagate bare turns
+        # all of those into "HTTP Error 400: Bad Request", which is the same
+        # message for every possible cause and sends you guessing.
+        try:
+            body = json.loads(e.read().decode())
+        except Exception:                                    # noqa: BLE001
+            raise e from None
+        desc = body.get("description", "")
+        # A group silently becomes a supergroup and its id changes. Telegram hands
+        # back the new one; without this you are told "chat not found" about a
+        # chat you are looking at on screen.
+        new_id = (body.get("parameters") or {}).get("migrate_to_chat_id")
+        if new_id:
+            desc += (f"  — this group became a SUPERGROUP and its id changed. "
+                     f"Set TELEGRAM_CHAT_ID={new_id}")
+        raise RuntimeError(f"Telegram refused it: {desc}") from None
 
 
 def whoami():
@@ -296,14 +316,84 @@ def send(title, body):
     return None
 
 
+def diagnose():
+    """Walk the chain token -> chat -> permission -> send and say which link broke.
+
+    "It doesn't work" has at least five distinct causes here — wrong token, wrong
+    chat id, bot not in the chat, bot lacking send rights, or an id that changed
+    under a supergroup upgrade — and every one of them looks identical from the
+    outside: no message arrives. This prints the first one that actually fails.
+    """
+    tok = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat = os.getenv("TELEGRAM_CHAT_ID")
+    print(f"  token set : {'yes' if tok else 'NO'}")
+    print(f"  chat id   : {chat or 'NOT SET'}")
+    if not tok:
+        sys.exit("  -> set TELEGRAM_BOT_TOKEN first")
+
+    def api(m, payload=None):
+        url = f"https://api.telegram.org/bot{tok}/{m}"
+        try:
+            if payload is None:
+                with urllib.request.urlopen(url, timeout=30) as r:
+                    return json.loads(r.read().decode())
+            return json.loads(_post(url, json.dumps(payload).encode(),
+                                    {"Content-Type": "application/json"}))
+        except Exception as e:                               # noqa: BLE001
+            return {"ok": False, "description": scrub(e)}
+
+    me = api("getMe")
+    if not me.get("ok"):
+        sys.exit(f"  -> TOKEN REJECTED: {me.get('description')}")
+    print(f"  bot       : @{me['result'].get('username')}  (token is valid)")
+
+    ups = api("getUpdates")
+    chats = {}
+    for u in ups.get("result", []):
+        c = (u.get("message") or u.get("channel_post") or {}).get("chat") or {}
+        if c.get("id"):
+            chats[c["id"]] = (c.get("title") or c.get("username")
+                              or c.get("first_name") or "?", c.get("type", "?"))
+    print(f"  chats seen: {len(chats)}")
+    for cid, (who, kind) in sorted(chats.items()):
+        mark = "  <- currently configured" if str(cid) == str(chat) else ""
+        print(f"      {cid:<16} {kind:<11} {who}{mark}")
+    if not chats:
+        print("      (none — send /start@<bot> IN the group, then re-run)")
+
+    if not chat:
+        sys.exit("  -> set TELEGRAM_CHAT_ID to one of the ids above")
+
+    info = api("getChat", {"chat_id": chat})
+    if not info.get("ok"):
+        sys.exit(f"  -> CANNOT REACH THAT CHAT: {info.get('description')}\n"
+                 f"     Usual cause: the bot was never added to it, or the id is a DM "
+                 f"id when you meant the group (group ids are NEGATIVE).")
+    r = info["result"]
+    print(f"  target    : {r.get('title') or r.get('username')} ({r.get('type')})")
+
+    sent = api("sendMessage", {"chat_id": chat, "text": "MARK6 connectivity test."})
+    if sent.get("ok"):
+        print("\n  RESULT: sent. If it is not visible, you are looking at a different chat.")
+    else:
+        print(f"\n  RESULT: SEND FAILED — {sent.get('description')}")
+        print("     'not enough rights'  -> the bot is in the group but cannot post; "
+              "give it Send Messages, or make it admin.")
+        print("     'chat not found'     -> wrong id, or the bot was removed.")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--send", action="store_true", help="actually deliver it")
     ap.add_argument("--no-health", action="store_true")
     ap.add_argument("--whoami", action="store_true",
                     help="print the chat_id for the configured bot, then exit")
+    ap.add_argument("--diagnose", action="store_true",
+                    help="walk token -> chat -> permission -> send and report the break")
     a = ap.parse_args()
 
+    if a.diagnose:
+        return diagnose()
     if a.whoami:
         return whoami()
 
@@ -317,7 +407,7 @@ def main():
         return
     try:
         via = send(title, body)
-    except (urllib.error.URLError, urllib.error.HTTPError, OSError) as e:
+    except (urllib.error.URLError, urllib.error.HTTPError, OSError, RuntimeError) as e:
         # A failed send must never fail the refresh job — the money record is the
         # deliverable, the notification is a convenience on top of it.
         print(f"\n  notify: delivery FAILED ({scrub(e)}) — the day's mark is still recorded",
