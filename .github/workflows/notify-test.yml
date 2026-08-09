@@ -10,6 +10,12 @@ name: Test the daily message
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "send = deliver the daily message · diagnose = find why it isn't arriving"
+        type: choice
+        default: send
+        options: [send, diagnose]
 
 permissions:
   contents: read
@@ -35,7 +41,23 @@ jobs:
         # --no-health because the health check reaches the live feed and the GitHub
         # API, and a red run here would say "the notification is broken" when the
         # thing under test is only the delivery path.
-        run: python scripts/notify.py --send --no-health
+        #
+        # `diagnose` exists so the owner never has to hold the token to debug this.
+        # It lives in Actions secrets, which are write-only — there is no way to
+        # read it back out — so the natural instinct is to revoke and reissue just
+        # to run a test. Rotating a working credential to diagnose a delivery
+        # problem is the wrong trade; run the diagnosis where the credential
+        # already is instead.
+        #
+        # Safe in a public log: notify.py scrubs the token from anything it prints,
+        # and GitHub masks registered secrets on top of that. Chat ids from
+        # getUpdates do appear, and they are useless without the token.
+        run: |
+          if [ "${{ inputs.mode }}" = "diagnose" ]; then
+            python scripts/notify.py --diagnose
+          else
+            python scripts/notify.py --send --no-health
+          fi
 
       - name: Confirm a channel was actually configured
         # Without this the job passes green while sending nothing, which is the
