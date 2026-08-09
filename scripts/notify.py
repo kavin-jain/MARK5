@@ -297,8 +297,12 @@ def whoami():
         print(f"  TELEGRAM_CHAT_ID={cid:<16} {kind:<11} {who}{star}")
 
 
-def send(title, body):
-    tok, chat = os.getenv("TELEGRAM_BOT_TOKEN"), os.getenv("TELEGRAM_CHAT_ID")
+def send(title, body, chat=None):
+    # `chat` overrides the configured destination so bot.py can answer in the
+    # chat that asked. Without it a question sent in a DM would be answered into
+    # the group, which is both confusing and a small privacy leak.
+    tok = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat = chat or os.getenv("TELEGRAM_CHAT_ID")
     if tok and chat:
         # <pre> so the column alignment survives Telegram's proportional font.
         payload = json.dumps({"chat_id": chat, "parse_mode": "HTML",

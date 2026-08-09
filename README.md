@@ -265,6 +265,18 @@ Three guards exist because each protects against a specific way this goes wrong 
   liveness signal is inverted and moved outside GitHub — absence of a daily ping becomes
   the alarm, rather than the failure.
 
+### Asking it questions
+
+The daily message is push. `scripts/bot.py` is the pull side: `/update`, `/holdings`,
+`/next`, `/health` answered in Telegram, on a 10-minute cron because this system has no
+server to host a webhook on. A first command after a quiet period waits for the next
+window; Telegram queues it, so it is answered late rather than lost.
+
+**Every command is read-only, and the workflow is granted `contents: read` to enforce
+it.** The book is an append-only record that is never rebalanced off-cadence (Mandate
+§6), and a chat message is the weakest possible authorisation for a write to it. The
+rebalance reports to the chat; it does not take orders from it.
+
 ---
 
 ## Methodological rigor

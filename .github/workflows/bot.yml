@@ -1,0 +1,61 @@
+name: Telegram bot
+
+# The other half of the notification layer: notify.py speaks once a day, this
+# listens the rest of the time.
+#
+# WHY A CRON AND NOT A WEBHOOK. A webhook needs a public HTTPS endpoint up 24/7.
+# This system deliberately has no server — it is a repository and a scheduled
+# runner, which is the shape that survives the owner not looking at it for six
+# months. So the bot wakes on a schedule and collects whatever was said while it
+# was asleep. Telegram queues messages for 24h, so a command is answered late,
+# never lost.
+#
+# WHY IT CAN ONLY READ. `contents: read`, and it is not an oversight. The paper
+# book is an append-only integrity record (Mandate §6): no off-cadence
+# rebalance, no mid-session mark. A chat message is the weakest possible
+# authorisation for a write to that record, and the record's whole value is that
+# nothing unscheduled is in it. The rebalance runs on its own schedule and
+# reports here; it does not take orders from here.
+
+on:
+  schedule:
+    # Every 10 minutes. Each run costs ~30s when nobody is talking and stays
+    # awake ~2.5 min after answering, so a conversation is responsive without
+    # holding a runner open all day. GitHub may delay a scheduled run under
+    # load; the queued command still arrives on the next one.
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # Telegram allows exactly one getUpdates poller per token and answers the
+  # second with 409. Queue rather than cancel: a run finishes inside the cron
+  # interval, so nothing piles up, and cancelling would kill a live conversation.
+  group: telegram-bot
+  cancel-in-progress: false
+
+jobs:
+  listen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install pandas numpy
+
+      - name: Answer whatever was asked
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Optional, comma separated: extra chats allowed to command the bot,
+          # e.g. the owner's DM alongside the group. Anything not listed is
+          # ignored without a reply — a Telegram bot is reachable by anyone who
+          # learns its @username, and an open one would hand the book's
+          # positions to strangers.
+          TELEGRAM_ADMIN_CHATS: ${{ secrets.TELEGRAM_ADMIN_CHATS }}
+        run: python scripts/bot.py --serve

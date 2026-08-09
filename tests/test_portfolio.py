@@ -1192,3 +1192,110 @@ class TestDailyNotification:
         body = self._mod().build(self.BOOK, {"n": 0, "fails": 0, "warns": 0, "failing": []})
         assert "0 checks passed" not in body, body
         assert "not checked" in body, body
+
+
+class TestTelegramBot:
+    """The command interface. What is tested here is the boundary, not the prose:
+    who may command it, what it refuses to say, and whether the two places that
+    report a profit report the same one."""
+
+    @staticmethod
+    def _mod():
+        import importlib.util
+        p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                         "scripts", "bot.py")
+        spec = importlib.util.spec_from_file_location("bot", p)
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        return m
+
+    @staticmethod
+    def _with_chat(cid, fn):
+        keep = {k: os.environ.get(k) for k in ("TELEGRAM_CHAT_ID", "TELEGRAM_ADMIN_CHATS")}
+        os.environ["TELEGRAM_CHAT_ID"] = cid
+        os.environ.pop("TELEGRAM_ADMIN_CHATS", None)
+        try:
+            return fn()
+        finally:
+            for k, v in keep.items():
+                os.environ.pop(k, None)
+                if v is not None:
+                    os.environ[k] = v
+
+    def test_a_stranger_is_never_answered(self):
+        """A Telegram bot is reachable by anyone who learns its @username. Without
+        this gate the book's positions and P&L are readable by the public."""
+        m = self._mod()
+        assert self._with_chat("-1001234567890", lambda: m.handle(
+            {"chat": {"id": 777777}, "text": "/holdings"})) is False
+
+    def test_plain_conversation_is_ignored(self):
+        """It sits in a group with a human in it. A bot that answers chatter gets
+        muted, and a muted bot is no bot on the day it has something urgent."""
+        m = self._mod()
+        assert m.answer("good morning") is None
+        assert m.answer("") is None
+        assert self._with_chat("-1001234567890", lambda: m.handle(
+            {"chat": {"id": -1001234567890}, "text": "how are we doing"})) is False
+
+    def test_an_unknown_command_explains_itself(self):
+        m = self._mod()
+        body = m.answer("/nonsense")
+        assert "No such command" in body and "/update" in body
+
+    def test_group_suffixed_commands_resolve(self):
+        """In a group Telegram delivers '/update@MARK5K_BOT', not '/update'."""
+        m = self._mod()
+        assert m.answer("/help@MARK5K_BOT").startswith("WHAT YOU CAN ASK")
+        assert m.answer("/status").startswith("MARK6")          # alias of /update
+
+    def test_every_advertised_command_exists(self):
+        """The menu published to Telegram is derived from COMMANDS, so a command
+        can never be offered in autocomplete that nothing here answers."""
+        m = self._mod()
+        for name, desc, fn in m.COMMANDS:
+            assert m.HANDLERS[name] is fn and desc
+        for alias, target in m.ALIASES.items():
+            assert target in m.HANDLERS, alias
+
+    def test_a_failing_command_reports_instead_of_dying(self):
+        m = self._mod()
+        m.HANDLERS["boom"] = lambda: 1 / 0
+        try:
+            body = m.answer("/boom")
+        finally:
+            del m.HANDLERS["boom"]
+        assert "failed" in body and "money record is untouched" in body
+
+    def test_holdings_reconciles_with_the_headline_profit(self):
+        """/holdings sums unrealised P&L; /update reports profit after the loss
+        already banked on names that were sold. Two screens showing two different
+        profits with no bridge is how a reader stops trusting both."""
+        import json as _json
+        m = self._mod()
+        L = _json.load(open(m.EXPORT))
+        want = m._amt(float(L["nav"]) - float(L["capital"]), True)
+        body = m.h_holdings()
+        assert "YOUR PROFIT" in body
+        assert want in body, f"expected {want} in the reconciliation\n{body[-400:]}"
+
+    def test_holdings_never_calls_paper_gains_banked(self):
+        m = self._mod()
+        body = m.h_holdings()
+        assert "still held" in body and "already sold" in body
+
+    def test_the_bot_workflow_cannot_write(self):
+        """The real read-only guarantee is the token GitHub hands the job, not
+        the absence of write code. Mandate §6: the book is append-only and never
+        rebalanced off-cadence — a chat message must not be able to reach it."""
+        p = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                         ".github", "workflows", "bot.yml")
+        wf = open(p).read()
+        assert "contents: read" in wf
+        assert "contents: write" not in wf
+
+    def test_replies_are_chunked_below_telegrams_limit(self):
+        """Telegram rejects a message over 4096 chars outright — the whole reply
+        vanishes rather than truncating. A 60-name book would hit that."""
+        m = self._mod()
+        assert m.CHUNK < 4096
