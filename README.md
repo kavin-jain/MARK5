@@ -282,6 +282,7 @@ late rather than lost.
 | `/sector` | where the money sits by industry, as a chart |
 | `/next` | when it next re-picks the stocks |
 | `/health` | the 25 integrity checks, on demand |
+| `/clear` | delete recent chat messages — the only command that changes anything, and only in Telegram |
 
 **Every command is read-only, and the workflow is granted `contents: read` to enforce
 it.** The book is an append-only record that is never rebalanced off-cadence (Mandate

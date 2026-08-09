@@ -1863,3 +1863,44 @@ class TestSectorChart:
         m = self._mod()
         cap = m.h_sector().caption
         assert "%" in cap and len(cap) <= 1024
+
+
+class TestClearCannotReachTheRecord:
+    """/clear is the one command that changes anything. It changes the Telegram
+    chat and nothing else — the workflow still grants `contents: read`, so the
+    ledger, the book and the NAV log remain unreachable from a chat message."""
+
+    @staticmethod
+    def _mod():
+        return TestTelegramBot._mod()
+
+    def test_it_is_bounded(self):
+        """An unbounded sweep would hammer Telegram's rate limit and could run
+        past the polling window."""
+        m = self._mod()
+        assert m.h_clear("999999").n <= 400
+        assert m.h_clear("-5").n >= 1
+        assert m.h_clear("").n == 100          # sane default with no argument
+
+    def test_it_returns_a_sweep_not_text(self):
+        """The message ids live in `handle`, not in the handler, so /clear cannot
+        delete anything by itself."""
+        m = self._mod()
+        assert isinstance(m.answer("/clear"), m.Sweep)
+
+    def test_a_sweep_without_a_message_id_does_nothing(self):
+        m = self._mod()
+        assert m._sweep("-100123", None, 10) is False
+
+    def test_the_workflow_still_cannot_write_to_the_repo(self):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        wf = open(os.path.join(root, ".github", "workflows", "bot.yml")).read()
+        assert "contents: read" in wf and "contents: write" not in wf
+
+    def test_help_no_longer_claims_everything_only_reads(self):
+        """The blanket claim stopped being true the moment /clear existed. A
+        disclosure that is 95% true is the kind this project treats as false."""
+        m = self._mod()
+        body = m.h_help()
+        assert "Everything here only reads" not in body
+        assert "/clear" in body

@@ -17,8 +17,8 @@ holds the message until the next run collects it, so nothing is ever lost —
 it is late, not dropped. Once a run has answered one command it stays awake
 (ACTIVE_EXIT below), so a real back-and-forth replies in about a second.
 
-EVERY COMMAND HERE IS READ-ONLY, AND THAT IS A DESIGN DECISION
----------------------------------------------------------------
+NOTHING HERE CAN TOUCH THE MONEY RECORD, AND THAT IS A DESIGN DECISION
+----------------------------------------------------------------------
 Mandate §6: the book is an append-only integrity record, never rebalanced
 off-cadence, never stamped with a mid-session price. A chat message is the
 single worst authorisation mechanism for a write to that record — it is one
@@ -26,12 +26,14 @@ fat-finger from a fill nobody scheduled, in a file whose entire value is that
 nothing unscheduled is in it. So the workflow that runs this grants
 `contents: read` and there is nothing here that could write even if it tried.
 
-Reading is a different question, and reading is genuinely useful. That is the
-whole of what this does.
+Reading is a different question, and reading is genuinely useful. That is
+almost the whole of what this does — the single exception is /clear, which
+deletes messages in the Telegram chat and cannot reach anything else.
 
   python3 scripts/bot.py            # one drain-and-reply pass, then exit
   python3 scripts/bot.py --serve    # the polling window the workflow runs
   python3 scripts/bot.py --dry      # print what it would answer, send nothing
+  python3 scripts/bot.py --say /why BHEL   # render one command locally
 """
 import argparse
 import html
@@ -927,13 +929,47 @@ def h_sector(arg=""):
     return Photo(buf.getvalue(), txt[:1024])
 
 
+class Sweep:
+    """A request to delete chat history. Carries no message ids of its own —
+    `handle` supplies them, because only it knows which message asked."""
+
+    def __init__(self, n):
+        self.n = n
+
+
+def h_clear(arg=""):
+    """Delete recent messages in this chat.
+
+    The Bot API has no "fetch history" call, so there is no list of what to
+    delete. Message ids within a chat are sequential integers, so the sweep walks
+    BACKWARDS from the id of the /clear message itself and asks Telegram to
+    delete each one. Ids that are not deletable simply fail and are counted.
+
+    That failure behaviour is the safety mechanism, not a workaround. Telegram
+    refuses to let a non-admin bot delete a message it did not send — so in a
+    group with other people in it, a plain bot removes only its own clutter and
+    cannot touch anyone else's messages, whatever number is passed. If the bot IS
+    made an admin with delete rights, the same sweep will remove EVERYTHING in
+    range, including other members' messages. The reply says which of those two
+    just happened rather than leaving it to be discovered.
+
+    Telegram also refuses to delete anything older than 48 hours.
+    """
+    try:
+        n = int((arg or "").strip())
+    except (TypeError, ValueError):
+        n = 100
+    return Sweep(max(1, min(n, 400)))
+
+
 def h_help(arg=""):
     out = ["WHAT YOU CAN ASK", "─" * W]
     out += [f"  /{n:<10} {d}" for n, d, _ in COMMANDS]
     out += ["",
-            "Everything here only reads. Nothing you type",
-            "can buy, sell, or change the record — that runs",
-            "on its own schedule and reports back.",
+            "Nothing you type can buy, sell, or change the",
+            "money record — that runs on its own schedule",
+            "and reports back. /clear is the one command",
+            "that changes anything, and only this chat.",
             "",
             "If a reply takes a few minutes, the bot was",
             "asleep. Nothing is lost; it answers on waking.",
@@ -948,6 +984,7 @@ COMMANDS = [
     ("why",      "Why a stock is held: /why BHEL",       h_why),
     ("ranking",  "What the rules rank highest today",    h_ranking),
     ("sector",   "Chart: which industries hold my money", h_sector),
+    ("clear",    "Delete recent messages: /clear 100",   h_clear),
     ("next",     "When it next re-picks the stocks",     h_next),
     ("health",   "Run the integrity checks now",         h_health),
     ("help",     "This list",                            h_help),
@@ -955,7 +992,7 @@ COMMANDS = [
 HANDLERS = {n: f for n, _, f in COMMANDS}
 ALIASES = {"status": "update", "pnl": "update", "money": "update",
            "start": "help", "positions": "holdings", "stocks": "holdings", "graph": "chart",
-           "rebalance": "next", "explain": "why", "top": "ranking", "scores": "ranking", "sectors": "sector", "division": "sector", "industry": "sector", "allocation": "sector"}
+           "rebalance": "next", "explain": "why", "top": "ranking", "scores": "ranking", "sectors": "sector", "division": "sector", "industry": "sector", "allocation": "sector", "clean": "clear"}
 
 
 # ── dispatch ─────────────────────────────────────────────────────────────
@@ -1023,6 +1060,51 @@ def reply(chat, body, dry=False):
         send("MARK6", body[i:i + CHUNK], chat=chat)
 
 
+def _sweep(chat, from_id, n, dry=False):
+    """Delete `n` message ids backwards from `from_id`, then report.
+
+    Deliberately reports rather than staying silent: a command that removes
+    things must say how many, or the owner cannot tell "nothing to delete" from
+    "the bot has no permission". The confirmation is itself sent AFTER the sweep
+    so it survives it.
+    """
+    if not from_id:
+        return False
+    if dry:
+        print(f"--- would sweep {n} ids back from {from_id} in {chat} ---")
+        return True
+
+    # Whether other people's messages are at risk depends entirely on this.
+    admin = False
+    try:
+        me = _api("getMe").get("result") or {}
+        st = (_api("getChatMember", chat_id=chat, user_id=me.get("id"))
+              .get("result") or {})
+        admin = bool(st.get("can_delete_messages"))
+    except RuntimeError:
+        pass
+
+    gone = 0
+    for mid in range(int(from_id), max(0, int(from_id) - n), -1):
+        try:
+            if (_api("deleteMessage", chat_id=chat, message_id=mid) or {}).get("ok"):
+                gone += 1
+        except RuntimeError:
+            pass                 # not ours, too old, or already gone — all fine
+        time.sleep(0.04)         # Telegram throttles bulk deletes
+
+    note = ("This bot is an ADMIN with delete rights, so that included messages "
+            "from everyone in this chat." if admin else
+            "Only this bot's own messages could be removed — Telegram protects "
+            "everyone else's, and anything older than 48 hours.")
+    try:
+        send("MARK6", f"Cleared {gone} message(s).\n{note}", chat=chat)
+    except Exception:                                        # noqa: BLE001
+        pass
+    print(f"  swept {gone} of {n} ids in {chat} (admin={admin})")
+    return True
+
+
 def handle(msg, dry=False):
     chat = str((msg.get("chat") or {}).get("id", ""))
     text = msg.get("text") or ""
@@ -1034,6 +1116,8 @@ def handle(msg, dry=False):
     body = answer(text)
     if body is None:
         return False
+    if isinstance(body, Sweep):
+        return _sweep(chat, msg.get("message_id"), body.n, dry)
     size = f"a {len(body.png)}-byte chart" if isinstance(body, Photo) else f"{len(body)} chars"
     print(f"  {chat} said {text.split()[0]!r} -> replying {size}")
     try:
