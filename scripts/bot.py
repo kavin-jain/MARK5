@@ -115,7 +115,7 @@ def _asof(L):
     return hist[-1]["date"] if hist else L.get("generated", "")[:10]
 
 
-def h_update():
+def h_update(arg=""):
     """The daily message, on demand. Same builder, so the answer to 'how is it
     going' is byte-identical whether it was pushed or pulled — two formatters
     would eventually disagree and the owner would have no way to know which
@@ -136,7 +136,7 @@ def _line(h):
             f"{_amt(h['pnl'], True):>9}{pct(h['pnl_pct'], 1):>7}")
 
 
-def h_holdings():
+def h_holdings(arg=""):
     """Split the passive sleeves out from the stocks, because a flat list of 22
     lines reads as "we hold 22 stocks" and the system holds 20. The other two are
     a whole sleeve each — one ETF standing in for gold, one for the Nasdaq-100 —
@@ -191,7 +191,7 @@ def h_holdings():
     return "\n".join(out)
 
 
-def h_next():
+def h_next(arg=""):
     """Ask paper_track the same question the scheduler asks it.
 
     Deliberately a subprocess to the exact command refresh.yml runs, rather than
@@ -234,7 +234,7 @@ def h_next():
     return "\n".join(out)
 
 
-def h_health():
+def h_health(arg=""):
     hp = health()
     out = ["SYSTEM CHECK", "─" * W]
     if hp["fails"] < 0:
@@ -278,7 +278,7 @@ class Photo:
         self.png, self.caption = png, caption
 
 
-def h_chart():
+def h_chart(arg=""):
     """The book against the index, as a picture.
 
     The daily message carries a 20-character sparkline, which answers "roughly
@@ -353,7 +353,149 @@ def h_chart():
     return Photo(buf.getvalue(), cap_txt)
 
 
-def h_help():
+SIGNALS = os.path.join(_ROOT, "data", "paper", "signals.json")
+
+FACTOR_PLAIN = {
+    "momentum":  "went up more than most",
+    "trend":     "went up steadily, not in one jump",
+    "low_vol":   "did not swing around wildly",
+    "stability": "behaved consistently",
+    "deliv_chg": "buyers took delivery, not day trades",
+}
+
+
+def _bar(p, n=8):
+    """A percentile as a bar. 0.87 needs converting in the reader's head; a bar
+    does not, and this is read on a phone by someone who is not a trader."""
+    return "█" * int(round((p or 0) * n)) + "░" * (n - int(round((p or 0) * n)))
+
+
+def _fundamentals(ticker):
+    """Basic company figures from a free third-party feed.
+
+    Fails OPEN and quietly. This is the only part of /why depending on a server
+    nobody here controls, and the reasoning above it must still render when that
+    server is down, rate-limited, or has renamed a field. Losing the whole
+    explanation because a supplementary block failed is the worse trade.
+    """
+    try:
+        import yfinance as yf
+        i = yf.Ticker(f"{ticker}.NS").info or {}
+    except Exception:                                        # noqa: BLE001
+        return []
+
+    def cr(v):
+        return f"Rs {_grp(f'{float(v) / 1e7:.0f}')} cr" if isinstance(v, (int, float)) else None
+
+    def num(v, nd=1):
+        return f"{float(v):.{nd}f}" if isinstance(v, (int, float)) else None
+
+    roe = i.get("returnOnEquity")
+    rows = [("sector", i.get("sector")),
+            ("market cap", cr(i.get("marketCap"))),
+            ("revenue 12m", cr(i.get("totalRevenue"))),
+            ("profit 12m", cr(i.get("netIncomeToCommon"))),
+            ("P/E", num(i.get("trailingPE"))),
+            ("price / book", num(i.get("priceToBook"))),
+            ("debt / equity", num(i.get("debtToEquity"))),
+            ("return on equity", num(roe * 100) + "%" if isinstance(roe, (int, float)) else None)]
+    rows = [(k, v) for k, v in rows if v]
+    if not rows:
+        return []
+    out = ["", "─" * W, "THE COMPANY ITSELF",
+           "  The system did NOT use any of this to",
+           "  choose the stock. It is here so a person",
+           "  can judge for themselves. Third-party",
+           "  figures, unverified by this system."]
+    return out + [f"  {k:<17}{str(v)[:20]:>{W - 19}}" for k, v in rows]
+
+
+def h_why(ticker=""):
+    """Why this stock is in the book — and what was never looked at.
+
+    The second half is not a disclaimer bolted onto the first. The ranking uses
+    five price and volume statistics and has never read a balance sheet, so a
+    reader who assumes the picks were vetted on the business is holding a view of
+    this book that is false. Saying so is the finding, not a caveat.
+    """
+    t = (ticker or "").strip().upper().replace(".NS", "")
+    L = _export()
+    held = {h["ticker"]: h for h in (L.get("holdings") or [])}
+    if not t:
+        return ("Name a stock — for example  /why " + (sorted(held)[0] if held else "BHEL")
+                + "\n\nHeld right now:\n  " + "  ".join(sorted(held)))
+
+    out = [f"WHY THE SYSTEM HOLDS {t}" if t in held else f"{t} — NOT HELD", "─" * W]
+    if t in held:
+        h = held[t]
+        try:
+            pos = json.load(open(BOOK)).get("positions", {}).get(t, {})
+        except (OSError, ValueError):
+            pos = {}
+        out += [f"  {'bought':<17}{str(pos.get('entry_date', '?')):>{W - 19}}",
+                f"  {'at':<17}{rs(pos.get('entry_price', 0)):>{W - 19}}",
+                f"  {'now':<17}{rs(h['price']):>{W - 19}}",
+                f"  {'worth':<17}{rs(h['value']):>{W - 19}}",
+                f"  {'made / lost':<17}{_amt(h['pnl'], True):>{W - 19}}"]
+
+    try:
+        sig = json.load(open(SIGNALS))
+    except (OSError, ValueError):
+        sig = None
+    sc = ((sig or {}).get("scores") or {}).get(t)
+
+    out += ["", "WHAT RANKED IT", "─" * W]
+    if not sc:
+        # Nothing invented. A rebuild of an old ranking does not return the old
+        # ranking — corporate actions adjust price history retroactively and the
+        # cross-sectional ranks move as names enter and leave the universe.
+        out += ["  No scores recorded for this name.",
+                "  The ranking is saved from each rebalance",
+                "  onward. Re-deriving an old one gives",
+                "  different numbers, so nothing is shown",
+                "  rather than something made up."]
+    else:
+        fw = sig.get("factor_weights") or {}
+        out += [f"  {'ranked':<17}{sc['rank']:>{W - 19}}"]
+        out += [f"  of {sig.get('n_eligible', '?')} stocks it was allowed to choose from",
+                ""]
+        for f, p in sorted((sc.get("factors") or {}).items(),
+                           key=lambda kv: -(fw.get(kv[0], 0))):
+            if p is None:
+                continue
+            out.append(f"  {f:<10}{fw.get(f, 0) * 100:>3.0f}%  {_bar(p)} {p * 100:>3.0f}%")
+            out.append(f"    {FACTOR_PLAIN.get(f, '')}")
+        out += ["", f"  Percentile against the other {sig.get('n_eligible', '?')} —",
+                "  higher is stronger. Weights show how",
+                "  much each one counted.",
+                "", f"  {sig.get('basis', 'basis not recorded')}"]
+
+    out += ["", "─" * W, "WHAT IT DID NOT LOOK AT",
+            "  profits · debt · revenue · valuation",
+            "  management · the business itself",
+            "  It has never read a balance sheet.",
+            "",
+            "  Company financials were tested on real",
+            "  12-year data across 98 companies and",
+            "  made results WORSE (research log K15).",
+            "  They help in flight-to-quality years and",
+            "  hurt in junk rallies — a bet on the",
+            "  regime, not on the company.",
+            "",
+            "HOW MUCH THIS ONE PICK MATTERS",
+            "  Little. The ranking is right slightly",
+            "  more often than a coin flip. The edge",
+            "  comes from holding 20 of them for",
+            "  months, not from this one being good."]
+    out += _fundamentals(t)
+    out += ["", "─" * W,
+            "Model portfolio. Simulated execution at live",
+            "market prices, net of costs and Indian tax.",
+            "Not investment advice.", PAGE]
+    return "\n".join(out)
+
+
+def h_help(arg=""):
     out = ["WHAT YOU CAN ASK", "─" * W]
     out += [f"  /{n:<10} {d}" for n, d, _ in COMMANDS]
     out += ["",
@@ -371,6 +513,7 @@ COMMANDS = [
     ("update",   "Where your money is right now",        h_update),
     ("holdings", "Every position, best to worst",        h_holdings),
     ("chart",    "A picture: you vs the index",          h_chart),
+    ("why",      "Why a stock is held: /why BHEL",       h_why),
     ("next",     "When it next re-picks the stocks",     h_next),
     ("health",   "Run the integrity checks now",         h_health),
     ("help",     "This list",                            h_help),
@@ -378,7 +521,7 @@ COMMANDS = [
 HANDLERS = {n: f for n, _, f in COMMANDS}
 ALIASES = {"status": "update", "pnl": "update", "money": "update",
            "start": "help", "positions": "holdings", "stocks": "holdings", "graph": "chart",
-           "rebalance": "next"}
+           "rebalance": "next", "explain": "why"}
 
 
 # ── dispatch ─────────────────────────────────────────────────────────────
@@ -395,11 +538,13 @@ def answer(text):
         return None
     cmd = word[1:].split("@", 1)[0].lower()      # /update@MARK5K_BOT in groups
     cmd = ALIASES.get(cmd, cmd)
+    rest = (text or "").strip().split(maxsplit=1)
+    arg = rest[1] if len(rest) > 1 else ""
     fn = HANDLERS.get(cmd)
     if fn is None:
         return f"No such command: /{cmd}\n\n" + h_help()
     try:
-        return fn()
+        return fn(arg)
     except Exception as e:                                   # noqa: BLE001
         # An exception here must reach the owner as words, not vanish into a CI
         # log they are not reading. Saying "it broke and here is why" is the

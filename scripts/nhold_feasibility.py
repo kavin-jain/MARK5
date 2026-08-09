@@ -91,7 +91,7 @@ def main():
     for n_hold, eq, label in cases:
         if n_hold not in built:
             pt.N_HOLD = n_hold
-            w_eq, asof, _ = pt.target_book()
+            w_eq, asof, _, _ = pt.target_book()
             built[n_hold] = (w_eq, asof)
         w_eq, asof = built[n_hold]
         # sorted() on a pandas Series iterates its VALUES, so this passed the

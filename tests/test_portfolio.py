@@ -1449,3 +1449,105 @@ class TestChartCommand:
         m = self._mod()
         dates, _ = m._series([{"date": "2026-07-22", "nav_inr": "100"}], "nav_inr")
         assert isinstance(dates[0], _dt.datetime)
+
+
+class TestCacheCoversHoldings:
+    """A rebalance must not run against a cache that cannot see what we own.
+
+    On 2026-08-09 the cache was missing RBLBANK, HFCL, AEROFLEX and NYKAA
+    entirely and had BHARATFORG two months stale. The existing freshness check
+    passed, because it tests the panel's NEWEST date — the maximum across all
+    names — which says nothing about breadth. A name the ranking cannot see is a
+    name it drops, and a dropped name is SOLD: 15 of 20 holdings would have been
+    liquidated, and the trade log would have read like 15 deliberate decisions.
+    """
+
+    @staticmethod
+    def _pt():
+        import sys
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path[:0] = [root, os.path.join(root, "scripts")]
+        import paper_track
+        return paper_track
+
+    @staticmethod
+    def _bars(days_old):
+        import pandas as pd
+        end = pd.Timestamp.today().normalize() - pd.Timedelta(days=days_old)
+        return pd.DataFrame({"close": [1.0, 2.0]},
+                            index=pd.DatetimeIndex([end - pd.Timedelta(days=1), end]))
+
+    def _run(self, cached, ages, book_names):
+        pt = self._pt()
+        keep = (pt.discover_tickers, pt.load_ohlcv)
+        pt.discover_tickers = lambda: list(cached)
+        pt.load_ohlcv = lambda t: self._bars(ages.get(t, 0)) if t in cached else None
+        try:
+            pt.assert_cache_covers_holdings({"positions": {n: {} for n in book_names}})
+            return None
+        except SystemExit as e:
+            return str(e)
+        finally:
+            pt.discover_tickers, pt.load_ohlcv = keep
+
+    def test_a_holding_absent_from_the_cache_stops_the_rebalance(self):
+        msg = self._run(cached=["AAA"], ages={}, book_names=["AAA", "BBB"])
+        assert msg and "BBB" in msg and "refusing" in msg.lower()
+
+    def test_a_stale_holding_stops_it_too(self):
+        msg = self._run(cached=["AAA", "BBB"], ages={"BBB": 60},
+                        book_names=["AAA", "BBB"])
+        assert msg and "BBB" in msg
+
+    def test_full_fresh_coverage_passes(self):
+        assert self._run(cached=["AAA", "BBB"], ages={}, book_names=["AAA", "BBB"]) is None
+
+    def test_sleeve_etfs_are_not_required_to_be_in_the_equity_cache(self):
+        """They are deliberately excluded from the equity universe, so demanding
+        them here would deadlock every rebalance permanently."""
+        pt = self._pt()
+        sleeve = sorted(pt.SLEEVES)[0]
+        assert self._run(cached=["AAA"], ages={}, book_names=["AAA", sleeve]) is None
+
+
+class TestWhyCommand:
+    @staticmethod
+    def _mod():
+        return TestTelegramBot._mod()
+
+    def test_it_never_claims_scores_it_does_not_have(self):
+        """Re-deriving an old ranking does not reproduce it — corporate actions
+        adjust price history retroactively and cross-sectional ranks move with
+        universe churn. A rebuild of the 2026-07-21 signal returned 5 of the 20
+        names actually picked. So absence must read as absence."""
+        m = self._mod()
+        body = m.h_why("BHEL")
+        if "No scores recorded" in body:
+            assert "made up" in body
+            for word in ("percentile", "█"):
+                assert word not in body, "claims a score it has not got"
+
+    def test_it_always_states_what_was_not_examined(self):
+        """The ranking uses five price/volume statistics and has never read a
+        balance sheet. A reader who assumes otherwise holds a false view of this
+        book, so this block is the finding — not a caveat that may be dropped."""
+        m = self._mod()
+        for t in ("BHEL", "RELIANCE", "NOTATICKER"):
+            body = m.h_why(t)
+            assert "never read a balance sheet" in body
+            assert "Not investment advice." in body
+
+    def test_a_name_we_do_not_hold_is_labelled_as_such(self):
+        m = self._mod()
+        assert "NOT HELD" in m.h_why("RELIANCE")
+
+    def test_no_argument_lists_what_is_held(self):
+        m = self._mod()
+        body = m.h_why("")
+        assert "/why" in body and "BHEL" in body
+
+    def test_fundamentals_fail_open(self):
+        """The only part of /why that depends on a server nobody here controls.
+        It must never take the explanation down with it."""
+        m = self._mod()
+        assert m._fundamentals("DEFINITELYNOTATICKER123") == []

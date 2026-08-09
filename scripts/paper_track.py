@@ -34,7 +34,8 @@ import pandas as pd
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, _ROOT)
-from core.portfolio import (DataPanel, discover_tickers, PortfolioConstructor,
+from core.portfolio import (DataPanel, discover_tickers, load_ohlcv,
+                            PortfolioConstructor,
                             ConstructionConfig, FactorLibrary, composite_score,
                             load_sector_map, load_delivery_factors)
 
@@ -253,6 +254,78 @@ def allocate(targets: dict, px: dict, capital: float) -> dict:
     return qty
 
 
+MAX_HOLDING_STALE_DAYS = 14
+
+
+def assert_cache_covers_holdings(book):
+    """Refuse to re-pick the book when the cache cannot see what we already own.
+
+    The existing freshness guard in `target_book` checks the PANEL's newest date —
+    the maximum across all names. That passes as long as any single ticker is
+    current, so it says nothing about breadth. On 2026-08-09 this cache was
+    missing RBLBANK, HFCL, AEROFLEX and NYKAA entirely and had BHARATFORG two
+    months stale, and the guard was perfectly happy.
+
+    Why that matters more at a rebalance than anywhere else: a name absent from
+    the cache cannot be ranked, so it is not in the target book, so the rebalance
+    SELLS it. Fifteen holdings would have been liquidated because a fetch failed —
+    and the trade log would read like fifteen deliberate decisions. A rebalance
+    driven by missing data is indistinguishable, after the fact, from one driven
+    by signal, which is what makes it worth stopping rather than warning about.
+
+    Declining is safe: the cadence is still due tomorrow, so a fixed cache simply
+    rebalances on the next session (the same contract the weekend and holiday
+    guards use).
+    """
+    cached = set(discover_tickers())
+    held = [t for t in book.get("positions", {}) if t not in SLEEVES]
+    today = pd.Timestamp.today().normalize()
+    absent, stale = [], []
+    for t in held:
+        if t not in cached:
+            absent.append(t)
+            continue
+        d = load_ohlcv(t)
+        if d is None or d.empty:
+            absent.append(t)
+        elif (today - d.index[-1].normalize()).days > MAX_HOLDING_STALE_DAYS:
+            stale.append(f"{t}({d.index[-1].date()})")
+    if absent or stale:
+        sys.exit(
+            f"ERROR: the price cache does not cover {len(absent) + len(stale)} of "
+            f"{len(held)} holdings — refusing to re-pick the book.\n"
+            f"  missing entirely : {', '.join(absent) or 'none'}\n"
+            f"  stale > {MAX_HOLDING_STALE_DAYS}d      : {', '.join(stale) or 'none'}\n"
+            f"  A name the cache cannot see is a name the ranking drops, and a "
+            f"dropped name is SOLD. Rebuild the cache and re-run; the cadence is "
+            f"still due on the next session.")
+
+
+def _num(x, nd=4):
+    """JSON-safe float. NaN and inf are not valid JSON and json.dump emits them
+    anyway, producing a file that every strict parser rejects."""
+    try:
+        f = float(x)
+    except (TypeError, ValueError):
+        return None
+    return round(f, nd) if f == f and abs(f) != float("inf") else None
+
+
+SIGNALS = os.path.join(_ROOT, "data", "paper", "signals.json")
+
+
+def write_signals(signals, basis):
+    """Persist the ranking that chose the book, with an explicit `basis` naming
+    where the numbers came from. The basis is not decoration: scores captured at
+    the rebalance ARE the reasoning; scores recomputed later merely describe how
+    the same name ranks today. Presenting the second as the first would be a
+    fabricated explanation, which is worse than no explanation."""
+    signals = dict(signals, basis=basis)
+    os.makedirs(os.path.dirname(SIGNALS), exist_ok=True)
+    json.dump(signals, open(SIGNALS, "w"), indent=1, allow_nan=False)
+    print(f"  wrote {SIGNALS}  ({len(signals['scores'])} names, {basis})")
+
+
 def target_book():
     """Today's deployed portfolio, from the same code path the backtest uses."""
     tickers = discover_tickers()
@@ -298,7 +371,27 @@ def target_book():
     comp = composite_score({f: pd.Series(v) for f, v in raw.items()}, cfg.factor_weights)
     w = PortfolioConstructor(cfg, sector_map=load_sector_map()).target_weights(
         comp, pd.Series(vol), [])
-    return w, asof, len(elig)
+
+    # Record WHY, not just what. These numbers chose the book and were previously
+    # dropped on the floor, which left "why do we hold this" answerable only by
+    # re-deriving them later — and a later re-derivation does NOT reproduce the
+    # original: corporate actions retroactively adjust price history and the
+    # cross-sectional ranks move as names enter and leave the universe. A rebuild
+    # of the 2026-07-21 signal returned 5 of the 20 names actually picked. So the
+    # reasoning has to be captured AT the decision or it is gone.
+    #
+    # Percentiles, not raw factor values. composite_score blends cross-sectional
+    # rank z-scores with higher always better, so a percentile is directly
+    # readable as "stronger than N% of the field" — whereas a raw momentum of
+    # 0.34 means nothing without the distribution it sat in.
+    pctl = {f: pd.Series(v).rank(pct=True) for f, v in raw.items()}
+    scores = {}
+    for i, (t, sc) in enumerate(comp.sort_values(ascending=False).items(), 1):
+        scores[t] = {"rank": i, "composite": _num(sc),
+                     "factors": {f: _num(pctl[f].get(t)) for f in raw}}
+    signals = {"asof": str(asof.date()), "n_eligible": len(elig),
+               "factor_weights": cfg.factor_weights, "scores": scores}
+    return w, asof, len(elig), signals
 
 
 def cmd_init(capital: float):
@@ -306,7 +399,9 @@ def cmd_init(capital: float):
         sys.exit(f"ERROR: {BOOK} already exists. Restarting the track record would erase a "
                  f"real history — if that is genuinely what you want, move the file aside "
                  f"manually and say so publicly.")
-    w_eq, asof, n_elig = target_book()
+    w_eq, asof, n_elig, signals = target_book()
+    write_signals(signals, f"recorded when the book was opened on "
+                           f"{pd.Timestamp.today().date()}")
     eq_frac = 1 - sum(SLEEVES.values())
     targets = {t: float(x) * eq_frac for t, x in w_eq.items()}
     targets.update(SLEEVES)
@@ -720,8 +815,9 @@ def cmd_rebalance(force=False):
               f"fills at a price nobody could have traded at. Will retry next session.")
         return
     reconcile_corporate_actions(book)
+    assert_cache_covers_holdings(book)
 
-    w_eq, asof, _ = target_book()
+    w_eq, asof, _, signals = target_book()
     eq_frac = 1 - sum(SLEEVES.values())
     targets = {t: float(x) * eq_frac for t, x in w_eq.items()}
     targets.update(SLEEVES)
@@ -845,6 +941,8 @@ def cmd_rebalance(force=False):
          "realised_pnl": realised, "tax_accrued": tax_accrued})
     json.dump(book, open(BOOK, "w"), indent=1)
     append_ledger(rows)
+    write_signals(signals, f"recorded at the {today} rebalance — these are the "
+                           f"numbers that chose this book")
     print(f"  REBALANCED {today}: {len(rows)} trades · realised P&L Rs {realised:+,.0f} · "
           f"tax accrued Rs {tax_accrued:,.0f} · cash Rs {cash:,.0f}")
 
@@ -858,6 +956,8 @@ def main():
     pr.add_argument("--force", action="store_true")
     pr.add_argument("--check", action="store_true",
                     help="print DUE/NOT-DUE from the book alone; touches no price data")
+    sub.add_parser("signals", help="recompute today's ranking and record it "
+                                   "(labelled as recomputed, not as the pick reasoning)")
     a = ap.parse_args()
     if a.cmd == "init":
         if not (0 < a.capital <= 1e12):
@@ -865,6 +965,20 @@ def main():
         cmd_init(a.capital)
     elif a.cmd == "status":
         cmd_status()
+    elif a.cmd == "signals":
+        # The live book was opened before any of this was recorded, so there is
+        # nothing to explain it with until the next rebalance. This fills the gap
+        # honestly: it answers "how does the system rank this name TODAY", which
+        # is a true statement and arguably the more useful one for anyone deciding
+        # now — but it is NOT why the name was bought, and the basis string says so.
+        # Same guard as the rebalance. A snapshot computed while names are missing
+        # would score the survivors against a field that accidentally lost its
+        # peers — a measurement artefact presented as the system's reasoning,
+        # which is worse than having no snapshot at all.
+        assert_cache_covers_holdings(json.load(open(BOOK)))
+        _, _, _, sig = target_book()
+        write_signals(sig, f"recomputed {pd.Timestamp.today().date()} — how these "
+                           f"names rank TODAY, not the numbers used to pick them")
     elif a.cmd == "rebalance":
         if a.check:
             cmd_rebalance_check()

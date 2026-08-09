@@ -832,10 +832,15 @@ Ranked by plausible edge × feasibility. Each: hypothesis → how to test → re
   user ever wants lower vol at the cost of ~4-5pp CAGR. Not a return edge.
 
 - **F3 — Quality factor.** 🟡 **promoter-level proxy TESTED → KILL (K11).** A *governance*
-  proxy (promoter holding level) adds nothing on top of the blend. **STILL OPEN:** true
-  *fundamental* quality (ROE / low debt / cash-flow stability) is untested — it needs
-  historical financial statements, which we do NOT have (the XBRL we fetched is shareholding,
-  not P&L/balance-sheet). Real frontier = find a free historical-fundamentals source first.
+  proxy (promoter holding level) adds nothing on top of the blend. **CLOSED — true
+  fundamental quality is TESTED → KILL (K15, 2026-06-08).** This line previously read
+  "STILL OPEN ... untested ... needs historical financial statements we do NOT have",
+  which K15 superseded: `fundamentals_quality_test.py` ran real 12-year fundamentals
+  (ROCE / low debt / FCF / earnings stability) across 98 tickers from indianapi.in and
+  every quality-weighted config failed walk-forward (−1 to −4.5pp, beats ≤5/8). Corrected
+  2026-08-09 — a stale "untested" here is exactly what makes someone re-run a KILL, which
+  Mandate §1 exists to prevent. **What remains open is K17, quality-as-a-SCREEN** (exclude
+  the bottom 30% rather than tilt toward the top), still blocked on API quota.
 
 - **F4 — Calendar / structural effects.** ✅ **TESTED → CLOSED (2026-06-11).** **[H]**
   `rebalance_date_sensitivity.py`: deployed config run from 13 staggered anchors
