@@ -43,12 +43,13 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from datetime import datetime
 
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_ROOT, "scripts"))
 
 from notify import (EXPORT, PAGE, _grp, build, health, pct,     # noqa: E402
-                    scrub, send)
+                    rs, scrub, send)
 
 BOOK = os.path.join(_ROOT, "data", "paper", "paper_book.json")
 
@@ -250,6 +251,108 @@ def h_health():
     return "\n".join(out)
 
 
+def _series(hist, key):
+    """(dates, values) for one series, blanks DROPPED and dates kept as datetimes.
+
+    Two bugs live here, both of which produce a chart that looks fine.
+
+    Validate before coercing: `bench_inr` is "" on days the benchmark had no
+    print, and float("" or 0) is 0.0 — which plots as a vertical crash to the
+    bottom of the axis on a chart whose entire job is the comparison.
+
+    Return datetimes, never the date STRINGS. Strings make matplotlib build a
+    CATEGORICAL axis ordered by first appearance across all plotted series. The
+    benchmark has no print on day one, so that date was missing from the
+    categories it established, got appended at the far RIGHT, and the NAV line
+    drew a phantom segment looping back to it.
+    """
+    pts = [(datetime.strptime(h["date"], "%Y-%m-%d"), h[key]) for h in hist
+           if str(h.get(key, "")).strip() not in ("", "None")]
+    return [p[0] for p in pts], [float(p[1]) for p in pts]
+
+
+class Photo:
+    """A reply that is an image rather than text."""
+
+    def __init__(self, png, caption):
+        self.png, self.caption = png, caption
+
+
+def h_chart():
+    """The book against the index, as a picture.
+
+    The daily message carries a 20-character sparkline, which answers "roughly
+    which way" and nothing else. The question this answers is the one actually
+    being asked — am I ahead of just buying the index, and by how much — and a
+    line pair answers it in less time than reading two numbers and subtracting.
+
+    matplotlib is imported here, not at module scope, so a broken or missing
+    plotting stack costs this one command instead of the whole bot.
+    """
+    import matplotlib
+    matplotlib.use("Agg")                        # no display on a CI runner
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import FuncFormatter
+
+    L = _export()
+    hist = L.get("nav_history") or []
+
+    # Validate BEFORE coercing. `bench_inr` is "" on days the benchmark had no
+    # print, and float("" or 0) silently becomes zero — which plots as a crash to
+    # the bottom of the axis on a chart whose whole job is to show a comparison.
+    d_nav, nav = _series(hist, "nav_inr")
+    d_ben, ben = _series(hist, "bench_inr")
+    if len(nav) < 2:
+        return "Not enough history to draw yet — it needs at least two marks."
+
+    cap = float(L["capital"])
+    fig, ax = plt.subplots(figsize=(8, 4.4), dpi=110)
+    fig.patch.set_facecolor("white")
+    ax.set_facecolor("white")
+
+    ax.axhline(cap, color="#b0b0b0", lw=1, ls=(0, (4, 3)), zorder=1)
+    if len(ben) > 1:
+        ax.plot(d_ben, ben, color="#9aa0a6", lw=1.6, zorder=2,
+                label="if you'd just bought the index")
+    up = nav[-1] >= cap
+    ax.plot(d_nav, nav, color="#1a7f37" if up else "#b3261e", lw=2.4, zorder=3,
+            label="your money")
+    ax.scatter([d_nav[-1]], [nav[-1]], s=34, zorder=4,
+               color="#1a7f37" if up else "#b3261e")
+    ax.annotate(rs(nav[-1]), (d_nav[-1], nav[-1]), textcoords="offset points",
+                xytext=(-6, 10), ha="right", fontsize=10, fontweight="bold",
+                color="#1a7f37" if up else "#b3261e")
+
+    ax.set_title(f"MARK6 · day {L['days_live']} · {pct(L['return_pct'])}",
+                 fontsize=12, loc="left", pad=12)
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: rs(v)))
+    # One label every ~6 marks: a tick per trading day is unreadable at phone size.
+    step = max(1, len(d_nav) // 6)
+    ax.set_xticks(d_nav[::step])
+    ax.set_xticklabels([d.strftime("%d %b") for d in d_nav[::step]], fontsize=8)
+    ax.tick_params(axis="y", labelsize=8)
+    for s in ("top", "right"):
+        ax.spines[s].set_visible(False)
+    ax.grid(axis="y", color="#ececec", lw=0.8)
+    ax.set_axisbelow(True)
+    ax.legend(frameon=False, fontsize=8, loc="upper left")
+    fig.tight_layout()
+
+    import io
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", facecolor="white")
+    plt.close(fig)
+
+    pnl = float(L["nav"]) - cap
+    cap_txt = (f"{'Profit' if pnl >= 0 else 'Loss'} {rs(pnl, True)} on {rs(cap)} "
+               f"since {L.get('start_date', '?')}.")
+    if L.get("benchmark_nav"):
+        cap_txt += (f" {'Ahead of' if float(L['nav']) >= float(L['benchmark_nav']) else 'Behind'}"
+                    f" the index by {float(L['relative_pct']):+.2f}pp.")
+    cap_txt += " Dotted line is what you put in. Model portfolio."
+    return Photo(buf.getvalue(), cap_txt)
+
+
 def h_help():
     out = ["WHAT YOU CAN ASK", "─" * W]
     out += [f"  /{n:<10} {d}" for n, d, _ in COMMANDS]
@@ -267,13 +370,14 @@ def h_help():
 COMMANDS = [
     ("update",   "Where your money is right now",        h_update),
     ("holdings", "Every position, best to worst",        h_holdings),
+    ("chart",    "A picture: you vs the index",          h_chart),
     ("next",     "When it next re-picks the stocks",     h_next),
     ("health",   "Run the integrity checks now",         h_health),
     ("help",     "This list",                            h_help),
 ]
 HANDLERS = {n: f for n, _, f in COMMANDS}
 ALIASES = {"status": "update", "pnl": "update", "money": "update",
-           "start": "help", "positions": "holdings", "stocks": "holdings",
+           "start": "help", "positions": "holdings", "stocks": "holdings", "graph": "chart",
            "rebalance": "next"}
 
 
@@ -303,7 +407,36 @@ def answer(text):
         return f"That command failed:\n  {scrub(e)}\n\nThe money record is untouched."
 
 
+def send_photo(chat, png, caption):
+    """sendPhoto needs multipart/form-data, which urllib will not build for us.
+    Hand-rolled rather than pulling in `requests` for one call."""
+    tok = os.environ["TELEGRAM_BOT_TOKEN"]
+    bnd = "----mark6" + os.urandom(12).hex()
+    body = b""
+    for k, v in (("chat_id", str(chat)), ("caption", caption[:1024])):
+        body += (f"--{bnd}\r\nContent-Disposition: form-data; "
+                 f'name="{k}"\r\n\r\n{v}\r\n').encode()
+    body += (f"--{bnd}\r\nContent-Disposition: form-data; name=\"photo\"; "
+             f'filename="nav.png"\r\nContent-Type: image/png\r\n\r\n').encode()
+    body += png + b"\r\n" + f"--{bnd}--\r\n".encode()
+    req = urllib.request.Request(
+        f"https://api.telegram.org/bot{tok}/sendPhoto", data=body,
+        headers={"Content-Type": f"multipart/form-data; boundary={bnd}"})
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            return json.loads(r.read().decode())
+    except Exception as e:                                   # noqa: BLE001
+        raise RuntimeError(scrub(e)) from None
+
+
 def reply(chat, body, dry=False):
+    if isinstance(body, Photo):
+        if dry:
+            print(f"--- would send a {len(body.png)}-byte chart to {chat} ---")
+            print(f"    caption: {body.caption}")
+            return
+        send_photo(chat, body.png, body.caption)
+        return
     if dry:
         print(f"--- would reply to {chat} ---\n{body}\n")
         return
@@ -322,7 +455,8 @@ def handle(msg, dry=False):
     body = answer(text)
     if body is None:
         return False
-    print(f"  {chat} said {text.split()[0]!r} -> replying {len(body)} chars")
+    size = f"a {len(body.png)}-byte chart" if isinstance(body, Photo) else f"{len(body)} chars"
+    print(f"  {chat} said {text.split()[0]!r} -> replying {size}")
     try:
         _api("sendChatAction", chat_id=chat, action="typing")
     except RuntimeError:
@@ -405,7 +539,14 @@ def main():
 
     if a.say:
         body = answer(a.say if a.say.startswith("/") else "/" + a.say)
-        print(body if body is not None else "(not a command — the bot would stay silent)")
+        if isinstance(body, Photo):
+            import tempfile
+            # Not the repo root — a preview is scratch, not an artifact.
+            out = os.path.join(tempfile.gettempdir(), "mark6_chart.png")
+            open(out, "wb").write(body.png)
+            print(f"wrote {out} ({len(body.png)} bytes)\n{body.caption}")
+        else:
+            print(body if body is not None else "(not a command — it would stay silent)")
         return
     if os.getenv("TELEGRAM_BOT_TOKEN"):
         register()

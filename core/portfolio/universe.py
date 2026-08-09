@@ -70,6 +70,27 @@ STRUCTURAL_EXCLUDE = {
     # the equity selection (LIQUIDBEES is ~cash: lowest vol -> inverse-vol would
     # massively overweight it and corrupt the book).
     "GOLDBEES", "LIQUIDBEES", "NIFTYBEES", "BANKBEES", "JUNIORBEES",
+    # MON100 and MAFANG were missing, and the omission was not visible: `_is_etf`
+    # matches the *BEES / *ETF naming convention, and neither of these follows it.
+    # ETF-ness is not derivable from an NSE symbol, so the list is the mechanism
+    # and anything absent from it is silently treated as a stock.
+    #
+    # What that cost: MON100 ranked FIRST of 194 eligible names in a rebuild of
+    # the 2026-07-21 signal. It is the Nasdaq-100 in rupees, so it scores high on
+    # momentum, trend, low-vol and stability at once — the exact composite this
+    # engine rewards. It will keep ranking near the top; this was not a fluke.
+    #
+    #   MON100 picked  -> `targets.update(SLEEVES)` overwrites its equity weight
+    #                     with the 25% sleeve weight. No double-holding, but the
+    #                     equity sleeve ships 19 names instead of 20 and is
+    #                     underweight by the discarded slot. Nothing says so.
+    #   MAFANG picked  -> not in SLEEVES, so nothing collapses it. The "Indian
+    #                     equity" sleeve buys a US mega-cap tech ETF, stacking
+    #                     undisclosed US exposure on top of the 25% Nasdaq sleeve.
+    #
+    # Both were in the recomputed top 20. The live book escaped it only because
+    # its 2026-07-26 ranking happened to differ.
+    "MON100", "MAFANG",
 }
 
 

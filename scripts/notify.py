@@ -50,6 +50,14 @@ _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXPORT = os.path.join(_ROOT, "data", "paper", "paper_export.json")
 PAGE = "https://kavinjain.in/mark6"
 
+# The worst peak-to-trough dip the deployed 50/25/25 book took across 2007-2026,
+# measured 2026-08-09 and disclosed on the page. Quoted whenever a live drawdown
+# is reported, so the live number always arrives next to the worst one known —
+# a dip is frightening in isolation and ordinary against its own history.
+# Shorter windows flatter it: the same book shows -23.78% over 2016-2026 only
+# because that window has no 2008 in it.
+BACKTEST_WORST_DD = -41.80
+
 BLOCKS = "▁▂▃▄▅▆▇█"
 
 
@@ -217,6 +225,95 @@ def build(L, hp):
             "Model portfolio. Simulated execution at live",
             "market prices, net of costs and Indian tax.",
             "Not investment advice.", PAGE]
+    return "\n".join(out)
+
+
+# ── the exceptional day ──────────────────────────────────────────────────
+# A message that looks identical every day stops being read. Three months in it
+# is wallpaper, and the one day it says something urgent it gets skimmed past
+# with the rest. So the routine message keeps its shape and an EXTRA one is sent
+# only when the day was genuinely unusual — that second message is what carries
+# the alarm, and its rarity is what makes it credible.
+
+BIG_MOVE_SIGMA = 3.0     # a move this many times a normal day's size
+MIN_OBS = 30             # ...measured from the book's own history once there is enough
+FALLBACK_DAILY_VOL = 0.86    # %, implied by the deployed book's ~13.6% annual vol
+MIN_MOVE_PCT = 1.0       # floor, so a becalmed book cannot alert on a rounding error
+DD_BAND = 5              # a new-low alert fires once per 5-point band...
+DD_FLOOR = 10            # ...and not at all until the book is this far down
+
+
+def alert(L):
+    """The second message, or None on an ordinary day.
+
+    The threshold is in units of the book's OWN daily volatility rather than a
+    fixed percentage, for two reasons. A fixed 2.5% is ~3 sigma for today's
+    50/25/25 book but nearly unreachable for January's four-sleeve version, which
+    is deliberately calmer — so a fixed number would quietly stop firing at the
+    exact moment the allocation changed. And "today was 3.6x a normal day" is a
+    sentence the owner can act on; "today was -2.7%" is not, without knowing what
+    normal looks like.
+    """
+    hist = L.get("nav_history") or []
+    navs = [float(h["nav_inr"]) for h in hist
+            if str(h.get("nav_inr", "")).strip() not in ("", "None")]
+    if len(navs) < 3:
+        return None
+    rets = [(navs[i] / navs[i - 1] - 1) * 100 for i in range(1, len(navs))]
+    today = rets[-1]
+
+    if len(rets) >= MIN_OBS:
+        mu = sum(rets) / len(rets)
+        sigma = (sum((r - mu) ** 2 for r in rets) / (len(rets) - 1)) ** 0.5
+    else:
+        sigma = FALLBACK_DAILY_VOL
+    sigma = max(sigma, 1e-9)
+
+    # Current drawdown, and yesterday's, each against the peak known AT THE TIME.
+    # Comparing today's dip to a peak that had not happened yet would invent
+    # crossings that never occurred.
+    dd_now = (navs[-1] / max(navs) - 1) * 100
+    dd_prev = (navs[-2] / max(navs[:-1]) - 1) * 100
+    band = lambda d: int(-d // DD_BAND) * DD_BAND            # noqa: E731
+    new_low = band(dd_now) > band(dd_prev) and -dd_now >= DD_FLOOR
+
+    big = abs(today) >= max(BIG_MOVE_SIGMA * sigma, MIN_MOVE_PCT)
+    if not (big or new_low):
+        return None
+
+    nav, cap = float(L["nav"]), float(L["capital"])
+    move_rs = nav - nav / (1 + today / 100)
+    out = []
+    if big:
+        out += [f"{'BIG UP DAY' if today > 0 else 'BIG DOWN DAY'}  {pct(today)}",
+                "─" * W,
+                _row("moved today", rs(move_rs, True)),
+                _row("worth now", rs(nav)),
+                f"  about {abs(today) / sigma:.1f}x a normal day"]
+    if new_low:
+        peak = max(navs)
+        out += ([""] if out else []) + [
+            f"NEW LOW  {pct(dd_now, 1)} below its peak", "─" * W,
+            _row("below the peak", rs(nav - peak, True)),
+            _row("still ahead of cost", rs(nav - cap, True))]
+
+    # The paragraph that matters. This message arrives on precisely the day the
+    # owner is most likely to want to do something, and the research log says
+    # every version of "do something" tested worse: six separate approaches died
+    # for cutting exposure after a loss, because Indian equity's drift is positive
+    # and its recoveries are V-shaped, so forward expected return is HIGHEST
+    # exactly when those rules sell. Saying so here is not reassurance, it is the
+    # finding.
+    out += ["", "WHAT HAPPENS NOW", "─" * W,
+            "  Nothing. No trade was made and none is",
+            "  scheduled — the book is only re-picked on",
+            "  its cadence, whatever the day did.",
+            "",
+            f"  The 19-year test dipped {pct(BACKTEST_WORST_DD, 1, False)} at its",
+            "  worst and recovered. Every version of this",
+            "  system that cut exposure after a loss scored",
+            "  worse, because the rebound is what pays.",
+            "", "─" * W, PAGE]
     return "\n".join(out)
 
 
@@ -425,6 +522,17 @@ def main():
         return
     print(f"\n  notify: sent via {via}" if via else
           "\n  notify: no channel configured (set TELEGRAM_BOT_TOKEN+TELEGRAM_CHAT_ID or NTFY_TOPIC)")
+
+    # Sent AFTER the daily message and only on an unusual day, so it lands last
+    # and reads as the exception it is. Failure here must not disturb anything
+    # above it — the mark is recorded, the routine message is already delivered.
+    extra = alert(L)
+    if extra:
+        print("\n" + extra)
+        try:
+            send(f"MARK6 alert: {pct(float(L['return_pct']))} overall", extra)
+        except (urllib.error.URLError, urllib.error.HTTPError, OSError, RuntimeError) as e:
+            print(f"  notify: alert delivery FAILED ({scrub(e)})", file=sys.stderr)
 
 
 if __name__ == "__main__":

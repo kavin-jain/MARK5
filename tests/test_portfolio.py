@@ -1312,3 +1312,140 @@ class TestTelegramBot:
         vanishes rather than truncating. A 60-name book would hit that."""
         m = self._mod()
         assert m.CHUNK < 4096
+
+
+class TestEquityUniverseExcludesSleeveETFs:
+    """The sleeve ETFs must never be rankable as stocks.
+
+    `_is_etf` matches the *BEES / *ETF naming convention; MON100 and MAFANG follow
+    neither, so both sat in the equity universe reading as ordinary companies.
+    MON100 ranked FIRST of 194 names in a rebuild of the 2026-07-21 signal — it is
+    the Nasdaq-100 in rupees and scores high on momentum, trend, low-vol and
+    stability simultaneously, which is exactly what the composite rewards.
+    """
+
+    @staticmethod
+    def _u():
+        import sys
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from core.portfolio.universe import STRUCTURAL_EXCLUDE, discover_tickers
+        return discover_tickers, STRUCTURAL_EXCLUDE
+
+    SLEEVE_ETFS = {"GOLDBEES", "MON100", "MAFANG", "LTGILTBEES",
+                   "NIFTYBEES", "LIQUIDBEES", "BANKBEES", "JUNIORBEES"}
+
+    def test_no_sleeve_etf_reaches_the_equity_universe(self):
+        discover, _ = self._u()
+        leaked = self.SLEEVE_ETFS & set(discover())
+        assert not leaked, f"ETFs rankable as stocks: {sorted(leaked)}"
+
+    def test_the_pinned_fallback_is_filtered_too(self):
+        """CI has no price cache, so discover_tickers() falls back to the pinned
+        list — a path that never calls _is_etf and is filtered ONLY by
+        STRUCTURAL_EXCLUDE. Fixing the predicate alone would have left CI, which
+        is where the unattended January rebalance runs, still exposed."""
+        import json as _json
+        _, exclude = self._u()
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        pinned = set(_json.load(
+            open(os.path.join(root, "config", "universe_tickers.json")))["tickers"])
+        assert (pinned & self.SLEEVE_ETFS) <= exclude, (
+            f"pinned list smuggles {sorted((pinned & self.SLEEVE_ETFS) - exclude)}")
+
+    def test_the_excluded_etfs_are_still_priceable(self):
+        """Excluding them from SELECTION must not make them unpriceable — they are
+        held sleeves and the book cannot be marked without them."""
+        import sys
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from core.portfolio.universe import load_ohlcv
+        if load_ohlcv("GOLDBEES") is None:
+            import pytest
+            pytest.skip("no price cache in this environment")
+        for etf in ("GOLDBEES", "MON100"):
+            assert load_ohlcv(etf) is not None, f"{etf} became unpriceable"
+
+
+class TestExceptionalDayAlert:
+    """The extra message sent only on an unusual day. What is tested is that it
+    stays silent when it should, does not nag, and never suggests acting."""
+
+    @staticmethod
+    def _mod():
+        return TestDailyNotification._mod()
+
+    @staticmethod
+    def _book(navs, cap=500000.0):
+        return {"nav": navs[-1], "capital": cap, "return_pct": (navs[-1] / cap - 1) * 100,
+                "nav_history": [{"date": f"2026-07-{i + 1:02d}", "nav_inr": str(v)}
+                                for i, v in enumerate(navs)]}
+
+    def test_an_ordinary_day_says_nothing(self):
+        """The whole value of this message is its rarity. One false alarm a week
+        and it becomes the daily message it was built to rescue."""
+        m = self._mod()
+        assert m.alert(self._book([500000, 502000, 503000])) is None
+
+    def test_a_big_move_fires_and_sizes_itself(self):
+        m = self._mod()
+        body = m.alert(self._book([500000, 520000, 501800]))
+        assert "BIG DOWN DAY" in body and "x a normal day" in body
+
+    def test_a_new_low_fires_once_per_band_not_daily(self):
+        """A long slide would otherwise alert every single day, which is how an
+        alarm gets muted precisely during the drawdown it exists for."""
+        m = self._mod()
+        crossed = self._book([500000, 560000, 505000, 503000])
+        assert "NEW LOW" in m.alert(crossed)
+        assert m.alert(self._book([500000, 560000, 505000, 503000, 502000])) is None
+
+    def test_a_shallow_dip_is_not_called_a_new_low(self):
+        m = self._mod()
+        assert m.alert(self._book([500000, 510000, 505000, 504000])) is None
+
+    def test_the_alert_never_suggests_acting(self):
+        """This message arrives on the day the owner is most likely to want to do
+        something, and the research log records six separate approaches that died
+        for cutting exposure after a loss. Telling them to sit still is the
+        finding, not reassurance — so it is asserted, not left to wording."""
+        m = self._mod()
+        body = m.alert(self._book([500000, 520000, 501800]))
+        assert "Nothing." in body
+        assert str(abs(m.BACKTEST_WORST_DD)) in body
+        for word in ("sell", "reduce", "exit", "consider"):
+            assert word not in body.lower(), f"the alert suggests {word!r}"
+
+
+class TestChartCommand:
+    @staticmethod
+    def _mod():
+        return TestTelegramBot._mod()
+
+    def test_it_returns_a_real_png(self):
+        m = self._mod()
+        p = m.h_chart()
+        assert isinstance(p, m.Photo)
+        assert p.png[:8] == b"\x89PNG\r\n\x1a\n", "not a PNG"
+        assert len(p.png) > 5000
+
+    def test_the_caption_fits_telegrams_limit(self):
+        """sendPhoto silently rejects a caption over 1024 characters."""
+        m = self._mod()
+        assert len(m.h_chart().caption) <= 1024
+
+    def test_a_blank_print_is_dropped_not_zeroed(self):
+        """float("" or 0) is 0.0, which plots as a vertical crash to the bottom of
+        a chart whose entire job is the comparison."""
+        m = self._mod()
+        hist = [{"date": "2026-07-22", "nav_inr": "100", "bench_inr": ""},
+                {"date": "2026-07-23", "nav_inr": "101", "bench_inr": "99"}]
+        dates, vals = m._series(hist, "bench_inr")
+        assert vals == [99.0] and len(dates) == 1
+        assert 0.0 not in vals
+
+    def test_dates_are_datetimes_not_strings(self):
+        """Strings make matplotlib build a categorical axis ordered by first
+        appearance, which drew a phantom segment looping back to day one."""
+        import datetime as _dt
+        m = self._mod()
+        dates, _ = m._series([{"date": "2026-07-22", "nav_inr": "100"}], "nav_inr")
+        assert isinstance(dates[0], _dt.datetime)
