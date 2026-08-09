@@ -101,7 +101,11 @@ def fetch_day(d: pd.Timestamp) -> str:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--start", default="2016-01-01")
-    ap.add_argument("--end", default="2026-06-09")
+    # Resolved at RUN TIME, never frozen in source. A hardcoded end date is what
+    # silently rotted the price cache to 61 days stale: the constant stopped
+    # moving while the calendar did, so every later run re-fetched to the same
+    # frozen day and reported success.
+    ap.add_argument("--end", default=str(pd.Timestamp.today().date()))
     ap.add_argument("--workers", type=int, default=8)
     args = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)

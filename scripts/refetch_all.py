@@ -131,7 +131,35 @@ def main():
             fail += 1; failed.append(t)
         if (i + 1) % 25 == 0:
             print(f"  {i+1}/{len(tickers)}  ok={ok} fail={fail}", flush=True)
-        time.sleep(0.15)
+        # 0.15s drew a ~16% failure rate from Yahoo — "possibly delisted" for names
+        # like AMBUJACEM and ATUL that are plainly listed. That is throttling, not
+        # delisting, and it is indistinguishable from the real thing downstream: a
+        # throttled name is simply absent, and an absent name gets SOLD at the next
+        # rebalance. Twice a year, a slower fetch that finishes is worth far more
+        # than a fast one that lies.
+        time.sleep(0.4)
+
+    # Second pass over the failures, slower. Most are throttling, and throttling
+    # clears. Without this an unattended January run would hand a knowingly
+    # incomplete cache to the one rebalance that matters.
+    if failed:
+        print(f"\n  retrying {len(failed)} failures more slowly ...", flush=True)
+        again = []
+        for t in failed:
+            try:
+                nd = normalize(yf.download(f"{t}.NS", start=START, end=END,
+                                           auto_adjust=True, progress=False,
+                                           threads=False))
+                if nd is None:
+                    again.append(t)
+                else:
+                    nd.reset_index().to_parquet(os.path.join(CACHE, f"{t}_daily.parquet"))
+                    ok += 1; fail -= 1
+            except Exception:                                # noqa: BLE001
+                again.append(t)
+            time.sleep(2.0)
+        failed = again
+        print(f"  after retry: ok={ok} fail={fail}", flush=True)
     # refresh the multi-asset sleeves (excluded from discover_tickers as ETFs)
     for etf in ("GOLDBEES", "MON100", "LIQUIDBEES"):
         try:

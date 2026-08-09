@@ -40,6 +40,26 @@ jobs:
           case "$OUT" in DUE*) echo "due=true" >> "$GITHUB_OUTPUT";;
                          *)    echo "due=false" >> "$GITHUB_OUTPUT";; esac
 
+      - name: Find out what is actually listed (rebalance days only)
+        if: steps.due.outputs.due == 'true'
+        # data/bhavcopy/ is gitignored, so a CI runner has NONE of it. Without
+        # this step refetch_all's new-listing lookup finds no bhavcopy, returns an
+        # empty set, and silently falls back to "whatever was already cached" —
+        # which is the exact decay this was built to stop. The fix worked on a
+        # laptop and was a no-op in the one place it matters.
+        #
+        # Only the last two weeks are needed: this answers "what is trading NOW",
+        # not "what traded in 2016". The full archive is for point-in-time
+        # backtests and is rebuilt separately when research needs it.
+        #
+        # continue-on-error: missing new listings for one cycle is a real cost but
+        # a small one; failing here would strand the rebalance AND the day's mark.
+        continue-on-error: true
+        run: |
+          python scripts/fetch_bhavcopy.py \
+            --start "$(date -u -d '15 days ago' +%Y-%m-%d)" \
+            --end "$(date -u +%Y-%m-%d)"
+
       - name: Rebuild the price cache (rebalance days only)
         if: steps.due.outputs.due == 'true'
         # config/universe_tickers.json is the pinned name list, committed for
