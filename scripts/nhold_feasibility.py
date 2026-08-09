@@ -52,8 +52,17 @@ REPORTS = os.path.join(_ROOT, "reports")
 MIN_SHARES = 3
 
 
-def assess(tgt, px, capital):
-    q = pt.allocate(tgt, px, capital)
+def assess(tgt, px, capital, sleeves=None):
+    """tgt = EQUITY targets only; sleeves = the ETF legs.
+
+    allocate() must see the WHOLE book. Handed only the equity slice — weights
+    summing to 0.25 — it treats the other 75% as unspent residual and pours it
+    back into those same names. The first run of this script reported Rs 224k
+    invested against a Rs 130k budget and zero unaffordable names, i.e. exactly
+    the opposite of the effect being measured. The sleeves are excluded from the
+    statistics afterwards: they are two cheap ETFs and were never the question.
+    """
+    q = pt.allocate({**tgt, **(sleeves or {})}, px, capital)
     zero = [t for t in tgt if q.get(t, 0) == 0]
     thin = [t for t in tgt if 0 < q.get(t, 0) < MIN_SHARES]
     err = sum(abs(q.get(t, 0) * px[t] / capital - w) for t, w in tgt.items()) * 100
@@ -85,9 +94,14 @@ def main():
             w_eq, asof, _ = pt.target_book()
             built[n_hold] = (w_eq, asof)
         w_eq, asof = built[n_hold]
-        px = pt.live_prices(sorted(w_eq))
-        tgt = {t: float(x) * eq for t, x in w_eq.items() if t in px}
-        a = assess(tgt, px, nav)
+        # sorted() on a pandas Series iterates its VALUES, so this passed the
+        # weights themselves as ticker symbols and yfinance dutifully looked up
+        # "0.0335.NS". Build the target dict first, then price ITS keys.
+        want = {t: float(x) * eq for t, x in w_eq.items()}
+        sl = {k: (1 - eq) / len(pt.SLEEVES) for k in pt.SLEEVES}
+        px = pt.live_prices(sorted(set(want) | set(sl)))
+        tgt = {t: w for t, w in want.items() if t in px}
+        a = assess(tgt, px, nav, {k: v for k, v in sl.items() if k in px})
         res["configs"][label.split()[0]] = {"n_hold": n_hold, "equity_frac": eq,
                                             "asof": str(asof.date()), **a,
                                             "dropped": [[p, t] for p, t in a["dropped"]]}
@@ -114,12 +128,15 @@ def main():
     print("  WHAT CAPITAL WOULD n_hold=60 NEED?  (25% equity sleeve)")
     print("=" * 78)
     w_eq, _ = built[60]
-    px = pt.live_prices(sorted(w_eq))
-    tgt = {t: float(x) * 0.25 for t, x in w_eq.items() if t in px}
+    want60 = {t: float(x) * 0.25 for t, x in w_eq.items()}
+    sl60 = {k: 0.75 / len(pt.SLEEVES) for k in pt.SLEEVES}
+    px = pt.live_prices(sorted(set(want60) | set(sl60)))
+    tgt = {t: w for t, w in want60.items() if t in px}
+    sl60 = {k: v for k, v in sl60.items() if k in px}
     res["capital_ladder"] = {}
     print(f"  {'capital':>14}{'zero-share names':>20}{'weight error':>15}")
     for cap in (5e5, 1e6, 2.5e6, 5e6, 1e7, 2.5e7):
-        a = assess(tgt, px, cap)
+        a = assess(tgt, px, cap, sl60)
         res["capital_ladder"][f"{cap:.0f}"] = {k: a[k] for k in
                                                ("n_zero", "n_thin", "weight_err_pp")}
         print(f"  Rs {cap/1e5:>9,.1f}L{a['n_zero']:>16} / {a['n_target']}"

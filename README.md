@@ -6,7 +6,7 @@
 
 *Built not to claim an edge, but to find out — rigorously — whether one exists.*
 
-`PAPER MODE ONLY` · `Net of Indian tax & costs` · `Survivorship-free universe` · `Walk-forward validated`
+`MODEL PORTFOLIO · SIMULATED EXECUTION` · `Net of Indian tax & costs` · `Survivorship-free universe` · `Walk-forward validated`
 
 [![CI](https://github.com/kavin-jain/MARK5/actions/workflows/ci.yml/badge.svg)](https://github.com/kavin-jain/MARK5/actions/workflows/ci.yml)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20619267-blue)](https://doi.org/10.5281/zenodo.20619267)
@@ -70,7 +70,7 @@ India exempts the first **₹1.25 lakh of long-term equity gain per year** (Sec 
 | Total capital | Net CAGR | Excess Sharpe |
 |---|---:|---:|
 | Scale-free (the headline above) | +21.83% | 1.13 |
-| **₹5,00,000 — the live paper book** | **+21.8%** | **1.01** |
+| **₹5,00,000 — the live model portfolio** | **+21.8%** | **1.01** |
 | ₹25,00,000 | +21.3% | 0.98 |
 | ₹5,00,00,000 (institutional) | +21.2% | 0.97 |
 
@@ -193,11 +193,77 @@ Most hypotheses in this project **failed**, and the kill list is the point. Full
 ✅ **Kept after validation:** multi-factor smart beta · fiscal-year tax netting · semi-annual momentum refresh · gold + US diversification · rank-transformed factor scoring · enforced sector caps · largest-remainder share allocation · Sec 112A exemption modelling · leakage defences.
 🟡 **Deployed but PROVISIONAL:** `deliv_chg` @10% — strong portfolio evidence, insignificant IC, six years of history. Labelled as such everywhere.
 
+**2026-08-09 — four more results, all negative, all on the deployed config over 19 years**
+(`scripts/cadence_and_filter_sweep.py`, `scripts/ownership_signal_study.py`):
+
+| Question | Swept | Verdict |
+|---|---|---|
+| How often to rebalance? | 21 / 42 / 63 / **126** / 189 / 252 / 378 / 504 bars | Nothing clears the bar. Best challenger wins 12 of 17 rolling windows against a required 13. |
+| How wide a universe? | top 100 / 200 / **300** / 500 / 800 by liquidity | **Withdrawn — measurement error.** The apparent +4.75pp for 800 names is microcaps trading ₹1 lakh/day in 2013, booked at closing prices. |
+| Same question, honestly | absolute floors of ₹1 / 3 / 5 / 10 / 25 cr per day | No floor beats the top-300 cut. Best wins 9 of 17. |
+| Does institutional flow predict returns? (**K7 re-test**) | Δ holding, cross-sectional, orthogonal to momentum | Residual IC **−0.0179 (t −0.70)** against a pre-registered bar of 0.03 and t 3.0. Fails both; sign is negative. |
+
+The K7 re-test matters beyond its own answer: the original kill was reached with a
+**pooled** Spearman across all tickers and dates, which is not an information coefficient
+— IC is cross-sectional by construction — and it was scored on **raw** IC rather than IC
+orthogonal to the momentum the book already owns. Both errors flatter a "no edge" finding.
+The verdict is unchanged; it now rests on evidence rather than on a mis-specified statistic.
+
+The universe sweep is the cautionary one. A rank cut is not a fixed standard: the 500th
+most liquid NSE name traded ₹0.01cr/day in 2013 and ₹11.50cr/day in 2026. Widening it
+buys names nobody could have filled, and the backtest fills them anyway. Caught before it
+was recommended, which is the only reason it appears here as a note rather than a defect.
+
+**`n_hold` 20 → 60 was staged for January and is now declined.** The breadth sweep is real
+(IR 0.365 → 0.433) but its t-statistic is **1.90**, under this project's own 3.0 bar and
+under even the conventional 2.0. It also collides with the four-sleeve allocation: 25%
+equity across 60 names is ~₹2,166 a position at this book's size, and six current holdings
+cost more than that for a *single share*. The allocator would silently drop what it cannot
+afford, tilting the book toward low-priced shares — an arbitrary, untested, undisclosed
+bet. The breadth evidence comes from a scale-free NAV-unit backtest where fractional
+shares are implicit; whole shares exist only in the live book. **Deployed value stays 20.**
+
 **Two previously-logged "wins" were overturned by better data**, and both corrections are recorded rather than quietly dropped:
 - **`n_hold=12`** was validated on the survivor-only cache and is **falsified on the honest universe** — 1/8 walk-forward windows, −5.42pp. Concentration is only safe when the universe cannot contain names that die. The deployed book holds **20**.
 - **Rebalance tranching** is real (+2.7pp, 6/8 on every metric) but requires 60 whole-share slots ≈ **₹1.55cr**. It is not executable at ₹5 lakh, and the capital-efficient variant fails (MaxDD −55%, worse than baseline).
 
 **One validated result was deliberately declined.** Risk parity (~29% equity / 45% gold / 26% US) scores Sharpe 0.99, MaxDD −17.9%, Calmar 1.11, with better drawdown in **8/8** windows — derived using only the covariance matrix, so it cannot be return-chasing. It was **not deployed** because it would cut the Indian equity sleeve to 29%, and MARK6 is intended to be an Indian stock-market system. Logged as *validated and declined*, not *falsified*.
+
+---
+
+## It runs itself
+
+As of 2026-08-09 the system requires no human step between the market closing and the
+owner being told what happened. This mattered enough to build because the failure it
+prevents had already happened: the daily refresh stopped on 4–5 August and nobody
+noticed for two days, because nothing in the system had ever spoken first.
+
+| Every trading day, 17:00 IST | |
+|---|---|
+| 1. Cadence check | Is a rebalance due? Answered from the book alone — no price data touched |
+| 2. Rebalance *(due days only)* | Rebuilds the price cache, re-picks the book, books the fills |
+| 3. Mark to market | Real closing prices, appended to a record that is never rewritten |
+| 4. Commit | Runs **before** the health check — recording is unconditional, judging comes after |
+| 5. Health check | 24 invariants; the run goes red if any fail |
+| 6. Message | Plain-English Telegram summary — **sends even when the checks fail** |
+| 7. Dead-man's switch | Pings an external monitor, which alerts if a day is ever missed |
+
+Three guards exist because each protects against a specific way this goes wrong unattended:
+
+- **Trading holidays.** The price fetcher returns the last available bar without saying
+  *when* it was, so on Diwali it hands back Friday's close as today's. The weekday check
+  catches Saturday and Sunday and nothing else. The rebalance now asks the index when the
+  market last actually traded, and declines otherwise. Declining cannot deadlock — the
+  cadence is still due on the next session.
+- **The missing cache.** `data/cache` is gitignored (61 MB), so a CI runner has never had
+  it. The rebalance would have passed silently every day until January and then died on
+  the one day it fired. `config/universe_tickers.json` is pinned and committed for exactly
+  this reason: it lets a cacheless runner rank the book against the same opportunity set
+  the book was opened with.
+- **Silence.** Every guard above is code that must *execute* to protect anything, and
+  GitHub disables scheduled workflows in public repos after 60 days of inactivity. So the
+  liveness signal is inverted and moved outside GitHub — absence of a daily ping becomes
+  the alarm, rather than the failure.
 
 ---
 
@@ -277,14 +343,14 @@ Every quantitative claim in this README is emitted by one of these scripts. Noth
 - [`reports/trade_ledger.csv`](reports/trade_ledger.csv) — every simulated trade, committed
 - [`reports/OVERFITTING_ANALYSIS.md`](reports/OVERFITTING_ANALYSIS.md) — DSR & PBO
 - [`docs/RESEARCH_LOG.md`](docs/RESEARCH_LOG.md) — every hypothesis, verdict and evidence grade
-- **Live paper track record:** [kavinjain.in/mark6](https://kavinjain.in/mark6) · [`data/paper/`](data/paper/) (append-only)
+- **Live track record:** [kavinjain.in/mark6](https://kavinjain.in/mark6) · [`data/paper/`](data/paper/) (append-only)
 
 ---
 
 ## Honest disclaimers
 
-- **PAPER MODE ONLY.** This has never traded real money. By its own rule it must track its backtest for 6–12 months before anyone considers funding it. The live record is currently **15 days old** and means nothing yet.
-- **The equity sleeve's honest max drawdown is −40%** (−54% at matched historical breadth). The multi-asset wrapper reduces the deployed system to −24%, but this book is volatile and you must be able to hold it.
+- **MODEL PORTFOLIO, SIMULATED EXECUTION.** This has never traded real money. By its own rule it must track its backtest for 6–12 months before anyone considers funding it. The live record is currently **16 days old** and means nothing yet.
+- **The drawdowns are severe and are the main reason to say no.** The equity sleeve's honest max drawdown is **−40%** on the 2016-2026 window and **−72%** across 2007-2026, which includes 2008. The four-sleeve wrapper cuts the deployed system to **−17%** — on ₹5,00,000 that is still watching ₹4,15,000 on the screen for months. Nobody should hold the equity sleeve alone, and the wrapper is what makes the rest holdable. That is a load-bearing fact, not a nicety.
 - **Excess Sharpe 1.13 is strong-institutional tier, not hedge-fund tier.** It rose from 0.97 on 2026-08-06 purely by removing two measurement errors (exit tax inside the return series; split-adjusted price times raw volume in the liquidity screen) — no strategy change. See RESEARCH_LOG 5b.
 - **The stock-selection alpha is not statistically significant** once known factors are controlled for (t = 1.61).
 - **The newest factor (`deliv_chg`) is provisional**: strong portfolio evidence over six post-2020 years, an insignificant underlying IC, and an effect size larger than theory explains. The system's demonstrated strengths are factor harvesting, tax discipline and diversification.
