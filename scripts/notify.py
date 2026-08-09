@@ -199,6 +199,12 @@ def build(L, hp):
         out += [f"    ✗ {c}" for c in hp["failing"][:6]]
     elif hp["fails"] < 0:
         out += ["", "⚠ SYSTEM  the health check itself did not run", f"    {hp['failing'][0][:70]}"]
+    elif hp["n"] == 0:
+        # Zero checks run is NOT zero checks failed. The old wording rendered this
+        # as "all 0 checks passed", which reads as reassurance and is the exact
+        # inversion this notifier exists to prevent: nothing ran, and the message
+        # said everything was fine.
+        out += ["", "SYSTEM  not checked on this run"]
     else:
         out += ["", f"SYSTEM  all {hp['n']} checks passed"
                     + (f", {hp['warns']} warning(s)" if hp["warns"] else "")]

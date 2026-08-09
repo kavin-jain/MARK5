@@ -1184,3 +1184,11 @@ class TestDailyNotification:
         """Most days book nothing. An empty 'THE SYSTEM REBALANCED' heading would
         train the reader to ignore the one that matters."""
         assert "REBALANCED" not in self._mod().build(self.BOOK, self.OK)
+
+    def test_zero_checks_never_reads_as_a_pass(self):
+        """Zero checks RUN is not zero checks FAILED. The fallback wording rendered
+        'all 0 checks passed', which is reassurance about something that never
+        happened — the precise inversion this notifier exists to prevent."""
+        body = self._mod().build(self.BOOK, {"n": 0, "fails": 0, "warns": 0, "failing": []})
+        assert "0 checks passed" not in body, body
+        assert "not checked" in body, body
