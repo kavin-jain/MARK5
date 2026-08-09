@@ -1768,3 +1768,98 @@ class TestRankingIsNotTheBook:
             import pytest
             pytest.skip("no signals file")
         assert body.count("\n") < 90
+
+
+class TestFundUnitsNeverRankAsStocks:
+    """Fund units must be excluded structurally, not by name.
+
+    Name matching failed three times running. `_is_etf` catches *BEES / *ETF;
+    MON100 and MAFANG follow neither and were added by hand; then HDFCGOLD,
+    HDFCSILVER, TATSILV and LIQUIDCASE turned up in the eligible universe the
+    same way. Each fix was one more name, and the next listing needed another.
+
+    ISIN is the real distinction: Indian equity shares are INE..., fund and ETF
+    units are INF.... LIQUIDCASE — a cash fund — scored 100th percentile on BOTH
+    low-volatility and stability, and inverse-vol sizing hands the steadiest name
+    the most money.
+    """
+
+    @staticmethod
+    def _u():
+        import sys
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        from core.portfolio.universe import discover_tickers, fund_units
+        return discover_tickers, fund_units
+
+    def test_isin_detection_finds_the_fund_units(self):
+        _, funds = self._u()
+        f = funds()
+        if not f:
+            import pytest
+            pytest.skip("no bhavcopy in this environment")
+        for etf in ("GOLDBEES", "MON100", "HDFCGOLD", "LIQUIDCASE"):
+            assert etf in f, f"{etf} not detected as a fund unit"
+        for share in ("RELIANCE", "BHEL", "LAURUSLABS"):
+            assert share not in f, f"{share} wrongly flagged as a fund"
+
+    def test_no_fund_unit_reaches_the_equity_universe(self):
+        discover, funds = self._u()
+        leaked = set(discover()) & funds()
+        assert not leaked, f"fund units rankable as stocks: {sorted(leaked)}"
+
+    def test_the_eligible_universe_is_all_equities(self):
+        import json as _json
+        _, funds = self._u()
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        p = os.path.join(root, "data", "paper", "signals.json")
+        if not os.path.exists(p) or not funds():
+            import pytest
+            pytest.skip("no signals or no bhavcopy")
+        scored = set(_json.load(open(p))["scores"])
+        assert not (scored & funds()), sorted(scored & funds())
+
+
+class TestSectorCapCanActuallyBind:
+    """The sector cap is enforced ONLY for names carrying a label; unmapped names
+    are treated as their own sector and escape it. Coverage is therefore not
+    cosmetic — it decides whether the control runs. It was 270/300, with the gaps
+    concentrated in the top 20 (7 of them), so the cap was switching itself off
+    for the highest-scoring names while the config still advertised it."""
+
+    def test_coverage_of_the_eligible_universe_is_high(self):
+        import json as _json
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sp = os.path.join(root, "data", "paper", "signals.json")
+        if not os.path.exists(sp):
+            import pytest
+            pytest.skip("no signals file")
+        scored = list(_json.load(open(sp))["scores"])
+        sec = _json.load(open(os.path.join(root, "config", "sector_map.json")))["sectors"]
+        missing = [t for t in scored if t not in sec]
+        assert len(missing) / len(scored) < 0.05, (
+            f"{len(missing)}/{len(scored)} unlabelled — the sector cap is off for "
+            f"those: {missing[:10]}")
+
+    def test_the_map_is_refreshed_before_every_rebalance(self):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        wf = open(os.path.join(root, ".github", "workflows", "refresh.yml")).read()
+        assert "fetch_sector_map.py" in wf
+        assert wf.index("fetch_sector_map.py") < wf.index("paper_track.py rebalance\n")
+
+
+class TestSectorChart:
+    @staticmethod
+    def _mod():
+        return TestTelegramBot._mod()
+
+    def test_it_returns_a_real_png(self):
+        m = self._mod()
+        p = m.h_sector()
+        assert isinstance(p, m.Photo) and p.png[:8] == b"\x89PNG\r\n\x1a\n"
+
+    def test_unlabelled_holdings_are_named_not_hidden(self):
+        """An unlabelled name also escapes the sector cap, so folding it silently
+        into a bucket would imply a control that is not running."""
+        m = self._mod()
+        cap = m.h_sector().caption
+        assert "%" in cap and len(cap) <= 1024

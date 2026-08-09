@@ -91,6 +91,10 @@ STRUCTURAL_EXCLUDE = {
     # Both were in the recomputed top 20. The live book escaped it only because
     # its 2026-07-26 ranking happened to differ.
     "MON100", "MAFANG",
+    # Reached the eligible universe by the same route and found the same way.
+    # Kept as a named fallback for when no bhavcopy is present; `fund_units()`
+    # is what catches these, and every future one, structurally.
+    "HDFCGOLD", "HDFCSILVER", "TATSILV", "LIQUIDCASE",
 }
 
 
@@ -102,11 +106,17 @@ def load_sector_map() -> dict:
     script passed one, so the configured 30% sector cap never executed — the
     control was advertised in the config and absent from the book.
 
-    Coverage is 268/300 (89%) of the live eligible universe. Unmapped names are
-    treated as their own sector and therefore escape the cap; that is the
-    conservative behaviour and it is NOT patched by guessing a label, because
-    inventing sector data to make a control look complete is exactly the kind of
-    fabrication this project refuses elsewhere.
+    Unmapped names are treated as their own sector and therefore ESCAPE the cap,
+    so coverage is not cosmetic — it decides whether the control runs at all. On
+    2026-08-09 coverage was 270/300, and the 30 gaps were concentrated where they
+    did most damage: 7 of the top 20, three of them capital-goods names. The cap
+    was switching itself off for the highest-scoring stocks while the config still
+    advertised it.
+
+    scripts/fetch_sector_map.py now refreshes this from NSE's own index
+    constituent files before every rebalance. Labels are never invented to make
+    the control look complete — an unmapped name stays unmapped and stays outside
+    the cap, which is at least honest about what is not being enforced.
     """
     p = os.path.join(_ROOT, "config", "sector_map.json")
     if not os.path.exists(p):
@@ -118,6 +128,49 @@ def load_sector_map() -> dict:
 
 def _is_etf(name: str) -> bool:
     return name.upper().endswith("BEES") or name.upper().endswith("ETF")
+
+
+_FUND_UNITS: set | None = None
+
+
+def fund_units() -> set:
+    """Every NSE symbol that is a FUND unit rather than an equity share.
+
+    Read from ISIN, which is the actual structural distinction and not a naming
+    convention: Indian equity shares are INE..., mutual-fund and ETF units are
+    INF.... 329 of the 2,685 symbols in a daily bhavcopy are INF.
+
+    This exists because name matching kept failing, one instrument at a time.
+    `_is_etf` catches the *BEES / *ETF convention; MON100 and MAFANG follow
+    neither and had to be added by hand. Then HDFCGOLD, HDFCSILVER, TATSILV and
+    LIQUIDCASE turned up in the eligible universe by the same route. Each fix was
+    a name, and the next ETF to list would have needed another one.
+
+    What that costs is not cosmetic. LIQUIDCASE is a liquid fund: it scored 100th
+    percentile on BOTH low-volatility and stability. Inverse-vol sizing gives the
+    steadiest name the most money, so a cash fund reaching the top of the ranking
+    — which is exactly what happens when a crash inverts momentum — would be
+    bought in size by the equity sleeve. HDFCGOLD is the gold sleeve again, at an
+    undisclosed extra weight.
+
+    Fails OPEN: with no bhavcopy this returns empty and the name-based
+    STRUCTURAL_EXCLUDE still applies. A CI runner fetches bhavcopy immediately
+    before the rebalance for exactly this reason.
+    """
+    global _FUND_UNITS
+    if _FUND_UNITS is not None:
+        return _FUND_UNITS
+    _FUND_UNITS = set()
+    try:
+        import glob as _glob
+        raw = sorted(_glob.glob(os.path.join(_ROOT, "data", "bhavcopy", "raw", "*.parquet")))
+        if raw:
+            df = pd.read_parquet(raw[-1])
+            _FUND_UNITS = {str(s).upper() for s, i in zip(df["symbol"], df["isin"])
+                           if str(i).upper().startswith("INF")}
+    except Exception:                                        # noqa: BLE001
+        _FUND_UNITS = set()
+    return _FUND_UNITS
 
 
 def _norm(name: str) -> str:
@@ -179,7 +232,9 @@ def discover_tickers() -> list[str]:
             import json
             with open(pinned) as f:
                 names = set(json.load(f)["tickers"])
-    return sorted(names - STRUCTURAL_EXCLUDE)
+    # One guard, where the equity universe is decided, so every caller is
+    # covered rather than each learning the rule separately.
+    return sorted(names - STRUCTURAL_EXCLUDE - fund_units())
 
 
 NIFTY_DIV_YIELD = 0.013   # long-run Nifty 50 dividend yield used to approximate TRI

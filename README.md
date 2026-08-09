@@ -267,10 +267,21 @@ Three guards exist because each protects against a specific way this goes wrong 
 
 ### Asking it questions
 
-The daily message is push. `scripts/bot.py` is the pull side: `/update`, `/holdings`,
-`/next`, `/health` answered in Telegram, on a 10-minute cron because this system has no
-server to host a webhook on. A first command after a quiet period waits for the next
-window; Telegram queues it, so it is answered late rather than lost.
+The daily message is push. `scripts/bot.py` is the pull side, answered in Telegram on a
+10-minute cron because this system has no server to host a webhook on. A first command
+after a quiet period waits for the next window; Telegram queues it, so it is answered
+late rather than lost.
+
+| | |
+|---|---|
+| `/update` | where the money is now — the daily message on demand |
+| `/holdings` | every position, stocks separated from the whole-sleeve ETFs |
+| `/chart` | the book against the index, as an image |
+| `/why BHEL` | a position note: entry, contribution in bps, score out of 100, how the size was set, when it would be sold, and what the model never examined |
+| `/ranking` | what the rules rank highest today, and how often that ranking has beaten the field |
+| `/sector` | where the money sits by industry, as a chart |
+| `/next` | when it next re-picks the stocks |
+| `/health` | the 25 integrity checks, on demand |
 
 **Every command is read-only, and the workflow is granted `contents: read` to enforce
 it.** The book is an append-only record that is never rebalanced off-cadence (Mandate

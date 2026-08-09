@@ -852,6 +852,81 @@ def h_ranking(arg=""):
     return "\n".join(out)
 
 
+def h_sector(arg=""):
+    """Where the money actually sits, by industry — as a chart.
+
+    Concentration is the risk a holdings list hides. Twenty names reads as
+    diversified right up until you notice eleven of them are capital goods, and
+    nobody spots that by scanning tickers. This is the one view that answers "how
+    exposed am I to one thing", so it is drawn rather than tabulated.
+
+    The passive sleeves are shown as their own slices, not folded into equity:
+    gold and the Nasdaq are the diversification, so hiding them inside a single
+    "portfolio" bar would misstate exactly what the chart exists to show.
+    """
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    L = _export()
+    holdings = L.get("holdings") or []
+    if not holdings:
+        return "No positions yet."
+    nav = float(L["nav"])
+    sleeve_label = {}
+    for r in (L.get("sleeves") or {}).get("rows") or []:
+        if r.get("passive") and r.get("n_holdings") == 1:
+            sleeve_label[round(float(r["value_inr"]), 2)] = r["label"]
+
+    buckets, unlabelled = {}, []
+    for h in holdings:
+        lbl = sleeve_label.get(round(float(h["value"]), 2))
+        if lbl is None:
+            lbl = SECTORS.get(h["ticker"])
+            if lbl is None:
+                # Named, never silently bundled: an unlabelled name also escapes
+                # the sector cap, so the chart must not imply it is accounted for.
+                unlabelled.append(h["ticker"])
+                lbl = "unclassified"
+        buckets[lbl] = buckets.get(lbl, 0.0) + float(h["value"])
+    rows = sorted(buckets.items(), key=lambda kv: -kv[1])
+
+    fig, ax = plt.subplots(figsize=(8, max(3.2, 0.42 * len(rows) + 1.4)), dpi=110)
+    fig.patch.set_facecolor("white")
+    ax.set_facecolor("white")
+    labels = [r[0][:28] for r in rows][::-1]
+    vals = [r[1] for r in rows][::-1]
+    colours = ["#1a7f37" if r[0] in sleeve_label.values() else
+               ("#c2410c" if r[0] == "unclassified" else "#2563eb") for r in rows][::-1]
+    ax.barh(labels, vals, color=colours, height=0.68)
+    for i, v in enumerate(vals):
+        ax.text(v + nav * 0.008, i, f"{v / nav * 100:.1f}%  {rs(v)}",
+                va="center", fontsize=8.5)
+    ax.set_xlim(0, max(vals) * 1.34)
+    ax.set_title(f"Where the money sits  ·  {rs(nav)}  ·  {_asof(L)}",
+                 fontsize=12, loc="left", pad=12)
+    ax.set_xticks([])
+    for s in ("top", "right", "bottom"):
+        ax.spines[s].set_visible(False)
+    ax.tick_params(axis="y", labelsize=9, length=0)
+    fig.tight_layout()
+
+    import io
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", facecolor="white")
+    plt.close(fig)
+
+    top = rows[0]
+    cap = "  ".join(f"{k} {v / nav * 100:.0f}%" for k, v in rows[:4])
+    txt = (f"Biggest single exposure: {top[0]} at {top[1] / nav * 100:.1f}% "
+           f"({rs(top[1])}).\n{cap}")
+    if unlabelled:
+        txt += (f"\n{len(unlabelled)} holding(s) have no industry label "
+                f"({', '.join(unlabelled[:4])}) — those also escape the sector cap.")
+    txt += "\nGreen = whole-sleeve funds. Model portfolio."
+    return Photo(buf.getvalue(), txt[:1024])
+
+
 def h_help(arg=""):
     out = ["WHAT YOU CAN ASK", "─" * W]
     out += [f"  /{n:<10} {d}" for n, d, _ in COMMANDS]
@@ -872,6 +947,7 @@ COMMANDS = [
     ("chart",    "A picture: you vs the index",          h_chart),
     ("why",      "Why a stock is held: /why BHEL",       h_why),
     ("ranking",  "What the rules rank highest today",    h_ranking),
+    ("sector",   "Chart: which industries hold my money", h_sector),
     ("next",     "When it next re-picks the stocks",     h_next),
     ("health",   "Run the integrity checks now",         h_health),
     ("help",     "This list",                            h_help),
@@ -879,7 +955,7 @@ COMMANDS = [
 HANDLERS = {n: f for n, _, f in COMMANDS}
 ALIASES = {"status": "update", "pnl": "update", "money": "update",
            "start": "help", "positions": "holdings", "stocks": "holdings", "graph": "chart",
-           "rebalance": "next", "explain": "why", "top": "ranking", "scores": "ranking"}
+           "rebalance": "next", "explain": "why", "top": "ranking", "scores": "ranking", "sectors": "sector", "division": "sector", "industry": "sector", "allocation": "sector"}
 
 
 # ── dispatch ─────────────────────────────────────────────────────────────

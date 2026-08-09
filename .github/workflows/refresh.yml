@@ -60,6 +60,17 @@ jobs:
             --start "$(date -u -d '15 days ago' +%Y-%m-%d)" \
             --end "$(date -u +%Y-%m-%d)"
 
+      - name: Refresh the sector labels (rebalance days only)
+        if: steps.due.outputs.due == 'true'
+        # The sector cap is enforced ONLY for names that carry a label; unmapped
+        # names are treated as their own sector and escape it entirely. The map
+        # was built by hand once and never refreshed, so every company listed
+        # since was unlabelled by construction — 7 of the top 20 on 2026-08-09.
+        # A risk control that silently switches off for the best-scoring names is
+        # worse than none, because the config still says it is on.
+        continue-on-error: true
+        run: python scripts/fetch_sector_map.py
+
       - name: Rebuild the price cache (rebalance days only)
         if: steps.due.outputs.due == 'true'
         # config/universe_tickers.json is the pinned name list, committed for
