@@ -1683,3 +1683,50 @@ class TestNoInventedSessions:
         src = open(os.path.join(root, "scripts", "paper_track.py")).read()
         assert "sess = last_session_date()" in src
         assert "if today not in seen" not in src, "back to keying on the calendar"
+
+
+class TestScoreBaseRate:
+    """The score's base rate must never read as a forecast.
+
+    The owner asked for "how much the system thinks this will grow in 6 months".
+    That number does not exist — the engine ranks, and an IC near 0.10 explains
+    under 1% of any single name's return. What CAN be stated is what stocks at a
+    given score historically DID, and the spread is the whole point: the top band
+    returned +12.8% at the median while 34% of those names still lost money. A
+    median shown without that is worse than showing nothing.
+    """
+
+    @staticmethod
+    def _mod():
+        return TestTelegramBot._mod()
+
+    def test_the_loss_rate_is_always_shown_with_the_median(self):
+        m = self._mod()
+        block = m._what_the_score_has_meant(95)
+        if not block:
+            import pytest
+            pytest.skip("score_meaning.json not built in this environment")
+        text = "\n".join(block)
+        assert "LOST MONEY" in text
+        assert "still lost money" in text
+        assert "not a prediction" in text
+
+    def test_it_never_promises_a_return(self):
+        m = self._mod()
+        text = "\n".join(m._what_the_score_has_meant(95) or ["skip"])
+        for word in ("will grow", "expected return", "target", "forecast"):
+            assert word not in text.lower(), f"reads as a forecast: {word!r}"
+
+    def test_a_high_score_does_not_claim_a_low_loss_rate(self):
+        """Sanity on the data itself: even the best band loses money often. If
+        this ever reads under 20% the study has been mis-measured."""
+        import json as _json
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        p = os.path.join(root, "reports", "score_meaning.json")
+        if not os.path.exists(p):
+            import pytest
+            pytest.skip("study not built")
+        d = _json.load(open(p))
+        top = d["bands"]["90-100"]
+        assert top["pct_negative"] > 20, "implausibly low loss rate — check the study"
+        assert top["p25"] < 0, "a quarter of top-scored names should still be down"

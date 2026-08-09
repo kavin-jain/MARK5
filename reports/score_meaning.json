@@ -1,0 +1,85 @@
+{
+ "window": "2019-11-01 to 2026-07-21",
+ "horizon_bars": 126,
+ "evaluation_dates": 74,
+ "step_bars": 21,
+ "independent_periods": 12.3,
+ "factor_weights": {
+  "momentum": 0.45,
+  "low_vol": 0.15,
+  "trend": 0.25,
+  "stability": 0.15,
+  "deliv_chg": 0.1
+ },
+ "bands": {
+  "0-20": {
+   "n": 4440,
+   "median": 6.83,
+   "p25": -9.68,
+   "p75": 28.32,
+   "worst_decile": -23.9,
+   "best_decile": 58.15,
+   "pct_negative": 40.1
+  },
+  "20-40": {
+   "n": 4440,
+   "median": 8.61,
+   "p25": -6.99,
+   "p75": 27.35,
+   "worst_decile": -20.38,
+   "best_decile": 52.7,
+   "pct_negative": 35.8
+  },
+  "40-60": {
+   "n": 4440,
+   "median": 8.48,
+   "p25": -7.08,
+   "p75": 28.4,
+   "worst_decile": -19.78,
+   "best_decile": 53.7,
+   "pct_negative": 36.4
+  },
+  "60-80": {
+   "n": 4440,
+   "median": 10.36,
+   "p25": -6.69,
+   "p75": 32.24,
+   "worst_decile": -20.34,
+   "best_decile": 59.82,
+   "pct_negative": 34.1
+  },
+  "80-90": {
+   "n": 2220,
+   "median": 9.69,
+   "p25": -7.44,
+   "p75": 34.89,
+   "worst_decile": -21.43,
+   "best_decile": 63.68,
+   "pct_negative": 36.1
+  },
+  "90-100": {
+   "n": 2220,
+   "median": 12.75,
+   "p25": -7.02,
+   "p75": 38.51,
+   "worst_decile": -22.66,
+   "best_decile": 73.7,
+   "pct_negative": 33.9
+  }
+ },
+ "top20_actually_bought": {
+  "n": 1480,
+  "median": 13.57,
+  "p25": -6.38,
+  "p75": 39.11,
+  "worst_decile": -21.48,
+  "best_decile": 75.91,
+  "pct_negative": 32.3
+ },
+ "caveats": [
+  "Windows OVERLAP: dates step 21 bars but returns span 126, so these are not independent observations. `independent_periods` is the honest count.",
+  "Single-name returns, GROSS of costs and tax. The book pays both.",
+  "This is what stocks at a score DID, not what any stock WILL do. The spread between p25 and p75 is the point.",
+  "Survivorship: names are those cached today, so companies that delisted during the window are under-represented and these figures are therefore optimistic."
+ ]
+}

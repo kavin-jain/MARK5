@@ -510,6 +510,50 @@ def bought_on(ticker):
         return None
 
 
+SCORE_MEANING = os.path.join(_ROOT, "reports", "score_meaning.json")
+
+
+def _what_the_score_has_meant(score):
+    """What stocks at this score ACTUALLY did over the next six months.
+
+    This is the honest form of "how much will it grow". The engine ranks; it does
+    not forecast, and its information coefficient explains under 1% of any single
+    name's return, so a per-stock growth number would be fabricated. A base rate
+    with its spread is the same question answered with evidence.
+
+    The spread is the point, and it is why this block leads with the median and
+    then immediately undercuts it. Stocks in the top band returned +12.8% at the
+    median — and 34% of them still lost money. A reader shown only the median
+    would take away the exact opposite of what the data says.
+    """
+    try:
+        d = json.load(open(SCORE_MEANING))
+    except (OSError, ValueError):
+        return []
+    band = next((k for k in d.get("bands", {})
+                 if len(k.split("-")) == 2
+                 and float(k.split("-")[0]) < score <= float(k.split("-")[1])), None)
+    b = (d.get("bands") or {}).get(band)
+    if not b:
+        return []
+    return ["", "─" * W, f"WHAT A SCORE OF {band} HAS MEANT",
+            f"  Over the SIX MONTHS after scoring this,",
+            f"  across {b['n']:,} historical cases:", "",
+            _kv("typical (middle)", pct(b["median"], 1)),
+            _kv("a quarter did worse", pct(b["p25"], 1)),
+            _kv("a quarter did better", pct(b["p75"], 1)),
+            _kv("LOST MONEY", f"{b['pct_negative']:.0f}% of them"),
+            "",
+            f"  {d.get('evaluation_dates', '?')} measurement dates, about "
+            f"{d.get('independent_periods', '?')}",
+            "  genuinely independent six-month periods.",
+            "",
+            "  This is what stocks at this score DID.",
+            "  It is not a prediction about this one, and",
+            f"  {b['pct_negative']:.0f}% of them still lost money.",
+            "  Gross of costs and tax; the book pays both."]
+
+
 def _sizing(L, h):
     """Why this position is this size.
 
@@ -694,6 +738,8 @@ def h_why(ticker=""):
         out += ["", f"  Each is out of 100 against the other {n}.",
                 "  The percentage is how much it counted.",
                 "", f"  {sig.get('basis', 'basis not recorded')}"]
+        if top is not None:
+            out += _what_the_score_has_meant(top)
 
     if t in held:
         out += _sizing(L, held[t])

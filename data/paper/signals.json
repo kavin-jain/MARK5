@@ -1,0 +1,3314 @@
+{
+ "asof": "2026-08-07",
+ "n_eligible": 300,
+ "factor_weights": {
+  "momentum": 0.45,
+  "low_vol": 0.15,
+  "trend": 0.25,
+  "stability": 0.15,
+  "deliv_chg": 0.1
+ },
+ "scores": {
+  "CPPLUS": {
+   "rank": 1,
+   "composite": 1.3032,
+   "factors": {
+    "momentum": 0.9867,
+    "low_vol": 0.21,
+    "trend": 0.98,
+    "stability": 0.9967,
+    "deliv_chg": 0.9565
+   }
+  },
+  "GRANULES": {
+   "rank": 2,
+   "composite": 1.2934,
+   "factors": {
+    "momentum": 0.9367,
+    "low_vol": 0.74,
+    "trend": 0.8533,
+    "stability": 0.9766,
+    "deliv_chg": 0.7023
+   }
+  },
+  "STLTECH": {
+   "rank": 3,
+   "composite": 1.2465,
+   "factors": {
+    "momentum": 0.9967,
+    "low_vol": 0.0167,
+    "trend": 0.9967,
+    "stability": 0.9833,
+    "deliv_chg": 1.0
+   }
+  },
+  "LAURUSLABS": {
+   "rank": 4,
+   "composite": 1.225,
+   "factors": {
+    "momentum": 0.9,
+    "low_vol": 0.6533,
+    "trend": 0.9533,
+    "stability": 0.9666,
+    "deliv_chg": 0.5452
+   }
+  },
+  "BHARATFORG": {
+   "rank": 5,
+   "composite": 1.2215,
+   "factors": {
+    "momentum": 0.9133,
+    "low_vol": 0.7,
+    "trend": 0.85,
+    "stability": 0.9599,
+    "deliv_chg": 0.6722
+   }
+  },
+  "SANSERA": {
+   "rank": 6,
+   "composite": 1.1985,
+   "factors": {
+    "momentum": 0.97,
+    "low_vol": 0.1733,
+    "trend": 0.9733,
+    "stability": 0.9866,
+    "deliv_chg": 0.786
+   }
+  },
+  "HFCL": {
+   "rank": 7,
+   "composite": 1.1623,
+   "factors": {
+    "momentum": 0.98,
+    "low_vol": 0.06,
+    "trend": 0.99,
+    "stability": 0.9632,
+    "deliv_chg": 0.7893
+   }
+  },
+  "FEDERALBNK": {
+   "rank": 8,
+   "composite": 1.1556,
+   "factors": {
+    "momentum": 0.8833,
+    "low_vol": 0.86,
+    "trend": 0.81,
+    "stability": 0.9732,
+    "deliv_chg": 0.4381
+   }
+  },
+  "NYKAA": {
+   "rank": 9,
+   "composite": 1.1319,
+   "factors": {
+    "momentum": 0.8267,
+    "low_vol": 0.7567,
+    "trend": 0.79,
+    "stability": 0.8863,
+    "deliv_chg": 0.9532
+   }
+  },
+  "KTKBANK": {
+   "rank": 10,
+   "composite": 1.1105,
+   "factors": {
+    "momentum": 0.8367,
+    "low_vol": 0.4733,
+    "trend": 0.8867,
+    "stability": 0.9465,
+    "deliv_chg": 0.9331
+   }
+  },
+  "WELCORP": {
+   "rank": 11,
+   "composite": 1.1069,
+   "factors": {
+    "momentum": 0.91,
+    "low_vol": 0.3467,
+    "trend": 0.9833,
+    "stability": 0.9498,
+    "deliv_chg": 0.5351
+   }
+  },
+  "ATHERENERG": {
+   "rank": 12,
+   "composite": 1.091,
+   "factors": {
+    "momentum": 0.9833,
+    "low_vol": 0.19,
+    "trend": 0.9867,
+    "stability": 0.99,
+    "deliv_chg": 0.3211
+   }
+  },
+  "AEROFLEX": {
+   "rank": 13,
+   "composite": 1.0747,
+   "factors": {
+    "momentum": 0.9567,
+    "low_vol": 0.01,
+    "trend": 0.94,
+    "stability": 0.903,
+    "deliv_chg": 0.9064
+   }
+  },
+  "ASTRAMICRO": {
+   "rank": 14,
+   "composite": 1.066,
+   "factors": {
+    "momentum": 0.9233,
+    "low_vol": 0.2333,
+    "trend": 0.96,
+    "stability": 0.9197,
+    "deliv_chg": 0.6187
+   }
+  },
+  "TDPOWERSYS": {
+   "rank": 15,
+   "composite": 1.0562,
+   "factors": {
+    "momentum": 0.96,
+    "low_vol": 0.1033,
+    "trend": 0.8767,
+    "stability": 0.9064,
+    "deliv_chg": 0.8462
+   }
+  },
+  "BELRISE": {
+   "rank": 16,
+   "composite": 1.0515,
+   "factors": {
+    "momentum": 0.8867,
+    "low_vol": 0.4067,
+    "trend": 0.8333,
+    "stability": 0.9298,
+    "deliv_chg": 0.7793
+   }
+  },
+  "SYRMA": {
+   "rank": 17,
+   "composite": 1.0512,
+   "factors": {
+    "momentum": 0.9467,
+    "low_vol": 0.25,
+    "trend": 0.9367,
+    "stability": 0.8696,
+    "deliv_chg": 0.5753
+   }
+  },
+  "ACUTAAS": {
+   "rank": 18,
+   "composite": 1.0302,
+   "factors": {
+    "momentum": 0.9733,
+    "low_vol": 0.1567,
+    "trend": 0.9067,
+    "stability": 0.9398,
+    "deliv_chg": 0.4983
+   }
+  },
+  "CUPID": {
+   "rank": 19,
+   "composite": 0.9909,
+   "factors": {
+    "momentum": 1.0,
+    "low_vol": 0.11,
+    "trend": 1.0,
+    "stability": 0.9933,
+    "deliv_chg": 0.01
+   }
+  },
+  "AUROPHARMA": {
+   "rank": 20,
+   "composite": 0.9607,
+   "factors": {
+    "momentum": 0.8033,
+    "low_vol": 0.81,
+    "trend": 0.8133,
+    "stability": 0.8896,
+    "deliv_chg": 0.3712
+   }
+  },
+  "ADANIPOWER": {
+   "rank": 21,
+   "composite": 0.9605,
+   "factors": {
+    "momentum": 0.9167,
+    "low_vol": 0.4533,
+    "trend": 0.72,
+    "stability": 0.8629,
+    "deliv_chg": 0.6689
+   }
+  },
+  "RRKABEL": {
+   "rank": 22,
+   "composite": 0.9577,
+   "factors": {
+    "momentum": 0.8933,
+    "low_vol": 0.2133,
+    "trend": 0.9667,
+    "stability": 0.9565,
+    "deliv_chg": 0.3679
+   }
+  },
+  "ADANIENSOL": {
+   "rank": 23,
+   "composite": 0.9442,
+   "factors": {
+    "momentum": 0.95,
+    "low_vol": 0.33,
+    "trend": 0.8933,
+    "stability": 0.913,
+    "deliv_chg": 0.1438
+   }
+  },
+  "KIRLOSENG": {
+   "rank": 24,
+   "composite": 0.9344,
+   "factors": {
+    "momentum": 0.9767,
+    "low_vol": 0.12,
+    "trend": 0.9167,
+    "stability": 0.9699,
+    "deliv_chg": 0.1639
+   }
+  },
+  "SAILIFE": {
+   "rank": 25,
+   "composite": 0.9308,
+   "factors": {
+    "momentum": 0.8433,
+    "low_vol": 0.5633,
+    "trend": 0.8667,
+    "stability": 0.8328,
+    "deliv_chg": 0.4181
+   }
+  },
+  "NEULANDLAB": {
+   "rank": 26,
+   "composite": 0.9301,
+   "factors": {
+    "momentum": 0.8133,
+    "low_vol": 0.29,
+    "trend": 0.9267,
+    "stability": 0.8829,
+    "deliv_chg": 0.7358
+   }
+  },
+  "PAISALO": {
+   "rank": 27,
+   "composite": 0.909,
+   "factors": {
+    "momentum": 0.9667,
+    "low_vol": 0.1633,
+    "trend": 0.9467,
+    "stability": 0.9532,
+    "deliv_chg": 0.0134
+   }
+  },
+  "SONACOMS": {
+   "rank": 28,
+   "composite": 0.9065,
+   "factors": {
+    "momentum": 0.81,
+    "low_vol": 0.6,
+    "trend": 0.9333,
+    "stability": 0.9431,
+    "deliv_chg": 0.1037
+   }
+  },
+  "CHENNPETRO": {
+   "rank": 29,
+   "composite": 0.9064,
+   "factors": {
+    "momentum": 0.9033,
+    "low_vol": 0.1433,
+    "trend": 0.8633,
+    "stability": 0.8796,
+    "deliv_chg": 0.6388
+   }
+  },
+  "MTARTECH": {
+   "rank": 30,
+   "composite": 0.8912,
+   "factors": {
+    "momentum": 0.9933,
+    "low_vol": 0.0067,
+    "trend": 0.9567,
+    "stability": 0.9799,
+    "deliv_chg": 0.0067
+   }
+  },
+  "HINDCOPPER": {
+   "rank": 31,
+   "composite": 0.8874,
+   "factors": {
+    "momentum": 0.9433,
+    "low_vol": 0.24,
+    "trend": 0.5433,
+    "stability": 0.9331,
+    "deliv_chg": 0.9732
+   }
+  },
+  "APARINDS": {
+   "rank": 32,
+   "composite": 0.8858,
+   "factors": {
+    "momentum": 0.8533,
+    "low_vol": 0.1833,
+    "trend": 0.9433,
+    "stability": 0.8194,
+    "deliv_chg": 0.6288
+   }
+  },
+  "RBLBANK": {
+   "rank": 33,
+   "composite": 0.8793,
+   "factors": {
+    "momentum": 0.74,
+    "low_vol": 0.6433,
+    "trend": 0.7433,
+    "stability": 0.7826,
+    "deliv_chg": 0.9833
+   }
+  },
+  "TORNTPHARM": {
+   "rank": 34,
+   "composite": 0.8741,
+   "factors": {
+    "momentum": 0.7467,
+    "low_vol": 0.9367,
+    "trend": 0.7167,
+    "stability": 0.8127,
+    "deliv_chg": 0.5184
+   }
+  },
+  "NATIONALUM": {
+   "rank": 35,
+   "composite": 0.8731,
+   "factors": {
+    "momentum": 0.93,
+    "low_vol": 0.2833,
+    "trend": 0.5667,
+    "stability": 0.9097,
+    "deliv_chg": 0.8997
+   }
+  },
+  "NAVINFLUOR": {
+   "rank": 36,
+   "composite": 0.8687,
+   "factors": {
+    "momentum": 0.8067,
+    "low_vol": 0.37,
+    "trend": 0.8267,
+    "stability": 0.8395,
+    "deliv_chg": 0.7659
+   }
+  },
+  "NETWEB": {
+   "rank": 37,
+   "composite": 0.8595,
+   "factors": {
+    "momentum": 0.9267,
+    "low_vol": 0.0767,
+    "trend": 0.8567,
+    "stability": 0.8528,
+    "deliv_chg": 0.5418
+   }
+  },
+  "HINDALCO": {
+   "rank": 38,
+   "composite": 0.853,
+   "factors": {
+    "momentum": 0.78,
+    "low_vol": 0.7067,
+    "trend": 0.64,
+    "stability": 0.8161,
+    "deliv_chg": 0.8328
+   }
+  },
+  "IDEA": {
+   "rank": 39,
+   "composite": 0.8475,
+   "factors": {
+    "momentum": 0.9533,
+    "low_vol": 0.4133,
+    "trend": 0.59,
+    "stability": 0.806,
+    "deliv_chg": 0.6154
+   }
+  },
+  "BHEL": {
+   "rank": 40,
+   "composite": 0.847,
+   "factors": {
+    "momentum": 0.8333,
+    "low_vol": 0.35,
+    "trend": 0.83,
+    "stability": 0.7592,
+    "deliv_chg": 0.7191
+   }
+  },
+  "TITAN": {
+   "rank": 41,
+   "composite": 0.8455,
+   "factors": {
+    "momentum": 0.71,
+    "low_vol": 0.8167,
+    "trend": 0.7333,
+    "stability": 0.8361,
+    "deliv_chg": 0.6957
+   }
+  },
+  "CUMMINSIND": {
+   "rank": 42,
+   "composite": 0.8423,
+   "factors": {
+    "momentum": 0.84,
+    "low_vol": 0.64,
+    "trend": 0.6267,
+    "stability": 0.8227,
+    "deliv_chg": 0.6522
+   }
+  },
+  "SHRIRAMFIN": {
+   "rank": 43,
+   "composite": 0.8362,
+   "factors": {
+    "momentum": 0.88,
+    "low_vol": 0.2533,
+    "trend": 0.7067,
+    "stability": 0.8963,
+    "deliv_chg": 0.7224
+   }
+  },
+  "APOLLO": {
+   "rank": 44,
+   "composite": 0.8262,
+   "factors": {
+    "momentum": 0.9633,
+    "low_vol": 0.03,
+    "trend": 0.8967,
+    "stability": 0.8997,
+    "deliv_chg": 0.1706
+   }
+  },
+  "SHAILY": {
+   "rank": 45,
+   "composite": 0.8199,
+   "factors": {
+    "momentum": 0.8733,
+    "low_vol": 0.0367,
+    "trend": 0.84,
+    "stability": 0.8428,
+    "deliv_chg": 0.7726
+   }
+  },
+  "MOTHERSON": {
+   "rank": 46,
+   "composite": 0.8139,
+   "factors": {
+    "momentum": 0.8,
+    "low_vol": 0.2967,
+    "trend": 0.8733,
+    "stability": 0.8729,
+    "deliv_chg": 0.5652
+   }
+  },
+  "RADICO": {
+   "rank": 47,
+   "composite": 0.8093,
+   "factors": {
+    "momentum": 0.7833,
+    "low_vol": 0.59,
+    "trend": 0.9,
+    "stability": 0.8294,
+    "deliv_chg": 0.1839
+   }
+  },
+  "HSCL": {
+   "rank": 48,
+   "composite": 0.7993,
+   "factors": {
+    "momentum": 0.7533,
+    "low_vol": 0.3067,
+    "trend": 0.9133,
+    "stability": 0.7759,
+    "deliv_chg": 0.7592
+   }
+  },
+  "THANGAMAYL": {
+   "rank": 49,
+   "composite": 0.7962,
+   "factors": {
+    "momentum": 0.99,
+    "low_vol": 0.0267,
+    "trend": 0.8433,
+    "stability": 0.9264,
+    "deliv_chg": 0.0535
+   }
+  },
+  "AEGISLOG": {
+   "rank": 50,
+   "composite": 0.7814,
+   "factors": {
+    "momentum": 0.8967,
+    "low_vol": 0.0967,
+    "trend": 0.9767,
+    "stability": 0.9164,
+    "deliv_chg": 0.0033
+   }
+  },
+  "PARAS": {
+   "rank": 51,
+   "composite": 0.7804,
+   "factors": {
+    "momentum": 0.92,
+    "low_vol": 0.0333,
+    "trend": 0.95,
+    "stability": 0.9231,
+    "deliv_chg": 0.0468
+   }
+  },
+  "OFSS": {
+   "rank": 52,
+   "composite": 0.7634,
+   "factors": {
+    "momentum": 0.7333,
+    "low_vol": 0.4333,
+    "trend": 0.91,
+    "stability": 0.7391,
+    "deliv_chg": 0.6087
+   }
+  },
+  "DATAPATTNS": {
+   "rank": 53,
+   "composite": 0.7598,
+   "factors": {
+    "momentum": 0.87,
+    "low_vol": 0.0933,
+    "trend": 0.8367,
+    "stability": 0.7659,
+    "deliv_chg": 0.6355
+   }
+  },
+  "MCX": {
+   "rank": 54,
+   "composite": 0.7596,
+   "factors": {
+    "momentum": 0.9067,
+    "low_vol": 0.48,
+    "trend": 0.4233,
+    "stability": 0.8595,
+    "deliv_chg": 0.7826
+   }
+  },
+  "BAJAJ-AUTO": {
+   "rank": 55,
+   "composite": 0.744,
+   "factors": {
+    "momentum": 0.6433,
+    "low_vol": 0.8433,
+    "trend": 0.77,
+    "stability": 0.8495,
+    "deliv_chg": 0.5217
+   }
+  },
+  "PNBHOUSING": {
+   "rank": 56,
+   "composite": 0.737,
+   "factors": {
+    "momentum": 0.7767,
+    "low_vol": 0.52,
+    "trend": 0.78,
+    "stability": 0.7525,
+    "deliv_chg": 0.505
+   }
+  },
+  "NESTLEIND": {
+   "rank": 57,
+   "composite": 0.7339,
+   "factors": {
+    "momentum": 0.6767,
+    "low_vol": 0.9633,
+    "trend": 0.7033,
+    "stability": 0.893,
+    "deliv_chg": 0.2609
+   }
+  },
+  "J&KBANK": {
+   "rank": 58,
+   "composite": 0.7323,
+   "factors": {
+    "momentum": 0.89,
+    "low_vol": 0.1267,
+    "trend": 0.82,
+    "stability": 0.7358,
+    "deliv_chg": 0.495
+   }
+  },
+  "ADANIENT": {
+   "rank": 59,
+   "composite": 0.7021,
+   "factors": {
+    "momentum": 0.6967,
+    "low_vol": 0.4967,
+    "trend": 0.7933,
+    "stability": 0.612,
+    "deliv_chg": 0.9666
+   }
+  },
+  "SOUTHBANK": {
+   "rank": 60,
+   "composite": 0.6954,
+   "factors": {
+    "momentum": 0.85,
+    "low_vol": 0.4767,
+    "trend": 0.6767,
+    "stability": 0.7224,
+    "deliv_chg": 0.4114
+   }
+  },
+  "BSE": {
+   "rank": 61,
+   "composite": 0.6907,
+   "factors": {
+    "momentum": 0.8667,
+    "low_vol": 0.3633,
+    "trend": 0.53,
+    "stability": 0.7124,
+    "deliv_chg": 0.8729
+   }
+  },
+  "AZAD": {
+   "rank": 62,
+   "composite": 0.6811,
+   "factors": {
+    "momentum": 0.86,
+    "low_vol": 0.1867,
+    "trend": 0.89,
+    "stability": 0.7458,
+    "deliv_chg": 0.1873
+   }
+  },
+  "APOLLOHOSP": {
+   "rank": 63,
+   "composite": 0.6757,
+   "factors": {
+    "momentum": 0.6233,
+    "low_vol": 0.9933,
+    "trend": 0.68,
+    "stability": 0.7425,
+    "deliv_chg": 0.5552
+   }
+  },
+  "DIACABS": {
+   "rank": 64,
+   "composite": 0.6744,
+   "factors": {
+    "momentum": 0.7967,
+    "low_vol": 0.0733,
+    "trend": 0.9933,
+    "stability": 0.9365,
+    "deliv_chg": 0.0769
+   }
+  },
+  "MAHABANK": {
+   "rank": 65,
+   "composite": 0.6653,
+   "factors": {
+    "momentum": 0.83,
+    "low_vol": 0.3333,
+    "trend": 0.63,
+    "stability": 0.7726,
+    "deliv_chg": 0.6622
+   }
+  },
+  "ABB": {
+   "rank": 66,
+   "composite": 0.6639,
+   "factors": {
+    "momentum": 0.7267,
+    "low_vol": 0.5733,
+    "trend": 0.8167,
+    "stability": 0.7893,
+    "deliv_chg": 0.2709
+   }
+  },
+  "POWERINDIA": {
+   "rank": 67,
+   "composite": 0.6572,
+   "factors": {
+    "momentum": 0.82,
+    "low_vol": 0.22,
+    "trend": 0.8033,
+    "stability": 0.6856,
+    "deliv_chg": 0.5485
+   }
+  },
+  "PHOENIXLTD": {
+   "rank": 68,
+   "composite": 0.6491,
+   "factors": {
+    "momentum": 0.7867,
+    "low_vol": 0.6933,
+    "trend": 0.47,
+    "stability": 0.6789,
+    "deliv_chg": 0.806
+   }
+  },
+  "ABCAPITAL": {
+   "rank": 69,
+   "composite": 0.6475,
+   "factors": {
+    "momentum": 0.7667,
+    "low_vol": 0.4,
+    "trend": 0.69,
+    "stability": 0.7492,
+    "deliv_chg": 0.6756
+   }
+  },
+  "LUPIN": {
+   "rank": 70,
+   "composite": 0.6431,
+   "factors": {
+    "momentum": 0.72,
+    "low_vol": 0.97,
+    "trend": 0.4833,
+    "stability": 0.7324,
+    "deliv_chg": 0.5585
+   }
+  },
+  "NAM-INDIA": {
+   "rank": 71,
+   "composite": 0.6262,
+   "factors": {
+    "momentum": 0.8167,
+    "low_vol": 0.2267,
+    "trend": 0.7767,
+    "stability": 0.7191,
+    "deliv_chg": 0.4716
+   }
+  },
+  "TFCILTD": {
+   "rank": 72,
+   "composite": 0.6087,
+   "factors": {
+    "momentum": 0.7367,
+    "low_vol": 0.26,
+    "trend": 0.97,
+    "stability": 0.8562,
+    "deliv_chg": 0.0368
+   }
+  },
+  "UJJIVANSFB": {
+   "rank": 73,
+   "composite": 0.6084,
+   "factors": {
+    "momentum": 0.7933,
+    "low_vol": 0.2467,
+    "trend": 0.7733,
+    "stability": 0.8261,
+    "deliv_chg": 0.3378
+   }
+  },
+  "ZYDUSLIFE": {
+   "rank": 74,
+   "composite": 0.5964,
+   "factors": {
+    "momentum": 0.6033,
+    "low_vol": 0.9133,
+    "trend": 0.6733,
+    "stability": 0.5452,
+    "deliv_chg": 0.8261
+   }
+  },
+  "HDFCGOLD": {
+   "rank": 75,
+   "composite": 0.5943,
+   "factors": {
+    "momentum": 0.79,
+    "low_vol": 0.8033,
+    "trend": 0.4,
+    "stability": 0.796,
+    "deliv_chg": 0.4515
+   }
+  },
+  "EICHERMOT": {
+   "rank": 76,
+   "composite": 0.5783,
+   "factors": {
+    "momentum": 0.6733,
+    "low_vol": 0.6067,
+    "trend": 0.6,
+    "stability": 0.7793,
+    "deliv_chg": 0.7458
+   }
+  },
+  "SCI": {
+   "rank": 77,
+   "composite": 0.5748,
+   "factors": {
+    "momentum": 0.7567,
+    "low_vol": 0.1067,
+    "trend": 0.6967,
+    "stability": 0.7625,
+    "deliv_chg": 0.893
+   }
+  },
+  "ADANIGREEN": {
+   "rank": 78,
+   "composite": 0.5456,
+   "factors": {
+    "momentum": 0.8233,
+    "low_vol": 0.2633,
+    "trend": 0.74,
+    "stability": 0.6488,
+    "deliv_chg": 0.3278
+   }
+  },
+  "LLOYDSME": {
+   "rank": 79,
+   "composite": 0.534,
+   "factors": {
+    "momentum": 0.5933,
+    "low_vol": 0.3533,
+    "trend": 0.9233,
+    "stability": 0.709,
+    "deliv_chg": 0.6421
+   }
+  },
+  "DIVISLAB": {
+   "rank": 80,
+   "composite": 0.5329,
+   "factors": {
+    "momentum": 0.4733,
+    "low_vol": 0.94,
+    "trend": 0.8233,
+    "stability": 0.6957,
+    "deliv_chg": 0.5686
+   }
+  },
+  "AUBANK": {
+   "rank": 81,
+   "composite": 0.5243,
+   "factors": {
+    "momentum": 0.7733,
+    "low_vol": 0.57,
+    "trend": 0.56,
+    "stability": 0.7692,
+    "deliv_chg": 0.2943
+   }
+  },
+  "MANAPPURAM": {
+   "rank": 82,
+   "composite": 0.5169,
+   "factors": {
+    "momentum": 0.67,
+    "low_vol": 0.5067,
+    "trend": 0.7867,
+    "stability": 0.7291,
+    "deliv_chg": 0.3244
+   }
+  },
+  "KARURVYSYA": {
+   "rank": 83,
+   "composite": 0.5086,
+   "factors": {
+    "momentum": 0.75,
+    "low_vol": 0.28,
+    "trend": 0.7367,
+    "stability": 0.7993,
+    "deliv_chg": 0.2977
+   }
+  },
+  "TVSMOTOR": {
+   "rank": 84,
+   "composite": 0.497,
+   "factors": {
+    "momentum": 0.6267,
+    "low_vol": 0.5867,
+    "trend": 0.7833,
+    "stability": 0.8094,
+    "deliv_chg": 0.2241
+   }
+  },
+  "ADANIPORTS": {
+   "rank": 85,
+   "composite": 0.495,
+   "factors": {
+    "momentum": 0.7033,
+    "low_vol": 0.7467,
+    "trend": 0.51,
+    "stability": 0.6254,
+    "deliv_chg": 0.592
+   }
+  },
+  "KEI": {
+   "rank": 86,
+   "composite": 0.4912,
+   "factors": {
+    "momentum": 0.69,
+    "low_vol": 0.4233,
+    "trend": 0.76,
+    "stability": 0.7023,
+    "deliv_chg": 0.3846
+   }
+  },
+  "LTF": {
+   "rank": 87,
+   "composite": 0.4849,
+   "factors": {
+    "momentum": 0.8633,
+    "low_vol": 0.3667,
+    "trend": 0.4933,
+    "stability": 0.786,
+    "deliv_chg": 0.2107
+   }
+  },
+  "JSWSTEEL": {
+   "rank": 88,
+   "composite": 0.4837,
+   "factors": {
+    "momentum": 0.5667,
+    "low_vol": 0.9167,
+    "trend": 0.52,
+    "stability": 0.6221,
+    "deliv_chg": 0.8963
+   }
+  },
+  "SBIN": {
+   "rank": 89,
+   "composite": 0.4781,
+   "factors": {
+    "momentum": 0.68,
+    "low_vol": 0.7933,
+    "trend": 0.5233,
+    "stability": 0.8027,
+    "deliv_chg": 0.2742
+   }
+  },
+  "HDFCSILVER": {
+   "rank": 90,
+   "composite": 0.4491,
+   "factors": {
+    "momentum": 0.9333,
+    "low_vol": 0.1,
+    "trend": 0.3167,
+    "stability": 0.8763,
+    "deliv_chg": 0.4883
+   }
+  },
+  "MARICO": {
+   "rank": 91,
+   "composite": 0.4454,
+   "factors": {
+    "momentum": 0.5867,
+    "low_vol": 0.99,
+    "trend": 0.5933,
+    "stability": 0.689,
+    "deliv_chg": 0.291
+   }
+  },
+  "NMDC": {
+   "rank": 92,
+   "composite": 0.4355,
+   "factors": {
+    "momentum": 0.6333,
+    "low_vol": 0.7767,
+    "trend": 0.4133,
+    "stability": 0.5753,
+    "deliv_chg": 0.99
+   }
+  },
+  "INDIANB": {
+   "rank": 93,
+   "composite": 0.4316,
+   "factors": {
+    "momentum": 0.6567,
+    "low_vol": 0.4867,
+    "trend": 0.4367,
+    "stability": 0.7926,
+    "deliv_chg": 0.9231
+   }
+  },
+  "GVT&D": {
+   "rank": 94,
+   "composite": 0.43,
+   "factors": {
+    "momentum": 0.8767,
+    "low_vol": 0.1767,
+    "trend": 0.6333,
+    "stability": 0.6689,
+    "deliv_chg": 0.087
+   }
+  },
+  "POLYCAB": {
+   "rank": 95,
+   "composite": 0.4274,
+   "factors": {
+    "momentum": 0.6933,
+    "low_vol": 0.6467,
+    "trend": 0.65,
+    "stability": 0.6622,
+    "deliv_chg": 0.1672
+   }
+  },
+  "M&MFIN": {
+   "rank": 96,
+   "composite": 0.4214,
+   "factors": {
+    "momentum": 0.6867,
+    "low_vol": 0.2,
+    "trend": 0.8,
+    "stability": 0.8462,
+    "deliv_chg": 0.1973
+   }
+  },
+  "CGPOWER": {
+   "rank": 97,
+   "composite": 0.418,
+   "factors": {
+    "momentum": 0.7133,
+    "low_vol": 0.4667,
+    "trend": 0.6867,
+    "stability": 0.5786,
+    "deliv_chg": 0.3512
+   }
+  },
+  "SAIL": {
+   "rank": 98,
+   "composite": 0.409,
+   "factors": {
+    "momentum": 0.7167,
+    "low_vol": 0.3367,
+    "trend": 0.58,
+    "stability": 0.7057,
+    "deliv_chg": 0.5786
+   }
+  },
+  "TATSILV": {
+   "rank": 99,
+   "composite": 0.4053,
+   "factors": {
+    "momentum": 0.94,
+    "low_vol": 0.1167,
+    "trend": 0.3267,
+    "stability": 0.8662,
+    "deliv_chg": 0.2843
+   }
+  },
+  "HINDZINC": {
+   "rank": 100,
+   "composite": 0.3919,
+   "factors": {
+    "momentum": 0.66,
+    "low_vol": 0.46,
+    "trend": 0.5067,
+    "stability": 0.6823,
+    "deliv_chg": 0.8127
+   }
+  },
+  "COALINDIA": {
+   "rank": 101,
+   "composite": 0.3914,
+   "factors": {
+    "momentum": 0.6133,
+    "low_vol": 0.9467,
+    "trend": 0.2933,
+    "stability": 0.6522,
+    "deliv_chg": 0.8696
+   }
+  },
+  "SIEMENS": {
+   "rank": 102,
+   "composite": 0.3902,
+   "factors": {
+    "momentum": 0.5367,
+    "low_vol": 0.5233,
+    "trend": 0.7233,
+    "stability": 0.6355,
+    "deliv_chg": 0.796
+   }
+  },
+  "UNIONBANK": {
+   "rank": 103,
+   "composite": 0.3869,
+   "factors": {
+    "momentum": 0.6533,
+    "low_vol": 0.4367,
+    "trend": 0.6133,
+    "stability": 0.7559,
+    "deliv_chg": 0.4849
+   }
+  },
+  "GESHIP": {
+   "rank": 104,
+   "composite": 0.3826,
+   "factors": {
+    "momentum": 0.8567,
+    "low_vol": 0.2667,
+    "trend": 0.41,
+    "stability": 0.699,
+    "deliv_chg": 0.4047
+   }
+  },
+  "GRASIM": {
+   "rank": 105,
+   "composite": 0.3798,
+   "factors": {
+    "momentum": 0.5433,
+    "low_vol": 0.8667,
+    "trend": 0.6833,
+    "stability": 0.5953,
+    "deliv_chg": 0.3779
+   }
+  },
+  "REDINGTON": {
+   "rank": 106,
+   "composite": 0.3746,
+   "factors": {
+    "momentum": 0.5233,
+    "low_vol": 0.1367,
+    "trend": 0.92,
+    "stability": 0.6923,
+    "deliv_chg": 0.8094
+   }
+  },
+  "NUVAMA": {
+   "rank": 107,
+   "composite": 0.3607,
+   "factors": {
+    "momentum": 0.77,
+    "low_vol": 0.3267,
+    "trend": 0.6233,
+    "stability": 0.5886,
+    "deliv_chg": 0.2676
+   }
+  },
+  "PIDILITIND": {
+   "rank": 108,
+   "composite": 0.3538,
+   "factors": {
+    "momentum": 0.47,
+    "low_vol": 0.9,
+    "trend": 0.6567,
+    "stability": 0.495,
+    "deliv_chg": 0.7926
+   }
+  },
+  "WOCKPHARMA": {
+   "rank": 109,
+   "composite": 0.3534,
+   "factors": {
+    "momentum": 0.5733,
+    "low_vol": 0.1467,
+    "trend": 0.86,
+    "stability": 0.6388,
+    "deliv_chg": 0.7324
+   }
+  },
+  "IIFL": {
+   "rank": 110,
+   "composite": 0.3527,
+   "factors": {
+    "momentum": 0.65,
+    "low_vol": 0.3167,
+    "trend": 0.7133,
+    "stability": 0.6756,
+    "deliv_chg": 0.4415
+   }
+  },
+  "WABAG": {
+   "rank": 111,
+   "composite": 0.3489,
+   "factors": {
+    "momentum": 0.7433,
+    "low_vol": 0.18,
+    "trend": 0.87,
+    "stability": 0.5418,
+    "deliv_chg": 0.0234
+   }
+  },
+  "INDUSINDBK": {
+   "rank": 112,
+   "composite": 0.3477,
+   "factors": {
+    "momentum": 0.64,
+    "low_vol": 0.5667,
+    "trend": 0.67,
+    "stability": 0.5485,
+    "deliv_chg": 0.3946
+   }
+  },
+  "RAIN": {
+   "rank": 113,
+   "composite": 0.3439,
+   "factors": {
+    "momentum": 0.7,
+    "low_vol": 0.0467,
+    "trend": 0.93,
+    "stability": 0.6321,
+    "deliv_chg": 0.1171
+   }
+  },
+  "ASIANPAINT": {
+   "rank": 114,
+   "composite": 0.3287,
+   "factors": {
+    "momentum": 0.52,
+    "low_vol": 0.93,
+    "trend": 0.4633,
+    "stability": 0.5217,
+    "deliv_chg": 0.8863
+   }
+  },
+  "SAMMAANCAP": {
+   "rank": 115,
+   "composite": 0.3148,
+   "factors": {
+    "momentum": 0.6633,
+    "low_vol": 0.3967,
+    "trend": 0.42,
+    "stability": 0.6054,
+    "deliv_chg": 0.9799
+   }
+  },
+  "GMRAIRPORT": {
+   "rank": 116,
+   "composite": 0.3136,
+   "factors": {
+    "momentum": 0.6,
+    "low_vol": 0.5567,
+    "trend": 0.5033,
+    "stability": 0.4849,
+    "deliv_chg": 0.9933
+   }
+  },
+  "LIQUIDCASE": {
+   "rank": 117,
+   "composite": 0.3014,
+   "factors": {
+    "momentum": 0.4333,
+    "low_vol": 0.9967,
+    "trend": 0.37,
+    "stability": 1.0,
+    "deliv_chg": 0.6054
+   }
+  },
+  "SOLARINDS": {
+   "rank": 118,
+   "composite": 0.3013,
+   "factors": {
+    "momentum": 0.5567,
+    "low_vol": 0.6167,
+    "trend": 0.8067,
+    "stability": 0.6187,
+    "deliv_chg": 0.1003
+   }
+  },
+  "TATASTEEL": {
+   "rank": 119,
+   "composite": 0.3005,
+   "factors": {
+    "momentum": 0.59,
+    "low_vol": 0.8267,
+    "trend": 0.3067,
+    "stability": 0.5652,
+    "deliv_chg": 0.9632
+   }
+  },
+  "EXIDEIND": {
+   "rank": 120,
+   "composite": 0.2973,
+   "factors": {
+    "momentum": 0.5267,
+    "low_vol": 0.47,
+    "trend": 0.8833,
+    "stability": 0.6656,
+    "deliv_chg": 0.1806
+   }
+  },
+  "SUNPHARMA": {
+   "rank": 121,
+   "composite": 0.296,
+   "factors": {
+    "momentum": 0.5767,
+    "low_vol": 0.98,
+    "trend": 0.57,
+    "stability": 0.5853,
+    "deliv_chg": 0.0903
+   }
+  },
+  "CHOLAFIN": {
+   "rank": 122,
+   "composite": 0.2955,
+   "factors": {
+    "momentum": 0.62,
+    "low_vol": 0.38,
+    "trend": 0.6367,
+    "stability": 0.6288,
+    "deliv_chg": 0.5619
+   }
+  },
+  "CUB": {
+   "rank": 123,
+   "composite": 0.2933,
+   "factors": {
+    "momentum": 0.7633,
+    "low_vol": 0.3233,
+    "trend": 0.46,
+    "stability": 0.6589,
+    "deliv_chg": 0.3913
+   }
+  },
+  "ALKEM": {
+   "rank": 124,
+   "composite": 0.291,
+   "factors": {
+    "momentum": 0.55,
+    "low_vol": 0.9033,
+    "trend": 0.3667,
+    "stability": 0.5552,
+    "deliv_chg": 0.8629
+   }
+  },
+  "HEROMOTOCO": {
+   "rank": 125,
+   "composite": 0.2878,
+   "factors": {
+    "momentum": 0.5067,
+    "low_vol": 0.75,
+    "trend": 0.54,
+    "stability": 0.6455,
+    "deliv_chg": 0.709
+   }
+  },
+  "IFCI": {
+   "rank": 126,
+   "composite": 0.2805,
+   "factors": {
+    "momentum": 0.7233,
+    "low_vol": 0.0433,
+    "trend": 0.7667,
+    "stability": 0.5585,
+    "deliv_chg": 0.3344
+   }
+  },
+  "LLOYDSENGG": {
+   "rank": 127,
+   "composite": 0.2804,
+   "factors": {
+    "momentum": 0.63,
+    "low_vol": 0.05,
+    "trend": 0.9633,
+    "stability": 0.6555,
+    "deliv_chg": 0.107
+   }
+  },
+  "BAJFINANCE": {
+   "rank": 128,
+   "composite": 0.2752,
+   "factors": {
+    "momentum": 0.54,
+    "low_vol": 0.51,
+    "trend": 0.6033,
+    "stability": 0.5686,
+    "deliv_chg": 0.8361
+   }
+  },
+  "PAYTM": {
+   "rank": 129,
+   "composite": 0.2697,
+   "factors": {
+    "momentum": 0.58,
+    "low_vol": 0.2933,
+    "trend": 0.7533,
+    "stability": 0.602,
+    "deliv_chg": 0.5385
+   }
+  },
+  "BANKINDIA": {
+   "rank": 130,
+   "composite": 0.2422,
+   "factors": {
+    "momentum": 0.6667,
+    "low_vol": 0.5,
+    "trend": 0.3233,
+    "stability": 0.7157,
+    "deliv_chg": 0.6555
+   }
+  },
+  "THERMAX": {
+   "rank": 131,
+   "composite": 0.2143,
+   "factors": {
+    "momentum": 0.73,
+    "low_vol": 0.2067,
+    "trend": 0.5967,
+    "stability": 0.5117,
+    "deliv_chg": 0.3445
+   }
+  },
+  "FORTIS": {
+   "rank": 132,
+   "composite": 0.2137,
+   "factors": {
+    "momentum": 0.5033,
+    "low_vol": 0.8933,
+    "trend": 0.4033,
+    "stability": 0.4783,
+    "deliv_chg": 0.8662
+   }
+  },
+  "ANGELONE": {
+   "rank": 133,
+   "composite": 0.2111,
+   "factors": {
+    "momentum": 0.7067,
+    "low_vol": 0.2233,
+    "trend": 0.4167,
+    "stability": 0.5284,
+    "deliv_chg": 0.8395
+   }
+  },
+  "YESBANK": {
+   "rank": 134,
+   "composite": 0.2075,
+   "factors": {
+    "momentum": 0.6467,
+    "low_vol": 0.7333,
+    "trend": 0.4067,
+    "stability": 0.5619,
+    "deliv_chg": 0.3077
+   }
+  },
+  "IDFCFIRSTB": {
+   "rank": 135,
+   "composite": 0.2033,
+   "factors": {
+    "momentum": 0.5467,
+    "low_vol": 0.3933,
+    "trend": 0.5867,
+    "stability": 0.5318,
+    "deliv_chg": 0.8495
+   }
+  },
+  "BOSCHLTD": {
+   "rank": 136,
+   "composite": 0.1969,
+   "factors": {
+    "momentum": 0.4133,
+    "low_vol": 0.6333,
+    "trend": 0.71,
+    "stability": 0.408,
+    "deliv_chg": 0.9465
+   }
+  },
+  "GLENMARK": {
+   "rank": 137,
+   "composite": 0.192,
+   "factors": {
+    "momentum": 0.5167,
+    "low_vol": 0.7233,
+    "trend": 0.5333,
+    "stability": 0.5151,
+    "deliv_chg": 0.612
+   }
+  },
+  "ZENTEC": {
+   "rank": 138,
+   "composite": 0.1912,
+   "factors": {
+    "momentum": 0.6367,
+    "low_vol": 0.3,
+    "trend": 0.66,
+    "stability": 0.5351,
+    "deliv_chg": 0.3579
+   }
+  },
+  "PREMIERENE": {
+   "rank": 139,
+   "composite": 0.1641,
+   "factors": {
+    "momentum": 0.4933,
+    "low_vol": 0.65,
+    "trend": 0.62,
+    "stability": 0.3545,
+    "deliv_chg": 0.7625
+   }
+  },
+  "ASHOKLEY": {
+   "rank": 140,
+   "composite": 0.1568,
+   "factors": {
+    "momentum": 0.6833,
+    "low_vol": 0.2167,
+    "trend": 0.5,
+    "stability": 0.7258,
+    "deliv_chg": 0.2776
+   }
+  },
+  "JSWINFRA": {
+   "rank": 141,
+   "composite": 0.13,
+   "factors": {
+    "momentum": 0.4767,
+    "low_vol": 0.3567,
+    "trend": 0.75,
+    "stability": 0.4582,
+    "deliv_chg": 0.689
+   }
+  },
+  "BIOCON": {
+   "rank": 142,
+   "composite": 0.1255,
+   "factors": {
+    "momentum": 0.4867,
+    "low_vol": 0.85,
+    "trend": 0.55,
+    "stability": 0.4749,
+    "deliv_chg": 0.3645
+   }
+  },
+  "AGIIL": {
+   "rank": 143,
+   "composite": 0.1247,
+   "factors": {
+    "momentum": 0.8467,
+    "low_vol": 0.13,
+    "trend": 0.2367,
+    "stability": 0.6421,
+    "deliv_chg": 0.3545
+   }
+  },
+  "OBEROIRLTY": {
+   "rank": 144,
+   "composite": 0.1069,
+   "factors": {
+    "momentum": 0.5633,
+    "low_vol": 0.8067,
+    "trend": 0.5133,
+    "stability": 0.4548,
+    "deliv_chg": 0.1472
+   }
+  },
+  "UNITDSPR": {
+   "rank": 145,
+   "composite": 0.1066,
+   "factors": {
+    "momentum": 0.4533,
+    "low_vol": 0.82,
+    "trend": 0.6167,
+    "stability": 0.5385,
+    "deliv_chg": 0.2375
+   }
+  },
+  "DELHIVERY": {
+   "rank": 146,
+   "composite": 0.1052,
+   "factors": {
+    "momentum": 0.5333,
+    "low_vol": 0.68,
+    "trend": 0.4967,
+    "stability": 0.3077,
+    "deliv_chg": 0.7291
+   }
+  },
+  "TATATECH": {
+   "rank": 147,
+   "composite": 0.0672,
+   "factors": {
+    "momentum": 0.45,
+    "low_vol": 0.3133,
+    "trend": 0.88,
+    "stability": 0.6154,
+    "deliv_chg": 0.1137
+   }
+  },
+  "CANBK": {
+   "rank": 148,
+   "composite": 0.0558,
+   "factors": {
+    "momentum": 0.5833,
+    "low_vol": 0.5767,
+    "trend": 0.2167,
+    "stability": 0.592,
+    "deliv_chg": 0.7759
+   }
+  },
+  "AXISBANK": {
+   "rank": 149,
+   "composite": 0.049,
+   "factors": {
+    "momentum": 0.61,
+    "low_vol": 0.8567,
+    "trend": 0.1933,
+    "stability": 0.5819,
+    "deliv_chg": 0.2876
+   }
+  },
+  "APLAPOLLO": {
+   "rank": 150,
+   "composite": 0.0317,
+   "factors": {
+    "momentum": 0.53,
+    "low_vol": 0.67,
+    "trend": 0.3933,
+    "stability": 0.5719,
+    "deliv_chg": 0.388
+   }
+  },
+  "AVANTIFEED": {
+   "rank": 151,
+   "composite": 0.011,
+   "factors": {
+    "momentum": 0.76,
+    "low_vol": 0.0567,
+    "trend": 0.04,
+    "stability": 0.6722,
+    "deliv_chg": 0.9398
+   }
+  },
+  "HEG": {
+   "rank": 152,
+   "composite": 0.0082,
+   "factors": {
+    "momentum": 0.34,
+    "low_vol": 0.2033,
+    "trend": 0.7567,
+    "stability": 0.5987,
+    "deliv_chg": 0.9197
+   }
+  },
+  "360ONE": {
+   "rank": 153,
+   "composite": 0.0046,
+   "factors": {
+    "momentum": 0.4267,
+    "low_vol": 0.7167,
+    "trend": 0.4733,
+    "stability": 0.4281,
+    "deliv_chg": 0.7124
+   }
+  },
+  "CHOICEIN": {
+   "rank": 154,
+   "composite": -0.0011,
+   "factors": {
+    "momentum": 0.5133,
+    "low_vol": 0.42,
+    "trend": 0.6433,
+    "stability": 0.4682,
+    "deliv_chg": 0.2642
+   }
+  },
+  "ONGC": {
+   "rank": 155,
+   "composite": -0.0014,
+   "factors": {
+    "momentum": 0.5,
+    "low_vol": 0.9233,
+    "trend": 0.0967,
+    "stability": 0.5184,
+    "deliv_chg": 0.8595
+   }
+  },
+  "CARTRADE": {
+   "rank": 156,
+   "composite": -0.0017,
+   "factors": {
+    "momentum": 0.6067,
+    "low_vol": 0.0633,
+    "trend": 0.7267,
+    "stability": 0.5518,
+    "deliv_chg": 0.0435
+   }
+  },
+  "INDUSTOWER": {
+   "rank": 157,
+   "composite": -0.018,
+   "factors": {
+    "momentum": 0.5533,
+    "low_vol": 0.91,
+    "trend": 0.0933,
+    "stability": 0.5251,
+    "deliv_chg": 0.5853
+   }
+  },
+  "BEL": {
+   "rank": 158,
+   "composite": -0.0331,
+   "factors": {
+    "momentum": 0.4633,
+    "low_vol": 0.92,
+    "trend": 0.1767,
+    "stability": 0.4114,
+    "deliv_chg": 0.8896
+   }
+  },
+  "NH": {
+   "rank": 159,
+   "composite": -0.0409,
+   "factors": {
+    "momentum": 0.51,
+    "low_vol": 0.76,
+    "trend": 0.36,
+    "stability": 0.3946,
+    "deliv_chg": 0.4615
+   }
+  },
+  "PFC": {
+   "rank": 160,
+   "composite": -0.0426,
+   "factors": {
+    "momentum": 0.3833,
+    "low_vol": 0.7533,
+    "trend": 0.4567,
+    "stability": 0.3779,
+    "deliv_chg": 0.8194
+   }
+  },
+  "HAL": {
+   "rank": 161,
+   "composite": -0.0439,
+   "factors": {
+    "momentum": 0.3167,
+    "low_vol": 0.7833,
+    "trend": 0.6533,
+    "stability": 0.4983,
+    "deliv_chg": 0.398
+   }
+  },
+  "LIQUID1": {
+   "rank": 162,
+   "composite": -0.0499,
+   "factors": {
+    "momentum": 0.4367,
+    "low_vol": 1.0,
+    "trend": 0.3767,
+    "stability": null,
+    "deliv_chg": 0.2007
+   }
+  },
+  "ICICIBANK": {
+   "rank": 163,
+   "composite": -0.0716,
+   "factors": {
+    "momentum": 0.3033,
+    "low_vol": 0.96,
+    "trend": 0.4767,
+    "stability": 0.2943,
+    "deliv_chg": 0.8528
+   }
+  },
+  "LT": {
+   "rank": 164,
+   "composite": -0.0886,
+   "factors": {
+    "momentum": 0.4833,
+    "low_vol": 0.6767,
+    "trend": 0.39,
+    "stability": 0.4649,
+    "deliv_chg": 0.3746
+   }
+  },
+  "ENRIN": {
+   "rank": 165,
+   "composite": -0.0924,
+   "factors": {
+    "momentum": 0.4567,
+    "low_vol": 0.23,
+    "trend": 0.7467,
+    "stability": 0.4716,
+    "deliv_chg": 0.2508
+   }
+  },
+  "POONAWALLA": {
+   "rank": 166,
+   "composite": -0.0981,
+   "factors": {
+    "momentum": 0.4667,
+    "low_vol": 0.4167,
+    "trend": 0.5533,
+    "stability": 0.4515,
+    "deliv_chg": 0.4214
+   }
+  },
+  "PNB": {
+   "rank": 167,
+   "composite": -0.1072,
+   "factors": {
+    "momentum": 0.4033,
+    "low_vol": 0.7133,
+    "trend": 0.3733,
+    "stability": 0.505,
+    "deliv_chg": 0.602
+   }
+  },
+  "MRPL": {
+   "rank": 168,
+   "composite": -0.1119,
+   "factors": {
+    "momentum": 0.5967,
+    "low_vol": 0.1133,
+    "trend": 0.3467,
+    "stability": 0.6087,
+    "deliv_chg": 0.5284
+   }
+  },
+  "NTPC": {
+   "rank": 169,
+   "composite": -0.1148,
+   "factors": {
+    "momentum": 0.46,
+    "low_vol": 0.9767,
+    "trend": 0.19,
+    "stability": 0.4415,
+    "deliv_chg": 0.4816
+   }
+  },
+  "TORNTPOWER": {
+   "rank": 170,
+   "composite": -0.1327,
+   "factors": {
+    "momentum": 0.49,
+    "low_vol": 0.5433,
+    "trend": 0.1833,
+    "stability": 0.4147,
+    "deliv_chg": 0.9967
+   }
+  },
+  "ATGL": {
+   "rank": 171,
+   "composite": -0.1374,
+   "factors": {
+    "momentum": 0.57,
+    "low_vol": 0.0833,
+    "trend": 0.5167,
+    "stability": 0.4615,
+    "deliv_chg": 0.408
+   }
+  },
+  "ETERNAL": {
+   "rank": 172,
+   "composite": -0.1489,
+   "factors": {
+    "momentum": 0.32,
+    "low_vol": 0.4467,
+    "trend": 0.6933,
+    "stability": 0.3846,
+    "deliv_chg": 0.6254
+   }
+  },
+  "INDHOTEL": {
+   "rank": 173,
+   "composite": -0.1516,
+   "factors": {
+    "momentum": 0.3367,
+    "low_vol": 0.8,
+    "trend": 0.4867,
+    "stability": 0.2843,
+    "deliv_chg": 0.6789
+   }
+  },
+  "MARUTI": {
+   "rank": 174,
+   "composite": -0.1581,
+   "factors": {
+    "momentum": 0.4967,
+    "low_vol": 0.8333,
+    "trend": 0.2433,
+    "stability": 0.5084,
+    "deliv_chg": 0.1605
+   }
+  },
+  "BAJAJFINSV": {
+   "rank": 175,
+   "composite": -0.1589,
+   "factors": {
+    "momentum": 0.3333,
+    "low_vol": 0.8233,
+    "trend": 0.4433,
+    "stability": 0.388,
+    "deliv_chg": 0.5886
+   }
+  },
+  "BANDHANBNK": {
+   "rank": 176,
+   "composite": -0.1668,
+   "factors": {
+    "momentum": 0.6167,
+    "low_vol": 0.14,
+    "trend": 0.3633,
+    "stability": 0.4247,
+    "deliv_chg": 0.4582
+   }
+  },
+  "BHARTIARTL": {
+   "rank": 177,
+   "composite": -0.1685,
+   "factors": {
+    "momentum": 0.3667,
+    "low_vol": 0.9667,
+    "trend": 0.3567,
+    "stability": 0.3512,
+    "deliv_chg": 0.4649
+   }
+  },
+  "CAMS": {
+   "rank": 178,
+   "composite": -0.1689,
+   "factors": {
+    "momentum": 0.41,
+    "low_vol": 0.6033,
+    "trend": 0.4667,
+    "stability": 0.398,
+    "deliv_chg": 0.4682
+   }
+  },
+  "UNOMINDA": {
+   "rank": 179,
+   "composite": -0.1713,
+   "factors": {
+    "momentum": 0.4433,
+    "low_vol": 0.4933,
+    "trend": 0.5767,
+    "stability": 0.4916,
+    "deliv_chg": 0.0602
+   }
+  },
+  "PETRONET": {
+   "rank": 180,
+   "composite": -0.1832,
+   "factors": {
+    "momentum": 0.4167,
+    "low_vol": 0.4833,
+    "trend": 0.35,
+    "stability": 0.3679,
+    "deliv_chg": 0.9097
+   }
+  },
+  "TECHM": {
+   "rank": 181,
+   "composite": -0.1833,
+   "factors": {
+    "momentum": 0.36,
+    "low_vol": 0.63,
+    "trend": 0.61,
+    "stability": 0.4816,
+    "deliv_chg": 0.1237
+   }
+  },
+  "ANANTRAJ": {
+   "rank": 182,
+   "composite": -0.1887,
+   "factors": {
+    "momentum": 0.39,
+    "low_vol": 0.1667,
+    "trend": 0.6667,
+    "stability": 0.3478,
+    "deliv_chg": 0.7258
+   }
+  },
+  "GAIL": {
+   "rank": 183,
+   "composite": -0.1912,
+   "factors": {
+    "momentum": 0.3967,
+    "low_vol": 0.78,
+    "trend": 0.4333,
+    "stability": 0.4348,
+    "deliv_chg": 0.2207
+   }
+  },
+  "JSWENERGY": {
+   "rank": 184,
+   "composite": -0.1948,
+   "factors": {
+    "momentum": 0.3567,
+    "low_vol": 0.6667,
+    "trend": 0.5567,
+    "stability": 0.4013,
+    "deliv_chg": 0.301
+   }
+  },
+  "TATAPOWER": {
+   "rank": 185,
+   "composite": -0.2071,
+   "factors": {
+    "momentum": 0.3433,
+    "low_vol": 0.9567,
+    "trend": 0.2533,
+    "stability": 0.3278,
+    "deliv_chg": 0.7559
+   }
+  },
+  "JINDALSTEL": {
+   "rank": 186,
+   "composite": -0.2086,
+   "factors": {
+    "momentum": 0.4067,
+    "low_vol": 0.7267,
+    "trend": 0.2767,
+    "stability": 0.4482,
+    "deliv_chg": 0.5719
+   }
+  },
+  "OIL": {
+   "rank": 187,
+   "composite": -0.2125,
+   "factors": {
+    "momentum": 0.37,
+    "low_vol": 0.5933,
+    "trend": 0.2967,
+    "stability": 0.4448,
+    "deliv_chg": 0.8796
+   }
+  },
+  "IOC": {
+   "rank": 188,
+   "composite": -0.2194,
+   "factors": {
+    "momentum": 0.4233,
+    "low_vol": 0.7033,
+    "trend": 0.1367,
+    "stability": 0.4047,
+    "deliv_chg": 0.913
+   }
+  },
+  "BANKBARODA": {
+   "rank": 189,
+   "composite": -0.2546,
+   "factors": {
+    "momentum": 0.4467,
+    "low_vol": 0.6867,
+    "trend": 0.09,
+    "stability": 0.5017,
+    "deliv_chg": 0.6923
+   }
+  },
+  "NAZARA": {
+   "rank": 190,
+   "composite": -0.2601,
+   "factors": {
+    "momentum": 0.2,
+    "low_vol": 0.27,
+    "trend": 0.8467,
+    "stability": 0.3813,
+    "deliv_chg": 0.699
+   }
+  },
+  "RECLTD": {
+   "rank": 191,
+   "composite": -0.261,
+   "factors": {
+    "momentum": 0.25,
+    "low_vol": 0.71,
+    "trend": 0.4533,
+    "stability": 0.2642,
+    "deliv_chg": 0.9699
+   }
+  },
+  "TATACONSUM": {
+   "rank": 192,
+   "composite": -0.2731,
+   "factors": {
+    "momentum": 0.44,
+    "low_vol": 0.9267,
+    "trend": 0.1667,
+    "stability": 0.3645,
+    "deliv_chg": 0.3177
+   }
+  },
+  "PPLPHARMA": {
+   "rank": 193,
+   "composite": -0.3048,
+   "factors": {
+    "momentum": 0.2033,
+    "low_vol": 0.34,
+    "trend": 0.7967,
+    "stability": 0.4214,
+    "deliv_chg": 0.5017
+   }
+  },
+  "CIPLA": {
+   "rank": 194,
+   "composite": -0.3054,
+   "factors": {
+    "momentum": 0.3267,
+    "low_vol": 0.95,
+    "trend": 0.44,
+    "stability": 0.2776,
+    "deliv_chg": 0.1371
+   }
+  },
+  "PAGEIND": {
+   "rank": 195,
+   "composite": -0.3225,
+   "factors": {
+    "momentum": 0.22,
+    "low_vol": 0.8767,
+    "trend": 0.5467,
+    "stability": 0.1271,
+    "deliv_chg": 0.6321
+   }
+  },
+  "MUTHOOTFIN": {
+   "rank": 196,
+   "composite": -0.326,
+   "factors": {
+    "momentum": 0.56,
+    "low_vol": 0.2767,
+    "trend": 0.0267,
+    "stability": 0.4883,
+    "deliv_chg": 0.7492
+   }
+  },
+  "LODHA": {
+   "rank": 197,
+   "composite": -0.3262,
+   "factors": {
+    "momentum": 0.3233,
+    "low_vol": 0.2433,
+    "trend": 0.7633,
+    "stability": 0.3378,
+    "deliv_chg": 0.2475
+   }
+  },
+  "POWERGRID": {
+   "rank": 198,
+   "composite": -0.3277,
+   "factors": {
+    "momentum": 0.3867,
+    "low_vol": 0.9833,
+    "trend": 0.16,
+    "stability": 0.1605,
+    "deliv_chg": 0.6221
+   }
+  },
+  "MFSL": {
+   "rank": 199,
+   "composite": -0.3391,
+   "factors": {
+    "momentum": 0.48,
+    "low_vol": 0.7367,
+    "trend": 0.0867,
+    "stability": 0.301,
+    "deliv_chg": 0.5084
+   }
+  },
+  "MANKIND": {
+   "rank": 200,
+   "composite": -0.3422,
+   "factors": {
+    "momentum": 0.3133,
+    "low_vol": 0.7733,
+    "trend": 0.5267,
+    "stability": 0.2341,
+    "deliv_chg": 0.194
+   }
+  },
+  "M&M": {
+   "rank": 201,
+   "composite": -0.346,
+   "factors": {
+    "momentum": 0.33,
+    "low_vol": 0.62,
+    "trend": 0.4467,
+    "stability": 0.4381,
+    "deliv_chg": 0.2308
+   }
+  },
+  "GODREJPROP": {
+   "rank": 202,
+   "composite": -0.3469,
+   "factors": {
+    "momentum": 0.2933,
+    "low_vol": 0.43,
+    "trend": 0.5833,
+    "stability": 0.3211,
+    "deliv_chg": 0.5117
+   }
+  },
+  "PRESTIGE": {
+   "rank": 203,
+   "composite": -0.3719,
+   "factors": {
+    "momentum": 0.42,
+    "low_vol": 0.4033,
+    "trend": 0.43,
+    "stability": 0.2709,
+    "deliv_chg": 0.3612
+   }
+  },
+  "HUDCO": {
+   "rank": 204,
+   "composite": -0.3849,
+   "factors": {
+    "momentum": 0.2967,
+    "low_vol": 0.61,
+    "trend": 0.2867,
+    "stability": 0.2575,
+    "deliv_chg": 0.9431
+   }
+  },
+  "COFORGE": {
+   "rank": 205,
+   "composite": -0.4107,
+   "factors": {
+    "momentum": 0.1767,
+    "low_vol": 0.1967,
+    "trend": 0.73,
+    "stability": 0.3712,
+    "deliv_chg": 0.7425
+   }
+  },
+  "GRSE": {
+   "rank": 206,
+   "composite": -0.4115,
+   "factors": {
+    "momentum": 0.3633,
+    "low_vol": 0.15,
+    "trend": 0.3367,
+    "stability": 0.4181,
+    "deliv_chg": 0.8829
+   }
+  },
+  "SBILIFE": {
+   "rank": 207,
+   "composite": -0.425,
+   "factors": {
+    "momentum": 0.3467,
+    "low_vol": 0.9433,
+    "trend": 0.2033,
+    "stability": 0.2876,
+    "deliv_chg": 0.2542
+   }
+  },
+  "ULTRACEMCO": {
+   "rank": 208,
+   "composite": -0.4349,
+   "factors": {
+    "momentum": 0.2567,
+    "low_vol": 0.79,
+    "trend": 0.4267,
+    "stability": 0.3311,
+    "deliv_chg": 0.2341
+   }
+  },
+  "LICI": {
+   "rank": 209,
+   "composite": -0.4394,
+   "factors": {
+    "momentum": 0.3767,
+    "low_vol": 0.6967,
+    "trend": 0.1733,
+    "stability": 0.194,
+    "deliv_chg": 0.6589
+   }
+  },
+  "OLECTRA": {
+   "rank": 210,
+   "composite": -0.4415,
+   "factors": {
+    "momentum": 0.3067,
+    "low_vol": 0.1333,
+    "trend": 0.6467,
+    "stability": 0.3144,
+    "deliv_chg": 0.4482
+   }
+  },
+  "DRREDDY": {
+   "rank": 211,
+   "composite": -0.4503,
+   "factors": {
+    "momentum": 0.43,
+    "low_vol": 0.8733,
+    "trend": 0.1067,
+    "stability": 0.2977,
+    "deliv_chg": 0.1304
+   }
+  },
+  "RELIANCE": {
+   "rank": 212,
+   "composite": -0.4512,
+   "factors": {
+    "momentum": 0.2467,
+    "low_vol": 0.9533,
+    "trend": 0.1533,
+    "stability": 0.2308,
+    "deliv_chg": 0.8161
+   }
+  },
+  "INDIGO": {
+   "rank": 213,
+   "composite": -0.4643,
+   "factors": {
+    "momentum": 0.2233,
+    "low_vol": 0.3033,
+    "trend": 0.5367,
+    "stability": 0.2174,
+    "deliv_chg": 0.9164
+   }
+  },
+  "COLPAL": {
+   "rank": 214,
+   "composite": -0.4729,
+   "factors": {
+    "momentum": 0.2733,
+    "low_vol": 0.7867,
+    "trend": 0.25,
+    "stability": 0.1839,
+    "deliv_chg": 0.7057
+   }
+  },
+  "BRITANNIA": {
+   "rank": 215,
+   "composite": -0.4739,
+   "factors": {
+    "momentum": 0.2867,
+    "low_vol": 0.9733,
+    "trend": 0.2833,
+    "stability": 0.2542,
+    "deliv_chg": 0.1739
+   }
+  },
+  "TEJASNET": {
+   "rank": 216,
+   "composite": -0.4772,
+   "factors": {
+    "momentum": 0.2633,
+    "low_vol": 0.0133,
+    "trend": 0.5633,
+    "stability": 0.3244,
+    "deliv_chg": 0.903
+   }
+  },
+  "OLAELEC": {
+   "rank": 217,
+   "composite": -0.4904,
+   "factors": {
+    "momentum": 0.3533,
+    "low_vol": 0.02,
+    "trend": 0.6067,
+    "stability": 0.4314,
+    "deliv_chg": 0.1773
+   }
+  },
+  "TIINDIA": {
+   "rank": 218,
+   "composite": -0.4974,
+   "factors": {
+    "momentum": 0.3733,
+    "low_vol": 0.5133,
+    "trend": 0.3133,
+    "stability": 0.2609,
+    "deliv_chg": 0.3144
+   }
+  },
+  "NHPC": {
+   "rank": 219,
+   "composite": -0.5053,
+   "factors": {
+    "momentum": 0.27,
+    "low_vol": 0.8967,
+    "trend": 0.29,
+    "stability": 0.1873,
+    "deliv_chg": 0.3478
+   }
+  },
+  "KOTAKBANK": {
+   "rank": 220,
+   "composite": -0.5384,
+   "factors": {
+    "momentum": 0.2667,
+    "low_vol": 0.9333,
+    "trend": 0.2267,
+    "stability": 0.2408,
+    "deliv_chg": 0.2809
+   }
+  },
+  "BPCL": {
+   "rank": 221,
+   "composite": -0.5394,
+   "factors": {
+    "momentum": 0.4,
+    "low_vol": 0.5167,
+    "trend": 0.2333,
+    "stability": 0.3579,
+    "deliv_chg": 0.1104
+   }
+  },
+  "DMART": {
+   "rank": 222,
+   "composite": -0.5419,
+   "factors": {
+    "momentum": 0.29,
+    "low_vol": 0.83,
+    "trend": 0.2067,
+    "stability": 0.1706,
+    "deliv_chg": 0.4749
+   }
+  },
+  "IEX": {
+   "rank": 223,
+   "composite": -0.5495,
+   "factors": {
+    "momentum": 0.2267,
+    "low_vol": 0.6567,
+    "trend": 0.31,
+    "stability": 0.3344,
+    "deliv_chg": 0.4916
+   }
+  },
+  "VOLTAS": {
+   "rank": 224,
+   "composite": -0.5635,
+   "factors": {
+    "momentum": 0.31,
+    "low_vol": 0.5367,
+    "trend": 0.1233,
+    "stability": 0.2809,
+    "deliv_chg": 0.7993
+   }
+  },
+  "FORCEMOT": {
+   "rank": 225,
+   "composite": -0.5659,
+   "factors": {
+    "momentum": 0.3933,
+    "low_vol": 0.1233,
+    "trend": 0.14,
+    "stability": 0.3913,
+    "deliv_chg": 0.8294
+   }
+  },
+  "POLICYBZR": {
+   "rank": 226,
+   "composite": -0.5809,
+   "factors": {
+    "momentum": 0.2167,
+    "low_vol": 0.69,
+    "trend": 0.2233,
+    "stability": 0.3043,
+    "deliv_chg": 0.6488
+   }
+  },
+  "HYUNDAI": {
+   "rank": 227,
+   "composite": -0.5815,
+   "factors": {
+    "momentum": 0.1933,
+    "low_vol": 0.6733,
+    "trend": 0.48,
+    "stability": 0.3411,
+    "deliv_chg": 0.0803
+   }
+  },
+  "MRF": {
+   "rank": 228,
+   "composite": -0.5859,
+   "factors": {
+    "momentum": 0.24,
+    "low_vol": 0.8367,
+    "trend": 0.2,
+    "stability": 0.1806,
+    "deliv_chg": 0.5518
+   }
+  },
+  "DIXON": {
+   "rank": 229,
+   "composite": -0.6016,
+   "factors": {
+    "momentum": 0.1267,
+    "low_vol": 0.2367,
+    "trend": 0.7,
+    "stability": 0.1672,
+    "deliv_chg": 0.6823
+   }
+  },
+  "LICHSGFIN": {
+   "rank": 230,
+   "composite": -0.6116,
+   "factors": {
+    "momentum": 0.2767,
+    "low_vol": 0.77,
+    "trend": 0.11,
+    "stability": 0.204,
+    "deliv_chg": 0.5953
+   }
+  },
+  "HINDPETRO": {
+   "rank": 231,
+   "composite": -0.6387,
+   "factors": {
+    "momentum": 0.38,
+    "low_vol": 0.2733,
+    "trend": 0.1333,
+    "stability": 0.2475,
+    "deliv_chg": 0.6656
+   }
+  },
+  "ASTRAL": {
+   "rank": 232,
+   "composite": -0.6393,
+   "factors": {
+    "momentum": 0.2433,
+    "low_vol": 0.6367,
+    "trend": 0.1867,
+    "stability": 0.3445,
+    "deliv_chg": 0.4548
+   }
+  },
+  "NAUKRI": {
+   "rank": 233,
+   "composite": -0.6456,
+   "factors": {
+    "momentum": 0.2133,
+    "low_vol": 0.54,
+    "trend": 0.49,
+    "stability": 0.2107,
+    "deliv_chg": 0.1572
+   }
+  },
+  "BAJAJHLDNG": {
+   "rank": 234,
+   "composite": -0.648,
+   "factors": {
+    "momentum": 0.11,
+    "low_vol": 0.7667,
+    "trend": 0.45,
+    "stability": 0.1171,
+    "deliv_chg": 0.5151
+   }
+  },
+  "MAXHEALTH": {
+   "rank": 235,
+   "composite": -0.6746,
+   "factors": {
+    "momentum": 0.18,
+    "low_vol": 0.87,
+    "trend": 0.3533,
+    "stability": 0.1003,
+    "deliv_chg": 0.2274
+   }
+  },
+  "SHREECEM": {
+   "rank": 236,
+   "composite": -0.6825,
+   "factors": {
+    "momentum": 0.19,
+    "low_vol": 0.8833,
+    "trend": 0.33,
+    "stability": 0.1037,
+    "deliv_chg": 0.1906
+   }
+  },
+  "MAZDOCK": {
+   "rank": 237,
+   "composite": -0.6868,
+   "factors": {
+    "momentum": 0.1533,
+    "low_vol": 0.3767,
+    "trend": 0.34,
+    "stability": 0.2375,
+    "deliv_chg": 0.8763
+   }
+  },
+  "AMBER": {
+   "rank": 238,
+   "composite": -0.6894,
+   "factors": {
+    "momentum": 0.3,
+    "low_vol": 0.17,
+    "trend": 0.3833,
+    "stability": 0.2274,
+    "deliv_chg": 0.4247
+   }
+  },
+  "HDFCAMC": {
+   "rank": 239,
+   "composite": -0.695,
+   "factors": {
+    "momentum": 0.35,
+    "low_vol": 0.4433,
+    "trend": 0.2733,
+    "stability": 0.1739,
+    "deliv_chg": 0.1271
+   }
+  },
+  "WAAREEENER": {
+   "rank": 240,
+   "composite": -0.7004,
+   "factors": {
+    "momentum": 0.26,
+    "low_vol": 0.45,
+    "trend": 0.0767,
+    "stability": 0.214,
+    "deliv_chg": 0.9365
+   }
+  },
+  "PGEL": {
+   "rank": 241,
+   "composite": -0.7007,
+   "factors": {
+    "momentum": 0.08,
+    "low_vol": 0.16,
+    "trend": 0.6633,
+    "stability": 0.1773,
+    "deliv_chg": 0.7692
+   }
+  },
+  "KALYANKJIL": {
+   "rank": 242,
+   "composite": -0.7075,
+   "factors": {
+    "momentum": 0.0833,
+    "low_vol": 0.0533,
+    "trend": 0.9033,
+    "stability": 0.3612,
+    "deliv_chg": 0.0167
+   }
+  },
+  "CONCOR": {
+   "rank": 243,
+   "composite": -0.7089,
+   "factors": {
+    "momentum": 0.1367,
+    "low_vol": 0.6833,
+    "trend": 0.3867,
+    "stability": 0.1438,
+    "deliv_chg": 0.4448
+   }
+  },
+  "COCHINSHIP": {
+   "rank": 244,
+   "composite": -0.7266,
+   "factors": {
+    "momentum": 0.1467,
+    "low_vol": 0.2867,
+    "trend": 0.3033,
+    "stability": 0.291,
+    "deliv_chg": 0.9264
+   }
+  },
+  "VBL": {
+   "rank": 245,
+   "composite": -0.7298,
+   "factors": {
+    "momentum": 0.28,
+    "low_vol": 0.6133,
+    "trend": 0.1033,
+    "stability": 0.1538,
+    "deliv_chg": 0.5318
+   }
+  },
+  "PERSISTENT": {
+   "rank": 246,
+   "composite": -0.7345,
+   "factors": {
+    "momentum": 0.2533,
+    "low_vol": 0.32,
+    "trend": 0.32,
+    "stability": 0.3746,
+    "deliv_chg": 0.204
+   }
+  },
+  "HAVELLS": {
+   "rank": 247,
+   "composite": -0.7358,
+   "factors": {
+    "momentum": 0.1233,
+    "low_vol": 0.8867,
+    "trend": 0.28,
+    "stability": 0.1304,
+    "deliv_chg": 0.4013
+   }
+  },
+  "ICICIGI": {
+   "rank": 248,
+   "composite": -0.7584,
+   "factors": {
+    "momentum": 0.2833,
+    "low_vol": 0.8133,
+    "trend": 0.05,
+    "stability": 0.1237,
+    "deliv_chg": 0.3043
+   }
+  },
+  "CDSL": {
+   "rank": 249,
+   "composite": -0.7802,
+   "factors": {
+    "momentum": 0.1833,
+    "low_vol": 0.56,
+    "trend": 0.26,
+    "stability": 0.2074,
+    "deliv_chg": 0.4147
+   }
+  },
+  "JPPOWER": {
+   "rank": 250,
+   "composite": -0.7893,
+   "factors": {
+    "momentum": 0.1967,
+    "low_vol": 0.04,
+    "trend": 0.3967,
+    "stability": 0.3177,
+    "deliv_chg": 0.5987
+   }
+  },
+  "HINDUNILVR": {
+   "rank": 251,
+   "composite": -0.7982,
+   "factors": {
+    "momentum": 0.1733,
+    "low_vol": 0.89,
+    "trend": 0.1,
+    "stability": 0.0936,
+    "deliv_chg": 0.4783
+   }
+  },
+  "MPHASIS": {
+   "rank": 252,
+   "composite": -0.8,
+   "factors": {
+    "momentum": 0.17,
+    "low_vol": 0.58,
+    "trend": 0.38,
+    "stability": 0.2241,
+    "deliv_chg": 0.0569
+   }
+  },
+  "HDFCBANK": {
+   "rank": 253,
+   "composite": -0.819,
+   "factors": {
+    "momentum": 0.16,
+    "low_vol": 0.8467,
+    "trend": 0.03,
+    "stability": 0.0201,
+    "deliv_chg": 0.8227
+   }
+  },
+  "DLF": {
+   "rank": 254,
+   "composite": -0.8277,
+   "factors": {
+    "momentum": 0.1633,
+    "low_vol": 0.5033,
+    "trend": 0.3433,
+    "stability": 0.1338,
+    "deliv_chg": 0.3411
+   }
+  },
+  "GODREJCP": {
+   "rank": 255,
+   "composite": -0.8291,
+   "factors": {
+    "momentum": 0.2333,
+    "low_vol": 0.84,
+    "trend": 0.15,
+    "stability": 0.1204,
+    "deliv_chg": 0.0201
+   }
+  },
+  "NBCC": {
+   "rank": 256,
+   "composite": -0.8377,
+   "factors": {
+    "momentum": 0.2067,
+    "low_vol": 0.4267,
+    "trend": 0.1267,
+    "stability": 0.1906,
+    "deliv_chg": 0.6856
+   }
+  },
+  "TIMETECHNO": {
+   "rank": 257,
+   "composite": -0.8519,
+   "factors": {
+    "momentum": 0.1033,
+    "low_vol": 0.31,
+    "trend": 0.5733,
+    "stability": 0.1973,
+    "deliv_chg": 0.1538
+   }
+  },
+  "CROMPTON": {
+   "rank": 258,
+   "composite": -0.8619,
+   "factors": {
+    "momentum": 0.1333,
+    "low_vol": 0.49,
+    "trend": 0.21,
+    "stability": 0.0435,
+    "deliv_chg": 0.8562
+   }
+  },
+  "IRCTC": {
+   "rank": 259,
+   "composite": -0.8992,
+   "factors": {
+    "momentum": 0.05,
+    "low_vol": 0.9067,
+    "trend": 0.0533,
+    "stability": 0.01,
+    "deliv_chg": 0.9298
+   }
+  },
+  "SAGILITY": {
+   "rank": 260,
+   "composite": -0.9058,
+   "factors": {
+    "momentum": 0.21,
+    "low_vol": 0.36,
+    "trend": 0.22,
+    "stability": 0.311,
+    "deliv_chg": 0.1405
+   }
+  },
+  "HCLTECH": {
+   "rank": 261,
+   "composite": -0.927,
+   "factors": {
+    "momentum": 0.14,
+    "low_vol": 0.53,
+    "trend": 0.3,
+    "stability": 0.2441,
+    "deliv_chg": 0.0334
+   }
+  },
+  "DABUR": {
+   "rank": 262,
+   "composite": -0.9412,
+   "factors": {
+    "momentum": 0.1667,
+    "low_vol": 0.8533,
+    "trend": 0.0433,
+    "stability": 0.0535,
+    "deliv_chg": 0.311
+   }
+  },
+  "SRF": {
+   "rank": 263,
+   "composite": -0.9655,
+   "factors": {
+    "momentum": 0.23,
+    "low_vol": 0.5267,
+    "trend": 0.1467,
+    "stability": 0.1472,
+    "deliv_chg": 0.0401
+   }
+  },
+  "IRFC": {
+   "rank": 264,
+   "composite": -0.971,
+   "factors": {
+    "momentum": 0.0533,
+    "low_vol": 0.73,
+    "trend": 0.0233,
+    "stability": 0.0368,
+    "deliv_chg": 0.9866
+   }
+  },
+  "BDL": {
+   "rank": 265,
+   "composite": -0.9833,
+   "factors": {
+    "momentum": 0.1567,
+    "low_vol": 0.3833,
+    "trend": 0.1433,
+    "stability": 0.2508,
+    "deliv_chg": 0.3813
+   }
+  },
+  "KFINTECH": {
+   "rank": 266,
+   "composite": -0.9887,
+   "factors": {
+    "momentum": 0.1133,
+    "low_vol": 0.3733,
+    "trend": 0.2567,
+    "stability": 0.1572,
+    "deliv_chg": 0.4314
+   }
+  },
+  "SUPREMEIND": {
+   "rank": 267,
+   "composite": -1.0002,
+   "factors": {
+    "momentum": 0.0967,
+    "low_vol": 0.7967,
+    "trend": 0.1967,
+    "stability": 0.0669,
+    "deliv_chg": 0.1204
+   }
+  },
+  "JIOFIN": {
+   "rank": 268,
+   "composite": -1.011,
+   "factors": {
+    "momentum": 0.0567,
+    "low_vol": 0.66,
+    "trend": 0.27,
+    "stability": 0.087,
+    "deliv_chg": 0.2575
+   }
+  },
+  "SUZLON": {
+   "rank": 269,
+   "composite": -1.0128,
+   "factors": {
+    "momentum": 0.15,
+    "low_vol": 0.44,
+    "trend": 0.12,
+    "stability": 0.0569,
+    "deliv_chg": 0.5819
+   }
+  },
+  "COROMANDEL": {
+   "rank": 270,
+   "composite": -1.018,
+   "factors": {
+    "momentum": 0.1067,
+    "low_vol": 0.5833,
+    "trend": 0.2667,
+    "stability": 0.1137,
+    "deliv_chg": 0.0936
+   }
+  },
+  "LTM": {
+   "rank": 271,
+   "composite": -1.03,
+   "factors": {
+    "momentum": 0.1,
+    "low_vol": 0.3433,
+    "trend": 0.18,
+    "stability": 0.2207,
+    "deliv_chg": null
+   }
+  },
+  "AWL": {
+   "rank": 272,
+   "composite": -1.037,
+   "factors": {
+    "momentum": 0.0767,
+    "low_vol": 0.6233,
+    "trend": 0.13,
+    "stability": 0.0635,
+    "deliv_chg": 0.5251
+   }
+  },
+  "ITC": {
+   "rank": 273,
+   "composite": -1.0463,
+   "factors": {
+    "momentum": 0.0633,
+    "low_vol": 0.9867,
+    "trend": 0.0667,
+    "stability": 0.0134,
+    "deliv_chg": 0.2441
+   }
+  },
+  "WIPRO": {
+   "rank": 274,
+   "composite": -1.0556,
+   "factors": {
+    "momentum": 0.0667,
+    "low_vol": 0.8633,
+    "trend": 0.06,
+    "stability": 0.0602,
+    "deliv_chg": 0.3311
+   }
+  },
+  "ZEEL": {
+   "rank": 275,
+   "composite": -1.0699,
+   "factors": {
+    "momentum": 0.1867,
+    "low_vol": 0.08,
+    "trend": 0.3333,
+    "stability": 0.2007,
+    "deliv_chg": 0.0268
+   }
+  },
+  "TMPV": {
+   "rank": 276,
+   "composite": -1.0741,
+   "factors": {
+    "momentum": 0.01,
+    "low_vol": 0.4633,
+    "trend": 0.2467,
+    "stability": 0.0702,
+    "deliv_chg": 0.6455
+   }
+  },
+  "PIIND": {
+   "rank": 277,
+   "composite": -1.0757,
+   "factors": {
+    "momentum": 0.0267,
+    "low_vol": 0.6633,
+    "trend": 0.0833,
+    "stability": 0.0268,
+    "deliv_chg": 0.7391
+   }
+  },
+  "ICICIPRULI": {
+   "rank": 278,
+   "composite": -1.0846,
+   "factors": {
+    "momentum": 0.13,
+    "low_vol": 0.72,
+    "trend": 0.0367,
+    "stability": 0.0736,
+    "deliv_chg": 0.2074
+   }
+  },
+  "GODFRYPHLP": {
+   "rank": 279,
+   "composite": -1.0936,
+   "factors": {
+    "momentum": 0.03,
+    "low_vol": 0.09,
+    "trend": 0.24,
+    "stability": 0.1505,
+    "deliv_chg": 0.9498
+   }
+  },
+  "IDBI": {
+   "rank": 280,
+   "composite": -1.0985,
+   "factors": {
+    "momentum": 0.2367,
+    "low_vol": 0.0867,
+    "trend": 0.1133,
+    "stability": 0.2676,
+    "deliv_chg": 0.1505
+   }
+  },
+  "VMM": {
+   "rank": 281,
+   "composite": -1.1106,
+   "factors": {
+    "momentum": 0.12,
+    "low_vol": 0.5533,
+    "trend": 0.0467,
+    "stability": 0.0468,
+    "deliv_chg": 0.4348
+   }
+  },
+  "INFY": {
+   "rank": 282,
+   "composite": -1.1126,
+   "factors": {
+    "momentum": 0.0867,
+    "low_vol": 0.5467,
+    "trend": 0.0567,
+    "stability": 0.1371,
+    "deliv_chg": 0.4281
+   }
+  },
+  "TRENT": {
+   "rank": 283,
+   "composite": -1.1333,
+   "factors": {
+    "momentum": 0.0167,
+    "low_vol": 0.39,
+    "trend": 0.1633,
+    "stability": 0.0903,
+    "deliv_chg": 0.7157
+   }
+  },
+  "HDFCLIFE": {
+   "rank": 284,
+   "composite": -1.143,
+   "factors": {
+    "momentum": 0.09,
+    "low_vol": 0.88,
+    "trend": 0.0167,
+    "stability": 0.0167,
+    "deliv_chg": 0.097
+   }
+  },
+  "SBICARD": {
+   "rank": 285,
+   "composite": -1.145,
+   "factors": {
+    "momentum": 0.0733,
+    "low_vol": 0.7633,
+    "trend": 0.0733,
+    "stability": 0.107,
+    "deliv_chg": 0.0635
+   }
+  },
+  "ITCHOTELS": {
+   "rank": 286,
+   "composite": -1.1467,
+   "factors": {
+    "momentum": 0.1167,
+    "low_vol": 0.4567,
+    "trend": 0.2133,
+    "stability": 0.0334,
+    "deliv_chg": 0.0836
+   }
+  },
+  "RVNL": {
+   "rank": 287,
+   "composite": -1.1564,
+   "factors": {
+    "momentum": 0.0333,
+    "low_vol": 0.5333,
+    "trend": 0.0133,
+    "stability": 0.0401,
+    "deliv_chg": 0.8027
+   }
+  },
+  "UPL": {
+   "rank": 288,
+   "composite": -1.181,
+   "factors": {
+    "momentum": 0.1433,
+    "low_vol": 0.41,
+    "trend": 0.0333,
+    "stability": 0.1405,
+    "deliv_chg": 0.214
+   }
+  },
+  "JUBLFOOD": {
+   "rank": 289,
+   "composite": -1.1864,
+   "factors": {
+    "momentum": 0.04,
+    "low_vol": 0.3867,
+    "trend": 0.2633,
+    "stability": 0.0769,
+    "deliv_chg": 0.2174
+   }
+  },
+  "TATAELXSI": {
+   "rank": 290,
+   "composite": -1.1891,
+   "factors": {
+    "momentum": 0.0233,
+    "low_vol": 0.55,
+    "trend": 0.02,
+    "stability": 0.0067,
+    "deliv_chg": 0.7525
+   }
+  },
+  "TARIL": {
+   "rank": 291,
+   "composite": -1.1904,
+   "factors": {
+    "momentum": 0.02,
+    "low_vol": 0.07,
+    "trend": 0.23,
+    "stability": 0.0836,
+    "deliv_chg": 0.8428
+   }
+  },
+  "KAYNES": {
+   "rank": 292,
+   "composite": -1.216,
+   "factors": {
+    "momentum": 0.0133,
+    "low_vol": 0.0667,
+    "trend": 0.1567,
+    "stability": 0.097,
+    "deliv_chg": 0.9599
+   }
+  },
+  "TCS": {
+   "rank": 293,
+   "composite": -1.2364,
+   "factors": {
+    "momentum": 0.0467,
+    "low_vol": 0.5967,
+    "trend": 0.1167,
+    "stability": 0.1104,
+    "deliv_chg": 0.0301
+   }
+  },
+  "VEDL": {
+   "rank": 294,
+   "composite": -1.2446,
+   "factors": {
+    "momentum": 0.0367,
+    "low_vol": 0.0033,
+    "trend": 0.0033,
+    "stability": 0.2742,
+    "deliv_chg": 0.9766
+   }
+  },
+  "JYOTICNC": {
+   "rank": 295,
+   "composite": -1.2461,
+   "factors": {
+    "momentum": 0.0933,
+    "low_vol": 0.1533,
+    "trend": 0.17,
+    "stability": 0.1639,
+    "deliv_chg": 0.2408
+   }
+  },
+  "AMBUJACEM": {
+   "rank": 296,
+   "composite": -1.2653,
+   "factors": {
+    "momentum": 0.06,
+    "low_vol": 0.6267,
+    "trend": 0.07,
+    "stability": 0.0301,
+    "deliv_chg": 0.0702
+   }
+  },
+  "PATANJALI": {
+   "rank": 297,
+   "composite": -1.3,
+   "factors": {
+    "momentum": 0.0433,
+    "low_vol": 0.7433,
+    "trend": 0.01,
+    "stability": 0.0033,
+    "deliv_chg": 0.0502
+   }
+  },
+  "SWIGGY": {
+   "rank": 298,
+   "composite": -1.4064,
+   "factors": {
+    "momentum": 0.07,
+    "low_vol": 0.2567,
+    "trend": 0.0633,
+    "stability": 0.0803,
+    "deliv_chg": 0.0736
+   }
+  },
+  "NEWGEN": {
+   "rank": 299,
+   "composite": -1.5886,
+   "factors": {
+    "momentum": 0.0067,
+    "low_vol": 0.0233,
+    "trend": 0.08,
+    "stability": 0.0502,
+    "deliv_chg": 0.1338
+   }
+  },
+  "KPITTECH": {
+   "rank": 300,
+   "composite": -1.6044,
+   "factors": {
+    "momentum": 0.0033,
+    "low_vol": 0.1933,
+    "trend": 0.0067,
+    "stability": 0.0234,
+    "deliv_chg": 0.0669
+   }
+  }
+ },
+ "basis": "recomputed 2026-08-09 \u2014 how these names rank TODAY, not the numbers used to pick them"
+}
