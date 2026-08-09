@@ -11,17 +11,42 @@ so a future reader can see what was rejected and why rather than re-proposing it
 
 ## DEPLOY
 
-### 1. `n_hold` 20 → 60  *(P2.1, 19-year evidence)*
+### 1. ~~`n_hold` 20 → 60~~ — **DECLINED 2026-08-09. Stay at 20.**
 
-| n_hold | 12 | **20 (now)** | 40 | **60** | 80 | 100 |
-|---|---|---|---|---|---|---|
-| IR | 0.360 | **0.365** | 0.379 | **0.433** | 0.428 | 0.415 |
+| n_hold | 12 | **20 (deployed)** | 40 | 60 | 80 |
+|---|---|---|---|---|---|
+| IR | 0.360 | **0.365** | 0.379 | 0.433 | 0.428 |
+| **t-stat** | 1.57 | **1.59** | 1.66 | **1.90** | 1.87 |
+| Net CAGR | 12.64% | 12.05% | 11.40% | 11.49% | 11.07% |
+| Tracking error | 14.2pp | 12.0pp | 9.7pp | 8.4pp | 7.6pp |
+| Turnover/yr | 316% | 281% | 239% | 198% | 178% |
+| ₹/position at 25% equity | ₹10,831 | ₹6,499 | ₹3,249 | **₹2,166** | ₹1,625 |
 
-IR peaks at 60 exactly where pre-registered. **Falsifies P5's "concentrate to 12"**,
-which was a 2016-2026 window artifact. Costs ~0.5pp of CAGR and buys +0.069 IR —
-the only metric that measures skill.
+IR does peak near 60, and the original entry above was right that IR is the metric
+that measures skill. Two things kill it anyway:
 
-`max_weight` must move with it: use `max(0.08, 1.5/n_hold)`.
+**It is not statistically distinguishable.** The t-statistic tops out at **1.90** —
+below this project's own 3.0 bar (§5, Harvey/Liu/Zhu) and below even the conventional
+2.0. The gap between IR 0.365 and 0.433 is inside the noise. Changing a live config on
+that is the precise pattern §4 says killed 22 previous ideas.
+
+**It is not implementable at this book's size, and failing quietly is the worst part.**
+25% equity across 60 names is ~₹2,166 a position at the current NAV. Six of today's 22
+holdings cost more than that for a *single share*. The allocator drops what it cannot
+afford, and affordability tracks SHARE PRICE — which is arbitrary, since a company can
+split 1:100 and change nothing about itself. The book would acquire a systematic tilt
+toward low-priced shares: a bet nobody chose, nobody tested, and that appears nowhere
+in the config to be disclosed.
+
+**Why the evidence could not have caught this.** The breadth sweep runs in NAV units —
+scale-free, fractional shares implicit, a 1.6% weight is always exactly 1.6%. Whole
+shares exist only in the live book. So the IR finding is real *and* silent on whether
+n_hold=60 is buyable at ₹5 lakh. It becomes viable somewhere above ₹25 lakh.
+
+In the Fundamental Law: n_hold=60 buys **breadth**, and unfillable names make
+**transfer** pay for it. At this capital the trade is not worth making.
+
+*`max_weight` stays 0.08, unchanged.*
 
 ### 2. Add a long-duration gilt sleeve, ~25%  *(P1.1, P1.1b)*
 
@@ -142,6 +167,22 @@ book is reconstituted once, not twice.
 **Not 8.0.** The remaining gap is IC, and the only credible route to it is now
 known: ~10 orthogonal non-price signals at IC ≈ 0.04 each, combining as
 `√(ΣIC²)`. `deliv_chg` is the first proven one.
+
+---
+
+## What lands in January, final
+
+| Change | Status |
+|---|---|
+| Four equal sleeves — equity 25 / gold 25 / US 25 / long gilt 25 | ✅ deploy |
+| `LTGILTBEES` as the gilt instrument | ✅ verified 2026-08-09 — ₹30.07/share, ₹3.78cr/day median turnover. Cheap per share, so whole-share rounding is negligible here |
+| Keep `deliv_chg` at 10% | ✅ deploy |
+| 1/N ensemble | ✅ deploy |
+| `n_hold` 20 → 60 | ❌ **declined** — see §1 |
+| Fifth sleeve (US short-duration) | ⏸ shelved — see §4b |
+
+Nothing above requires the owner to be present. The rebalance runs itself on the
+scheduled date and reports the fills; that automation landed 2026-08-09.
 
 ---
 
