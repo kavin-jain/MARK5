@@ -770,6 +770,88 @@ def h_why(ticker=""):
     return "\n".join(out)
 
 
+def _does_it_work():
+    """The ranking's own track record, printed next to the ranking.
+
+    A list of "top 20" with no hit rate beside it reads as a promise. This is the
+    measured answer: how often the picked 20 actually beat the field they were
+    picked from, over six months, and by how much — including the periods they
+    lost. Both halves go together or neither should be shown.
+    """
+    try:
+        hh = (json.load(open(SCORE_MEANING)) or {}).get("head_to_head") or {}
+    except (OSError, ValueError):
+        return []
+    if not hh.get("periods"):
+        return []
+    return ["", "HAS THIS RANKING WORKED?",
+            _kv("beat the field", f"{hh['top20_beat_the_field']} of {hh['periods']} times"),
+            _kv("typical edge", f"{hh['median_edge_pp']:+.1f}pp per 6 months"),
+            _kv("worst period", f"{hh['worst_period_pp']:+.1f}pp"),
+            "",
+            f"  So it loses about 1 period in 3. The edge is",
+            f"  real but small, and it is measured over only",
+            f"  ~{hh['independent_periods']:.0f} independent six-month periods —",
+            f"  t-stat {hh['t_stat_on_independent_periods']}, under this project's own",
+            "  bar of 3.0. Treat it as evidence, not proof."]
+
+
+def h_ranking(arg=""):
+    """What the ranking says TODAY — which is not the same as what is held.
+
+    Keeping those two apart is the whole point of the section headers here. The
+    book changes only at the scheduled review; a name topping the list today has
+    no claim on the portfolio until then, and showing this list without saying so
+    would invite exactly the off-cadence trading Mandate §6 forbids.
+
+    It is worth showing anyway, because the gap between the two IS the
+    information: it is how much the book has drifted from what the rules would
+    pick now, and therefore roughly how much January will change.
+    """
+    try:
+        sig = json.load(open(SIGNALS))
+    except (OSError, ValueError):
+        return ("No ranking recorded yet. It is saved at each rebalance, and can "
+                "be refreshed in between.")
+    n = sig.get("n_eligible", 0)
+    L = _export()
+    sleeves = set((L.get("config") or {}).get("sleeve_targets") or {})
+    held = {h["ticker"] for h in (L.get("holdings") or [])} - sleeves
+
+    try:
+        want = int(arg.strip())
+    except (TypeError, ValueError):
+        want = (L.get("config") or {}).get("n_hold") or 20
+    want = max(5, min(want, 50))
+
+    rows = sorted(sig["scores"].items(), key=lambda kv: kv[1]["rank"])[:want]
+    out = [f"TOP {want} BY SCORE TODAY",
+           f"  out of {n} the rules may choose from", "─" * W,
+           f"  {'#':>3} {'stock':<12}{'score':>6}  held"]
+    for t, v in rows:
+        score = (1 - (v["rank"] - 1) / max(n - 1, 1)) * 100
+        out.append(f"  {v['rank']:>3} {t[:12]:<12}{score:>6.0f}  "
+                   + ("yes" if t in held else "—"))
+
+    top = {t for t, _ in rows}
+    keep, new, gone = len(top & held), len(top - held), len(held - top)
+    out += ["─" * W,
+            _kv("already held", f"{keep} of {want}"),
+            _kv("would be new", str(new)),
+            _kv("held, now outside", str(gone))]
+    out += _does_it_work()
+    out += ["",
+            "THIS IS NOT THE BOOK.",
+            "  It is what the rules say today. Nothing is",
+            "  bought or sold until the scheduled review —",
+            "  trading a list like this as it moves is the",
+            "  thing that tested worst of everything tried.",
+            "",
+            f"  {sig.get('basis', '')}",
+            "", PAGE]
+    return "\n".join(out)
+
+
 def h_help(arg=""):
     out = ["WHAT YOU CAN ASK", "─" * W]
     out += [f"  /{n:<10} {d}" for n, d, _ in COMMANDS]
@@ -789,6 +871,7 @@ COMMANDS = [
     ("holdings", "Every position, best to worst",        h_holdings),
     ("chart",    "A picture: you vs the index",          h_chart),
     ("why",      "Why a stock is held: /why BHEL",       h_why),
+    ("ranking",  "What the rules rank highest today",    h_ranking),
     ("next",     "When it next re-picks the stocks",     h_next),
     ("health",   "Run the integrity checks now",         h_health),
     ("help",     "This list",                            h_help),
@@ -796,7 +879,7 @@ COMMANDS = [
 HANDLERS = {n: f for n, _, f in COMMANDS}
 ALIASES = {"status": "update", "pnl": "update", "money": "update",
            "start": "help", "positions": "holdings", "stocks": "holdings", "graph": "chart",
-           "rebalance": "next", "explain": "why"}
+           "rebalance": "next", "explain": "why", "top": "ranking", "scores": "ranking"}
 
 
 # ── dispatch ─────────────────────────────────────────────────────────────

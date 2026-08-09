@@ -1730,3 +1730,41 @@ class TestScoreBaseRate:
         top = d["bands"]["90-100"]
         assert top["pct_negative"] > 20, "implausibly low loss rate — check the study"
         assert top["p25"] < 0, "a quarter of top-scored names should still be down"
+
+
+class TestRankingIsNotTheBook:
+    """/ranking shows what the rules say TODAY. The book changes only at the
+    scheduled review, and a live list of "best stocks" is precisely the thing
+    that tempts off-cadence trading — which Mandate §6 forbids and which every
+    tested version of scored worse. The separation has to be stated, not implied."""
+
+    @staticmethod
+    def _mod():
+        return TestTelegramBot._mod()
+
+    def test_it_says_plainly_that_this_is_not_the_portfolio(self):
+        m = self._mod()
+        body = m.h_ranking()
+        if "No ranking recorded" in body:
+            import pytest
+            pytest.skip("no signals file in this environment")
+        assert "THIS IS NOT THE BOOK" in body
+        assert "scheduled review" in body
+
+    def test_it_marks_which_names_are_already_held(self):
+        m = self._mod()
+        body = m.h_ranking()
+        if "No ranking recorded" in body:
+            import pytest
+            pytest.skip("no signals file")
+        assert "held" in body and "already held" in body
+
+    def test_the_size_is_bounded(self):
+        """An unbounded argument would blow past Telegram's message limit and the
+        whole reply would vanish rather than truncate."""
+        m = self._mod()
+        body = m.h_ranking("500")
+        if "No ranking recorded" in body:
+            import pytest
+            pytest.skip("no signals file")
+        assert body.count("\n") < 90

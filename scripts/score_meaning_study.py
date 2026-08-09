@@ -77,6 +77,11 @@ def main():
 
     by_band = {f"{lo}-{hi}": [] for lo, hi in BANDS}
     top20, used = [], 0
+    # Per-DATE comparison, which is the only fair one. Pooling every name from
+    # every date and comparing means lets a single strong period dominate; asking
+    # "did the picked 20 beat the field THIS period" and counting how often is the
+    # question a person actually means by "does the ranking work".
+    periods = []
     for d in dates:
         fi = close.index.searchsorted(d)
         if fi + FWD >= len(close.index):
@@ -100,9 +105,41 @@ def main():
             sel = fwd[(score > lo) & (score <= hi)] if lo else fwd[score <= hi]
             by_band[f"{lo}-{hi}"].extend(sel.tolist())
         # what the book actually buys, rather than a band nobody holds
-        top20.extend(fwd.reindex(comp.nlargest(20).index).dropna().tolist())
+        picked = fwd.reindex(comp.nlargest(20).index).dropna()
+        top20.extend(picked.tolist())
+        rest = fwd.drop(picked.index, errors="ignore")
+        if len(picked) >= 10 and len(rest) >= 50:
+            periods.append({
+                "date": str(d.date()),
+                "n_eligible": int(len(fwd)),
+                "top20": round(float(picked.mean()) * 100, 2),
+                "field": round(float(fwd.mean()) * 100, 2),
+                "rest": round(float(rest.mean()) * 100, 2),
+                "edge_vs_field": round(float(picked.mean() - fwd.mean()) * 100, 2)})
+
+    wins = [p for p in periods if p["edge_vs_field"] > 0]
+    edges = np.array([p["edge_vs_field"] for p in periods], float)
+    # A t-stat on OVERLAPPING periods overstates significance badly, so the
+    # effective sample is scaled down to the number of genuinely independent
+    # windows rather than the number of dates. Reported as an indication, not as
+    # a pass mark: this project's bar for a new factor is t >= 3.0 (Harvey/Liu/Zhu).
+    n_eff = max(len(periods) * STEP / FWD, 1)
+    t_stat = (float(edges.mean()) / (float(edges.std(ddof=1)) / n_eff ** 0.5)
+              if len(edges) > 2 and edges.std(ddof=1) > 0 else None)
+    head_to_head = {
+        "periods": len(periods),
+        "independent_periods": round(n_eff, 1),
+        "top20_beat_the_field": len(wins),
+        "hit_rate_pct": round(len(wins) / len(periods) * 100, 1) if periods else None,
+        "median_edge_pp": round(float(np.median(edges)), 2) if len(edges) else None,
+        "mean_edge_pp": round(float(edges.mean()), 2) if len(edges) else None,
+        "worst_period_pp": round(float(edges.min()), 2) if len(edges) else None,
+        "best_period_pp": round(float(edges.max()), 2) if len(edges) else None,
+        "t_stat_on_independent_periods": round(t_stat, 2) if t_stat else None,
+        "by_period": periods}
 
     out = {"window": f"{START} to {END}", "horizon_bars": FWD,
+           "head_to_head": head_to_head,
            "evaluation_dates": used, "step_bars": STEP,
            "independent_periods": round(used * STEP / FWD, 1),
            "factor_weights": w,
@@ -129,6 +166,17 @@ def main():
         if v:
             print(f"{k:<12}{v['n']:>7}{v['median']:>8.1f}%{v['p25']:>8.1f}%"
                   f"{v['p75']:>8.1f}%{v['pct_negative']:>11.0f}%")
+    hh = out["head_to_head"]
+    print(f"\nDOES THE RANKING WORK? top 20 vs the whole eligible field")
+    print(f"  periods measured        {hh['periods']}  (~{hh['independent_periods']} independent)")
+    print(f"  top 20 beat the field   {hh['top20_beat_the_field']} of {hh['periods']}"
+          f"   ({hh['hit_rate_pct']}%)")
+    print(f"  median edge             {hh['median_edge_pp']:+.2f}pp per 6 months")
+    print(f"  worst period            {hh['worst_period_pp']:+.2f}pp")
+    print(f"  best period             {hh['best_period_pp']:+.2f}pp")
+    print(f"  t-stat (independent)    {hh['t_stat_on_independent_periods']}"
+          f"   [this project's bar for a NEW factor is 3.0]")
+
     t = out["top20_actually_bought"]
     if t:
         print(f"{'TOP 20':<12}{t['n']:>7}{t['median']:>8.1f}%{t['p25']:>8.1f}%"
