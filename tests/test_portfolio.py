@@ -1284,6 +1284,19 @@ class TestTelegramBot:
         body = m.h_holdings()
         assert "still held" in body and "already sold" in body
 
+    def test_sleeve_etfs_are_not_presented_as_stocks(self):
+        """n_hold governs the equity sleeve alone. A flat 22-line list reads as
+        "22 stocks" when the system picked 20 and the other two lines are a whole
+        sleeve each — and they are the two largest lines on the page."""
+        import json as _json
+        m = self._mod()
+        L = _json.load(open(m.EXPORT))
+        n_eq = next(r["n_holdings"] for r in L["sleeves"]["rows"] if not r.get("passive"))
+        body = m.h_holdings()
+        assert f"THE {n_eq} STOCKS" in body, body[:200]
+        assert f"{n_eq} stocks +" in body, body[:200]
+        assert len(L["holdings"]) != n_eq, "fixture no longer exercises the split"
+
     def test_the_bot_workflow_cannot_write(self):
         """The real read-only guarantee is the token GitHub hands the job, not
         the absence of write code. Mandate §6: the book is append-only and never

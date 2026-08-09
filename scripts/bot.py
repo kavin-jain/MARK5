@@ -130,17 +130,45 @@ def _amt(x, signed=False):
     return f"{s}{_grp(f'{abs(float(x)):.0f}')}"
 
 
+def _line(h):
+    return (f"  {h['ticker'][:11]:<11}{_amt(h['value']):>10}"
+            f"{_amt(h['pnl'], True):>9}{pct(h['pnl_pct'], 1):>7}")
+
+
 def h_holdings():
+    """Split the passive sleeves out from the stocks, because a flat list of 22
+    lines reads as "we hold 22 stocks" and the system holds 20. The other two are
+    a whole sleeve each — one ETF standing in for gold, one for the Nasdaq-100 —
+    and they are the two largest lines on the page. `n_hold` governs the equity
+    sleeve alone; when the gilt sleeve lands this becomes 23 lines and still 20
+    stocks. Presenting them as peers of BHEL invites exactly the wrong count.
+
+    Which lines are sleeves is read off the export's own sleeve table rather than
+    hardcoded here, so adding the gilt sleeve needs no change in this file.
+    """
     L = _export()
     rows = sorted(L.get("holdings") or [], key=lambda h: -float(h["pnl"]))
     if not rows:
         return "No positions recorded yet."
-    out = [f"HOLDINGS  {len(rows)} positions · as of {_asof(L)}",
-           "  all figures in rupees", "─" * W,
-           f"  {'stock':<11}{'worth':>10}{'P&L':>9}{'':>7}"]
-    for h in rows:
-        out.append(f"  {h['ticker'][:11]:<11}{_amt(h['value']):>10}"
-                   f"{_amt(h['pnl'], True):>9}{pct(h['pnl_pct'], 1):>7}")
+
+    sleeve_of = {round(float(r["value_inr"]), 2): r["label"]
+                 for r in (L.get("sleeves") or {}).get("rows") or []
+                 if r.get("passive") and r.get("n_holdings") == 1}
+    etfs = [h for h in rows if round(float(h["value"]), 2) in sleeve_of]
+    stocks = [h for h in rows if h not in etfs]
+
+    out = [f"HOLDINGS  as of {_asof(L)}",
+           f"  {len(stocks)} stocks + {len(etfs)} whole-sleeve ETFs",
+           "  all figures in rupees"]
+    if etfs:
+        out += ["─" * W, "SLEEVES IT JUST BUYS AND HOLDS",
+                f"  {'':<11}{'worth':>10}{'P&L':>9}{'':>7}"]
+        for h in etfs:
+            out.append(_line(h) + f"\n    = {sleeve_of[round(float(h['value']), 2)]}")
+    out += ["─" * W, f"THE {len(stocks)} STOCKS THE SYSTEM PICKED",
+            f"  {'':<11}{'worth':>10}{'P&L':>9}{'':>7}"]
+    for h in stocks:
+        out.append(_line(h))
     # The column above is UNREALISED — it is what the positions are worth today.
     # /update reports a different, smaller number, because that one also carries
     # the loss already banked on names that were sold. Two screens showing two
