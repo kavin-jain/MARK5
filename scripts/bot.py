@@ -50,14 +50,19 @@ from datetime import datetime
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(_ROOT, "scripts"))
 
-from notify import (EXPORT, PAGE, _grp, build, health, pct,     # noqa: E402
-                    rs, scrub, send)
+from notify import (BACKTEST_WORST_DD as BACKTEST_WORST,   # noqa: E402
+                    EXPORT, PAGE, _grp, build, health, pct, rs, scrub, send)
 
 BOOK = os.path.join(_ROOT, "data", "paper", "paper_book.json")
 
 # Cheap when nobody is talking, responsive when they are. An idle run costs ~30s
 # of runner time; only a run that actually hears something stays up.
-IDLE_EXIT = 30       # silence before a quiet run gives up
+# Cover the WHOLE cron interval. At 30s the bot was awake ~5% of the time, so a
+# command sent at a random moment almost always waited for the next run — which
+# reads as "nothing works", however correct the queueing is. Polling is idle
+# waiting, not compute, and runner minutes are free on a public repo; paying them
+# to be reachable is the right trade.
+IDLE_EXIT = 500      # silence before a quiet run gives up (~the full interval)
 ACTIVE_EXIT = 150    # silence to wait for a follow-up after answering
 HARD_CAP = 540       # ceiling, must stay under the cron interval
 POLL = 25            # long-poll held open per request
@@ -991,6 +996,147 @@ def h_clear(arg=""):
     return Sweep(max(1, min(n, 400)))
 
 
+FD_RATE = 7.0        # a good bank fixed deposit, before tax
+FD_SLAB = 30.0       # FD interest is taxed at slab, unlike equity
+
+
+def h_compare(arg=""):
+    """The same rupees, three ways. The question behind every other command.
+
+    A percentage return answers nothing on its own — the honest comparison is
+    what the identical money would be worth today somewhere else, including the
+    boring option. FD interest is taxed at slab rate, not at equity rates, which
+    is a real part of the comparison and usually left out of it.
+    """
+    L = _export()
+    cap, nav = float(L["capital"]), float(L["nav"])
+    yrs = max(_days_since(L.get("start_date", "")) or 1, 1) / 365.25
+    fd_net = cap * (1 + FD_RATE / 100 * (1 - FD_SLAB / 100)) ** yrs
+    rows = [("this book", nav), ("the Nifty 50", float(L.get("benchmark_nav") or 0)),
+            (f"a {FD_RATE:.0f}% fixed deposit", fd_net), ("cash under a mattress", cap)]
+    rows = [(k, v) for k, v in rows if v]
+    out = [f"THE SAME {rs(cap)}, {len(rows)} WAYS",
+           f"  after {yrs * 12:.0f} months", "─" * W]
+    for k, v in sorted(rows, key=lambda kv: -kv[1]):
+        out.append(f"  {k:<24}{rs(v):>{W - 26}}")
+    out += ["", "AHEAD OF", "─" * W]
+    for k, v in rows[1:]:
+        out.append(_kv(k, f"{_amt(nav - v, True)}"))
+    out += ["",
+            f"  The FD is shown NET: interest is taxed at",
+            f"  your slab ({FD_SLAB:.0f}%), unlike equity. It is also the",
+            "  only line here that cannot lose money.",
+            "",
+            f"  {yrs * 12:.0f} months is far too short to judge any of",
+            "  this. The worst dip this book took in a",
+            f"  19-year test was {pct(BACKTEST_WORST, 1, False)}.",
+            "", PAGE]
+    return "\n".join(out)
+
+
+def h_costs(arg=""):
+    """What the machinery has actually taken, in rupees.
+
+    Costs are the one part of a return that is certain, and they are invisible
+    everywhere else in this bot — the P&L is already net of them, so they never
+    appear as a number. Stating them separately is what makes "net of costs"
+    checkable rather than a claim.
+    """
+    import csv
+    L = _export()
+    buys = sells = bc = sc = 0.0
+    nb = ns = 0
+    try:
+        with open(LEDGER) as fh:
+            for r in csv.DictReader(fh):
+                a = (r.get("action") or "").upper()
+                c = float(r.get("cost_inr") or 0)
+                v = float(r.get("value_inr") or 0)
+                if a == "BUY":
+                    buys += v; bc += c; nb += 1
+                elif a == "SELL":
+                    sells += v; sc += c; ns += 1
+    except (OSError, csv.Error):
+        return "No ledger to read."
+    try:
+        book = json.load(open(BOOK))
+    except (OSError, ValueError):
+        book = {}
+    tax_accrued = float(book.get("tax_accrued", 0) or 0)
+    cap = float(L["capital"])
+    total = bc + sc
+    out = ["WHAT IT HAS COST", "  every rupee of friction so far", "─" * W,
+           _kv(f"buying ({nb} fills)", rs(bc)),
+           _kv(f"selling ({ns} fills)", rs(sc)),
+           _kv("tax accrued", rs(tax_accrued)),
+           "─" * W,
+           _kv("total so far", rs(total + tax_accrued)),
+           _kv("as % of your money", f"{(total + tax_accrued) / cap * 100:.3f}%"),
+           "",
+           _kv("turnover bought", rs(buys)),
+           _kv("turnover sold", rs(sells)),
+           "",
+           "  Brokerage on delivery is zero; this is STT,",
+           "  stamp duty, exchange and SEBI fees and GST,",
+           "  at real Zerodha rates.",
+           "",
+           "  Every P&L figure elsewhere is already net of",
+           "  these — this is the same money, itemised, so",
+           "  'net of costs' can be checked rather than",
+           "  taken on trust.",
+           "", PAGE]
+    return "\n".join(out)
+
+
+def h_tax(arg=""):
+    """What is owed, and which holdings are close to costing less.
+
+    The 365-day line is worth 7.5 percentage points of any gain (20% short-term
+    against 12.5% long-term) and nothing else in this system mentions it. The
+    engine does NOT defer a sale to reach it — that was tested and lost 0.23pp
+    (research log, LTCG deferral) — so this is information, not a plan.
+    """
+    L = _export()
+    try:
+        book = json.load(open(BOOK))
+    except (OSError, ValueError):
+        book = {}
+    out = ["TAX", "─" * W,
+           _kv("owed if sold today", rs(float(L.get("tax_liability", 0) or 0))),
+           _kv("accrued so far", rs(float(book.get("tax_accrued", 0) or 0))),
+           _kv("realised P&L", _amt(float(L.get("realised_pnl", 0) or 0), True))]
+
+    soon, longterm = [], 0
+    for h in (L.get("holdings") or []):
+        pos = (book.get("positions") or {}).get(h["ticker"], {})
+        when = pos.get("entry_date") or bought_on(h["ticker"])
+        d = _days_since(when) if when else None
+        if d is None:
+            continue
+        if d > 365:
+            longterm += 1
+        elif d > 335:
+            soon.append((h["ticker"], 366 - d))
+    out += ["", "THE 365-DAY LINE", "─" * W,
+            _kv("already long-term", f"{longterm} holding(s)"),
+            _kv("within 30 days", f"{len(soon)} holding(s)")]
+    for t, days in sorted(soon, key=lambda kv: kv[1]):
+        out.append(f"  {t:<16}{days} days to go")
+    out += ["",
+            "  Past 365 days the rate on a gain falls from",
+            "  20% to 12.5%, and the first Rs 1,25,000 of",
+            "  long-term gain each year is exempt (Sec 112A,",
+            "  listed Indian equity only — the gold and US",
+            "  sleeves do not qualify).",
+            "",
+            "  The system does NOT wait for that date. Holding",
+            "  a deranked name to reach it was tested and lost",
+            "  0.23pp net: the tax saved is smaller than the",
+            "  cost of keeping the wrong stock to collect it.",
+            "", PAGE]
+    return "\n".join(out)
+
+
 def h_help(arg=""):
     out = ["WHAT YOU CAN ASK", "─" * W]
     out += [f"  /{n:<10} {d}" for n, d, _ in COMMANDS]
@@ -1013,6 +1159,9 @@ COMMANDS = [
     ("why",      "Why a stock is held: /why BHEL",       h_why),
     ("ranking",  "What the rules rank highest today",    h_ranking),
     ("sector",   "Chart: which industries hold my money", h_sector),
+    ("compare",  "This vs the index vs a fixed deposit",  h_compare),
+    ("costs",    "What fees and tax have actually taken",  h_costs),
+    ("tax",      "What is owed, and the 365-day line",     h_tax),
     ("clear",    "Delete recent messages: /clear 100",   h_clear),
     ("next",     "When it next re-picks the stocks",     h_next),
     ("health",   "Run the integrity checks now",         h_health),
@@ -1021,7 +1170,7 @@ COMMANDS = [
 HANDLERS = {n: f for n, _, f in COMMANDS}
 ALIASES = {"status": "update", "pnl": "update", "money": "update",
            "start": "help", "positions": "holdings", "stocks": "holdings", "graph": "chart",
-           "rebalance": "next", "explain": "why", "top": "ranking", "scores": "ranking", "sectors": "sector", "division": "sector", "industry": "sector", "allocation": "sector", "clean": "clear"}
+           "rebalance": "next", "explain": "why", "top": "ranking", "scores": "ranking", "sectors": "sector", "division": "sector", "industry": "sector", "allocation": "sector", "clean": "clear", "fees": "costs", "vs": "compare"}
 
 
 # ── dispatch ─────────────────────────────────────────────────────────────
@@ -1182,7 +1331,9 @@ def handle(msg, dry=False):
         return False
     if isinstance(body, Sweep):
         return _sweep(chat, msg.get("message_id"), body.n, dry)
-    size = f"a {len(body.png)}-byte chart" if isinstance(body, Photo) else f"{len(body)} chars"
+    size = (f"a {len(body.png)}-byte chart" if isinstance(body, Photo) else
+            f"{len(body.buttons)} buttons" if isinstance(body, Menu) else
+            f"{len(body)} chars")
     print(f"  {chat} said {text.split()[0]!r} -> replying {size}")
     try:
         _api("sendChatAction", chat_id=chat, action="typing")
@@ -1232,10 +1383,19 @@ def serve(once=False, dry=False):
             except RuntimeError:
                 pass
             for u in ups:
-                if u.get("callback_query"):
-                    ok = handle_tap(u["callback_query"], dry)
-                else:
-                    ok = handle(u.get("message") or {}, dry)
+                # Isolated per update. A single malformed command must not end the
+                # window: on 2026-08-09 a /why menu raised TypeError in the LOG
+                # line, and that one exception killed the run and every command
+                # queued behind it. The blast radius of a bad command is now that
+                # command.
+                try:
+                    if u.get("callback_query"):
+                        ok = handle_tap(u["callback_query"], dry)
+                    else:
+                        ok = handle(u.get("message") or {}, dry)
+                except Exception as e:                       # noqa: BLE001
+                    print(f"  update {u.get('update_id')} failed: {scrub(e)}")
+                    ok = False
                 if ok:
                     served += 1
             quiet = time.monotonic() + ACTIVE_EXIT

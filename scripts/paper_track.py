@@ -801,7 +801,14 @@ def cmd_rebalance_check() -> bool:
     due_in = REBAL_DAYS - (pd.Timestamp.today().normalize() - last.normalize()).days
     weekend = pd.Timestamp.today().weekday() >= 5
     if due_in > 0 or weekend:
-        print(f"NOT-DUE  ({due_in}d to go" + (", weekend" if weekend else "") +
+        # A third state, a week out. The rebalance is the only scheduled event in
+        # a six-month absence and it used to arrive with no warning at all. On a
+        # PREVIEW day the workflow does the full preparation — new listings,
+        # sector labels, prices, ranking — WITHOUT trading. That makes the
+        # heads-up message accurate, and it rehearses the machinery while there
+        # is still a week to fix whatever it breaks on.
+        state = ("PREVIEW" if 0 < due_in <= 7 and not weekend else "NOT-DUE")
+        print(f"{state}  ({due_in}d to go" + (", weekend" if weekend else "") +
               f", next ~{(last + pd.Timedelta(days=REBAL_DAYS)).date()})")
         return False
     print(f"DUE  (last rebalance {last.date()}, cadence {REBAL_DAYS}d)")

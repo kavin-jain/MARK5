@@ -317,6 +317,160 @@ def alert(L):
     return "\n".join(out)
 
 
+# ── the other messages that are not daily ────────────────────────────────
+BOOK = os.path.join(_ROOT, "data", "paper", "paper_book.json")
+REBAL_DAYS = 182
+NOTICE_DAYS = 7          # how far ahead the rebalance is announced
+LTCG_WATCH_DAYS = 30
+
+
+def _book():
+    try:
+        return json.load(open(BOOK))
+    except (OSError, ValueError):
+        return {}
+
+
+def _days(a, b):
+    return (datetime.strptime(a, "%Y-%m-%d") - datetime.strptime(b, "%Y-%m-%d")).days
+
+
+def monthly(L):
+    """A differently-shaped message once a month, on the first mark of a new one.
+
+    The daily message is identical every day by design, and over six months of
+    absence that is exactly what turns it into wallpaper. This is the same money
+    described a different way, so it has to be read rather than recognised.
+    """
+    hist = [h for h in (L.get("nav_history") or [])
+            if str(h.get("nav_inr", "")).strip()]
+    if len(hist) < 3 or hist[-1]["date"][:7] == hist[-2]["date"][:7]:
+        return None                       # still inside the same month
+    month = hist[-2]["date"][:7]
+    inside = [h for h in hist if h["date"][:7] == month]
+    if len(inside) < 3:
+        return None
+    start = hist[hist.index(inside[0]) - 1] if hist.index(inside[0]) else inside[0]
+    n0, n1 = float(start["nav_inr"]), float(inside[-1]["nav_inr"])
+    move = (n1 / n0 - 1) * 100
+
+    out = [f"MONTH IN REVIEW  ·  {month}", "─" * W,
+           _row(f"the month ({pct(move)})", rs(n1 - n0, True)),
+           _row("ended at", rs(n1))]
+    b0 = b1 = None
+    for h in inside:
+        if str(h.get("bench_inr", "")).strip():
+            b1 = float(h["bench_inr"])
+            b0 = b0 if b0 is not None else b1
+    if b0 and b1 and b0 > 0:
+        bm = (b1 / b0 - 1) * 100
+        out += [_row("the index did", pct(bm)),
+                _row("you were", f"{move - bm:+.2f}pp {'ahead' if move >= bm else 'behind'}")]
+
+    # Stocks only. The sleeves are whole asset classes bought on purpose, so
+    # crowning GOLDBEES "best holding" would credit the stock picker for a
+    # decision it did not make.
+    sleeves = set((L.get("config") or {}).get("sleeve_targets") or {})
+    rows = sorted((h for h in (L.get("holdings") or []) if h["ticker"] not in sleeves),
+                  key=lambda h: -float(h["pnl_pct"]))
+    if rows:
+        out += ["", "THE STOCKS, SINCE THE BOOK OPENED", "─" * W,
+                _row(f"best   {rows[0]['ticker'][:12]}", pct(float(rows[0]["pnl_pct"]), 1)),
+                _row(f"worst  {rows[-1]['ticker'][:12]}", pct(float(rows[-1]["pnl_pct"]), 1))]
+    out += ["",
+            "  One month is noise. It is here so the daily",
+            "  message does not become the only thing you",
+            "  see, not because a month means anything.",
+            "", "─" * W, PAGE]
+    return "\n".join(out)
+
+
+def rebalance_notice(L):
+    """Announce the rebalance BEFORE it happens, not after.
+
+    It is the only scheduled event in a six-month absence, and until now it
+    arrived with no warning at all: the owner would learn the book had been
+    re-picked from the message reporting the fills. A week's notice also means a
+    failure in the machinery surfaces while there is still time to fix it.
+    """
+    book = _book()
+    last = book.get("last_rebalance") or book.get("start_date")
+    asof = (L.get("nav_history") or [{}])[-1].get("date")
+    if not last or not asof:
+        return None
+    due_in = REBAL_DAYS - _days(asof, last)
+    if not 0 < due_in <= NOTICE_DAYS:
+        return None
+
+    out = [f"REBALANCE IN {due_in} DAY{'S' if due_in != 1 else ''}", "─" * W,
+           "  The system will re-pick the stock sleeve by",
+           "  itself and post every fill here. There is no",
+           "  step for you, and nothing to approve."]
+    try:
+        sig = json.load(open(os.path.join(_ROOT, "data", "paper", "signals.json")))
+        held = {h["ticker"] for h in (L.get("holdings") or [])}
+        sleeves = set((L.get("config") or {}).get("sleeve_targets") or {})
+        n_hold = (L.get("config") or {}).get("n_hold") or 20
+        top = {t for t, _ in sorted(sig["scores"].items(),
+                                    key=lambda kv: kv[1]["rank"])[:n_hold]}
+        stocks = held - sleeves
+        out += ["", "ON TODAY'S RANKING IT WOULD", "─" * W,
+                _row("keep", f"{len(top & stocks)} of {len(stocks)}"),
+                _row("sell", f"{len(stocks - top)}"),
+                _row("buy", f"{len(top - stocks)}"),
+                "", f"  out  {', '.join(sorted(stocks - top))[:64] or '—'}",
+                f"  in   {', '.join(sorted(top - stocks))[:64] or '—'}",
+                "",
+                f"  Ranking as of {sig.get('asof', '?')}. The real",
+                "  decision is made on the day, on that day's",
+                "  prices, so this is an indication."]
+    except (OSError, ValueError, KeyError):
+        out += ["", "  (no ranking recorded to preview against)"]
+    out += ["", "─" * W, PAGE]
+    return "\n".join(out)
+
+
+def tax_watch(L):
+    """Holdings about to cross the 365-day line.
+
+    Worth 7.5 percentage points of the gain — 20% short-term against 12.5%
+    long-term — and nothing else in the system mentions it. Reported as
+    information, NOT as a plan: holding a deranked name to reach the date was
+    tested and lost 0.23pp net, so the engine deliberately does not wait.
+    """
+    book, asof = _book(), (L.get("nav_history") or [{}])[-1].get("date")
+    if not asof:
+        return None
+    soon = []
+    for h in (L.get("holdings") or []):
+        e = ((book.get("positions") or {}).get(h["ticker"]) or {}).get("entry_date")
+        if not e:
+            continue
+        left = 366 - _days(asof, e)
+        if 0 < left <= LTCG_WATCH_DAYS:
+            soon.append((left, h["ticker"], float(h["pnl"])))
+    if not soon:
+        return None
+    out = [f"{len(soon)} HOLDING(S) TURN LONG-TERM SOON", "─" * W]
+    for left, t, pnl in sorted(soon):
+        out.append(f"  {t[:12]:<13}{left:>3} days   gain {_amt_local(pnl)}")
+    out += ["",
+            "  After 365 days the tax on a gain drops from",
+            "  20% to 12.5%, and the first Rs 1,25,000 of",
+            "  long-term gain each year is exempt.",
+            "",
+            "  The system does NOT wait for these dates.",
+            "  Holding a deranked name to reach one was",
+            "  tested and lost 0.23pp net. This is here to",
+            "  be known, not acted on.",
+            "", "─" * W, PAGE]
+    return "\n".join(out)
+
+
+def _amt_local(x):
+    return f"{'+' if x >= 0 else '-'}Rs {_grp(f'{abs(float(x)):.0f}')}"
+
+
 # ── transport ────────────────────────────────────────────────────────────
 def scrub(text):
     """Never let a bot token reach stdout. The token lives in the URL path for
@@ -526,13 +680,24 @@ def main():
     # Sent AFTER the daily message and only on an unusual day, so it lands last
     # and reads as the exception it is. Failure here must not disturb anything
     # above it — the mark is recorded, the routine message is already delivered.
-    extra = alert(L)
-    if extra:
+    # Each is silent on an ordinary day and speaks only when its own condition is
+    # met, so the count of messages is itself information: one means nothing
+    # happened, two means something did. Any of them failing to build must not
+    # take the others down — the daily message is already delivered by here.
+    for label, fn in (("alert", alert), ("rebalance notice", rebalance_notice),
+                      ("tax watch", tax_watch), ("month in review", monthly)):
+        try:
+            extra = fn(L)
+        except Exception as e:                               # noqa: BLE001
+            print(f"  notify: {label} could not be built ({scrub(e)})", file=sys.stderr)
+            continue
+        if not extra:
+            continue
         print("\n" + extra)
         try:
-            send(f"MARK6 alert: {pct(float(L['return_pct']))} overall", extra)
+            send(f"MARK6 {label}", extra)
         except (urllib.error.URLError, urllib.error.HTTPError, OSError, RuntimeError) as e:
-            print(f"  notify: alert delivery FAILED ({scrub(e)})", file=sys.stderr)
+            print(f"  notify: {label} delivery FAILED ({scrub(e)})", file=sys.stderr)
 
 
 if __name__ == "__main__":

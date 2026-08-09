@@ -37,11 +37,16 @@ jobs:
         run: |
           OUT=$(python scripts/paper_track.py rebalance --check)
           echo "$OUT"
-          case "$OUT" in DUE*) echo "due=true" >> "$GITHUB_OUTPUT";;
-                         *)    echo "due=false" >> "$GITHUB_OUTPUT";; esac
+          case "$OUT" in
+            DUE*)     echo "due=true"  >> "$GITHUB_OUTPUT"
+                      echo "prep=true" >> "$GITHUB_OUTPUT";;
+            PREVIEW*) echo "due=false" >> "$GITHUB_OUTPUT"
+                      echo "prep=true" >> "$GITHUB_OUTPUT";;
+            *)        echo "due=false" >> "$GITHUB_OUTPUT"
+                      echo "prep=false" >> "$GITHUB_OUTPUT";; esac
 
-      - name: Find out what is actually listed (rebalance days only)
-        if: steps.due.outputs.due == 'true'
+      - name: Find out what is actually listed (rebalance + preview days)
+        if: steps.due.outputs.prep == 'true'
         # data/bhavcopy/ is gitignored, so a CI runner has NONE of it. Without
         # this step refetch_all's new-listing lookup finds no bhavcopy, returns an
         # empty set, and silently falls back to "whatever was already cached" —
@@ -60,8 +65,8 @@ jobs:
             --start "$(date -u -d '15 days ago' +%Y-%m-%d)" \
             --end "$(date -u +%Y-%m-%d)"
 
-      - name: Refresh the sector labels (rebalance days only)
-        if: steps.due.outputs.due == 'true'
+      - name: Refresh the sector labels (rebalance + preview days)
+        if: steps.due.outputs.prep == 'true'
         # The sector cap is enforced ONLY for names that carry a label; unmapped
         # names are treated as their own sector and escape it entirely. The map
         # was built by hand once and never refreshed, so every company listed
@@ -71,13 +76,22 @@ jobs:
         continue-on-error: true
         run: python scripts/fetch_sector_map.py
 
-      - name: Rebuild the price cache (rebalance days only)
-        if: steps.due.outputs.due == 'true'
+      - name: Rebuild the price cache (rebalance + preview days)
+        if: steps.due.outputs.prep == 'true'
         # config/universe_tickers.json is the pinned name list, committed for
         # exactly this reason: it is what lets a cacheless runner rank the January
         # book against the SAME opportunity set the book was opened with, instead
         # of against whatever happens to be fetchable that morning.
         run: python scripts/refetch_all.py
+
+      - name: Record the ranking (preview days — no trading)
+        if: steps.due.outputs.prep == 'true' && steps.due.outputs.due != 'true'
+        # The rehearsal. Everything a rebalance does except the part that trades,
+        # so the heads-up a week out shows a CURRENT ranking rather than one from
+        # the last rebalance six months ago — and so a broken cache or a dead data
+        # source surfaces while there is still a week left to fix it.
+        continue-on-error: true
+        run: python scripts/paper_track.py signals
 
       - name: Rebalance
         if: steps.due.outputs.due == 'true'
@@ -119,7 +133,11 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/data/mark6.json docs/index.html data/paper/
+          # config/ matters: the preview and rebalance steps regenerate the
+          # sector map and re-pin the universe, and without this those are
+          # rebuilt in CI and then thrown away — so the next run starts from the
+          # stale committed copies and the refresh accomplishes nothing.
+          git add docs/data/mark6.json docs/index.html data/paper/ config/
           git diff --staged --quiet || git commit -m "chore: daily live refresh [skip ci]"
           git push
 

@@ -1954,3 +1954,137 @@ class TestWhyOffersButtons:
         src = open(os.path.join(os.path.dirname(os.path.dirname(
             os.path.abspath(__file__))), "scripts", "bot.py")).read()
         assert '"message","callback_query"' in src, "taps would never be delivered"
+
+
+class TestTheOtherMessages:
+    """Three messages that are silent on an ordinary day. Their value is entirely
+    in that silence: one message means nothing happened, more than one means
+    something did, and a false positive destroys the signal."""
+
+    @staticmethod
+    def _mod():
+        return TestDailyNotification._mod()
+
+    def test_all_of_them_are_silent_on_a_normal_day(self):
+        import json as _json
+        m = self._mod()
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        L = _json.load(open(os.path.join(root, "data", "paper", "paper_export.json")))
+        for fn in (m.alert, m.rebalance_notice, m.tax_watch, m.monthly):
+            assert fn(L) is None, f"{fn.__name__} fired on an ordinary day"
+
+    def test_the_monthly_fires_only_on_a_month_boundary(self):
+        import copy as _c, json as _json
+        m = self._mod()
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        L = _json.load(open(os.path.join(root, "data", "paper", "paper_export.json")))
+        x = _c.deepcopy(L)
+        x["nav_history"] = [{"date": f"2026-07-{d:02d}", "nav_inr": str(500000 + d * 300),
+                             "bench_inr": str(500000 + d * 100)} for d in range(20, 32)]
+        assert m.monthly(x) is None, "fired inside the same month"
+        x["nav_history"].append({"date": "2026-08-03", "nav_inr": "512000",
+                                 "bench_inr": "505000"})
+        assert "MONTH IN REVIEW" in m.monthly(x)
+
+    def test_the_monthly_best_holding_is_a_stock_not_a_sleeve(self):
+        """The sleeves are whole asset classes bought on purpose — crowning
+        GOLDBEES "best holding" credits the stock picker for a decision it did
+        not make."""
+        import copy as _c, json as _json
+        m = self._mod()
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        L = _json.load(open(os.path.join(root, "data", "paper", "paper_export.json")))
+        x = _c.deepcopy(L)
+        x["nav_history"] = ([{"date": f"2026-07-{d:02d}", "nav_inr": "500000"}
+                             for d in range(20, 32)]
+                            + [{"date": "2026-08-03", "nav_inr": "512000"}])
+        body = m.monthly(x)
+        for sleeve in (L.get("config") or {}).get("sleeve_targets") or {}:
+            assert f"best   {sleeve}" not in body
+
+    def test_the_rebalance_notice_fires_only_inside_the_window(self):
+        import copy as _c, json as _json
+        m = self._mod()
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        L = _json.load(open(os.path.join(root, "data", "paper", "paper_export.json")))
+        keep = m._book
+        m._book = lambda: {"last_rebalance": "2026-07-26", "start_date": "2026-07-22"}
+        try:
+            far = _c.deepcopy(L); far["nav_history"][-1]["date"] = "2026-11-01"
+            assert m.rebalance_notice(far) is None, "fired months early"
+            near = _c.deepcopy(L); near["nav_history"][-1]["date"] = "2027-01-19"
+            body = m.rebalance_notice(near)
+            assert body and "REBALANCE IN" in body and "nothing to approve" in body
+        finally:
+            m._book = keep
+
+    def test_the_tax_watch_says_it_is_not_a_plan(self):
+        """Holding a deranked name to reach the 365-day line was tested and lost
+        0.23pp. The message must not read as advice to wait."""
+        import copy as _c, json as _json
+        m = self._mod()
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        L = _json.load(open(os.path.join(root, "data", "paper", "paper_export.json")))
+        keep = m._book
+        pos = {h["ticker"]: {"entry_date": "2026-08-20"} for h in L["holdings"]}
+        m._book = lambda: {"positions": pos}
+        try:
+            x = _c.deepcopy(L); x["nav_history"][-1]["date"] = "2027-08-10"
+            body = m.tax_watch(x)
+            assert body and "does NOT wait" in body and "0.23pp" in body
+        finally:
+            m._book = keep
+
+    def test_preview_state_exists_and_the_workflow_uses_it(self):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        pt = open(os.path.join(root, "scripts", "paper_track.py")).read()
+        wf = open(os.path.join(root, ".github", "workflows", "refresh.yml")).read()
+        assert '"PREVIEW"' in pt
+        assert "PREVIEW*)" in wf and "prep=true" in wf
+        # the rehearsal must not trade
+        assert "paper_track.py signals" in wf
+        assert wf.index("Record the ranking") < wf.index("- name: Rebalance")
+
+    def test_the_refreshed_config_is_committed(self):
+        """The preview and rebalance steps regenerate the sector map and re-pin
+        the universe. Without config/ in the commit those are rebuilt in CI and
+        discarded, so the next run starts from the stale copies."""
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        wf = open(os.path.join(root, ".github", "workflows", "refresh.yml")).read()
+        add = [ln for ln in wf.splitlines() if "git add" in ln][0]
+        assert "config/" in add and "data/paper/" in add
+
+
+class TestOneBadCommandCannotEndTheWindow:
+    """On 2026-08-09 a /why menu raised TypeError inside the LOG line — the size
+    of the reply — and that single exception killed the whole run along with
+    every command queued behind it. The blast radius of a bad command must be
+    that command."""
+
+    @staticmethod
+    def _mod():
+        return TestTelegramBot._mod()
+
+    def test_every_reply_type_can_be_described(self):
+        """The crash was in logging, not in logic, which is why nothing caught
+        it: the handler worked and the line reporting it did not."""
+        m = self._mod()
+        for body in (m.h_why(""), m.h_holdings(), m.h_sector()):
+            size = (f"a {len(body.png)}-byte chart" if isinstance(body, m.Photo) else
+                    f"{len(body.buttons)} buttons" if isinstance(body, m.Menu) else
+                    f"{len(body)} chars")
+            assert size
+
+    def test_the_poll_loop_isolates_each_update(self):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        src = open(os.path.join(root, "scripts", "bot.py")).read()
+        loop = src[src.index("for u in ups:"):src.index("if ok:")]
+        assert "try:" in loop and "except Exception" in loop
+
+    def test_the_window_covers_most_of_the_cron_interval(self):
+        """At 30s awake in every 600s the bot was reachable ~5% of the time, so a
+        command almost always waited for the next run. Queueing is correct and
+        still reads as broken."""
+        m = self._mod()
+        assert m.IDLE_EXIT / 600 > 0.7, "most commands would wait for the next run"
+        assert m.IDLE_EXIT < m.HARD_CAP, "must exit before the job timeout"
