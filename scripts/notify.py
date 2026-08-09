@@ -257,11 +257,18 @@ def whoami():
     for u in d.get("result", []):
         c = (u.get("message") or u.get("channel_post") or {}).get("chat") or {}
         if c.get("id"):
-            seen[c["id"]] = c.get("username") or c.get("title") or c.get("first_name") or "?"
+            seen[c["id"]] = (c.get("title") or c.get("username")
+                             or c.get("first_name") or "?", c.get("type", "?"))
     if not seen:
-        sys.exit("No messages yet. Send your bot any message, then run this again.")
-    for cid, who in seen.items():
-        print(f"  TELEGRAM_CHAT_ID={cid}   ({who})")
+        sys.exit("No messages yet. Send the bot a message — in the GROUP if you want the "
+                 "group's id — then run this again. Bots only ever see chats that have "
+                 "spoken to them.")
+    # Type matters: a private id is positive, a group/supergroup id is negative, and
+    # they are easy to mix up when copying. Sending to the wrong one fails silently
+    # from the sender's side — the message simply arrives somewhere else.
+    for cid, (who, kind) in sorted(seen.items(), key=lambda kv: kv[0]):
+        star = "  <- group" if kind in ("group", "supergroup") else ""
+        print(f"  TELEGRAM_CHAT_ID={cid:<16} {kind:<11} {who}{star}")
 
 
 def send(title, body):
