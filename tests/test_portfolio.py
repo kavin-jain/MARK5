@@ -1483,31 +1483,45 @@ class TestCacheCoversHoldings:
         pt.discover_tickers = lambda: list(cached)
         pt.load_ohlcv = lambda t: self._bars(ages.get(t, 0)) if t in cached else None
         try:
-            pt.assert_cache_covers_holdings({"positions": {n: {} for n in book_names}})
-            return None
-        except SystemExit as e:
-            return str(e)
+            return pt.assert_cache_covers_holdings({"positions": {n: {} for n in book_names}})
         finally:
             pt.discover_tickers, pt.load_ohlcv = keep
 
-    def test_a_holding_absent_from_the_cache_stops_the_rebalance(self):
-        msg = self._run(cached=["AAA"], ages={}, book_names=["AAA", "BBB"])
-        assert msg and "BBB" in msg and "refusing" in msg.lower()
+    def test_a_holding_absent_from_the_cache_is_reported(self):
+        gap = self._run(cached=["AAA"], ages={}, book_names=["AAA", "BBB"])
+        assert gap and "BBB" in gap
 
-    def test_a_stale_holding_stops_it_too(self):
-        msg = self._run(cached=["AAA", "BBB"], ages={"BBB": 60},
+    def test_a_stale_holding_is_reported_too(self):
+        gap = self._run(cached=["AAA", "BBB"], ages={"BBB": 60},
                         book_names=["AAA", "BBB"])
-        assert msg and "BBB" in msg
+        assert gap and "BBB" in gap
 
-    def test_full_fresh_coverage_passes(self):
+    def test_full_fresh_coverage_returns_nothing(self):
         assert self._run(cached=["AAA", "BBB"], ages={}, book_names=["AAA", "BBB"]) is None
 
-    def test_sleeve_etfs_are_not_required_to_be_in_the_equity_cache(self):
+    def test_sleeve_etfs_are_not_required_in_the_equity_cache(self):
         """They are deliberately excluded from the equity universe, so demanding
         them here would deadlock every rebalance permanently."""
         pt = self._pt()
         sleeve = sorted(pt.SLEEVES)[0]
         assert self._run(cached=["AAA"], ages={}, book_names=["AAA", sleeve]) is None
+
+    def test_the_guard_reports_rather_than_raising(self):
+        """It must NOT raise or exit non-zero. In refresh.yml the rebalance step
+        runs BEFORE the mark-and-commit steps, so a non-zero exit strands them —
+        and `due` stays true every following day, so one bad cache would stop the
+        append-only record for as long as nobody looked. Declining keeps the day
+        recorded; healthcheck's overdue check is what breaks the silence."""
+        gap = self._run(cached=[], ages={}, book_names=["AAA"])
+        assert isinstance(gap, str) and gap        # returned, not raised
+
+    def test_an_overdue_rebalance_fails_the_health_check(self):
+        """The counterpart to declining quietly: every reason a rebalance can
+        decline shows up as the same symptom, so it is checked in one place."""
+        src = open(os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "scripts", "healthcheck.py")).read()
+        assert "rebalance not overdue" in src
 
 
 class TestWhyCommand:

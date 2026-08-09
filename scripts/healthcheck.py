@@ -111,6 +111,21 @@ def main():
     # ── 4. accounting identity on the live book ──────────────────────────
     print("\nLIVE BOOK INTEGRITY")
     bookp = os.path.join(PAPER, "paper_book.json")
+    if os.path.exists(bookp):
+        # A rebalance can now DECLINE — on a weekend, a trading holiday, or when
+        # the price cache cannot see the names we hold. Declining is correct and
+        # exits 0 so the day is still marked, which means a permanently blocked
+        # rebalance would otherwise be completely silent: the job stays green and
+        # the book quietly stops being re-picked. Overdue-by-a-lot is the symptom
+        # every one of those causes shares, so it is checked here rather than
+        # having each guard learn to shout. The grace covers a long weekend plus
+        # a holiday; beyond that something is actually stuck.
+        _b = json.load(open(bookp))
+        _last = pd.Timestamp(_b.get("last_rebalance", _b["start_date"]))
+        _overdue = (pd.Timestamp.today().normalize() - _last.normalize()).days - 182
+        check("rebalance not overdue", _overdue <= 7,
+              f"{_overdue}d past its cadence (last {_last.date()})" if _overdue > 0
+              else f"next in {-_overdue}d")
     if os.path.exists(bookp) and feed:
         book = json.load(open(bookp))
         live = feed.get("live", {})

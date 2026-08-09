@@ -290,15 +290,12 @@ def assert_cache_covers_holdings(book):
             absent.append(t)
         elif (today - d.index[-1].normalize()).days > MAX_HOLDING_STALE_DAYS:
             stale.append(f"{t}({d.index[-1].date()})")
-    if absent or stale:
-        sys.exit(
-            f"ERROR: the price cache does not cover {len(absent) + len(stale)} of "
-            f"{len(held)} holdings — refusing to re-pick the book.\n"
+    if not (absent or stale):
+        return None
+    return (f"the price cache does not cover {len(absent) + len(stale)} of "
+            f"{len(held)} holdings\n"
             f"  missing entirely : {', '.join(absent) or 'none'}\n"
-            f"  stale > {MAX_HOLDING_STALE_DAYS}d      : {', '.join(stale) or 'none'}\n"
-            f"  A name the cache cannot see is a name the ranking drops, and a "
-            f"dropped name is SOLD. Rebuild the cache and re-run; the cadence is "
-            f"still due on the next session.")
+            f"  stale > {MAX_HOLDING_STALE_DAYS}d      : {', '.join(stale) or 'none'}")
 
 
 def _num(x, nd=4):
@@ -815,7 +812,23 @@ def cmd_rebalance(force=False):
               f"fills at a price nobody could have traded at. Will retry next session.")
         return
     reconcile_corporate_actions(book)
-    assert_cache_covers_holdings(book)
+    gap = assert_cache_covers_holdings(book)
+    if gap:
+        # DECLINE, do not fail. The exit-code contract is "0 = nothing to do, or
+        # done; 1 = something is actually wrong" — but the consequence of exiting
+        # 1 here is worse than the thing it reports. This step runs BEFORE the
+        # mark-and-commit steps, so a non-zero exit strands them, and `due` stays
+        # true every subsequent day: one bad cache would stop the append-only
+        # record for as long as nobody looked. That is the exact hole the weekend
+        # and holiday guards return early to avoid.
+        #
+        # Silence is handled elsewhere: healthcheck.py fails when a rebalance is
+        # overdue, so the daily message says so instead of this being invisible.
+        print(f"  declined — {gap}\n"
+              f"  A name the cache cannot see is a name the ranking drops, and a "
+              f"dropped name is SOLD. Rebuilding the cache and retrying on the "
+              f"next session is the safe move; the cadence is still due.")
+        return
 
     w_eq, asof, _, signals = target_book()
     eq_frac = 1 - sum(SLEEVES.values())
@@ -975,7 +988,10 @@ def main():
         # would score the survivors against a field that accidentally lost its
         # peers — a measurement artefact presented as the system's reasoning,
         # which is worse than having no snapshot at all.
-        assert_cache_covers_holdings(json.load(open(BOOK)))
+        gap = assert_cache_covers_holdings(json.load(open(BOOK)))
+        if gap:
+            sys.exit(f"ERROR: {gap}\n  Refusing to score names against a field "
+                     f"that is accidentally missing its peers.")
         _, _, _, sig = target_book()
         write_signals(sig, f"recomputed {pd.Timestamp.today().date()} — how these "
                            f"names rank TODAY, not the numbers used to pick them")
