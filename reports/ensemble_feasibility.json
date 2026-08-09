@@ -1,0 +1,37 @@
+{
+ "nav": 519909.90242343233,
+ "equity_frac": 0.25,
+ "asof": "2026-08-07",
+ "configs": {
+  "single config (mom_heavy)": {
+   "n": 19,
+   "n_zero": 0,
+   "n_thin": 6,
+   "sleeve_filled_pct": 199.76307776865858,
+   "min_weight_pct": 0.8073041288252184,
+   "dropped": []
+  },
+  "1/N ensemble": {
+   "n": 29,
+   "n_zero": 3,
+   "n_thin": 13,
+   "sleeve_filled_pct": 199.68761077914107,
+   "min_weight_pct": 0.17194668452302497,
+   "dropped": [
+    [
+     3020.0,
+     "ADANIENT"
+    ],
+    [
+     2735.0,
+     "ASIANPAINT"
+    ],
+    [
+     1945.0,
+     "SUNPHARMA"
+    ]
+   ]
+  }
+ },
+ "verdict": "FALSIFIED \u2014 3 of 29 ensemble names round to zero (single config: 0 of 19)"
+}

@@ -42,7 +42,28 @@ PAPER_DIR = os.path.join(_ROOT, "data", "paper")
 BOOK = os.path.join(PAPER_DIR, "paper_book.json")
 NAV_LOG = os.path.join(PAPER_DIR, "paper_nav.csv")
 LEDGER = os.path.join(PAPER_DIR, "paper_ledger.csv")
-SLEEVES = {"GOLDBEES": 0.25, "MON100": 0.25}
+# Four equal sleeves. Equity is the remainder, so this dict alone sets the
+# allocation: 1 - 0.75 = 25% equity.
+#
+# Staged in DEPLOYMENT_2027-01 and lands at the scheduled rebalance (~2027-01-24),
+# NOT on the day it was written — Mandate §6. Evidence, 2007-2026 (19 years, so it
+# contains 2008, which the 2016-2026 window does not):
+#
+#     50 eq / 25 gold / 25 US   +17.27% CAGR   Sharpe 1.25   MaxDD -41.80%
+#     25 / 25 / 25 / 25 gilt    +16.16% CAGR   Sharpe 1.43   MaxDD -17.09%
+#
+# 1.1pp of return for less than half the drawdown. That trade is invisible on a
+# window without a financial crisis in it, which is why the shorter window had
+# undersold this change.
+#
+# LTGILTBEES verified 2026-08-09: Rs 30.07/share, Rs 3.78cr median daily turnover.
+# The low share price matters as much as the liquidity — a Rs 1.3 lakh sleeve buys
+# ~4,300 whole shares, so rounding error is negligible.
+#
+# N_HOLD stays 20. The 20->60 breadth change was staged and DECLINED (K43): IR
+# peaks near 60 but at t=1.90, under this project's 3.0 bar, and 25% equity across
+# 60 names is ~Rs 2,166 a position here — less than one share of several holdings.
+SLEEVES = {"GOLDBEES": 0.25, "MON100": 0.25, "LTGILTBEES": 0.25}
 N_HOLD, TOP_N = 20, 300
 
 # Real Zerodha equity-delivery costs (buy side), as fractions of turnover.

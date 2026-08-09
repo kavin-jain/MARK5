@@ -133,11 +133,35 @@ diversification, not a currency artefact.
 roughly doubles its drawdown. The five-sleeve structure is genuine, and the book is
 *also* structurally short the rupee. Both are true and both must be disclosed.
 
-### 5. The 1/N ensemble  *(P5.2, approved 2026-08-08)*
+### 5. ~~The 1/N ensemble~~ — **DECLINED 2026-08-09, same reason as §1**
 
-Removes config selection entirely, so PBO stops applying. Priced at −1.92pp CAGR
-for a better drawdown (−20.95% vs −22.16%). Land it together with the above so the
-book is reconstituted once, not twice.
+*(P5.2, approved 2026-08-08; reversed on a feasibility measurement, not on new
+performance evidence.)*
+
+The case for it stands and is epistemic rather than financial: averaging all five
+factor-weight schemes removes config *selection*, so PBO stops applying to the
+choice. Priced at −1.92pp CAGR for ~1.2pp of drawdown (−20.95% vs −22.16%).
+
+It is not buyable at this book's size (`scripts/ensemble_feasibility.py`):
+
+| | Target names | Round to zero shares | Smallest position |
+|---|---|---|---|
+| Single config (`mom_heavy`) | 19 | **0** | ₹4,197 |
+| **1/N ensemble** | 29 | **3** | **₹894** |
+
+Averaging five top-20 books is a breadth expansion wearing a different hat. Names
+all five schemes agree on keep a full weight; a name only one scheme picks gets a
+fifth of one. At a ₹1.3 lakh equity sleeve that tail is ₹894 — which does not buy
+one share of SUNPHARMA (₹1,945), ASIANPAINT (₹2,735) or ADANIENT (₹3,020).
+
+That last figure needs no allocator to verify: it is arithmetic on the target
+weights. It is the same wall as §1, and it produces the same undisclosed tilt
+toward low-priced shares.
+
+**Revisit above ~₹25 lakh**, where the tail weight clears typical share prices.
+Until then the deployed book keeps a single fixed, economically-motivated config
+— which is the *other* honest option `nested_walkforward.py` named, and it was
+never selected on the strength of its own backtest.
 
 ---
 
