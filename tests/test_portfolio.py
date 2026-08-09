@@ -1555,10 +1555,12 @@ class TestWhyCommand:
         m = self._mod()
         assert "NOT HELD" in m.h_why("RELIANCE")
 
-    def test_no_argument_lists_what_is_held(self):
+    def test_no_argument_offers_what_is_held(self):
+        """Superseded the text list: bare /why now returns tappable buttons, so a
+        ticker cannot be mistyped. Covered in depth by TestWhyOffersButtons."""
         m = self._mod()
-        body = m.h_why("")
-        assert "/why" in body and "BHEL" in body
+        menu = m.h_why("")
+        assert isinstance(menu, m.Menu) and menu.buttons
 
     def test_fundamentals_fail_open(self):
         """The only part of /why that depends on a server nobody here controls.
@@ -1904,3 +1906,51 @@ class TestClearCannotReachTheRecord:
         body = m.h_help()
         assert "Everything here only reads" not in body
         assert "/clear" in body
+
+
+class TestWhyOffersButtons:
+    """Typing a ticker is the only place the owner can get the question wrong,
+    and a wrong ticker gives a useless answer rather than an obviously wrong one.
+    Buttons remove the failure mode: only held names are offered."""
+
+    @staticmethod
+    def _mod():
+        return TestTelegramBot._mod()
+
+    def test_bare_why_offers_every_held_stock(self):
+        import json as _json
+        m = self._mod()
+        menu = m.h_why("")
+        assert isinstance(menu, m.Menu)
+        L = m._export()
+        sleeves = set((L.get("config") or {}).get("sleeve_targets") or {})
+        stocks = {h["ticker"] for h in L["holdings"]} - sleeves
+        assert {lbl for lbl, _ in menu.buttons} == stocks
+        rows = _json.loads(menu.markup())["inline_keyboard"]
+        assert all(len(r) <= menu.per_row for r in rows)
+
+    def test_the_sleeve_etfs_are_not_offered(self):
+        """They have no factor score and no position note worth reading — offering
+        them would invite a question the system cannot answer."""
+        m = self._mod()
+        labels = {lbl for lbl, _ in m.h_why("").buttons}
+        assert not (labels & {"GOLDBEES", "MON100", "LTGILTBEES"})
+
+    def test_callback_data_fits_telegrams_limit(self):
+        """Over 64 bytes and Telegram rejects the whole keyboard."""
+        m = self._mod()
+        for _, data in m.h_why("").buttons:
+            assert len(data.encode()) <= 64 and data.startswith("why:")
+
+    def test_a_tap_from_a_stranger_is_ignored(self):
+        """A callback carries a chat id like anything else. A bot that trusts taps
+        but not typed commands has just moved the hole."""
+        m = self._mod()
+        cq = {"id": "1", "data": "why:BHEL", "message": {"chat": {"id": 999999}}}
+        assert TestTelegramBot._with_chat("-100123", lambda: m.handle_tap(cq)) is False
+
+    def test_the_poll_loop_asks_for_callbacks(self):
+        m = self._mod()
+        src = open(os.path.join(os.path.dirname(os.path.dirname(
+            os.path.abspath(__file__))), "scripts", "bot.py")).read()
+        assert '"message","callback_query"' in src, "taps would never be delivered"

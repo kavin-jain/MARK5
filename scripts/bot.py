@@ -646,8 +646,13 @@ def h_why(ticker=""):
     L = _export()
     held = {h["ticker"]: h for h in (L.get("holdings") or [])}
     if not t:
-        return ("Name a stock — for example  /why " + (sorted(held)[0] if held else "BHEL")
-                + "\n\nHeld right now:\n  " + "  ".join(sorted(held)))
+        sleeves = set((L.get("config") or {}).get("sleeve_targets") or {})
+        names = sorted(set(held) - sleeves)
+        if not names:
+            return "No positions yet."
+        return Menu(f"WHICH ONE?\n\nTap a stock for its position note.\n"
+                    f"{len(names)} held. Or type  /why BHEL",
+                    [(t2, f"why:{t2}") for t2 in names])
 
     try:
         book = json.load(open(BOOK))
@@ -929,6 +934,30 @@ def h_sector(arg=""):
     return Photo(buf.getvalue(), txt[:1024])
 
 
+class Menu:
+    """A message with tappable buttons under it.
+
+    Typing a ticker is the only step in this bot where the owner can get it
+    wrong — a typo, a wrong suffix, a name that was sold last rebalance — and the
+    reply to a wrong ticker is useless rather than obviously wrong. Buttons remove
+    the failure mode entirely: the only tickers offered are the ones actually
+    held, so the question cannot be malformed.
+    """
+
+    def __init__(self, text, buttons, per_row=3):
+        self.text, self.buttons, self.per_row = text, buttons, per_row
+
+    def markup(self):
+        rows, cur = [], []
+        for label, data in self.buttons:
+            cur.append({"text": label, "callback_data": data[:64]})
+            if len(cur) == self.per_row:
+                rows.append(cur); cur = []
+        if cur:
+            rows.append(cur)
+        return json.dumps({"inline_keyboard": rows})
+
+
 class Sweep:
     """A request to delete chat history. Carries no message ids of its own —
     `handle` supplies them, because only it knows which message asked."""
@@ -1046,6 +1075,13 @@ def send_photo(chat, png, caption):
 
 
 def reply(chat, body, dry=False):
+    if isinstance(body, Menu):
+        if dry:
+            print(f"--- would offer {len(body.buttons)} buttons to {chat} ---\n{body.text}")
+            return
+        _api("sendMessage", chat_id=chat, text=body.text,
+             reply_markup=body.markup())
+        return
     if isinstance(body, Photo):
         if dry:
             print(f"--- would send a {len(body.png)}-byte chart to {chat} ---")
@@ -1105,6 +1141,34 @@ def _sweep(chat, from_id, n, dry=False):
     return True
 
 
+def handle_tap(cq, dry=False):
+    """A button press. Same authorisation as a typed command — a callback carries
+    a chat id like anything else, and a bot that trusts taps but not text has
+    simply moved the hole."""
+    chat = str(((cq.get("message") or {}).get("chat") or {}).get("id", ""))
+    data = cq.get("data") or ""
+    if chat not in allowed_chats():
+        print(f"  ignored a tap from unauthorised chat {chat}")
+        return False
+    if not dry:
+        # Always answer, even on failure: an unanswered callback leaves a spinner
+        # turning on the button forever, which reads as a hung system.
+        try:
+            _api("answerCallbackQuery", callback_query_id=cq.get("id"))
+        except RuntimeError:
+            pass
+    if not data.startswith("why:"):
+        return False
+    ticker = data.split(":", 1)[1]
+    print(f"  {chat} tapped {ticker}")
+    try:
+        body = h_why(ticker)
+    except Exception as e:                                   # noqa: BLE001
+        body = f"That failed:\n  {scrub(e)}\n\nThe money record is untouched."
+    reply(chat, body, dry)
+    return True
+
+
 def handle(msg, dry=False):
     chat = str((msg.get("chat") or {}).get("id", ""))
     text = msg.get("text") or ""
@@ -1150,7 +1214,7 @@ def serve(once=False, dry=False):
         try:
             d = _api("getUpdates", offset=offset,
                      timeout=0 if once else int(min(POLL, max(1, left))),
-                     allowed_updates='["message"]')
+                     allowed_updates='["message","callback_query"]')
         except RuntimeError as e:
             # 409 means another run of this workflow is already polling. Not an
             # error worth failing the job over — the other one is doing the work.
@@ -1168,7 +1232,11 @@ def serve(once=False, dry=False):
             except RuntimeError:
                 pass
             for u in ups:
-                if handle(u.get("message") or {}, dry):
+                if u.get("callback_query"):
+                    ok = handle_tap(u["callback_query"], dry)
+                else:
+                    ok = handle(u.get("message") or {}, dry)
+                if ok:
                     served += 1
             quiet = time.monotonic() + ACTIVE_EXIT
         if once:
@@ -1202,6 +1270,11 @@ def main():
 
     if a.say:
         body = answer(a.say if a.say.startswith("/") else "/" + a.say)
+        if isinstance(body, Menu):
+            print(body.text + "\n")
+            for r in json.loads(body.markup())["inline_keyboard"]:
+                print("  [ " + " ] [ ".join(b["text"] for b in r) + " ]")
+            return
         if isinstance(body, Photo):
             import tempfile
             # Not the repo root — a preview is scratch, not an artifact.
