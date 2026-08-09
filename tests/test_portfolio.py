@@ -1625,3 +1625,61 @@ class TestUniverseCanGrow:
         sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         import paper_track as pt
         assert r.MARKET_TOP_N > pt.TOP_N, "cache must hold more than the screen selects"
+
+
+class TestNoInventedSessions:
+    """The NAV log must contain one row per TRADING SESSION, dated by the session.
+
+    The old rule was "one honest row per calendar day", and it was not honest on a
+    day the market was shut: _mark() prices the book from the last non-NaN bar in
+    a 7-day window and never reports WHEN that bar was, so a Sunday run wrote
+    Friday's closes under Sunday's date. Proven on 2026-08-09 by doing exactly
+    that. The weekday cron hid it — but trading holidays are weekdays, so the
+    unattended daily job would have written the same invented session on Diwali.
+    """
+
+    @staticmethod
+    def _rows():
+        import csv as _csv
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, "data", "paper", "paper_nav.csv")) as f:
+            return list(_csv.DictReader(f))
+
+    # The one pre-existing exception, and it is not a loophole: 2026-07-26 is the
+    # Sunday the book was resynced mid-flight, already disclosed in the published
+    # feed and already waived by name in healthcheck.py. Waiving it here keeps the
+    # check guarding every future date instead of being deleted for being red.
+    # Anything ADDED to this set is a new incident that must be disclosed first.
+    DOCUMENTED_INCIDENTS = {"2026-07-26"}
+
+    def test_no_weekend_marks(self):
+        from datetime import datetime as _dt
+        for r in self._rows():
+            if r["date"] in self.DOCUMENTED_INCIDENTS:
+                continue
+            wd = _dt.strptime(r["date"], "%Y-%m-%d").weekday()
+            assert wd < 5, f"{r['date']} is a {'Saturday' if wd == 5 else 'Sunday'}"
+
+    def test_the_waiver_matches_the_one_healthcheck_already_declares(self):
+        """Two independent lists of "known incidents" is how one of them quietly
+        grows. This asserts they name the same date."""
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        src = open(os.path.join(root, "scripts", "healthcheck.py")).read()
+        for d in self.DOCUMENTED_INCIDENTS:
+            assert d in src, f"{d} is waived in tests but unknown to healthcheck.py"
+
+    def test_the_waiver_has_not_quietly_grown(self):
+        assert len(self.DOCUMENTED_INCIDENTS) == 1
+
+    def test_one_row_per_session(self):
+        dates = [r["date"] for r in self._rows()]
+        dupes = {d for d in dates if dates.count(d) > 1}
+        assert not dupes, f"duplicate sessions: {sorted(dupes)}"
+
+    def test_the_mark_is_keyed_on_the_session_not_the_calendar(self):
+        """Guards the fix itself: keying on today's date is what allowed a
+        non-session row, and it is an easy thing to reintroduce."""
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        src = open(os.path.join(root, "scripts", "paper_track.py")).read()
+        assert "sess = last_session_date()" in src
+        assert "if today not in seen" not in src, "back to keying on the calendar"

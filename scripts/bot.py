@@ -413,6 +413,84 @@ def _fundamentals(ticker):
 LEDGER = os.path.join(_ROOT, "data", "paper", "paper_ledger.csv")
 
 
+def _sectors():
+    try:
+        with open(os.path.join(_ROOT, "config", "sector_map.json")) as f:
+            # The file wraps the map in a "sectors" key alongside its
+            # provenance note; reading the top level silently yields nothing.
+            d = json.load(f)
+            d = d.get("sectors", d)
+            return {k.upper(): v for k, v in d.items()}
+    except (OSError, ValueError):
+        return {}
+
+
+SECTORS = _sectors()
+
+
+def px(v):
+    """A price with paise. rs() rounds to whole rupees, which is right for a
+    portfolio total and wrong for an execution price — a position note that says
+    "Rs 1,587" cannot be checked against a contract note."""
+    body = f"{abs(float(v)):.2f}"
+    whole, dec = body.split(".")
+    return f"{'-' if float(v) < 0 else ''}Rs {_grp(whole)}.{dec}"
+
+
+def _kv(label, value):
+    return f"  {label:<19}{str(value):>{W - 21}}"
+
+
+def _days_since(datestr):
+    try:
+        return (datetime.now() - datetime.strptime(datestr, "%Y-%m-%d")).days
+    except (TypeError, ValueError):
+        return None
+
+
+def _plus_year(datestr):
+    """The date a holding turns long-term. Sec 112A: >365 days, so the rate falls
+    on day 366 — not on the anniversary, which is the usual off-by-one here."""
+    try:
+        d = datetime.strptime(datestr, "%Y-%m-%d")
+        return (d.replace(year=d.year + 1)).strftime("%Y-%m-%d")
+    except (TypeError, ValueError):
+        return None
+
+
+def _vs_bench(L, entry_date, stock_pct):
+    """This name against the index over the SAME window it has been held.
+
+    "+16%" alone is not information — the market may have done +15%. The relevant
+    figure is what the position added over simply owning the index for the same
+    days, which is what anyone comparing this to a mutual fund actually wants.
+
+    Read from nav_history, which is committed, so this works on a runner with no
+    price cache. Returns nothing rather than guessing when the benchmark has no
+    print on or before the entry date.
+    """
+    hist = [h for h in (L.get("nav_history") or [])
+            if str(h.get("bench_inr", "")).strip() not in ("", "None")]
+    if not hist or not entry_date:
+        return []
+    at_entry = [h for h in hist if h["date"] <= entry_date]
+    base = at_entry[-1] if at_entry else hist[0]
+    b0, b1 = float(base["bench_inr"]), float(hist[-1]["bench_inr"])
+    if b0 <= 0:
+        return []
+    bench_pct = (b1 / b0 - 1) * 100
+    lead = stock_pct - bench_pct
+    out = [_kv("this stock", pct(stock_pct, 1)),
+           _kv("Nifty 50", pct(bench_pct, 1)),
+           _kv("ahead / behind", f"{lead:+.1f}pp"),
+           "  Measured over the same days, so this is",
+           "  what holding it added over simply owning",
+           "  the index."]
+    if not at_entry:
+        out.append("  Index measured from the book's first mark.")
+    return out
+
+
 def bought_on(ticker):
     """First BUY date for a name, from the ledger.
 
@@ -432,6 +510,84 @@ def bought_on(ticker):
         return None
 
 
+def _sizing(L, h):
+    """Why this position is this size.
+
+    "We hold LAURUSLABS" is half an answer; the other half is how much, and why
+    that much. Equal weighting would be the null choice, so the honest way to show
+    the sizing rule is the gap between what equal weight WOULD be and what this
+    name actually got — which states the rule and its effect in one line without
+    exposing a formula.
+    """
+    cfg = L.get("config") or {}
+    rows = [r for r in (L.get("sleeves") or {}).get("rows") or [] if not r.get("passive")]
+    if not rows:
+        return []
+    eq = rows[0]
+    n = eq.get("n_holdings") or 0
+    if not n:
+        return []
+    equal = float(eq["weight_pct"]) / n
+    actual = float(h["weight"])
+    cap = cfg.get("max_weight_per_name")
+    out = ["", "HOW THE SIZE WAS SET",
+           _kv("this position", f"{actual:.2f}%"),
+           _kv("equal weight", f"{equal:.2f}%")]
+    if cap:
+        out.append(_kv("hard cap", f"{float(cap) * 100:.1f}%"))
+    lean = "above" if actual > equal * 1.05 else ("below" if actual < equal * 0.95 else "at")
+    out += ["",
+            f"  Sized {lean} equal weight. Money is split by",
+            "  inverse volatility: the steadier a stock has",
+            "  been, the more it gets, because a calm name",
+            "  and a wild one at the same weight are not",
+            "  the same amount of risk.",
+            "  The cap exists so no single name can decide",
+            "  the year, however good its score."]
+    return out
+
+
+def _next_rebalance(L):
+    try:
+        p = subprocess.run([sys.executable, os.path.join(_ROOT, "scripts", "paper_track.py"),
+                            "rebalance", "--check"], capture_output=True, text=True,
+                           cwd=_ROOT, timeout=120)
+        line = (p.stdout.strip().splitlines() or [""])[-1]
+        return line.split("next ~")[-1].rstrip(")") if "next ~" in line else None
+    except Exception:                                        # noqa: BLE001
+        return None
+
+
+def _exit_rule(L):
+    """When it goes. Stated as a rule, because it IS one.
+
+    This is the section a reader will look for when the position is down, and the
+    honest answer is the least intuitive one in the whole system: nothing happens.
+    Six separate approaches that cut exposure after a loss were tested and every
+    one scored worse, so "we sell if it falls" is not a missing feature — it is a
+    falsified one, and the note says which.
+    """
+    cfg = L.get("config") or {}
+    nxt = _next_rebalance(L)
+    out = ["", "WHEN IT WOULD BE SOLD"]
+    if nxt:
+        out.append(_kv("next review", nxt))
+    if cfg.get("n_hold"):
+        out.append(_kv("kept if in", f"top {cfg['n_hold']} by score"))
+    out += ["",
+            "  It is sold at the next scheduled review if",
+            "  it is no longer in the top by score. That is",
+            "  the only thing that removes it.",
+            "",
+            "  Not on a price fall, not on news, not on a",
+            "  bad month. Six versions of this system that",
+            "  cut exposure after a loss were tested and",
+            "  all scored worse: Indian equity recovers in",
+            "  a V, so selling after a fall sells the",
+            "  rebound. The calendar is the rule."]
+    return out
+
+
 def h_why(ticker=""):
     """Why this stock is in the book — and what was never looked at.
 
@@ -447,19 +603,59 @@ def h_why(ticker=""):
         return ("Name a stock — for example  /why " + (sorted(held)[0] if held else "BHEL")
                 + "\n\nHeld right now:\n  " + "  ".join(sorted(held)))
 
-    out = [f"WHY THE SYSTEM HOLDS {t}" if t in held else f"{t} — NOT HELD", "─" * W]
+    try:
+        book = json.load(open(BOOK))
+    except (OSError, ValueError):
+        book = {}
+    sector = SECTORS.get(t, "")
+    head = f"{t}" + (f"  ·  {sector}" if sector else "")
+    out = [head, f"Position note  ·  {_asof(L)}" if t in held
+           else "NOT HELD  ·  this stock is not in the book", "─" * W]
+
     if t in held:
         h = held[t]
-        try:
-            pos = json.load(open(BOOK)).get("positions", {}).get(t, {})
-        except (OSError, ValueError):
-            pos = {}
+        pos = (book.get("positions") or {}).get(t, {})
         when = pos.get("entry_date") or bought_on(t) or "?"
-        out += [f"  {'bought':<17}{when:>{W - 19}}",
-                f"  {'at':<17}{rs(pos.get('entry_price', 0)):>{W - 19}}",
-                f"  {'now':<17}{rs(h['price']):>{W - 19}}",
-                f"  {'worth':<17}{rs(h['value']):>{W - 19}}",
-                f"  {'made / lost':<17}{_amt(h['pnl'], True):>{W - 19}}"]
+        nav, cap = float(L["nav"]), float(L["capital"])
+
+        out += ["THE POSITION",
+                _kv("entered", when),
+                _kv("entry price", px(pos.get("entry_price", 0))),
+                _kv("last price", px(h["price"])),
+                _kv("shares", f"{int(h['qty']):,}"),
+                _kv("market value", rs(h["value"])),
+                _kv("unrealised P&L", f"{_amt(h['pnl'], True)}  {pct(h['pnl_pct'], 1)}"),
+                _kv("weight in book", f"{float(h['weight']):.2f}%")]
+
+        # Days held drives the tax rate, and it is the single most consequential
+        # date on the position — 20% versus 12.5% is a 7.5pp swing on the gain.
+        # Nobody should have to work it out from an entry date.
+        days = _days_since(when)
+        if days is not None:
+            lt = _plus_year(when)
+            out += [_kv("held", f"{days} days"),
+                    _kv("tax if sold today", "20% short-term" if days <= 365
+                        else "12.5% long-term")]
+            if days <= 365 and lt:
+                out += [_kv("  drops to 12.5% on", lt)]
+
+        # Contribution in basis points: the standard way a desk reports what one
+        # name did FOR THE BOOK, as opposed to what the stock did. A +16% stock at
+        # a 3.5% weight and a +16% stock at a 0.5% weight are not the same event.
+        bps = float(h["pnl"]) / cap * 10000
+        out += ["", "CONTRIBUTION TO THE BOOK",
+                _kv("this position", f"{bps:+.0f} bps"),
+                _kv("whole book", f"{(nav - cap) / cap * 10000:+.0f} bps"),
+                "  A basis point is one hundredth of a",
+                "  percent. This is what the position did to",
+                "  YOUR return, not what the stock did."]
+
+        # Relative performance over the holding period. The benchmark series is in
+        # the export, so this needs no price cache — which matters, because the
+        # bot runs on a runner that has none.
+        rel = _vs_bench(L, when, float(h["pnl_pct"]))
+        if rel:
+            out += ["", "SINCE IT WAS BOUGHT"] + rel
 
     try:
         sig = json.load(open(SIGNALS))
@@ -498,6 +694,10 @@ def h_why(ticker=""):
         out += ["", f"  Each is out of 100 against the other {n}.",
                 "  The percentage is how much it counted.",
                 "", f"  {sig.get('basis', 'basis not recorded')}"]
+
+    if t in held:
+        out += _sizing(L, held[t])
+        out += _exit_rule(L)
 
     out += ["", "─" * W, "WHAT IT DID NOT LOOK AT",
             "  profits · debt · revenue · valuation",

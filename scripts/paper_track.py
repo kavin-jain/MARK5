@@ -66,6 +66,12 @@ LEDGER = os.path.join(PAPER_DIR, "paper_ledger.csv")
 # 60 names is ~Rs 2,166 a position here — less than one share of several holdings.
 SLEEVES = {"GOLDBEES": 0.25, "MON100": 0.25, "LTGILTBEES": 0.25}
 N_HOLD, TOP_N = 20, 300
+# Hoisted out of target_book so the export can publish the rules next to the
+# numbers they produced. Anything that needs them reads them from here; a second
+# copy in a display layer is a copy that drifts.
+MAX_WEIGHT = 0.08
+FACTOR_WEIGHTS = {"momentum": 0.45, "low_vol": 0.15, "trend": 0.25, "stability": 0.15}
+DELIV_WEIGHT = 0.10          # added only when the delivery archive is present
 
 # Real Zerodha equity-delivery costs (buy side), as fractions of turnover.
 BUY_COSTS = 0.001 + 0.00015 + 0.0000297 + 0.000001      # STT + stamp + NSE txn + SEBI
@@ -340,11 +346,11 @@ def target_book():
     # drawdown ~1.5pp worse. deliv_per_z is deliberately EXCLUDED: it tested worse
     # than baseline. Degrades to the price-only book if the archive is absent.
     dfac = load_delivery_factors(universe=panel.tickers)
-    fw = {"momentum": 0.45, "low_vol": 0.15, "trend": 0.25, "stability": 0.15}
+    fw = dict(FACTOR_WEIGHTS)
     if dfac:
-        fw["deliv_chg"] = 0.10
+        fw["deliv_chg"] = DELIV_WEIGHT
     cfg = ConstructionConfig(mode="factor_tilt", n_hold=N_HOLD, base_weighting="inverse_vol",
-                             tilt_strength=1.5, max_weight=0.08, factor_weights=fw)
+                             tilt_strength=1.5, max_weight=MAX_WEIGHT, factor_weights=fw)
     elig = panel.eligible(asof, 252, top_n=TOP_N)
     raw = {f: {} for f in FactorLibrary.DEFAULT_FACTORS}
     vol = {}
@@ -530,11 +536,33 @@ def cmd_status(quiet=False):
         for d in detail:
             print(f"  {d['ticker']:<14}{d['qty']:>6}{d['entry']:>10.2f}{d['price']:>10.2f}"
                   f"{d['value']:>12,.0f}{d['pnl_pct']:>+9.1f}")
-    today = str(pd.Timestamp.today().date())
+    # One row per TRADING SESSION, dated by the session — not one per calendar day.
+    #
+    # The old rule was "one honest row per calendar day", and it was not honest on
+    # a day the market was shut. _mark() prices the book from the last non-NaN bar
+    # in a 7-day window and never says WHEN that bar was, so running this on a
+    # Sunday writes Friday's closes under Sunday's date, and on Diwali it writes
+    # the previous session's closes as if they were the holiday's. Both are
+    # invented sessions in a record whose entire value is that nothing invented is
+    # in it (Mandate §6). Proven the hard way on 2026-08-09: a manual `export` on
+    # a Sunday appended a 2026-08-09 row carrying Friday's prices.
+    #
+    # The weekday cron hid it — trading holidays are weekdays, so the daily job
+    # would have written the same thing on the next NSE holiday, unattended.
+    #
+    # Keying on the session date also makes this idempotent: re-running any number
+    # of times can only ever produce the row that session already has.
+    sess = last_session_date()
+    if sess is None:
+        if not quiet:
+            print("  could not confirm the last NSE session — not recording a mark")
+        return book, nav, ret, days, detail, bench
+    stamp = str(sess.date())
+    days = (sess.normalize() - pd.Timestamp(book["start_date"]).normalize()).days
     seen = set()
     if os.path.exists(NAV_LOG):
         seen = {r.split(",")[0] for r in open(NAV_LOG).read().splitlines()[1:]}
-    if today not in seen:                      # one honest row per calendar day
+    if stamp not in seen:
         new = not os.path.exists(NAV_LOG)
         with open(NAV_LOG, "a", newline="") as f:
             w = csv.writer(f)
@@ -542,7 +570,7 @@ def cmd_status(quiet=False):
                 w.writerow(["date", "day", "nav_inr", "return_pct", "bench_inr",
                             "bench_return_pct", "timestamp"])
             br = (bench / book["capital"] - 1) * 100 if bench else None
-            w.writerow([today, days, f"{nav:.2f}", f"{ret*100:.4f}",
+            w.writerow([stamp, days, f"{nav:.2f}", f"{ret*100:.4f}",
                         f"{bench:.2f}" if bench else "",
                         f"{br:.4f}" if br is not None else "", now_iso()])
     return book, nav, ret, days, detail, bench
@@ -707,7 +735,17 @@ def cmd_export():
         peak = max(peak, v)
         mdd = min(mdd, v / peak - 1)
     bench_ret = (bench / book["capital"] - 1) * 100 if bench else None
-    out = {"generated": now_iso(), "mode": book["mode"],
+    # The rules, published alongside the numbers they produced. Everything that
+    # reads this file — the dashboard, the bot's position notes — otherwise has to
+    # hardcode its own copy of the config, and a second copy is a copy that
+    # disagrees eventually. A caption that describes a different portfolio from
+    # the one in the table is the failure Mandate §6 names.
+    out_config = {"n_hold": N_HOLD, "max_weight_per_name": MAX_WEIGHT,
+                  "top_n_liquid": TOP_N, "cadence_days": REBAL_DAYS,
+                  "factor_weights": FACTOR_WEIGHTS,
+                  "sleeve_targets": SLEEVES,
+                  "sizing": "inverse volatility within the equity sleeve"}
+    out = {"generated": now_iso(), "mode": book["mode"], "config": out_config,
            "start_date": book["start_date"], "days_live": days,
            "capital": book["capital"], "nav": nav, "return_pct": ret * 100,
            "cash": book.get("cash", 0), "integrity": book.get("integrity"),

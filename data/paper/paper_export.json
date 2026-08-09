@@ -1,6 +1,24 @@
 {
- "generated": "2026-08-07T12:07:35+00:00",
+ "generated": "2026-08-09T18:59:08+05:30",
  "mode": "PAPER \u2014 no real money; all prices, quantities and costs are real",
+ "config": {
+  "n_hold": 20,
+  "max_weight_per_name": 0.08,
+  "top_n_liquid": 300,
+  "cadence_days": 182,
+  "factor_weights": {
+   "momentum": 0.45,
+   "low_vol": 0.15,
+   "trend": 0.25,
+   "stability": 0.15
+  },
+  "sleeve_targets": {
+   "GOLDBEES": 0.25,
+   "MON100": 0.25,
+   "LTGILTBEES": 0.25
+  },
+  "sizing": "inverse volatility within the equity sleeve"
+ },
  "start_date": "2026-07-22",
  "days_live": 16,
  "capital": 500000.0,
@@ -16,6 +34,24 @@
  "tax_liability": 0.0,
  "realised_pnl": -1732.8946754525493,
  "rebalances": 2,
+ "rebalance_events": [
+  {
+   "date": "2026-07-26",
+   "signal_asof": "2026-07-21",
+   "trades": 36,
+   "realised_pnl": -1766.4226809045601,
+   "day_of_book": 4,
+   "off_cadence": true
+  },
+  {
+   "date": "2026-07-26",
+   "signal_asof": "2026-07-21",
+   "trades": 28,
+   "realised_pnl": 33.52800545201083,
+   "day_of_book": 4,
+   "off_cadence": true
+  }
+ ],
  "sleeves": {
   "rows": [
    {
