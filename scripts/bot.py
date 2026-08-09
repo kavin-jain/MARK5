@@ -410,6 +410,28 @@ def _fundamentals(ticker):
     return out + [f"  {k:<17}{str(v)[:20]:>{W - 19}}" for k, v in rows]
 
 
+LEDGER = os.path.join(_ROOT, "data", "paper", "paper_ledger.csv")
+
+
+def bought_on(ticker):
+    """First BUY date for a name, from the ledger.
+
+    The book stores `entry_date` on a position, but 13 of the 22 open positions
+    do not have one — it was added after those were opened, so /why printed a
+    bare "?" for most of the book. The ledger has always had it: every fill is a
+    row with a date, and the ledger is the record the book is a summary OF. So
+    ask the record rather than backfilling the summary.
+    """
+    import csv
+    try:
+        with open(LEDGER) as fh:
+            days = [r["date"] for r in csv.DictReader(fh)
+                    if r.get("ticker") == ticker and r.get("action", "").upper() == "BUY"]
+        return min(days) if days else None
+    except (OSError, csv.Error):
+        return None
+
+
 def h_why(ticker=""):
     """Why this stock is in the book — and what was never looked at.
 
@@ -432,7 +454,8 @@ def h_why(ticker=""):
             pos = json.load(open(BOOK)).get("positions", {}).get(t, {})
         except (OSError, ValueError):
             pos = {}
-        out += [f"  {'bought':<17}{str(pos.get('entry_date', '?')):>{W - 19}}",
+        when = pos.get("entry_date") or bought_on(t) or "?"
+        out += [f"  {'bought':<17}{when:>{W - 19}}",
                 f"  {'at':<17}{rs(pos.get('entry_price', 0)):>{W - 19}}",
                 f"  {'now':<17}{rs(h['price']):>{W - 19}}",
                 f"  {'worth':<17}{rs(h['value']):>{W - 19}}",
@@ -456,18 +479,24 @@ def h_why(ticker=""):
                 "  rather than something made up."]
     else:
         fw = sig.get("factor_weights") or {}
-        out += [f"  {'ranked':<17}{sc['rank']:>{W - 19}}"]
-        out += [f"  of {sig.get('n_eligible', '?')} stocks it was allowed to choose from",
-                ""]
+        n = sig.get("n_eligible", "?")
+        # A 0-100 score, not a raw z-score. The composite is a blended z-score:
+        # "1.21" is meaningless without knowing the spread it came from, whereas
+        # a position in the field is self-explaining and is what was asked for.
+        # It is a RANK, and only ever a rank — see the caveat printed below it.
+        top = (1 - (sc["rank"] - 1) / max(n - 1, 1)) * 100 if isinstance(n, int) else None
+        if top is not None:
+            out += [f"  {'SCORE':<17}{f'{top:.0f} / 100':>{W - 19}}"]
+        out += [f"  {'ranked':<17}{f'{sc['rank']} of {n}':>{W - 19}}", ""]
+        out += ["  what went into that score"]
         for f, p in sorted((sc.get("factors") or {}).items(),
                            key=lambda kv: -(fw.get(kv[0], 0))):
             if p is None:
                 continue
-            out.append(f"  {f:<10}{fw.get(f, 0) * 100:>3.0f}%  {_bar(p)} {p * 100:>3.0f}%")
+            out.append(f"  {f:<10}{fw.get(f, 0) * 100:>3.0f}%  {_bar(p)}{p * 100:>4.0f}")
             out.append(f"    {FACTOR_PLAIN.get(f, '')}")
-        out += ["", f"  Percentile against the other {sig.get('n_eligible', '?')} —",
-                "  higher is stronger. Weights show how",
-                "  much each one counted.",
+        out += ["", f"  Each is out of 100 against the other {n}.",
+                "  The percentage is how much it counted.",
                 "", f"  {sig.get('basis', 'basis not recorded')}"]
 
     out += ["", "─" * W, "WHAT IT DID NOT LOOK AT",

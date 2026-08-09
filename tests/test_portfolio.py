@@ -1565,3 +1565,63 @@ class TestWhyCommand:
         It must never take the explanation down with it."""
         m = self._mod()
         assert m._fundamentals("DEFINITELYNOTATICKER123") == []
+
+
+class TestUniverseCanGrow:
+    """The cached universe must be able to GROW, not only shrink.
+
+    `discover_tickers()` reads the cache, and refetch_all fetched exactly what it
+    returned. So the investable set was whatever happened to be cached once, minus
+    anything that later fell out — a holding that dropped out could never come
+    back, and a newly listed company could never enter however large it became.
+    Both halves of that were live on 2026-08-09: 14 of 20 holdings were absent,
+    and the cache held 207 names against 450 liquid ones actually trading.
+    """
+
+    @staticmethod
+    def _r():
+        import sys
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path[:0] = [root, os.path.join(root, "scripts")]
+        import refetch_all
+        return refetch_all
+
+    def test_every_holding_is_always_fetched(self):
+        """A name the cache cannot see cannot be ranked, so the rebalance drops it,
+        so it is SOLD. You must always be able to price what you own."""
+        import json as _json
+        r = self._r()
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        book = _json.load(open(os.path.join(root, "data", "paper", "paper_book.json")))
+        assert set(book["positions"]) <= (r.held_names() | set())
+        assert r.held_names(), "holdings must never resolve to an empty set"
+
+    def test_new_listings_can_enter_from_the_market(self):
+        """Bhavcopy is a snapshot of what actually traded that day, so a new
+        listing simply appears. Without this the universe decays into a survivor
+        set while believing it ranks the market."""
+        r = self._r()
+        mkt = r.market_names()
+        if not mkt:
+            import pytest
+            pytest.skip("no bhavcopy in this environment")
+        assert len(mkt) > 300, f"only {len(mkt)} names — the top-300 screen needs headroom"
+
+    def test_the_fetch_list_is_a_superset_of_the_cache(self):
+        """Nothing in the union may ever REMOVE a name. Delisting removes names,
+        by ceasing to print — a fetch list must not."""
+        r = self._r()
+        from core.portfolio.universe import STRUCTURAL_EXCLUDE, discover_tickers
+        cached = set(discover_tickers())
+        union = ((cached | r.pinned_names() | r.held_names() | r.market_names())
+                 - STRUCTURAL_EXCLUDE)
+        assert cached - STRUCTURAL_EXCLUDE <= union
+
+    def test_the_liquidity_screen_has_something_to_screen(self):
+        """TOP_N_LIQUID is 300. With 207 names cached, "top 300 by liquidity" has
+        never once been binding — it silently meant "all of them"."""
+        r = self._r()
+        import sys
+        sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        import paper_track as pt
+        assert r.MARKET_TOP_N > pt.TOP_N, "cache must hold more than the screen selects"

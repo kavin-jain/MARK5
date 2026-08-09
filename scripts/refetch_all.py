@@ -6,6 +6,7 @@ file only on a successful fetch (never destroys good data on a network blip).
 
   python3 scripts/refetch_all.py
 """
+import json
 import os, sys, time
 import pandas as pd
 import yfinance as yf
@@ -36,8 +37,84 @@ def normalize(df):
     return df if len(df) >= 200 else None
 
 
+def held_names():
+    """Whatever the live book owns. Always fetched, whatever else is going on.
+
+    This exists because of a specific hole. `discover_tickers()` reads the CACHE,
+    so this script only ever refreshed names already in it — a holding that fell
+    out could never come back, because nothing in the system fetched it again. On
+    2026-08-09 that was 14 of the 20 stocks in the book, none of them in the
+    pinned list either.
+
+    Not a cosmetic gap: a name the cache cannot see cannot be ranked, so the next
+    rebalance drops it from the target book, so it is SOLD. You must always be
+    able to price what you own.
+    """
+    try:
+        with open(os.path.join(_ROOT, "data", "paper", "paper_book.json")) as f:
+            return set(json.load(f).get("positions", {}))
+    except (OSError, ValueError):
+        return set()
+
+
+def pinned_names():
+    try:
+        with open(os.path.join(_ROOT, "config", "universe_tickers.json")) as f:
+            return set(json.load(f)["tickers"])
+    except (OSError, ValueError, KeyError):
+        return set()
+
+
+# How many of the market's most-traded names to keep cached. TOP_N_LIQUID is 300
+# at selection time, so the cache must hold MORE than 300 for that screen to have
+# anything to screen — with 203 cached it has never once been binding, and "top
+# 300 by liquidity" has quietly meant "all of them". The margin also lets names
+# near the boundary move in and out without falling off the edge of the world.
+MARKET_TOP_N = 450
+
+
+def market_names(top_n=MARKET_TOP_N):
+    """The most-traded names currently listed, from the latest NSE bhavcopy.
+
+    Without this the universe can only ever SHRINK. `discover_tickers()` reads the
+    cache, so the set of investable names was whatever happened to be cached once,
+    minus anything that later fell out. New listings — and NSE lists dozens every
+    six months — could never enter, however large or liquid they became. A book
+    left alone for a year would be choosing from a slowly decaying survivor set
+    while believing it was ranking the market.
+
+    Bhavcopy is the honest source: a snapshot of what actually traded that day, so
+    a new listing simply appears and a delisted one simply stops. Names are taken
+    by turnover, because an illiquid microcap that we could never buy is noise in
+    the cross-section, not opportunity.
+
+    A brand-new listing still will not be SELECTABLE for about a year — 252 days
+    of history is required to score it, and that is deliberate. What matters is
+    that it is now in the cache when that day comes, instead of invisible forever.
+    """
+    import glob
+    raw = sorted(glob.glob(os.path.join(_ROOT, "data", "bhavcopy", "raw", "*.parquet")))
+    if not raw:
+        print("  no bhavcopy — cannot look for new listings")
+        return set()
+    df = pd.read_parquet(raw[-1])
+    df = df[pd.to_numeric(df["turnover"], errors="coerce").fillna(0) > 0]
+    names = set(df.nlargest(top_n, "turnover")["symbol"].astype(str).str.upper())
+    print(f"  bhavcopy {os.path.basename(raw[-1])[:10]}: top {top_n} of "
+          f"{len(df)} traded names")
+    return names
+
+
 def main():
-    tickers = discover_tickers()
+    # Union of four sources, so the universe can grow as well as persist:
+    #   cached   — what we already track
+    #   pinned   — what a cacheless CI runner is told to fetch
+    #   held     — what we own, which must always be priceable
+    #   market   — what is actually trading now, so new listings can ever enter
+    # Nothing here ever removes a name; delisting removes it, by ceasing to print.
+    from core.portfolio.universe import STRUCTURAL_EXCLUDE
+    tickers = sorted((set(discover_tickers()) | pinned_names() | held_names()
+                      | market_names()) - STRUCTURAL_EXCLUDE)
     print(f"Re-fetching {len(tickers)} names to uniform END={END} ...", flush=True)
     ok = fail = 0
     failed = []
@@ -82,6 +159,27 @@ def main():
     print(f"\nDONE: ok={ok} fail={fail} of {len(tickers)}")
     if failed:
         print(f"  failed: {failed}")
+
+    # Re-pin, so the cacheless CI runner is told to fetch what actually exists.
+    # The pinned list had drifted to missing 14 of the 20 stocks in the live book,
+    # which is how the January rebalance would have arrived at a universe that
+    # could not see most of the portfolio. A list that is never regenerated stops
+    # describing reality the moment the cache moves.
+    #
+    # Only on a mostly-successful run: re-pinning after a rate-limited or offline
+    # run would BAKE IN the truncation and make the next cacheless rebuild worse.
+    if ok and ok / max(len(tickers), 1) >= 0.9:
+        names = sorted(set(discover_tickers()) | held_names())
+        p = os.path.join(_ROOT, "config", "universe_tickers.json")
+        json.dump({"description": "Version-pinned universe for rebuilding data/cache "
+                                  "from scratch (scripts/refetch_all.py). Regenerated "
+                                  "automatically after a successful full fetch.",
+                   "pinned": END, "count": len(names), "tickers": names},
+                  open(p, "w"), indent=1)
+        print(f"  re-pinned {p}: {len(names)} names")
+    else:
+        print(f"  NOT re-pinning: only {ok}/{len(tickers)} succeeded — a truncated "
+              f"list would make the next cacheless rebuild worse, not better")
 
 
 if __name__ == "__main__":
