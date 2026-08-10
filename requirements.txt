@@ -4,6 +4,7 @@
 numpy>=1.26.0
 pandas>=2.2.0
 scipy>=1.12.0            # stats.py (DSR/PBO)
+matplotlib>=3.8.0        # bot.py /chart and /sector
 pyarrow>=15.0.0          # parquet data cache
 yfinance>=0.2.40         # price data (refetch_all.py)
 requests>=2.31.0         # fundamentals fetcher (fetch_fundamentals.py)
