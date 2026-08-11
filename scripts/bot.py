@@ -1419,15 +1419,79 @@ def register():
         print(f"  could not publish the command menu: {e}")
 
 
+def render_all(outdir):
+    """Pre-render every answer so an always-on webhook can serve them instantly.
+
+    GitHub's scheduler is the reason this exists. The cron asks for every 10
+    minutes; measured gaps on 2026-08-09 were 23 to 69 minutes, because scheduled
+    workflows are best-effort and high-frequency ones are throttled hard. No
+    amount of window tuning fixes that — a question could wait an hour.
+
+    A webhook answers instantly, but only if whatever receives it can produce an
+    answer without running pandas. So the split is: this job does ALL the work and
+    writes the finished text; the receiver looks it up and sends it. No formatting
+    logic is duplicated, which is the mistake that would have rotted first.
+
+    Staleness is not a cost here. Every answer is a function of the daily mark, so
+    a pre-rendered reply is exactly as fresh as a computed one — with the single
+    exception of /health, which is labelled with when it last actually ran.
+    """
+    os.makedirs(outdir, exist_ok=True)
+    L = _export()
+    text, photo, menus = {}, {}, {}
+
+    for name, _desc, fn in COMMANDS:
+        if name == "clear":
+            continue                     # live-only: it acts, it does not report
+        try:
+            body = fn()
+        except Exception as e:           # noqa: BLE001
+            print(f"  {name}: FAILED to render ({scrub(e)})")
+            continue
+        if isinstance(body, Photo):
+            fname = f"bot_{name}.png"
+            with open(os.path.join(outdir, fname), "wb") as fh:
+                fh.write(body.png)
+            photo[name] = {"file": fname, "caption": body.caption}
+        elif isinstance(body, Menu):
+            menus[name] = {"text": body.text, "buttons": body.buttons,
+                           "per_row": body.per_row}
+        else:
+            text[name] = body
+
+    # One answer per held stock, so a button tap resolves to a lookup too.
+    for h in (L.get("holdings") or []):
+        t = h["ticker"]
+        if t in set((L.get("config") or {}).get("sleeve_targets") or {}):
+            continue
+        try:
+            text[f"why:{t}"] = h_why(t)
+        except Exception as e:           # noqa: BLE001
+            print(f"  why:{t}: FAILED ({scrub(e)})")
+
+    doc = {"generated": datetime.now().astimezone().isoformat(timespec="seconds"),
+           "asof": _asof(L),
+           "commands": [{"name": n, "description": d} for n, d, _ in COMMANDS],
+           "aliases": ALIASES, "text": text, "photo": photo, "menu": menus}
+    p = os.path.join(outdir, "bot_answers.json")
+    json.dump(doc, open(p, "w"), indent=1)
+    print(f"  wrote {p}: {len(text)} answers, {len(photo)} image(s), "
+          f"{len(menus)} menu(s)")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--serve", action="store_true",
                     help="hold a polling window open (what the workflow runs)")
     ap.add_argument("--dry", action="store_true", help="print replies, send nothing")
+    ap.add_argument("--render", metavar="DIR",
+                    help="pre-render every answer to DIR for the webhook to serve")
     ap.add_argument("--say", metavar="CMD",
                     help="render one command locally, e.g. --say /holdings")
     a = ap.parse_args()
 
+    if a.render:
+        return render_all(a.render)
     if a.say:
         body = answer(a.say if a.say.startswith("/") else "/" + a.say)
         if isinstance(body, Menu):

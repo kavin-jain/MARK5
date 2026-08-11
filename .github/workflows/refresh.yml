@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install pandas numpy yfinance pyarrow
+      - run: pip install pandas numpy yfinance pyarrow matplotlib
 
       - name: Is a rebalance due?
         # Cheap: reads the book, touches no price data. Everything below keys off
@@ -119,6 +119,14 @@ jobs:
           print(f"live day {live['days_live']}  NAV {live['nav']:.0f}  {live['return_pct']:+.2f}%")
           PY
 
+      - name: Pre-render the bot's answers
+        # So an always-on webhook can reply instantly without running pandas.
+        # Every answer is a function of the daily mark, so a pre-rendered reply is
+        # exactly as fresh as a computed one — and all the formatting stays here,
+        # in Python, rather than being duplicated in whatever serves it.
+        continue-on-error: true
+        run: python scripts/bot.py --render docs/data
+
       - name: Rebuild the standalone dashboard from the feed
         # docs/index.html EMBEDS mark6.json rather than fetching it, so updating the
         # feed alone leaves the standalone page frozen at whatever it was built with.
@@ -137,7 +145,7 @@ jobs:
           # sector map and re-pin the universe, and without this those are
           # rebuilt in CI and then thrown away — so the next run starts from the
           # stale committed copies and the refresh accomplishes nothing.
-          git add docs/data/mark6.json docs/index.html data/paper/ config/
+          git add docs/data/ docs/index.html data/paper/ config/
           git diff --staged --quiet || git commit -m "chore: daily live refresh [skip ci]"
           git push
 
