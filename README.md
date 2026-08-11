@@ -291,6 +291,16 @@ rebalance reports to the chat; it does not take orders from it.
 
 ---
 
+## Stress tests
+
+Every crash since 2007, year by year, rolling-window worst cases, and an explicit
+list of what is **not** modelled: **[docs/STRESS_TESTS.md](docs/STRESS_TESTS.md)**.
+
+The headline from it is not the 2008 row (−1.6% against the Nifty's −50.8%). It is
+**2022: −11.3% while the index gained 2.2%** — the one episode where this structure
+lost and the index did not, because gold and bonds are insurance and insurance has a
+premium. A reader shown 2008 without 2022 has been sold something.
+
 ## Methodological rigor
 
 | Technique | Purpose |
