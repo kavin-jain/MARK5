@@ -1,8 +1,8 @@
 {
- "generated": "2026-08-14T12:28:34+00:00",
+ "generated": "2026-08-15T01:44:45+00:00",
  "disclaimer": "PAPER MODE. The live panel is a real-price paper book with no money at risk. The research panel is a historical simulation: real prices, simulated trades. Neither is investment advice.",
  "live": {
-  "generated": "2026-08-14T12:28:34+00:00",
+  "generated": "2026-08-15T01:44:44+00:00",
   "mode": "PAPER \u2014 no real money; all prices, quantities and costs are real",
   "config": {
    "n_hold": 20,
@@ -23,15 +23,15 @@
    "sizing": "inverse volatility within the equity sleeve"
   },
   "start_date": "2026-07-22",
-  "days_live": 23,
+  "days_live": 22,
   "capital": 500000.0,
-  "nav": 524287.48485141085,
-  "return_pct": 4.857496970282171,
+  "nav": 524350.8843570261,
+  "return_pct": 4.870176871405207,
   "cash": 12.513934662822408,
   "integrity": "77a5de0d83926722",
-  "benchmark_nav": 509127.1967722993,
-  "benchmark_return_pct": 1.825439354459868,
-  "relative_pct": 3.0320576158223034,
+  "benchmark_nav": 508779.6652175952,
+  "benchmark_return_pct": 1.7559330435190423,
+  "relative_pct": 3.114243827886165,
   "max_drawdown_pct": -1.7248489981475879,
   "observations": 19,
   "tax_liability": 0.0,
@@ -63,12 +63,12 @@
      "passive": false,
      "role": "Factor-ranked stock selection \u2014 this is the system",
      "n_holdings": 20,
-     "value_inr": 267498.2714996338,
+     "value_inr": 267967.0214996338,
      "invested_inr": 252510.42999999993,
-     "weight_pct": 51.021296374344296,
-     "pnl_inr": 14987.841499633854,
-     "nav_impact_pp": 2.9975682999267708,
-     "return_pct": 5.91087121894196
+     "weight_pct": 51.10452361079214,
+     "pnl_inr": 15456.591499633854,
+     "nav_impact_pp": 3.0913182999267708,
+     "return_pct": NaN
     },
     {
      "key": "Gold ETF",
@@ -76,12 +76,12 @@
      "passive": true,
      "role": "Passive ETF \u2014 anyone can buy this",
      "n_holdings": 1,
-     "value_inr": 131386.49711608887,
+     "value_inr": 131754.00352478027,
      "invested_inr": 125430.63999999998,
-     "weight_pct": 25.06001018760258,
-     "pnl_inr": 5955.857116088882,
-     "nav_impact_pp": 1.1911714232177766,
-     "return_pct": 5.027696738673959
+     "weight_pct": 25.1270680484006,
+     "pnl_inr": 6323.363524780289,
+     "nav_impact_pp": 1.2646727049560578,
+     "return_pct": NaN
     },
     {
      "key": "US Nasdaq-100",
@@ -89,17 +89,17 @@
      "passive": true,
      "role": "Passive ETF \u2014 anyone can buy this",
      "n_holdings": 1,
-     "value_inr": 125390.20230102539,
+     "value_inr": 124617.34539794922,
      "invested_inr": 122046.37999999999,
-     "weight_pct": 23.91630659209087,
-     "pnl_inr": 3343.8223010254005,
-     "nav_impact_pp": 0.6687644602050801,
-     "return_pct": 2.832056515263237
+     "weight_pct": 23.76602178343964,
+     "pnl_inr": 2570.9653979492286,
+     "nav_impact_pp": 0.5141930795898457,
+     "return_pct": NaN
     }
    ],
    "cash_inr": 12.513934662822408,
-   "total_pnl_inr": 24287.520916748137,
-   "total_impact_pp": 4.8575041833496275,
+   "total_pnl_inr": 24350.92042236337,
+   "total_impact_pp": 4.870184084472674,
    "method": "NAV impact is cash-on-cash and sums exactly to the headline. Return % is time-weighted and chain-linked across rebalances, so cash swept in at a rebalance is never counted as profit."
   },
   "holdings": [
@@ -107,33 +107,33 @@
     "ticker": "GOLDBEES",
     "qty": 1050,
     "entry": 119.31463339213073,
-    "price": 125.12999725341797,
-    "value": 131386.49711608887,
-    "pnl": 5957.52122802588,
-    "pnl_pct": 4.8739737079649625,
-    "weight": 25.06001018760258,
+    "price": 125.4800033569336,
+    "value": 131754.00352478027,
+    "pnl": 6325.027636717286,
+    "pnl_pct": 5.167320880532911,
+    "weight": 25.1270680484006,
     "stale": false
    },
    {
     "ticker": "MON100",
     "qty": 377,
     "entry": 323.45246273626094,
-    "price": 332.6000061035156,
-    "value": 125390.20230102539,
-    "pnl": 3303.973578614727,
-    "pnl_pct": 2.828095136413755,
-    "weight": 23.91630659209087,
+    "price": 330.54998779296875,
+    "value": 124617.34539794922,
+    "pnl": 2531.1166755385552,
+    "pnl_pct": 2.194302370328538,
+    "weight": 23.76602178343964,
     "stale": false
    },
    {
     "ticker": "TORNTPHARM",
     "qty": 4,
     "entry": 4961.5,
-    "price": 4833.0,
-    "value": 19332.0,
-    "pnl": -537.541841196,
-    "pnl_pct": -2.589942557694247,
-    "weight": 3.687289999966128,
+    "price": 4914.5,
+    "value": 19658.0,
+    "pnl": -211.541841196,
+    "pnl_pct": -0.9472941650710442,
+    "weight": 3.7490162764014783,
     "stale": false
    },
    {
@@ -144,7 +144,7 @@
     "value": 17873.00048828125,
     "pnl": 1985.8132086272644,
     "pnl_pct": 12.632913499262187,
-    "weight": 3.409007654139726,
+    "weight": 3.4085954694627105,
     "stale": false
    },
    {
@@ -155,18 +155,18 @@
     "value": 17543.0,
     "pnl": 414.30621884171205,
     "pnl_pct": 2.5402764922935583,
-    "weight": 3.346064994279215,
+    "weight": 3.3456604200280364,
     "stale": false
    },
    {
     "ticker": "NAVINFLUOR",
     "qty": 2,
     "entry": 7520.0,
-    "price": 8235.0,
-    "value": 16470.0,
-    "pnl": 1412.15916096,
-    "pnl_pct": 9.507978723404253,
-    "weight": 3.141406284887344,
+    "price": 8294.0,
+    "value": 16588.0,
+    "pnl": 1530.15916096,
+    "pnl_pct": 10.292553191489361,
+    "weight": 3.163530470696293,
     "stale": false
    },
    {
@@ -177,7 +177,7 @@
     "value": 16200.0,
     "pnl": -621.430376139,
     "pnl_pct": -3.5800374966520887,
-    "weight": 3.089907821200666,
+    "weight": 3.089534219030621,
     "stale": false
    },
    {
@@ -188,18 +188,18 @@
     "value": 15698.400390625,
     "pnl": 2548.9209591659233,
     "pnl_pct": 19.52581334683905,
-    "weight": 2.994235194279739,
+    "weight": 2.99387315993084,
     "stale": false
    },
    {
     "ticker": "RBLBANK",
     "qty": 39,
     "entry": 352.8999938964844,
-    "price": 385.0,
-    "value": 15015.0,
-    "pnl": 1235.5740912588751,
-    "pnl_pct": 9.09606309399129,
-    "weight": 2.8638867861313577,
+    "price": 386.25,
+    "value": 15063.75,
+    "pnl": 1284.3240912588751,
+    "pnl_pct": 9.4502710910497,
+    "weight": 2.872837721723612,
     "stale": false
    },
    {
@@ -210,7 +210,7 @@
     "value": 14553.549713134766,
     "pnl": 1392.0551303503228,
     "pnl_pct": 10.707894309022926,
-    "weight": 2.775872042274557,
+    "weight": 2.775536410314391,
     "stale": false
    },
    {
@@ -221,7 +221,7 @@
     "value": 14455.0,
     "pnl": -909.4047458458467,
     "pnl_pct": -5.807305025969789,
-    "weight": 2.7570751577441746,
+    "weight": 2.7567417985239278,
     "stale": false
    },
    {
@@ -232,7 +232,7 @@
     "value": 13113.100341796875,
     "pnl": 1815.0143083558366,
     "pnl_pct": 16.202473618129744,
-    "weight": 2.5011278584140304,
+    "weight": 2.500825445898986,
     "stale": false
    },
    {
@@ -243,7 +243,7 @@
     "value": 12092.0,
     "pnl": 1634.8103022193866,
     "pnl_pct": 15.770529125634901,
-    "weight": 2.306368232960398,
+    "weight": 2.3060893689208806,
     "stale": false
    },
    {
@@ -254,18 +254,18 @@
     "value": 11904.5,
     "pnl": -760.1479622386427,
     "pnl_pct": -5.890621966327214,
-    "weight": 2.2706054109557607,
+    "weight": 2.2703308710154335,
     "stale": false
    },
    {
     "ticker": "TDPOWERSYS",
     "qty": 8,
     "entry": 1113.5999755859375,
-    "price": 1484.5999755859375,
-    "value": 11876.7998046875,
-    "pnl": 2957.4321500428846,
-    "pnl_pct": 33.31537429360958,
-    "weight": 2.2653220127986695,
+    "price": 1481.5999755859375,
+    "value": 11852.7998046875,
+    "pnl": 2933.4321500428846,
+    "pnl_pct": 33.04597773597933,
+    "weight": 2.2604710239445365,
     "stale": false
    },
    {
@@ -276,7 +276,7 @@
     "value": 11807.600341796875,
     "pnl": 109.34034492479834,
     "pnl_pct": 1.0544031974056622,
-    "weight": 2.2521232497364085,
+    "weight": 2.2518509444826607,
     "stale": false
    },
    {
@@ -287,7 +287,7 @@
     "value": 11721.599609375,
     "pnl": 837.4037417751538,
     "pnl_pct": 7.821507609281131,
-    "weight": 2.2357198956784248,
+    "weight": 2.2354495737617297,
     "stale": false
    },
    {
@@ -298,7 +298,7 @@
     "value": 11142.400390625,
     "pnl": 1366.818079961,
     "pnl_pct": 14.11716909693772,
-    "weight": 2.125246303329725,
+    "weight": 2.124989338825685,
     "stale": false
    },
    {
@@ -309,7 +309,7 @@
     "value": 10486.170028686523,
     "pnl": 90.30292614085047,
     "pnl_pct": 0.9882955664577642,
-    "weight": 2.000080171980154,
+    "weight": 1.9998383413703902,
     "stale": false
    },
    {
@@ -320,7 +320,7 @@
     "value": 10435.80029296875,
     "pnl": -40.61237589525,
     "pnl_pct": -0.2694926130662245,
-    "weight": 1.9904728978847124,
+    "weight": 1.9902322288948602,
     "stale": false
    },
    {
@@ -331,7 +331,7 @@
     "value": 8420.75,
     "pnl": 1212.058970423077,
     "pnl_pct": 16.952424205706286,
-    "weight": 1.6061321781095994,
+    "weight": 1.6059379799322284,
     "stale": false
    },
    {
@@ -342,7 +342,7 @@
     "value": 7357.60009765625,
     "pnl": 616.0124284905576,
     "pnl_pct": 9.266959589970213,
-    "weight": 1.403352227593508,
+    "weight": 1.4031825476328408,
     "stale": false
    }
   ],
