@@ -660,6 +660,12 @@ def _sleeve_twr(book, led):
                          end=str((dates[-1] + pd.Timedelta(days=2)).date()),
                          auto_adjust=True, progress=False, threads=False)["Close"]
         px.index = px.index.tz_localize(None)
+        # yfinance sometimes prints a NaN close right after NSE close, before the
+        # settlement print is final. reindex(method="ffill") below only fills
+        # labels ABSENT from the index — it does nothing for a NaN already sitting
+        # at a label that exists — so that NaN would otherwise ride straight
+        # through the chain-link multiply and poison every sleeve's return_pct.
+        px = px.ffill()
     except Exception:
         return {}
 
@@ -683,6 +689,10 @@ def _sleeve_twr(book, led):
             try:
                 p = float(px[f"{t}.NS"].reindex([d], method="ffill").iloc[0])
             except Exception:
+                return {}
+            if pd.isna(p):
+                # no valid price exists yet for this date even after ffill (e.g.
+                # the series' first row) — don't fake a number, drop the feature
                 return {}
             v = q[t] * p
             series[PASSIVE[t]].append(v)
@@ -767,7 +777,7 @@ def cmd_export():
            "sleeves": sleeve_attribution(book, detail, nav),
            "holdings": detail, "nav_history": hist}
     path = os.path.join(PAPER_DIR, "paper_export.json")
-    json.dump(out, open(path, "w"), indent=1, default=float)
+    json.dump(out, open(path, "w"), indent=1, default=float, allow_nan=False)
     print(f"  wrote {path}  (day {days}, NAV Rs {nav:,.0f}, {ret*100:+.2f}%)")
 
 

@@ -118,7 +118,7 @@ jobs:
           live = json.load(open("data/paper/paper_export.json"))
           doc["live"] = live
           doc["generated"] = datetime.datetime.now(datetime.timezone.utc).astimezone().isoformat(timespec="seconds")
-          json.dump(doc, open("docs/data/mark6.json", "w"), indent=1, default=float)
+          json.dump(doc, open("docs/data/mark6.json", "w"), indent=1, default=float, allow_nan=False)
           print(f"live day {live['days_live']}  NAV {live['nav']:.0f}  {live['return_pct']:+.2f}%")
           PY
 
