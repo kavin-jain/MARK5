@@ -43,6 +43,28 @@ def check(name, ok, detail="", warn=False):
     return ok
 
 
+def _previous_prices():
+    """Per-ticker close from the PREVIOUS committed feed, for day-over-day moves.
+
+    The published feed carries only entry and current price, so a one-session
+    move is not derivable from it alone. The feed is committed daily, which
+    makes git the price history: HEAD~1 is the last committed mark. Returns {}
+    when there is no prior commit (first run, shallow clone) — callers must
+    treat that as "cannot judge", never as "nothing moved".
+    """
+    try:
+        out = subprocess.run(["git", "show", "HEAD~1:docs/data/mark6.json"],
+                             capture_output=True, text=True, cwd=_ROOT, timeout=30)
+        if out.returncode != 0 or not out.stdout.strip():
+            return {}
+        prev = json.loads(out.stdout)
+        return {h["ticker"]: h["price"]
+                for h in prev.get("live", {}).get("holdings", [])
+                if h.get("ticker") and h.get("price")}
+    except Exception:
+        return {}
+
+
 def get(url, timeout=30):
     return urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=timeout)
 
@@ -101,10 +123,26 @@ def main():
             check("refresh workflow has run", False,
                   "no completed runs yet — first fire is the next scheduled weekday 17:00 IST", warn=True)
         else:
-            last = completed[0]
-            check("last refresh run succeeded",
-                  last.get("conclusion") in ("success", None),
-                  f"{last.get('conclusion')} at {last.get('createdAt','')[:16]}")
+            # This is the ONE check whose own failure causes its next failure:
+            # it grades the last completed run while running inside a run that
+            # its own FAIL would turn red. Graded as a FAIL it latches — 13 Aug
+            # tripped on an unrelated check, 14 Aug then failed *because* 13 Aug
+            # had failed, and nothing could ever clear it. A guard that cannot
+            # return to green stops being read, which is worse than no guard.
+            #
+            # So it WARNs and reports the streak instead. Nothing is lost: a job
+            # that stops running entirely is caught by the dead-man switch from
+            # outside GitHub, and a job that runs but breaks an invariant is
+            # caught by the other 24 checks, which fail properly.
+            streak = 0
+            for r in completed:
+                if r.get("conclusion") == "success":
+                    break
+                streak += 1
+            check("refresh automation healthy", streak == 0,
+                  f"{streak} consecutive failed run(s), latest "
+                  f"{completed[0].get('createdAt','')[:16]}" if streak else "",
+                  warn=True)
     except Exception as e:
         check("refresh workflow queryable", False, f"{type(e).__name__}", warn=True)
 
@@ -144,12 +182,31 @@ def main():
         stale = [h["ticker"] for h in holds if h.get("stale")]
         check("all holdings priced from live quotes", not stale,
               f"stale: {stale}" if stale else "", warn=True)
-        # a >30% single-name move against entry, this early, almost always means an
-        # unhandled corporate action rather than a real market move
-        wild = [f"{h['ticker']} {h['pnl_pct']:+.0f}%" for h in holds
-                if abs(h.get("pnl_pct", 0)) > 30]
-        check("no suspicious single-name moves", not wild,
-              f"check for unhandled splits: {wild}" if wild else "")
+        # A split makes a price FALL, and it falls between one close and the next.
+        # This used to flag abs(pnl_pct) > 30 — cumulative gain since ENTRY — so
+        # it fired on winners and got worse the longer a position was held:
+        # TDPOWERSYS at a genuine +33% (verified against the exchange, no
+        # corporate action) failed the run for two days. Over a six-month hold
+        # every good position would trip it.
+        #
+        # The real signature is an OVERNIGHT COLLAPSE. Indian price bands cap a
+        # real daily move at 5/10/20%, so a >25% one-session drop is essentially
+        # only possible via a corporate action: 1:2 split or 1:1 bonus is -50%,
+        # 1:5 is -80%, a 1:2 bonus is -33%. All clear the bar; no real move does.
+        prev_px = _previous_prices()
+        wild = []
+        for h in holds:
+            p0, p1 = prev_px.get(h.get("ticker")), h.get("price")
+            if not p0 or not p1:
+                continue
+            move = p1 / p0 - 1.0
+            if move <= -0.25:
+                wild.append(f"{h['ticker']} {move * 100:+.0f}% overnight")
+        check("no unexplained overnight collapse", not wild,
+              f"a real daily move cannot do this — check for an unhandled "
+              f"split/bonus: {wild}" if wild else
+              ("" if prev_px else "no prior feed to compare against yet"),
+              warn=not prev_px)
         has_bench = live.get("benchmark_return_pct") is not None
         check("benchmark present", has_bench,
               "" if has_bench else "missing — the vs-index number is the whole point")

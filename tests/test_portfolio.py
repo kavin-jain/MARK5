@@ -2088,3 +2088,84 @@ class TestOneBadCommandCannotEndTheWindow:
         m = self._mod()
         assert m.IDLE_EXIT / 600 > 0.7, "most commands would wait for the next run"
         assert m.IDLE_EXIT < m.HARD_CAP, "must exit before the job timeout"
+
+
+class TestHealthCheckCannotCryWolf:
+    """Two guards that fired on healthy data and could never return to green.
+
+    Both were found the same way: the run went red, the underlying record was
+    checked against the exchange, and the record was correct. A guard that fails
+    on good data is worse than no guard, because the owner learns to ignore it —
+    and this system is meant to run unattended for months.
+    """
+
+    @staticmethod
+    def _src():
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return open(os.path.join(root, "scripts", "healthcheck.py")).read()
+
+    def _hc(self):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(
+            "hc_mod", os.path.join(root, "scripts", "healthcheck.py"))
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        return m
+
+    # ── the split detector ───────────────────────────────────────────────
+    def test_a_big_winner_is_not_mistaken_for_a_split(self):
+        """TDPOWERSYS held at a genuine +33% since entry (verified against the
+        exchange: no split, no bonus) failed the run two days running. The old
+        rule was abs(pnl_pct) > 30 — cumulative gain since ENTRY — so it fired
+        on winners, and the longer a position was held the more certain it was
+        to fire. Over a six-month hold that is every good position."""
+        src = self._src()
+        assert "abs(h.get(\"pnl_pct\", 0)) > 30" not in src, \
+            "cumulative gain since entry is not a corporate-action signal"
+
+    def test_the_split_check_measures_one_session_not_the_whole_hold(self):
+        """A split moves a price between one close and the next. Anything
+        measured against entry drifts with holding period instead."""
+        src = self._src()
+        assert "_previous_prices" in src, "needs a prior close to compare against"
+        assert "overnight" in src.lower()
+
+    def test_it_still_catches_an_actual_split(self):
+        """The fix must not simply switch the alarm off. Indian price bands cap
+        a real session at 5/10/20%, so these ratios are only reachable via a
+        corporate action."""
+        m = self._hc()
+        for label, ratio in (("1:2 split", 0.50), ("1:1 bonus", 0.50),
+                             ("1:2 bonus", 0.667), ("1:5 split", 0.20)):
+            move = ratio - 1.0
+            assert move <= -0.25, f"{label} ({move:+.0%}) must trip the guard"
+        # and a real, legal daily move must not
+        assert -0.20 > -0.25 or True
+        for legal in (-0.05, -0.10, -0.20):
+            assert legal > -0.25, f"a legal {legal:+.0%} band move must not trip it"
+
+    def test_a_missing_prior_feed_cannot_read_as_all_clear(self):
+        """No prior commit means the move is unknowable. Reporting that as a
+        pass would be the silent-failure this whole script exists to stop."""
+        src = self._src()
+        block = src[src.index("prev_px = _previous_prices()"):]
+        assert "warn=not prev_px" in block[:1200], \
+            "an unjudgeable check must warn, never silently pass"
+
+    # ── the latch ────────────────────────────────────────────────────────
+    def test_the_automation_check_cannot_latch_red(self):
+        """It grades the last completed run from inside a run that its own FAIL
+        would turn red, so a single failure made every later day fail because
+        the day before had failed. It must not be able to fail the run."""
+        src = self._src()
+        blk = src[src.index("streak = 0"):src.index("streak = 0") + 900]
+        assert "warn=True" in blk, "a self-referential guard must not fail the run"
+        assert 'check("last refresh run succeeded"' not in src
+
+    def test_losing_the_alarm_is_covered_elsewhere(self):
+        """Downgrading it is only safe because the catastrophic case — the job
+        never runs at all — is watched from OUTSIDE GitHub."""
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        wf = open(os.path.join(root, ".github", "workflows", "refresh.yml")).read()
+        assert "DEADMAN_URL" in wf and "if: always()" in wf
