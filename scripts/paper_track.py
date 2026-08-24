@@ -611,6 +611,8 @@ def sleeve_attribution(book, detail, nav_now):
     # cash-on-cash: net rupees committed per sleeve, brokerage included
     invested = {}
     for r in led:
+        if r["action"] not in ("BUY", "SELL"):
+            continue
         k = PASSIVE.get(r["ticker"], "eq")
         sgn = 1 if r["action"] == "BUY" else -1
         invested[k] = invested.get(k, 0.0) + sgn * float(r["value_inr"]) + float(r["cost_inr"])
@@ -672,7 +674,7 @@ def _sleeve_twr(book, led):
     qty, cash, states = {t: 0 for t in etf}, float(book["capital"]), {}
     for d in sorted({r["date"] for r in led}):
         for r in led:
-            if r["date"] != d:
+            if r["date"] != d or r["action"] not in ("BUY", "SELL"):
                 continue
             sgn = 1 if r["action"] == "BUY" else -1
             cash -= sgn * float(r["value_inr"]) + float(r["cost_inr"])

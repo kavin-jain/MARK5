@@ -527,6 +527,43 @@ class TestSleeveAttribution:
             "equity sleeve is reporting the naive entry-price return; a rebalance "
             "has reset entry prices and swept cash in, so this overstates it")
 
+    def test_a_corporate_action_row_does_not_crash_attribution(self):
+        """reconcile_corporate_actions() logs a SPLIT row with blank value_inr and
+        cost_inr — correctly, since a split moves no cash. sleeve_attribution()
+        used to assume every ledger row was a BUY/SELL and did float(r["value_inr"])
+        unconditionally, so the first-ever split (TDPOWERSYS 2x, 2026-08-24) crashed
+        cmd_export with ValueError: could not convert string to float: '', which
+        took down the whole daily refresh job before it could commit or publish."""
+        import csv as _csv, tempfile, json as _json, sys
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path.insert(0, os.path.join(root, "scripts"))
+        import paper_track as pt
+
+        rows = [{"timestamp": "", "date": "2026-07-22", "action": "BUY",
+                 "ticker": "TDPOWERSYS", "qty": "16", "price": "556.80",
+                 "value_inr": "8908.80", "cost_inr": "12.34", "note": "rebalance entry"},
+                {"timestamp": "", "date": "2026-08-24", "action": "SPLIT",
+                 "ticker": "TDPOWERSYS", "qty": "32", "price": "278.40",
+                 "value_inr": "", "cost_inr": "",
+                 "note": "corporate action 2x — qty scaled, entry rebased"}]
+        with tempfile.NamedTemporaryFile("w", suffix=".csv", delete=False, newline="") as fh:
+            w = _csv.DictWriter(fh, fieldnames=list(rows[0]))
+            w.writeheader()
+            w.writerows(rows)
+            path = fh.name
+        old = pt.LEDGER
+        pt.LEDGER = path
+        try:
+            book = {"capital": 500000.0, "cash": 100.0}
+            detail = [{"ticker": "TDPOWERSYS", "value": 12482.0}]
+            out = pt.sleeve_attribution(book, detail, 500000.0)
+        finally:
+            pt.LEDGER = old
+            os.unlink(path)
+        eq = next(r for r in out["rows"] if r["key"] == "eq")
+        assert eq["invested_inr"] == pytest.approx(8908.80 + 12.34), (
+            "the SPLIT row's blank value_inr/cost_inr must not enter cash-on-cash")
+
 
 class TestTerminalTax:
     """Exit tax is a liquidation COST, not a market return. Folding it into the
