@@ -157,12 +157,13 @@
    "entry_date": "2026-07-26"
   },
   "TDPOWERSYS": {
-   "qty": 8,
-   "entry_price": 1113.5999755859375,
+   "qty": 16,
+   "entry_price": 556.7999877929688,
    "entry_value": 8908.7998046875,
    "entry_cost": 10.567849957115232,
    "target_weight": 0.017857292347697135,
-   "entry_date": "2026-07-26"
+   "entry_date": "2026-07-26",
+   "split_factor_applied": 2.0
   },
   "AEROFLEX": {
    "qty": 16,

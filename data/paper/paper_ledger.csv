@@ -85,3 +85,4 @@ timestamp,date,action,ticker,qty,price,value_inr,cost_inr,note
 2026-07-26T16:32:13+05:30,2026-07-26,BUY,SANSERA,1,3184.70,3184.70,3.78,residual-cash sweep
 2026-07-26T16:32:13+05:30,2026-07-26,BUY,STLTECH,1,564.15,564.15,0.67,residual-cash sweep
 2026-07-26T16:32:13+05:30,2026-07-26,BUY,HFCL,1,196.85,196.85,0.23,residual-cash sweep
+2026-08-24T12:46:56+00:00,2026-08-24,SPLIT,TDPOWERSYS,16,556.8000,,,"corporate action 2x — qty scaled, entry rebased"
