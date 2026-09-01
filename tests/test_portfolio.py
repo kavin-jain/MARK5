@@ -2003,10 +2003,29 @@ class TestTheOtherMessages:
         return TestDailyNotification._mod()
 
     def test_all_of_them_are_silent_on_a_normal_day(self):
-        import json as _json
+        """None of the conditional messages may fire when nothing has happened.
+
+        This used to load the LIVE export and assert silence, which quietly made
+        the test mean "today happens to be an ordinary day" instead of "these
+        stay silent on an ordinary day". It went red on 2026-09-01 because
+        monthly() correctly fired a month-in-review — the code was right and the
+        test was wrong. It would also have fired within 7 days of any rebalance,
+        on any 3-sigma move, and inside the LTCG watch window: four false alarms
+        a year on a system meant to run unattended, which is how a real alert
+        gets ignored.
+
+        An ordinary day is now CONSTRUCTED, so the assertion is about behaviour
+        rather than about the calendar.
+        """
+        import copy as _c, json as _json
         m = self._mod()
         root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        L = _json.load(open(os.path.join(root, "data", "paper", "paper_export.json")))
+        L = _c.deepcopy(_json.load(
+            open(os.path.join(root, "data", "paper", "paper_export.json"))))
+        # mid-month, small moves: no month boundary to review, nothing to alert on
+        L["nav_history"] = [{"date": f"2026-06-{d:02d}",
+                             "nav_inr": str(500000 + d * 40),
+                             "bench_inr": str(500000 + d * 30)} for d in range(8, 21)]
         for fn in (m.alert, m.rebalance_notice, m.tax_watch, m.monthly):
             assert fn(L) is None, f"{fn.__name__} fired on an ordinary day"
 
