@@ -18,12 +18,20 @@ name: Telegram bot
 # reports here; it does not take orders from here.
 
 on:
-  schedule:
-    # Every 10 minutes. Each run costs ~30s when nobody is talking and stays
-    # awake ~2.5 min after answering, so a conversation is responsive without
-    # holding a runner open all day. GitHub may delay a scheduled run under
-    # load; the queued command still arrives on the next one.
-    - cron: "*/10 * * * *"
+  # POLLING IS OFF. Commands now arrive by webhook, pushed to a Netlify function
+  # the instant they are sent (see .github/workflows/webhook.yml).
+  #
+  # The schedule below asked for 144 runs a day and GitHub delivered 5 — 3.5%,
+  # worst observed gap 12.5 hours, so a /command could wait half a day. That is
+  # not a tuning problem: GitHub throttles high-frequency schedules hardest, and
+  # refresh.yml degraded from +0.3h late to +9.7h and then to not running at all
+  # over the same period this workflow was hammering the scheduler.
+  #
+  # Kept as workflow_dispatch so it still works as a manual fallback: if the
+  # webhook ever fails, run `webhook.yml -> disable` to hand delivery back to
+  # getUpdates, then run this. Telegram allows only ONE consumer at a time —
+  # while a webhook is set, getUpdates returns 409 — so this must not be on a
+  # schedule at the same time.
   workflow_dispatch:
 
 permissions:
