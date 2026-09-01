@@ -2206,3 +2206,96 @@ class TestHealthCheckCannotCryWolf:
         root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         wf = open(os.path.join(root, ".github", "workflows", "refresh.yml")).read()
         assert "DEADMAN_URL" in wf and "if: always()" in wf
+
+
+class TestPublishedConfigCannotClaimAnUnheldSleeve:
+    """The feed published `sleeve_targets` — the INTENT — with nothing marking
+    which sleeves actually exist. LTGILTBEES was added after the book opened, so
+    the page advertised a 25% bond sleeve the book did not own. Correct per
+    Mandate §6 (changes land at the rebalance), but the feed read as though it
+    were already held, which is exactly the caption/table disagreement §6 forbids.
+    """
+
+    @staticmethod
+    def _cfg(held):
+        import importlib.util, os
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        spec = importlib.util.spec_from_file_location(
+            "pt_cfg", os.path.join(root, "scripts", "paper_track.py"))
+        m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+        return m, {k: v for k, v in m.SLEEVES.items() if k in held}
+
+    def test_every_target_sleeve_is_either_held_or_declared_pending(self):
+        """The invariant: no sleeve may appear in the config without the reader
+        being told whether it exists. held + pending must cover the targets."""
+        import importlib.util, os
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        src = open(os.path.join(root, "scripts", "paper_track.py")).read()
+        assert '"sleeves_held"' in src and '"sleeves_pending_next_rebalance"' in src
+        m, _ = self._cfg(set())
+        for held in (set(), {"GOLDBEES"}, set(m.SLEEVES)):
+            h = {k for k in m.SLEEVES if k in held}
+            p = {k for k in m.SLEEVES if k not in held}
+            assert h | p == set(m.SLEEVES), "a target sleeve went unreported"
+            assert not (h & p), "a sleeve cannot be both held and pending"
+
+    def test_the_live_book_reports_its_missing_bond_sleeve(self):
+        """Regression on the real defect: the deployed book holds no LTGILTBEES,
+        so it must show up as pending rather than silently as a target."""
+        import json, os
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        book = json.load(open(os.path.join(root, "data", "paper", "paper_book.json")))
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(
+            "pt_live", os.path.join(root, "scripts", "paper_track.py"))
+        m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+        pending = sorted(k for k in m.SLEEVES if k not in book["positions"])
+        assert "LTGILTBEES" in pending, \
+            "the bond sleeve is unheld and must be declared pending, not advertised"
+
+
+class TestPublishingCannotWriteTheRecord:
+    """`export` publishes the dashboard feed. It used to call cmd_status() with
+    the default record=True, so every manual `export` appended to the append-only
+    NAV log — a publish command mutating the evidence it publishes.
+
+    Keying the row on the trading session already stopped INVENTED sessions
+    (the 2026-08-09 Sunday row). It did not stop this: on a real trading day a
+    human regenerating the dashboard still wrote a mark the cadence had not
+    produced. Mandate §6 — the record is written by the schedule, not by whoever
+    happened to look at it.
+    """
+
+    @staticmethod
+    def _src():
+        import os
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return open(os.path.join(root, "scripts", "paper_track.py")).read()
+
+    def test_export_marks_the_book_without_recording_it(self):
+        src = self._src()
+        assert "def cmd_status(quiet=False, record=True):" in src
+        exp = src[src.index("def cmd_export"):]
+        exp = exp[:exp.index("\ndef ", 1)]
+        assert "record=False" in exp, "export must not write the NAV log"
+
+    def test_the_write_is_actually_guarded(self):
+        """The flag must gate the append itself, not merely exist."""
+        src = self._src()
+        body = src[src.index("def cmd_status"):src.index("PASSIVE = {")]
+        assert "if not record:" in body
+        # the guard must come BEFORE the only place the log is opened for append
+        assert body.index("if not record:") < body.index('open(NAV_LOG, "a"'), \
+            "the read-only return must precede the append"
+
+    def test_running_export_twice_cannot_change_the_record(self):
+        import os, subprocess, hashlib, sys
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        log = os.path.join(root, "data", "paper", "paper_nav.csv")
+        if not os.path.exists(log):
+            return
+        before = hashlib.md5(open(log, "rb").read()).hexdigest()
+        subprocess.run([sys.executable, os.path.join(root, "scripts", "paper_track.py"),
+                        "export"], cwd=root, capture_output=True, timeout=180)
+        assert hashlib.md5(open(log, "rb").read()).hexdigest() == before, \
+            "export mutated the append-only NAV log"

@@ -513,7 +513,17 @@ def _mark(book):
     return mv, sorted(detail, key=lambda d: -d["value"])
 
 
-def cmd_status(quiet=False):
+def cmd_status(quiet=False, record=True):
+    """Mark the book to market. `record=False` makes this READ-ONLY.
+
+    The append below is the append-only NAV record, and only the scheduled daily
+    job is allowed to write it. `cmd_export` used to call this with the default
+    and so silently stamped a row every time a human ran `export` to regenerate
+    the dashboard — a publish command mutating the evidence it publishes. Keying
+    the row on the trading session (below) stopped INVENTED sessions; it did not
+    stop this. Mandate §6: the record is written by the cadence, not by whoever
+    happened to look at it.
+    """
     if not os.path.exists(BOOK):
         sys.exit("ERROR: no paper book — run 'init' first.")
     book = json.load(open(BOOK))
@@ -552,6 +562,13 @@ def cmd_status(quiet=False):
     #
     # Keying on the session date also makes this idempotent: re-running any number
     # of times can only ever produce the row that session already has.
+    if not record:
+        # read-only path: still return a correct mark, just never write one
+        sess = last_session_date()
+        if sess is not None:
+            days = (sess.normalize()
+                    - pd.Timestamp(book["start_date"]).normalize()).days
+        return book, nav, ret, days, detail, bench
     sess = last_session_date()
     if sess is None:
         if not quiet:
@@ -737,7 +754,8 @@ def rebalance_events(book) -> list[dict]:
 
 def cmd_export():
     """Emit the JSON the public dashboard reads. Real data only."""
-    book, nav, ret, days, detail, bench = cmd_status(quiet=True)
+    # read-only: publishing must never write to the append-only record
+    book, nav, ret, days, detail, bench = cmd_status(quiet=True, record=False)
     hist = []
     if os.path.exists(NAV_LOG):
         hist = list(csv.DictReader(open(NAV_LOG)))
@@ -752,10 +770,20 @@ def cmd_export():
     # hardcode its own copy of the config, and a second copy is a copy that
     # disagrees eventually. A caption that describes a different portfolio from
     # the one in the table is the failure Mandate §6 names.
+    # SLEEVES is the TARGET, not the holding. Publishing it alone asserts a
+    # portfolio that may not exist: LTGILTBEES was added 2026-08-09, AFTER the
+    # book opened, so it is a target with no position behind it until the next
+    # rebalance — correct per Mandate §6 (changes land at the cadence, not when
+    # finished), but the feed still read as though the bond sleeve were held.
+    # Split it, so a reader can never mistake intent for position.
+    _held = set(book.get("positions", {}))
     out_config = {"n_hold": N_HOLD, "max_weight_per_name": MAX_WEIGHT,
                   "top_n_liquid": TOP_N, "cadence_days": REBAL_DAYS,
                   "factor_weights": FACTOR_WEIGHTS,
                   "sleeve_targets": SLEEVES,
+                  "sleeves_held": {k: v for k, v in SLEEVES.items() if k in _held},
+                  "sleeves_pending_next_rebalance":
+                      sorted(k for k in SLEEVES if k not in _held),
                   "sizing": "inverse volatility within the equity sleeve"}
     out = {"generated": now_iso(), "mode": book["mode"], "config": out_config,
            "start_date": book["start_date"], "days_live": days,
