@@ -1666,6 +1666,98 @@ class TestUniverseCanGrow:
         assert r.MARKET_TOP_N > pt.TOP_N, "cache must hold more than the screen selects"
 
 
+class TestExportFieldsCannotDisagreeWithEachOther:
+    """nav, days_live and the benchmark must all come from ONE confirmed
+    session, never three independent live fetches that can each land on a
+    different day.
+
+    Proven on 2026-09-01: two `export` runs the same evening produced days_live
+    41 (matching the ledger, NAV Rs 5,34,907) and then days_live 40 with a
+    DIFFERENT, HIGHER nav (Rs 5,42,298) — a session going backwards in real
+    time. `_mark()` priced each ticker off its own independent last-available
+    bar while `days` and the benchmark each asked yfinance separately what day
+    it was, so a transient per-symbol data lag let one ticker silently blend a
+    different session's close into the NAV. Guards the fix: the session must
+    be resolved ONCE, before marking, and threaded into both the price fetch
+    and the benchmark fetch — so they can only ever agree with each other.
+    """
+
+    @staticmethod
+    def _src():
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return open(os.path.join(root, "scripts", "paper_track.py")).read()
+
+    @staticmethod
+    def _cmd_status_body():
+        src = TestExportFieldsCannotDisagreeWithEachOther._src()
+        start = src.index("def cmd_status(")
+        end = src.index("\ndef ", start + 1)
+        return src[start:end]
+
+    def test_session_resolved_before_marking(self):
+        body = self._cmd_status_body()
+        assert body.index("sess = last_session_date()") < body.index("_mark(book"), (
+            "the session must be confirmed BEFORE pricing, not derived "
+            "independently afterwards")
+
+    def test_mark_and_benchmark_pinned_to_the_resolved_session(self):
+        body = self._cmd_status_body()
+        assert "_mark(book, asof=sess)" in body
+        assert 'benchmark_value(book["capital"], book["start_date"], asof=sess)' in body
+
+    def test_no_redundant_independent_session_fetch_remains(self):
+        """Each branch used to re-call last_session_date() AFTER marking — the
+        second, independent source of drift. Exactly one call may remain."""
+        body = self._cmd_status_body()
+        assert body.count("last_session_date()") == 1, (
+            "a redundant last_session_date() call inside cmd_status "
+            "reintroduces the drift between the marked price and the "
+            "reported day")
+
+    def test_price_and_benchmark_fetchers_accept_a_session_pin(self):
+        import sys, inspect
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path.insert(0, os.path.join(root, "scripts"))
+        import paper_track as pt
+        assert "asof" in inspect.signature(pt.live_prices).parameters
+        assert "asof" in inspect.signature(pt.benchmark_value).parameters
+
+    def test_live_prices_pins_every_ticker_to_the_same_bar(self):
+        """The actual mechanism: given a panel where one ticker's own latest
+        bar is a session AHEAD of the confirmed one, asof= must still read it
+        off the confirmed row — not fall through to its own newer bar, which
+        is exactly how one symbol's data lag used to blend into the NAV."""
+        import sys
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        sys.path.insert(0, os.path.join(root, "scripts"))
+        import paper_track as pt
+        idx = pd.to_datetime(["2026-08-31", "2026-09-01"])
+        closes = pd.DataFrame({"AAA.NS": [100.0, 101.0],  # confirmed session ahead is missing
+                               "BBB.NS": [200.0, 205.0]},  # both sessions present
+                              index=idx)
+        # real yfinance shape for a multi-ticker batch: MultiIndex columns
+        # (field, ticker), so `yf.download(...)["Close"]` yields the panel.
+        panel = pd.concat({"Close": closes}, axis=1)
+
+        class _FakeYF:
+            @staticmethod
+            def download(tickers, **kw):
+                return panel
+
+        import types
+        fake_module = types.SimpleNamespace(download=_FakeYF.download)
+        orig = sys.modules.get("yfinance")
+        sys.modules["yfinance"] = fake_module
+        try:
+            out = pt.live_prices(["AAA", "BBB"], asof=idx[0])
+        finally:
+            if orig is not None:
+                sys.modules["yfinance"] = orig
+            else:
+                del sys.modules["yfinance"]
+        assert out["BBB"] == 200.0, "must read the CONFIRMED session, not the ticker's own latest bar"
+
+
 class TestNoInventedSessions:
     """The NAV log must contain one row per TRADING SESSION, dated by the session.
 

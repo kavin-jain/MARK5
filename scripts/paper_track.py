@@ -83,17 +83,39 @@ def now_iso():
     return datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
 
 
-def live_prices(tickers: list[str]) -> dict[str, float]:
-    """Latest real closing price per ticker (yfinance, one batched call)."""
+def live_prices(tickers: list[str], asof: "pd.Timestamp | None" = None) -> dict[str, float]:
+    """Closing price per ticker, all pinned to the SAME session (yfinance, one batched call).
+
+    Each ticker used to take its own independent "last non-NaN bar" — a Yahoo
+    data gap on one ticker (a transient CDN lag, not a real trading halt) could
+    silently leave it one session behind its neighbours, blending two different
+    days' closes into one NAV. Proven on 2026-09-01: two `export` runs the same
+    evening produced day 41 (correct) and day 40 (a reverted session), because
+    the day count and the prices were two independent live fetches with nothing
+    tying them to the same close. When `asof` is given (the confirmed session
+    from `last_session_date()`), every ticker is read off THAT row; a ticker
+    still missing it falls back to its own last available bar, exactly as
+    before, and stays flagged `stale` by the caller.
+    """
     import yfinance as yf
-    data = yf.download([f"{t}.NS" for t in tickers], period="7d",
+    data = yf.download([f"{t}.NS" for t in tickers], period="10d",
                        auto_adjust=True, progress=False, threads=False)["Close"]
     if isinstance(data, pd.Series):
         data = data.to_frame(f"{tickers[0]}.NS")
+    pinned = None
+    if asof is not None and len(data):
+        eligible = data.index[data.index <= asof]
+        if len(eligible):
+            pinned = data.loc[eligible[-1]]
     out = {}
     for t in tickers:
         s = data.get(f"{t}.NS")
-        if s is not None and s.dropna().size:
+        if s is None:
+            continue
+        v = pinned.get(f"{t}.NS") if pinned is not None else None
+        if v is not None and not pd.isna(v):
+            out[t] = float(v)
+        elif s.dropna().size:
             out[t] = float(s.dropna().iloc[-1])
     return out
 
@@ -171,7 +193,7 @@ def reconcile_corporate_actions(book) -> list[str]:
     return notes
 
 
-def benchmark_value(capital: float, start: str) -> float | None:
+def benchmark_value(capital: float, start: str, asof=None) -> float | None:
     """What the same rupees in the index (NIFTYBEES) would be worth now.
 
     Without this the live return is unreadable: +5% means nothing if the index did
@@ -180,6 +202,12 @@ def benchmark_value(capital: float, start: str) -> float | None:
     before it and take the first bar at or after the start date. Failures are
     reported, never swallowed: a silently-missing benchmark is how a dashboard
     ends up quietly flattering itself.
+
+    `asof`, when given, pins the "now" leg to the SAME confirmed session the NAV
+    was marked at (`last_session_date()`) instead of yfinance's own independent
+    last bar — the two used to drift apart on a Yahoo data lag and silently
+    report a benchmark from a different day than the NAV it was being compared
+    against (part of the 2026-09-01 day-counter regression).
     """
     import yfinance as yf
     buf = (pd.Timestamp(start) - pd.Timedelta(days=10)).strftime("%Y-%m-%d")
@@ -198,7 +226,12 @@ def benchmark_value(capital: float, start: str) -> float | None:
     if len(at) < 1:
         print(f"  WARN: no benchmark bar at or after {start}")
         return None
-    return capital * float(h.iloc[-1]) / float(at.iloc[0])
+    now = h.loc[h.index <= asof] if asof is not None else h
+    if asof is not None and not len(now):
+        print(f"  WARN: no benchmark bar at or before {asof.date()}")
+        return None
+    last = now.iloc[-1] if len(now) else h.iloc[-1]
+    return capital * float(last) / float(at.iloc[0])
 
 
 def append_ledger(rows: list[dict]):
@@ -494,8 +527,8 @@ def net_fy_tax(book) -> float:
     return st * STCG + max(0.0, lt - exempt) * LTCG
 
 
-def _mark(book):
-    px = live_prices(list(book["positions"]))
+def _mark(book, asof=None):
+    px = live_prices(list(book["positions"]), asof=asof)
     mv, detail = book.get("cash", 0.0) - net_fy_tax(book), []
     for t, p in book["positions"].items():
         now = px.get(t)
@@ -530,8 +563,20 @@ def cmd_status(quiet=False, record=True):
     ca = reconcile_corporate_actions(book)
     if ca and not quiet:
         print(f"  corporate actions applied: {', '.join(ca)}")
-    nav, detail = _mark(book)
-    bench = benchmark_value(book["capital"], book["start_date"])
+    # Resolve the session ONCE, before marking, and pin every price fetch to it.
+    # Previously `_mark()` priced each ticker off its OWN independent last-
+    # available bar while `days` below (and the two calls further down) each
+    # asked yfinance separately what day it was — three unrelated live fetches
+    # that can each land on a different day under a transient Yahoo data lag.
+    # That let a single ticker silently blend a stale close into the NAV, and
+    # let `days_live` regress on a later run the same evening (both observed
+    # 2026-09-01: two `export` runs, one at day 41/Rs 5,34,907, the next at day
+    # 40/Rs 5,42,298 — a session going backwards in real time). Pinning nav,
+    # benchmark and the day count to one confirmed session closes the whole
+    # class: they can only ever agree, because they now come from the same date.
+    sess = last_session_date()
+    nav, detail = _mark(book, asof=sess)
+    bench = benchmark_value(book["capital"], book["start_date"], asof=sess)
     ret = nav / book["capital"] - 1
     days = (pd.Timestamp.today().normalize()
             - pd.Timestamp(book["start_date"]).normalize()).days
@@ -564,12 +609,10 @@ def cmd_status(quiet=False, record=True):
     # of times can only ever produce the row that session already has.
     if not record:
         # read-only path: still return a correct mark, just never write one
-        sess = last_session_date()
         if sess is not None:
             days = (sess.normalize()
                     - pd.Timestamp(book["start_date"]).normalize()).days
         return book, nav, ret, days, detail, bench
-    sess = last_session_date()
     if sess is None:
         if not quiet:
             print("  could not confirm the last NSE session — not recording a mark")
