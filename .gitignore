@@ -277,3 +277,6 @@ data/delivery/raw/
 
 # browser-verification scratch (screenshots, console logs)
 .playwright-mcp/
+
+# Local Netlify folder
+.netlify
