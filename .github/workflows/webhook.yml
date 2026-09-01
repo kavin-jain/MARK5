@@ -1,26 +1,29 @@
 name: Telegram webhook control
 
-# Turns the bot's delivery mode on and off WITHOUT anyone handling the token.
-# The token is already a repository secret, so this job can call Telegram's
-# admin endpoints on your behalf; you never paste it into a terminal, a chat,
-# or a shell history again.
+# Switches how Telegram delivers updates, WITHOUT anyone handling the token.
+# The token is already a repository secret, so these admin calls run here
+# instead of in a terminal — nothing is pasted into a shell, a chat, or a
+# history file.
 #
-#   status  — what is Telegram currently doing with updates?
+#   status  — which mode is live right now
 #   enable  — push updates to the Netlify function (instant replies)
-#   disable — go back to polling from bot.yml (the slow fallback)
+#   disable — back to bot.yml polling (the slow fallback)
 #
-# Why this exists: GitHub delivered 5 of bot.yml's 144 requested runs in 24h
-# (3.5%), worst gap 12.5 hours, so a /command could wait half a day. A webhook
-# is pushed the instant a message is sent and uses no scheduled runs at all.
+# Why: GitHub delivered 5 of bot.yml's 144 requested runs in 24h (3.5%), worst
+# gap 12.5 hours, so a /command could wait half a day. A webhook is pushed on
+# send and uses no scheduled runs at all.
 
 on:
   workflow_dispatch:
     inputs:
       action:
-        description: "status = check · enable = webhook · disable = back to polling"
+        description: "status = check | enable = webhook | disable = polling"
         type: choice
         default: status
-        options: [status, enable, disable]
+        options:
+          - status
+          - enable
+          - disable
 
 permissions:
   contents: read
@@ -35,47 +38,54 @@ jobs:
     env:
       TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       HOOK_SECRET: ${{ secrets.TELEGRAM_WEBHOOK_SECRET }}
-      URL: https://kavinjain.in/.netlify/functions/telegram
+      HOOK_URL: https://kavinjain.in/.netlify/functions/telegram
+      ACTION: ${{ inputs.action }}
     steps:
-      - name: Refuse to run without the credentials it needs
+      - name: Check the credentials this action needs
         run: |
-          [ -n "$TOKEN" ] || { echo "::error::TELEGRAM_BOT_TOKEN is not set"; exit 1; }
-          if [ "${{ inputs.action }}" = "enable" ] && [ -z "$HOOK_SECRET" ]; then
-            echo "::error::TELEGRAM_WEBHOOK_SECRET is not set — without it the"
-            echo "::error::function URL would be an open relay for anyone who finds it"
+          if [ -z "$TOKEN" ]; then
+            echo "::error::TELEGRAM_BOT_TOKEN is not set"
+            exit 1
+          fi
+          if [ "$ACTION" = "enable" ] && [ -z "$HOOK_SECRET" ]; then
+            echo "::error::TELEGRAM_WEBHOOK_SECRET is not set. Without it the"
+            echo "::error::function URL is an open relay for anyone who finds it."
             exit 1
           fi
 
-      - name: ${{ inputs.action }}
-        # Never echo a URL containing the token. GitHub masks registered secrets,
-        # but a job that depends on masking to stay safe is one config change away
-        # from leaking. Build the URL into a variable and print only the response.
+      # Form fields, not inline JSON: a nested command substitution inside a
+      # quoted YAML scalar is what broke the first version of this file, and
+      # GitHub silently fell back to treating it as unparseable.
+      - name: Apply
         run: |
           API="https://api.telegram.org/bot${TOKEN}"
-          case "${{ inputs.action }}" in
+          case "$ACTION" in
             status)
-              curl -sS "${API}/getWebhookInfo" | python3 -m json.tool ;;
+              curl -sS "$API/getWebhookInfo" | python3 -m json.tool
+              ;;
             enable)
-              curl -sS -X POST "${API}/setWebhook" \
-                -H "content-type: application/json" \
-                -d "$(python3 -c "
-import json,os
-print(json.dumps({'url': os.environ['URL'],
-                  'secret_token': os.environ['HOOK_SECRET'],
-                  'drop_pending_updates': True,
-                  'allowed_updates': ['message','callback_query']}))")" \
+              curl -sS -X POST "$API/setWebhook" \
+                -d "url=$HOOK_URL" \
+                -d "secret_token=$HOOK_SECRET" \
+                -d "drop_pending_updates=true" \
+                -d 'allowed_updates=["message","callback_query"]' \
                 | python3 -m json.tool
               echo "--- verifying ---"
-              curl -sS "${API}/getWebhookInfo" | python3 -m json.tool ;;
+              sleep 3
+              curl -sS "$API/getWebhookInfo" | python3 -m json.tool
+              ;;
             disable)
-              curl -sS -X POST "${API}/deleteWebhook" \
+              curl -sS -X POST "$API/deleteWebhook" \
                 -d "drop_pending_updates=false" | python3 -m json.tool
-              echo "Polling restored — bot.yml will pick updates up again." ;;
+              echo "Polling restored - bot.yml picks updates up again."
+              ;;
           esac
 
-      - name: What this means
+      - name: How to read that
         if: always()
         run: |
-          echo "url set + pending_update_count low  -> webhook live, replies are instant"
-          echo "url empty                           -> polling mode, replies wait on the cron"
-          echo "last_error_message present          -> Netlify rejected it; check the env vars"
+          echo 'url set + pending_update_count 0  -> webhook live, replies instant'
+          echo 'url empty                         -> polling, replies wait on cron'
+          echo 'last_error_message present        -> Netlify rejected it; the'
+          echo '                                     secret likely differs between'
+          echo '                                     Netlify and GitHub'
