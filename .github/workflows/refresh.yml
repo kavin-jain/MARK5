@@ -5,11 +5,34 @@ name: Refresh live performance
 # fast rather than re-running the whole pipeline.
 on:
   schedule:
-    - cron: "47 11 * * 1-5"      # 17:00 IST, after the 15:30 NSE close
-                                  # (:47, not :30 — GitHub queues scheduled jobs
-                                  # worst at :00/:30 since that's what everyone
-                                  # else picks; measured 37min-2h27m delay at :30)
+    # FOUR attempts, not one. GitHub does not guarantee scheduled runs — it
+    # drops them under load, and this repo is being throttled hard: bot.yml is
+    # served 5 of its 144 requested runs a day (3.5%). refresh.yml drifted from
+    # +0.3h late on 26 Aug to +9.7h on 28 Aug, then on 1 Sep did not fire at all
+    # and the day's mark had to be triggered by hand.
+    #
+    # One cron = one chance = a lost session whenever GitHub is busy. Four spread
+    # attempts means all four must be dropped to lose the day.
+    #
+    # Safe because the mark is IDEMPOTENT: cmd_status keys the NAV row on the
+    # trading-session date and skips the append when that date is already
+    # recorded, so runs 2-4 mark nothing and simply exit. Minutes are
+    # deliberately off-round; :00 and :30 are the most congested on GitHub's
+    # scheduler because they are what everyone picks.
+    - cron: "47 11 * * 1-5"      # 17:17 IST — first try, after the 15:30 close
+    - cron: "23 13 * * 1-5"      # 18:53 IST
+    - cron: "11 15 * * 1-5"      # 20:41 IST
+    - cron: "37 17 * * 1-5"      # 23:07 IST — last chance before the day is lost
   workflow_dispatch:
+
+concurrency:
+  # Four scheduled attempts a day means two CAN overlap if GitHub delivers a
+  # delayed run late. Both would mark, commit and push, and the second push
+  # would be rejected as non-fast-forward — a red run for no reason. Queue
+  # instead of cancelling: the first run must be allowed to finish writing the
+  # append-only record before the next one starts.
+  group: refresh-live
+  cancel-in-progress: false
 
 permissions:
   contents: write
