@@ -1907,6 +1907,80 @@ class TestSessionQuorum:
         assert str(got.date()) == "2026-09-07"
 
 
+class TestNoProvisionalMarks:
+    """A NAV row may only be written from closes that have stopped moving.
+
+    The job runs ~5h after the 15:30 close and Yahoo has not settled by then: on
+    2026-09-08 eleven of the book's 22 holdings were served at prices later
+    revised (NAVINFLUOR 8,603.50 -> 8,731.00 real close). Those went into the
+    append-only record and onto the public page, and can never be corrected.
+    """
+
+    @staticmethod
+    def _fn():
+        import importlib.util, os as _os
+        root = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+        spec = importlib.util.spec_from_file_location(
+            "_pt_final", _os.path.join(root, "scripts", "paper_track.py"))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod.confirm_final
+
+    P1 = {"A": 10.0, "B": 20.0}
+    P2 = {"A": 10.0, "B": 20.5}          # B revised — the same session, unsettled
+
+    def test_a_first_look_is_never_written(self):
+        """The actual bug: one fetch, straight into the record."""
+        d = self._fn()(None, "2026-09-08", self.P1, set())
+        assert d["action"] == "defer" and d["flush"] is None
+
+    def test_two_agreeing_looks_confirm(self):
+        pend = {"session": "2026-09-08", "prices": self.P1}
+        assert self._fn()(pend, "2026-09-08", self.P1, set())["action"] == "confirm"
+
+    def test_a_revised_price_defers_again(self):
+        """The 11-of-22 case. One ticker still moving is enough to wait."""
+        pend = {"session": "2026-09-08", "prices": self.P1}
+        d = self._fn()(pend, "2026-09-08", self.P2, set())
+        assert d["action"] == "defer" and d["flush"] is None
+
+    def test_a_deferred_session_is_never_dropped(self):
+        """Waiting is only safe if waiting cannot lose the day — which is the
+        exact bug sitting next to this one (2026-08-28, 2026-09-08). Once a newer
+        session begins, the older one's closes are settled and it is written."""
+        pend = {"session": "2026-09-08", "prices": self.P2}
+        d = self._fn()(pend, "2026-09-09", self.P1, set())
+        assert d["flush"] == "2026-09-08", "a deferred session was silently dropped"
+        assert d["action"] == "defer", "the new session still needs its own pair"
+
+    def test_an_already_recorded_session_is_not_reflushed(self):
+        pend = {"session": "2026-09-08", "prices": self.P1}
+        d = self._fn()(pend, "2026-09-09", self.P1, {"2026-09-08"})
+        assert d["flush"] is None
+
+    def test_idempotent_on_a_session_already_in_the_record(self):
+        pend = {"session": "2026-09-08", "prices": self.P1}
+        d = self._fn()(pend, "2026-09-08", self.P1, {"2026-09-08"})
+        assert d["action"] == "already"
+
+    def test_no_sequence_of_disagreeing_looks_ever_confirms(self):
+        """Property check: confirmation requires agreement, never elapsed time or
+        a number of attempts. A price that keeps moving is never written."""
+        fn, pend = self._fn(), None
+        for i in range(10):
+            prices = {"A": 10.0, "B": 20.0 + i}      # never repeats
+            d = fn(pend, "2026-09-08", prices, set())
+            assert d["action"] != "confirm"
+            pend = {"session": "2026-09-08", "prices": prices}
+
+    def test_the_row_writer_is_the_only_path_to_the_record(self):
+        """One append site, so the confirmation cannot be bypassed by a caller."""
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        src = open(os.path.join(root, "scripts", "paper_track.py")).read()
+        assert src.count('open(NAV_LOG, "a"') == 1, \
+            "a second append path to paper_nav.csv skips the finality check"
+
+
 class TestOneMessagePerMark:
     """The daily message must be sent by the run that RECORDED the mark, not by
     every run that happened to fire.
@@ -2527,13 +2601,23 @@ class TestPublishingCannotWriteTheRecord:
         assert "record=False" in exp, "export must not write the NAV log"
 
     def test_the_write_is_actually_guarded(self):
-        """The flag must gate the append itself, not merely exist."""
+        """The flag must gate the append itself, not merely exist.
+
+        The append now lives in `_append_nav_row` so that the finality check has
+        a single choke point it cannot be routed around; the guard is therefore
+        stated against the call rather than the `open()`. Same property, and the
+        assertion is stricter: EVERY write site in cmd_status must sit after the
+        read-only return, not just the first one.
+        """
         src = self._src()
         body = src[src.index("def cmd_status"):src.index("PASSIVE = {")]
         assert "if not record:" in body
-        # the guard must come BEFORE the only place the log is opened for append
-        assert body.index("if not record:") < body.index('open(NAV_LOG, "a"'), \
-            "the read-only return must precede the append"
+        guard = body.index("if not record:")
+        writes = [i for i in range(len(body))
+                  if body.startswith("_append_nav_row(", i)]
+        assert writes, "cmd_status no longer writes the NAV log at all"
+        assert all(i > guard for i in writes), \
+            "a NAV-log write precedes the read-only return"
 
     def test_running_export_twice_cannot_change_the_record(self):
         import os, subprocess, hashlib, sys

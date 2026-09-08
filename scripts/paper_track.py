@@ -43,6 +43,11 @@ PAPER_DIR = os.path.join(_ROOT, "data", "paper")
 BOOK = os.path.join(PAPER_DIR, "paper_book.json")
 NAV_LOG = os.path.join(PAPER_DIR, "paper_nav.csv")
 LEDGER = os.path.join(PAPER_DIR, "paper_ledger.csv")
+# Operational state, NOT the record: the observation a session is waiting on to
+# be confirmed final. Same class of file as .healthcheck_watermark.json beside
+# it — the workflow commits data/paper/, so it survives between runs, which is
+# the whole mechanism (see confirm_final).
+PENDING = os.path.join(PAPER_DIR, ".pending_mark.json")
 # Four equal sleeves. Equity is the remainder, so this dict alone sets the
 # allocation: 1 - 0.75 = 25% equity.
 #
@@ -567,6 +572,86 @@ def net_fy_tax(book) -> float:
     return st * STCG + max(0.0, lt - exempt) * LTCG
 
 
+def price_fingerprint(detail) -> dict:
+    """{ticker: close} for one observation of one session, rounded for compare.
+
+    Two observations of the SAME session should be identical. When they are not,
+    the exchange's closes had not finished settling at the earlier one.
+    """
+    return {d["ticker"]: round(float(d["price"]), 4) for d in detail}
+
+
+def confirm_final(pending, session, prices, recorded) -> dict:
+    """Is this observation safe to write to the append-only record? PURE.
+
+    WHY THIS EXISTS. The job runs ~5h after the 15:30 close and Yahoo has not
+    finished settling by then: on 2026-09-08 ELEVEN of the book's 22 holdings
+    were served at prices that were later revised (NAVINFLUOR 8,603.50 -> the
+    real close 8,731.00; TDPOWERSYS 734.15 -> 768.80). Those provisional numbers
+    were marked, published, and frozen into a record that by design can never be
+    corrected — a measurement error that outlives the thing it measured. It is
+    also why two `export` runs the same evening once disagreed (2026-09-01, day
+    41 then day 40).
+
+    A price is treated as final when it STOPS MOVING: two observations of the
+    same session, taken by different runs, that agree. The four scheduled
+    attempts already provide the second look at no extra cost.
+
+    Deferring is only safe because a deferred session is never dropped: once a
+    NEWER session has begun, the older one's closes are certainly final, so it is
+    written then. Waiting forever would just re-create the lost-session bug this
+    is sitting next to.
+
+      pending  : the previous observation, or None
+      session  : date of the session just observed, "YYYY-MM-DD"
+      prices   : price_fingerprint of that observation
+      recorded : session dates already in the NAV log
+
+    Returns {"flush": <older session to write now, or None>,
+             "action": "already" | "confirm" | "defer"}.
+    """
+    flush = None
+    if (pending and pending.get("session") and pending["session"] < session
+            and pending["session"] not in recorded):
+        flush = pending["session"]
+    if session in recorded:
+        return {"flush": flush, "action": "already"}
+    if pending and pending.get("session") == session and pending.get("prices") == prices:
+        return {"flush": None, "action": "confirm"}
+    return {"flush": flush, "action": "defer"}
+
+
+def _load_pending():
+    try:
+        with open(PENDING) as fh:
+            return json.load(fh)
+    except (OSError, ValueError):
+        return None
+
+
+def _save_pending(obs):
+    if obs is None:
+        if os.path.exists(PENDING):
+            os.remove(PENDING)
+        return
+    with open(PENDING, "w") as fh:
+        json.dump(obs, fh, indent=1, sort_keys=True)
+
+
+def _append_nav_row(stamp, days, nav, ret, bench, capital):
+    """The one place a NAV row is written. Append-only, header on first write."""
+    new = not os.path.exists(NAV_LOG)
+    with open(NAV_LOG, "a", newline="") as f:
+        w = csv.writer(f)
+        if new:
+            w.writerow(["date", "day", "nav_inr", "return_pct", "bench_inr",
+                        "bench_return_pct", "timestamp"])
+        br = (bench / capital - 1) * 100 if bench else None
+        w.writerow([stamp, days, f"{nav:.2f}", f"{ret*100:.4f}",
+                    f"{bench:.2f}" if bench else "",
+                    f"{br:.4f}" if br is not None else "", now_iso()])
+
+
 def _mark(book, asof=None):
     px = live_prices(list(book["positions"]), asof=asof)
     mv, detail = book.get("cash", 0.0) - net_fy_tax(book), []
@@ -667,24 +752,45 @@ def cmd_status(quiet=False, record=True):
     seen = set()
     if os.path.exists(NAV_LOG):
         seen = {r.split(",")[0] for r in open(NAV_LOG).read().splitlines()[1:]}
-    if stamp not in seen:
-        new = not os.path.exists(NAV_LOG)
-        with open(NAV_LOG, "a", newline="") as f:
-            w = csv.writer(f)
-            if new:
-                w.writerow(["date", "day", "nav_inr", "return_pct", "bench_inr",
-                            "bench_return_pct", "timestamp"])
-            br = (bench / book["capital"] - 1) * 100 if bench else None
-            w.writerow([stamp, days, f"{nav:.2f}", f"{ret*100:.4f}",
-                        f"{bench:.2f}" if bench else "",
-                        f"{br:.4f}" if br is not None else "", now_iso()])
+
+    # A row is written only once the session's closes have stopped moving —
+    # never straight off the first fetch, which is provisional for roughly half
+    # the book at the hour this runs. See confirm_final.
+    obs = price_fingerprint(detail)
+    verdict = confirm_final(_load_pending(), stamp, obs, seen)
+
+    if verdict["flush"]:
+        # An earlier session that never got a matching pair of observations. A
+        # newer session has since begun, so its closes are settled now — but
+        # re-price it from today's data rather than trusting the last provisional
+        # look, which is the entire thing being defended against.
+        fs = pd.Timestamp(verdict["flush"])
+        fnav, _ = _mark(book, asof=fs)
+        fbench = benchmark_value(book["capital"], book["start_date"], asof=fs)
+        fdays = (fs.normalize() - pd.Timestamp(book["start_date"]).normalize()).days
+        _append_nav_row(verdict["flush"], fdays, fnav, fnav / book["capital"] - 1,
+                        fbench, book["capital"])
+        seen.add(verdict["flush"])
+        print(f"  MARKED {verdict['flush']} (deferred session, settled)")
+
+    if verdict["action"] == "confirm":
+        _append_nav_row(stamp, days, nav, ret, bench, book["capital"])
+        _save_pending(None)
         print(f"  MARKED {stamp}")
-    else:
+    elif verdict["action"] == "already":
         # Said out loud so the caller can tell the run that DID the day's work
         # from the ones that re-ran behind it. The daily message keys off this:
         # four scheduled attempts exist so the mark is never missed, and every
         # one of them used to send its own copy of the same message.
+        _save_pending(None)
         print(f"  ALREADY-MARKED {stamp}")
+    else:
+        prev = _load_pending()
+        moved = (sum(1 for t, p in obs.items() if prev["prices"].get(t) != p)
+                 if prev and prev.get("session") == stamp else None)
+        _save_pending({"session": stamp, "prices": obs, "observed": now_iso()})
+        print(f"  PENDING {stamp} " + (f"({moved} prices still moving)" if moved
+                                       else "(first look — confirming next run)"))
     return book, nav, ret, days, detail, bench
 
 
