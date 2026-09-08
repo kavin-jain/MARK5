@@ -69,6 +69,96 @@ def series_for_chart(s, step=5):
     return [[s.index[i].strftime("%Y-%m-%d"), round(float(s.iloc[i]), 4)] for i in idx]
 
 
+def _pbo_reading(pbo_pct) -> str:
+    """Read PBO against this repo's MEASURED bands, not the textbook 20% bar.
+
+    PBO's null is ~50%, not 0. When candidate configs are statistically
+    indistinguishable, ranking them is ranking noise and PBO goes to ~50% with no
+    overfitting present — so "59.6% fails the <20% bar, worse than a coin flip"
+    described overfitting that reports/pbo_calibration.json explicitly says is not
+    there. The bands are read from that file rather than restated here, so the
+    published sentence cannot drift away from the calibration that justifies it.
+    """
+    path = os.path.join(REPORTS, "pbo_calibration.json")
+    if pbo_pct is None or not os.path.exists(path):
+        return ("PBO is uninterpretable without its null band — see "
+                "reports/pbo_calibration.json.")
+    cal = json.load(open(path))["calibration"]
+    lo, hi = cal["null_all_identical"]["pbo_lo"] * 100, cal["null_all_identical"]["pbo_hi"] * 100
+    edge = cal["one_real_edge"]["pbo_mean"] * 100
+    edge_hi = cal["one_real_edge"]["pbo_hi"] * 100
+    over = cal["genuinely_overfit"]["pbo_mean"] * 100
+    if lo <= pbo_pct <= hi:
+        verdict = (f"{pbo_pct:.1f}% is inside the NULL band — it is what a set of "
+                   f"statistically INDISTINGUISHABLE configurations reads as, not "
+                   f"evidence of overfitting. Driving it lower by tuning is neither "
+                   f"possible nor meaningful; the only real fix is to stop selecting "
+                   f"and deploy the ensemble.")
+    elif pbo_pct <= edge_hi:
+        verdict = (f"{pbo_pct:.1f}% sits in the measured one-real-edge region — the "
+                   f"selected configuration is distinguishable from its alternatives "
+                   f"out of sample.")
+    elif pbo_pct < lo:
+        # Between the two measured bands. Neither result has been simulated here,
+        # so say that rather than borrowing the nearer band's conclusion.
+        verdict = (f"{pbo_pct:.1f}% falls BETWEEN the measured bands (real edge "
+                   f"≤{edge_hi:.0f}%, null from {lo:.0f}%) — no simulated regime "
+                   f"corresponds to it, so it supports neither claim on its own.")
+    else:
+        verdict = (f"{pbo_pct:.1f}% is ABOVE the null band and approaching the "
+                   f"overfit region — the selected configuration does not survive "
+                   f"out of sample.")
+    return (f"{verdict} Calibrated on this system rather than against the "
+            f"conventional 20% bar: simulated null (indistinguishable configs) "
+            f"{lo:.0f}-{hi:.0f}%, one real edge ~{edge:.0f}%, genuine overfitting "
+            f"~{over:.0f}% (reports/pbo_calibration.json). Read alongside "
+            f"nested_wf.is_oos_rank_corr, which is negative: the factor FAMILY has "
+            f"an edge, but this particular parameterisation is not demonstrably the "
+            f"right member of it — quote certainty.honest_expectation, not the "
+            f"headline.")
+
+
+def _pbo_bands() -> dict:
+    """The measured bands, shipped so the PAGE can render the verdict from data.
+
+    The page had "FAILS the <20% bar" hardcoded in its stat card, with a red tone
+    and a tooltip saying "above 20% means config tuning is noise-fitting" — three
+    separate restatements of a conclusion this repo has falsified. A caption that
+    restates a verdict drifts from the evidence the moment the evidence changes;
+    one that renders the evidence cannot.
+    """
+    path = os.path.join(REPORTS, "pbo_calibration.json")
+    if not os.path.exists(path):
+        return {}
+    cal = json.load(open(path))["calibration"]
+    return {"null_lo_pct": round(cal["null_all_identical"]["pbo_lo"] * 100, 1),
+            "null_hi_pct": round(cal["null_all_identical"]["pbo_hi"] * 100, 1),
+            "edge_hi_pct": round(cal["one_real_edge"]["pbo_hi"] * 100, 1),
+            "overfit_pct": round(cal["genuinely_overfit"]["pbo_mean"] * 100, 1),
+            "source": "reports/pbo_calibration.json"}
+
+
+def _clean_trades(trades: list) -> list:
+    """Delisting exits have no closing price. Emit null, never the string 'nan'.
+
+    Eight rows (ESSAROIL, PIPAVAVDOC, PRICOL, CAIRN, MERCK, TATAGLOBAL,
+    TATASTLBSL, TATAMTRDVR) are forced exits at delisting, where by definition no
+    close exists. The raw ledger carries the float repr, so the public page was
+    printing the literal text "nan" in its PRICE column. The value and P&L are
+    real and are kept; only the absent price becomes null, which a renderer can
+    show as an em-dash and a reader can understand.
+    """
+    out = []
+    for t in trades:
+        r = dict(t)
+        p = str(r.get("price", "")).strip().lower()
+        if p in ("nan", "", "none"):
+            r["price"] = None
+            r["price_absent_reason"] = "delisted — no closing price exists"
+        out.append(r)
+    return out
+
+
 def _certainty_block() -> dict:
     """How much of the headline is knowable, from significance_analysis.py.
 
@@ -221,17 +311,21 @@ def main():
             "rolling_sharpe": series_for_chart(rs, step=10),
             "yearly": yearly,
             "holdings": holdings,
-            "trades": trades,
+            "trades": _clean_trades(trades),
             "validation": {
                 "dsr_pct": ov.get("dsr"), "pbo_pct": ov.get("pbo"), "trials": ov.get("trials"),
-                "pbo_reading": ("PBO above the conventional 20% bar is a FAIL, and above 50% it "
-                                "is worse than a coin flip: across train/test splits the "
-                                "in-sample-best variant of this family lands BELOW the "
-                                "out-of-sample median more often than not. Read with "
-                                "nested_wf.is_oos_rank_corr, which is negative. Together they say "
-                                "the factor FAMILY has an edge but this particular "
-                                "parameterisation is not demonstrably the right member of it — "
-                                "quote certainty.honest_expectation, not the headline."),
+                # CALIBRATED, not conventional. This said "FAILS the <20% bar" and
+                # "worse than a coin flip", which contradicts this repo's own
+                # reports/pbo_calibration.json — whose verdict is that the measured
+                # PBO "is within the NULL band ... NOT evidence of overfitting".
+                # PBO's null is ~50%, not 0: when candidate configs are statistically
+                # indistinguishable, ranking them ranks noise and PBO goes to ~50%
+                # with no overfitting present (CLAUDE.md §5; bands measured at
+                # null 27.8-78.0, real edge ~1.3%, true overfitting ~99.9%).
+                # Publishing the uncalibrated reading was self-deception in the
+                # pessimistic direction — still a false statement about the system.
+                "pbo_reading": _pbo_reading(ov.get("pbo")),
+                "pbo_bands": _pbo_bands(),
                 "nested_wf": (json.load(open(os.path.join(REPORTS, "nested_walkforward.json")))
                               if os.path.exists(os.path.join(REPORTS, "nested_walkforward.json")) else {}),
             },

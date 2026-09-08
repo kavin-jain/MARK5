@@ -1696,9 +1696,11 @@ class TestExportFieldsCannotDisagreeWithEachOther:
 
     def test_session_resolved_before_marking(self):
         body = self._cmd_status_body()
-        assert body.index("sess = last_session_date(") < body.index("_mark(book"), (
+        assert body.index("sess = ") < body.index("_mark(book"), (
             "the session must be confirmed BEFORE pricing, not derived "
             "independently afterwards")
+        assert body.count("sess = ") == 1, \
+            "the session is resolved more than once, so the legs can disagree"
 
     def test_mark_and_benchmark_pinned_to_the_resolved_session(self):
         body = self._cmd_status_body()
@@ -1825,7 +1827,7 @@ class TestNoInventedSessions:
         pricing, so a straggling series cannot hold the whole book back."""
         root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         src = open(os.path.join(root, "scripts", "paper_track.py")).read()
-        assert "sess = last_session_date(held)" in src, \
+        assert "last_session_date(held)" in src, \
             "the mark no longer confirms the session against the book it prices"
 
 
@@ -1905,6 +1907,113 @@ class TestSessionQuorum:
         rows = {"2026-09-04": full, "2026-09-07": patchy}
         got = self._call(monkeypatch, rows, [s[:-3] for s in syms])
         assert str(got.date()) == "2026-09-07"
+
+
+class TestPublishedFeedTellsTheTruth:
+    """The page's own words must agree with the reports it cites (Mandate §6).
+
+    Two published statements were false. The PBO caption asserted overfitting
+    that this repo's own calibration says is absent, and the trade table printed
+    the literal text "nan" as a price.
+    """
+
+    @staticmethod
+    def _ed():
+        import importlib.util, os as _os
+        root = _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__)))
+        spec = importlib.util.spec_from_file_location(
+            "_ed", _os.path.join(root, "scripts", "export_dashboard.py"))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod
+
+    @staticmethod
+    def _calibration():
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        p = os.path.join(root, "reports", "pbo_calibration.json")
+        if not os.path.exists(p):
+            pytest.skip("no pbo_calibration.json")
+        import json as _json
+        return _json.load(open(p))
+
+    def test_the_measured_pbo_is_not_published_as_a_failure(self):
+        """The exact contradiction that shipped: 'FAILS the <20% bar' and 'worse
+        than a coin flip' about a value the calibration calls the null."""
+        cal = self._calibration()
+        txt = self._ed()._pbo_reading(cal["observed_pbo"] * 100)
+        low = txt.lower()
+        assert "not evidence of overfitting" in low
+        assert "worse than a coin flip" not in low
+        assert "20% bar" not in low or "conventional" in low, \
+            "the uncalibrated 20% bar is being applied rather than cited"
+
+    def test_the_caption_agrees_with_the_calibration_it_cites(self):
+        """Whatever the bands say, the sentence must land in the same regime —
+        this is the drift that made the two disagree in the first place."""
+        cal = self._calibration()
+        obs, bands = cal["observed_pbo"] * 100, cal["calibration"]["null_all_identical"]
+        in_null = bands["pbo_lo"] * 100 <= obs <= bands["pbo_hi"] * 100
+        txt = self._ed()._pbo_reading(obs)
+        assert in_null == ("inside the NULL band" in txt), \
+            "the published reading disagrees with reports/pbo_calibration.json"
+
+    def test_every_band_gets_its_own_honest_reading(self):
+        r = self._ed()._pbo_reading
+        assert "one-real-edge" in r(1.3)
+        assert "BETWEEN the measured bands" in r(25.0)
+        assert "inside the NULL band" in r(59.6)
+        assert "ABOVE the null band" in r(99.0)
+
+    def test_no_trade_is_published_with_a_nan_price(self):
+        clean = self._ed()._clean_trades([
+            {"ticker": "ESSAROIL", "price": "nan"},
+            {"ticker": "X", "price": ""},
+            {"ticker": "KEI", "price": "123.93"}])
+        assert [t["price"] for t in clean] == [None, None, "123.93"]
+        assert all(str(t["price"]).lower() != "nan" for t in clean)
+
+    def test_an_absent_price_says_why(self):
+        """Null alone reads as a bug. These are delistings — a real event."""
+        clean = self._ed()._clean_trades([{"ticker": "CAIRN", "price": "nan"}])
+        assert "delisted" in clean[0]["price_absent_reason"]
+
+
+class TestPublishedPayloadHasOneAsOfDate:
+    """Headline, day count, chart and sleeve table must share one date.
+
+    They did not: publishing marked at the newest CONFIRMED session while the
+    chart ended at the newest RECORDED one, so the page showed Rs 5,44,324 above
+    a graph whose last point was Rs 5,38,020, both captioned day 47 — and "days
+    live 47" under a page stamped 2026-09-08.
+    """
+
+    @staticmethod
+    def _src():
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return open(os.path.join(root, "scripts", "paper_track.py")).read()
+
+    def test_export_pins_to_the_record(self):
+        src = self._src()
+        exp = src[src.index("def cmd_export"):]
+        exp = exp[:exp.index("\ndef ", 1)]
+        assert "pin_to_record=True" in exp, \
+            "publishing is free to mark at a session the chart does not contain"
+
+    def test_the_pin_resolves_to_the_newest_recorded_session(self):
+        src = self._src()
+        assert "def last_recorded_session(" in src
+        assert "last_recorded_session() if pin_to_record else None" in src
+
+    def test_a_price_is_never_taken_from_after_the_as_of_date(self):
+        """The lookahead. A ticker missing from the pinned row fell back to its
+        own globally-latest bar, so a mark dated 2026-09-07 priced the ETFs at
+        the 2026-09-08 close — a price that did not exist on the row's own date,
+        and the reason the sleeve table read +0.38% beside +Rs 7,906."""
+        src = self._src()
+        lp = src[src.index("def live_prices("):]
+        lp = lp[:lp.index("\ndef ", 1)]
+        assert "s = s.loc[s.index <= asof]" in lp, \
+            "the fallback can still reach forward past the as-of date"
 
 
 class TestNoProvisionalMarks:
@@ -2595,7 +2704,7 @@ class TestPublishingCannotWriteTheRecord:
 
     def test_export_marks_the_book_without_recording_it(self):
         src = self._src()
-        assert "def cmd_status(quiet=False, record=True):" in src
+        assert "def cmd_status(quiet=False, record=True" in src
         exp = src[src.index("def cmd_export"):]
         exp = exp[:exp.index("\ndef ", 1)]
         assert "record=False" in exp, "export must not write the NAV log"

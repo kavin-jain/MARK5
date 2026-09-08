@@ -98,9 +98,17 @@ def live_prices(tickers: list[str], asof: "pd.Timestamp | None" = None) -> dict[
     evening produced day 41 (correct) and day 40 (a reverted session), because
     the day count and the prices were two independent live fetches with nothing
     tying them to the same close. When `asof` is given (the confirmed session
-    from `last_session_date()`), every ticker is read off THAT row; a ticker
-    still missing it falls back to its own last available bar, exactly as
-    before, and stays flagged `stale` by the caller.
+    from `last_session_date()`), every ticker is read off THAT row.
+
+    A ticker missing from that row falls back to its own last bar AT OR BEFORE
+    `asof` — never its globally-latest one. That fallback used to reach FORWARD:
+    the two ETFs have no 2026-09-07 bar, so a mark dated 2026-09-07 priced them
+    at the 2026-09-08 close, a price that did not exist on the date the row
+    claims. Lookahead in an append-only track record, and the visible symptom of
+    it was the published sleeve table showing US Nasdaq-100 at "+0.38%" beside
+    its own +Rs 7,906 on Rs 1,22,046 — the return leg ffilled backwards to
+    2026-09-04 while the value leg reached forward to 2026-09-08. Both legs now
+    resolve to the same bar, so the row can only be self-consistent.
     """
     import yfinance as yf
     data = yf.download([f"{t}.NS" for t in tickers], period="10d",
@@ -117,6 +125,8 @@ def live_prices(tickers: list[str], asof: "pd.Timestamp | None" = None) -> dict[
         s = data.get(f"{t}.NS")
         if s is None:
             continue
+        if asof is not None:
+            s = s.loc[s.index <= asof]
         v = pinned.get(f"{t}.NS") if pinned is not None else None
         if v is not None and not pd.isna(v):
             out[t] = float(v)
@@ -621,6 +631,14 @@ def confirm_final(pending, session, prices, recorded) -> dict:
     return {"flush": flush, "action": "defer"}
 
 
+def last_recorded_session():
+    """Newest session actually IN the record, or None. What publishing pins to."""
+    if not os.path.exists(NAV_LOG):
+        return None
+    dates = [r.split(",")[0] for r in open(NAV_LOG).read().splitlines()[1:] if r.strip()]
+    return pd.Timestamp(max(dates)) if dates else None
+
+
 def _load_pending():
     try:
         with open(PENDING) as fh:
@@ -671,7 +689,7 @@ def _mark(book, asof=None):
     return mv, sorted(detail, key=lambda d: -d["value"])
 
 
-def cmd_status(quiet=False, record=True):
+def cmd_status(quiet=False, record=True, pin_to_record=False):
     """Mark the book to market. `record=False` makes this READ-ONLY.
 
     The append below is the append-only NAV record, and only the scheduled daily
@@ -703,7 +721,15 @@ def cmd_status(quiet=False, record=True):
     # from, so they are the right witnesses to whether the market traded. Asking
     # the index alone is what dated the export a day behind the prices inside it.
     held = list(book.get("positions", {}))
-    sess = last_session_date(held)
+    # ONE as-of date for the whole published payload. Publishing marked at the
+    # newest CONFIRMED session while the chart ended at the newest RECORDED one,
+    # so the page showed a headline its own graph never reached: Rs 5,44,324
+    # against a last plotted point of Rs 5,38,020, both captioned day 47. Same
+    # split put "days live 47" under a page stamped 2026-09-08. Pinning the
+    # export to the record makes the headline, the day count, the chart's last
+    # point and the sleeve table arithmetically incapable of disagreeing.
+    sess = ((last_recorded_session() if pin_to_record else None)
+            or last_session_date(held))
     nav, detail = _mark(book, asof=sess)
     bench = benchmark_value(book["capital"], book["start_date"], asof=sess)
     ret = nav / book["capital"] - 1
@@ -956,7 +982,8 @@ def rebalance_events(book) -> list[dict]:
 def cmd_export():
     """Emit the JSON the public dashboard reads. Real data only."""
     # read-only: publishing must never write to the append-only record
-    book, nav, ret, days, detail, bench = cmd_status(quiet=True, record=False)
+    book, nav, ret, days, detail, bench = cmd_status(quiet=True, record=False,
+                                                     pin_to_record=True)
     hist = []
     if os.path.exists(NAV_LOG):
         hist = list(csv.DictReader(open(NAV_LOG)))
