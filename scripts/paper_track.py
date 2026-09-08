@@ -120,7 +120,7 @@ def live_prices(tickers: list[str], asof: "pd.Timestamp | None" = None) -> dict[
     return out
 
 
-def last_session_date() -> pd.Timestamp | None:
+def last_session_date(tickers: list[str] | None = None) -> pd.Timestamp | None:
     """Date of the most recent NSE session that actually printed a close.
 
     live_prices() takes the last non-NaN bar in a 7-day window and says nothing
@@ -128,16 +128,56 @@ def last_session_date() -> pd.Timestamp | None:
     as if it were today's. The weekday check catches Saturday and Sunday and
     nothing else; Diwali, Holi and every other trading holiday fall on weekdays.
     Booking fills at a stale close is the one thing an append-only ledger can
-    never take back, so the rebalance asks the index what day the market last
-    traded rather than assuming.
+    never take back, so the rebalance asks the market what day it last traded
+    rather than assuming.
+
+    WHY A QUORUM AND NOT ONE SYMBOL. This asked `^NSEI` alone, which made the
+    answer hostage to that one series' publish lag: Yahoo lands the index's daily
+    bar hours after the 15:30 close, routinely after the evening job has run. The
+    job then saw YESTERDAY and dated everything downstream accordingly — and
+    because `live_prices(asof=)` falls back to a ticker's own last bar when it is
+    missing from the pinned row, the two ETFs (no 2026-09-07 bar at all) were
+    still read at the NEXT day's close. One NAV, two sessions, labelled with the
+    older one: the 2026-09-08 export published day 47 priced partly at day 48.
+    Worse, the append below only ever writes the CURRENT session, so once the
+    pointer moved on the skipped day was gone — 2026-08-28 and 2026-09-08 were
+    both lost that way, silently, with the run green.
+
+    Individual names publish before the index does, so the honest question is not
+    "did ^NSEI print?" but "did the market print?". Take the latest date a QUORUM
+    of the panel closed on. A holiday still prints nothing and is still excluded,
+    which is the property the single-symbol version was protecting; a straggling
+    series can no longer hold the whole book back. With no tickers the panel is
+    the index alone, i.e. exactly the old behaviour.
     """
     import yfinance as yf
+    syms = ["^NSEI"] + [f"{t}.NS" for t in (tickers or [])]
     try:
-        h = yf.download("^NSEI", period="10d", auto_adjust=True,
-                        progress=False)["Close"].dropna()
+        px = yf.download(syms, period="10d", auto_adjust=True,
+                         progress=False, threads=False)["Close"]
     except Exception:                                        # noqa: BLE001
         return None
-    return pd.Timestamp(h.index[-1]).normalize() if len(h) else None
+    if isinstance(px, pd.Series):                            # single-symbol panel
+        px = px.to_frame(syms[0])
+    px = px.dropna(how="all")
+    if px.empty:
+        return None
+    # A THIRD, and the threshold is measured rather than guessed. Yahoo's daily
+    # coverage is patchy well beyond the ETFs: on 2026-09-07 — an unambiguously
+    # real session, RELIANCE/TCS/HDFCBANK/INFY all printed — 7 of an 18-name
+    # sample had no bar at all (AXISBANK, NYKAA, RBLBANK, SYRMA, AEROFLEX and
+    # both ETFs). A 60% bar would have rejected that session outright, which is
+    # the opposite failure to the one being fixed.
+    #
+    # The gap between the two cases being separated is enormous, so the exact
+    # threshold barely matters: a real session prints 60-100% of the panel, a
+    # holiday prints 0%. A third sits in the middle with room either side, and
+    # still needs several independent series to agree before a date counts —
+    # so one mispublished bar cannot invent a session (the 2026-07-26 failure).
+    quorum = max(1, round(len(syms) / 3))
+    closed = px.notna().sum(axis=1)
+    traded = closed[closed >= quorum]
+    return pd.Timestamp(traded.index[-1]).normalize() if len(traded) else None
 
 
 def reconcile_corporate_actions(book) -> list[str]:
@@ -574,7 +614,11 @@ def cmd_status(quiet=False, record=True):
     # 40/Rs 5,42,298 — a session going backwards in real time). Pinning nav,
     # benchmark and the day count to one confirmed session closes the whole
     # class: they can only ever agree, because they now come from the same date.
-    sess = last_session_date()
+    # The panel is the book itself: these are the very series the mark is made
+    # from, so they are the right witnesses to whether the market traded. Asking
+    # the index alone is what dated the export a day behind the prices inside it.
+    held = list(book.get("positions", {}))
+    sess = last_session_date(held)
     nav, detail = _mark(book, asof=sess)
     bench = benchmark_value(book["capital"], book["start_date"], asof=sess)
     ret = nav / book["capital"] - 1
@@ -616,6 +660,7 @@ def cmd_status(quiet=False, record=True):
     if sess is None:
         if not quiet:
             print("  could not confirm the last NSE session — not recording a mark")
+        print("  NOT-MARKED (no confirmed session)")
         return book, nav, ret, days, detail, bench
     stamp = str(sess.date())
     days = (sess.normalize() - pd.Timestamp(book["start_date"]).normalize()).days
@@ -633,6 +678,13 @@ def cmd_status(quiet=False, record=True):
             w.writerow([stamp, days, f"{nav:.2f}", f"{ret*100:.4f}",
                         f"{bench:.2f}" if bench else "",
                         f"{br:.4f}" if br is not None else "", now_iso()])
+        print(f"  MARKED {stamp}")
+    else:
+        # Said out loud so the caller can tell the run that DID the day's work
+        # from the ones that re-ran behind it. The daily message keys off this:
+        # four scheduled attempts exist so the mark is never missed, and every
+        # one of them used to send its own copy of the same message.
+        print(f"  ALREADY-MARKED {stamp}")
     return book, nav, ret, days, detail, bench
 
 
@@ -933,7 +985,7 @@ def cmd_rebalance(force=False):
     # …and the same for trading holidays, which are weekdays. Declining cannot
     # block permanently: `due` still exceeds the cadence tomorrow, so it simply
     # happens on the next real session.
-    sess = last_session_date()
+    sess = last_session_date(list(book.get("positions", {})))
     if sess is None or sess != pd.Timestamp.today().normalize():
         print(f"  declined — no NSE session printed today (last close "
               f"{sess.date() if sess is not None else 'unknown'}). Refusing to book "

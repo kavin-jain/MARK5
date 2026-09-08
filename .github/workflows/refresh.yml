@@ -129,8 +129,22 @@ jobs:
         run: python scripts/paper_track.py rebalance
 
       - name: Mark the paper book to market
+        id: mark
+        # `recorded` distinguishes the run that actually did the day's work from
+        # the ones that re-ran behind it. Four attempts exist so the mark is
+        # never missed; only one of them has anything new to announce.
+        #
+        # pipefail because the status command is piped: without it a crashed
+        # python is masked by tee's exit 0 and the job sails on having marked
+        # nothing.
         run: |
-          python scripts/paper_track.py status
+          set -o pipefail
+          python scripts/paper_track.py status | tee /tmp/mark.txt
+          if grep -q '^  MARKED ' /tmp/mark.txt; then
+            echo "recorded=true"  >> "$GITHUB_OUTPUT"
+          else
+            echo "recorded=false" >> "$GITHUB_OUTPUT"
+          fi
           python scripts/paper_track.py export
 
       - name: Merge live data into the dashboard feed
@@ -195,7 +209,16 @@ jobs:
         # Piping that step into a file would need `pipefail` to preserve its exit
         # code, and a health check that cannot turn the run red is decoration.
         # Twenty seconds of duplicated requests is the cheaper mistake.
-        if: always()
+        #
+        # ONE MESSAGE PER MARK, not one per attempt. Going from one cron to four
+        # (5b93c97) quadrupled the daily message with it: the mark is idempotent
+        # so runs 2-4 record nothing, but this step had no such guard and every
+        # run sent its own copy — four identical messages an evening, the last
+        # landing after midnight and so reading as "yesterday's".
+        #
+        # The failure branch is deliberate and keeps the paragraph above true: a
+        # run that breaks still speaks, whether or not it got as far as marking.
+        if: always() && (steps.mark.outputs.recorded == 'true' || job.status != 'success')
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}

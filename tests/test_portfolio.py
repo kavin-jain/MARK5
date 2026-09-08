@@ -1696,7 +1696,7 @@ class TestExportFieldsCannotDisagreeWithEachOther:
 
     def test_session_resolved_before_marking(self):
         body = self._cmd_status_body()
-        assert body.index("sess = last_session_date()") < body.index("_mark(book"), (
+        assert body.index("sess = last_session_date(") < body.index("_mark(book"), (
             "the session must be confirmed BEFORE pricing, not derived "
             "independently afterwards")
 
@@ -1709,7 +1709,7 @@ class TestExportFieldsCannotDisagreeWithEachOther:
         """Each branch used to re-call last_session_date() AFTER marking — the
         second, independent source of drift. Exactly one call may remain."""
         body = self._cmd_status_body()
-        assert body.count("last_session_date()") == 1, (
+        assert body.count("last_session_date(") == 1, (
             "a redundant last_session_date() call inside cmd_status "
             "reintroduces the drift between the marked price and the "
             "reported day")
@@ -1812,8 +1812,144 @@ class TestNoInventedSessions:
         non-session row, and it is an easy thing to reintroduce."""
         root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         src = open(os.path.join(root, "scripts", "paper_track.py")).read()
-        assert "sess = last_session_date()" in src
+        assert "sess = last_session_date(" in src
         assert "if today not in seen" not in src, "back to keying on the calendar"
+
+    def test_the_session_is_confirmed_by_the_book_not_by_one_index_series(self):
+        """The second half of the same guard, and the one that was missing.
+
+        Asking ^NSEI alone made the session date hostage to that series' publish
+        lag: the evening job saw yesterday, dated the export a day behind the
+        prices inside it, and lost the session for good when the pointer moved
+        on (2026-08-28, 2026-09-08). The mark must ask the names it is actually
+        pricing, so a straggling series cannot hold the whole book back."""
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        src = open(os.path.join(root, "scripts", "paper_track.py")).read()
+        assert "sess = last_session_date(held)" in src, \
+            "the mark no longer confirms the session against the book it prices"
+
+
+class TestSessionQuorum:
+    """`last_session_date` must answer "did the MARKET trade?", not "did one
+    series publish yet?".
+
+    Network is monkeypatched: these assert the decision rule, not yfinance.
+    """
+
+    @staticmethod
+    def _panel(rows):
+        """rows: {date: {sym: close-or-None}} -> object answering ["Close"]."""
+        import pandas as _pd
+        dates = sorted(rows)
+        syms = sorted({s for r in rows.values() for s in r})
+        frame = _pd.DataFrame(
+            {("Close", s): [rows[d].get(s) for d in dates] for s in syms},
+            index=_pd.to_datetime(dates))
+        frame.columns = _pd.MultiIndex.from_tuples(frame.columns)
+        return frame
+
+    def _call(self, monkeypatch, rows, tickers):
+        import yfinance as _yf
+        monkeypatch.setattr(_yf, "download", lambda *a, **k: self._panel(rows))
+        import importlib.util
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        spec = importlib.util.spec_from_file_location(
+            "_pt_quorum", os.path.join(root, "scripts", "paper_track.py"))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod.last_session_date(tickers)
+
+    def test_a_straggling_series_does_not_hold_the_session_back(self, monkeypatch):
+        """The live failure: on 2026-09-07 both ETFs had no bar while the index
+        and every stock did. The session is real and must be reported as such."""
+        rows = {"2026-09-04": {"^NSEI": 1, "A.NS": 1, "B.NS": 1, "C.NS": 1, "D.NS": 1},
+                "2026-09-07": {"^NSEI": 1, "A.NS": 1, "B.NS": 1, "C.NS": 1, "D.NS": None}}
+        assert str(self._call(monkeypatch, rows, list("ABCD")).date()) == "2026-09-07"
+
+    def test_the_index_alone_cannot_hold_the_book_back(self, monkeypatch):
+        """The inverse, and the actual 2026-09-08 bug: the stocks had printed and
+        ^NSEI had not. Waiting on the index is what lost the day's mark."""
+        rows = {"2026-09-07": {"^NSEI": 1, "A.NS": 1, "B.NS": 1, "C.NS": 1, "D.NS": 1},
+                "2026-09-08": {"^NSEI": None, "A.NS": 1, "B.NS": 1, "C.NS": 1, "D.NS": 1}}
+        assert str(self._call(monkeypatch, rows, list("ABCD")).date()) == "2026-09-08"
+
+    def test_a_holiday_is_still_excluded(self, monkeypatch):
+        """The property the single-symbol version existed to protect. Nothing
+        printed, so there is no session and no row may be written."""
+        rows = {"2026-09-07": {"^NSEI": 1, "A.NS": 1, "B.NS": 1, "C.NS": 1, "D.NS": 1},
+                "2026-09-08": {"^NSEI": None, "A.NS": None, "B.NS": None,
+                               "C.NS": None, "D.NS": None}}
+        assert str(self._call(monkeypatch, rows, list("ABCD")).date()) == "2026-09-07"
+
+    def test_one_stray_bar_cannot_invent_a_session(self, monkeypatch):
+        """Below quorum is not a session. Otherwise a single mispublished series
+        writes a row nobody could have traded at — the 2026-07-26 failure."""
+        rows = {"2026-09-07": {"^NSEI": 1, "A.NS": 1, "B.NS": 1, "C.NS": 1, "D.NS": 1},
+                "2026-09-08": {"^NSEI": None, "A.NS": 1, "B.NS": None,
+                               "C.NS": None, "D.NS": None}}
+        assert str(self._call(monkeypatch, rows, list("ABCD")).date()) == "2026-09-07"
+
+    def test_no_tickers_is_the_old_index_only_behaviour(self, monkeypatch):
+        rows = {"2026-09-07": {"^NSEI": 1}, "2026-09-08": {"^NSEI": 1}}
+        assert str(self._call(monkeypatch, rows, None).date()) == "2026-09-08"
+
+    def test_patchy_coverage_is_still_a_session(self, monkeypatch):
+        """Measured from the real 2026-09-07: the market unambiguously traded
+        (RELIANCE, TCS, HDFCBANK, INFY all printed) while 7 of an 18-name sample
+        had no bar at all. A quorum tight enough to reject that is worse than the
+        bug it replaces, so this pins the tolerance with the real shape."""
+        syms = [f"S{i}.NS" for i in range(21)]          # 21 names + index = 22
+        full = {"^NSEI": 1, **{s: 1 for s in syms}}
+        patchy = {"^NSEI": 1, **{s: (1 if i >= 8 else None)
+                                 for i, s in enumerate(syms)}}   # 13 of 22 print
+        rows = {"2026-09-04": full, "2026-09-07": patchy}
+        got = self._call(monkeypatch, rows, [s[:-3] for s in syms])
+        assert str(got.date()) == "2026-09-07"
+
+
+class TestOneMessagePerMark:
+    """The daily message must be sent by the run that RECORDED the mark, not by
+    every run that happened to fire.
+
+    Four scheduled attempts exist so the mark is never missed (5b93c97). The mark
+    is idempotent, so runs 2-4 record nothing — but the notify step had no such
+    guard and sent its own copy anyway: four identical messages an evening, the
+    last landing after IST midnight and so reading as "yesterday's".
+
+    This is a STRING CONTRACT between paper_track.py and refresh.yml, which is
+    exactly the kind of coupling that breaks silently when one side is reworded.
+    """
+
+    @staticmethod
+    def _read(*parts):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return open(os.path.join(root, *parts)).read()
+
+    def test_status_emits_a_machine_readable_verdict(self):
+        src = self._read("scripts", "paper_track.py")
+        for token in ('print(f"  MARKED {stamp}")',
+                      'print(f"  ALREADY-MARKED {stamp}")'):
+            assert token in src, f"cmd_status no longer emits {token!r}"
+
+    def test_the_workflow_greps_for_exactly_that_token(self):
+        wf = self._read(".github", "workflows", "refresh.yml")
+        assert "grep -q '^  MARKED '" in wf, \
+            "the workflow's marker no longer matches what cmd_status prints"
+        assert "set -o pipefail" in wf, \
+            "piping status into tee without pipefail hides a crashed mark"
+
+    def test_the_notify_step_is_gated_on_having_marked(self):
+        wf = self._read(".github", "workflows", "refresh.yml")
+        assert ("if: always() && (steps.mark.outputs.recorded == 'true' "
+                "|| job.status != 'success')") in wf, \
+            "the daily message is back to firing on every scheduled attempt"
+
+    def test_a_failing_run_still_speaks(self):
+        """The half of `always()` that must survive: the 4-5 August outage went
+        unnoticed for two days because nothing ever spoke first. Deduplicating
+        the routine message must not buy that silence back."""
+        wf = self._read(".github", "workflows", "refresh.yml")
+        assert "job.status != 'success'" in wf
 
 
 class TestScoreBaseRate:

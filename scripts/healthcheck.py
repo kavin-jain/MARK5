@@ -106,6 +106,40 @@ def main():
         check("no duplicate days in nav history", len(dates) == len(set(dates)),
               f"{len(dates) - len(set(dates))} duplicates")
 
+        # THE GAP THIS FILE EXISTED TO CATCH AND DID NOT.
+        #
+        # Every check above asks whether the recorded rows are well-formed. None
+        # asked the prior question: is a row that SHOULD exist missing? The mark
+        # only ever writes the current session, so a session skipped once is
+        # skipped for good — 2026-08-28 and 2026-09-08 were lost exactly that
+        # way, with every run green and the page still claiming the book is
+        # "marked to market every trading day since".
+        #
+        # A missing row is not cosmetic: nav_history IS the drawdown series, the
+        # observation count and the chart. FAIL, not WARN — silence is what let
+        # this run unnoticed for eleven days.
+        #
+        # Bounded at the last recorded date on purpose: today's mark legitimately
+        # does not exist yet when this runs before the append, and flagging it
+        # would make the check red every single day.
+        if dates:
+            try:
+                import yfinance as yf
+                idx = yf.download("^NSEI", start=min(dates),
+                                  end=str((pd.Timestamp(max(dates))
+                                           + pd.Timedelta(days=1)).date()),
+                                  auto_adjust=True, progress=False)["Close"].dropna()
+                sess = {str(pd.Timestamp(d).date()) for d in idx.index}
+                missing = sorted(s for s in sess
+                                 if s <= max(dates) and s not in set(dates))
+                check("every trading session since inception has a mark", not missing,
+                      f"unrecorded: {missing}" if missing
+                      else f"{len(sess)} sessions, {len(dates)} rows")
+            except Exception as e:                           # noqa: BLE001
+                check("every trading session since inception has a mark", True,
+                      f"could not verify ({type(e).__name__}) — the gap check did "
+                      f"not run", warn=True)
+
     # ── 3. the scheduled job ─────────────────────────────────────────────
     print("\nAUTOMATION")
     try:
