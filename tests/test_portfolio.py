@@ -1978,6 +1978,40 @@ class TestPublishedFeedTellsTheTruth:
         assert "delisted" in clean[0]["price_absent_reason"]
 
 
+class TestPublishingCannotShrinkTheUniverse:
+    """A smaller universe reads BETTER, so shrinkage must never publish silently.
+
+    export_dashboard.py reads MARK5_CACHE and falls back to the small working
+    cache when it is unset. Run that way the universe drops 1337 -> 456 names and
+    the headline "improves" to 25.2% CAGR / Sharpe 1.35 from 21.83% / 1.13 —
+    survivorship, not skill, and nothing in the output says so. Mandate §0: every
+    defect in this repo's history was a measurement error that flattered results.
+    """
+
+    @staticmethod
+    def _src():
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return open(os.path.join(root, "scripts", "export_dashboard.py")).read()
+
+    def test_the_write_is_guarded(self):
+        src = self._src()
+        assert "REFUSING TO WRITE" in src
+        guard = src.index("prev_n = 0")
+        write = src.index('json.dump(doc, open(OUT, "w")')
+        assert guard < write, "the universe check must precede the write"
+
+    def test_the_escape_hatch_the_message_advertises_actually_exists(self):
+        """The message names ALLOW_UNIVERSE_SHRINK. If that is only prose, the
+        guard is unbypassable and someone will delete it instead."""
+        src = self._src()
+        assert 'os.environ.get("ALLOW_UNIVERSE_SHRINK") != "1"' in src
+
+    def test_the_guard_points_at_the_actual_cause(self):
+        src = self._src()
+        assert "MARK5_CACHE=data/pit_cache" in src, \
+            "the refusal must name the fix, not just the symptom"
+
+
 class TestPublishedPayloadHasOneAsOfDate:
     """Headline, day count, chart and sleeve table must share one date.
 

@@ -343,6 +343,38 @@ def main():
             ],
         },
     }
+    # REFUSE TO PUBLISH A SMALLER UNIVERSE THAN THE ONE ALREADY PUBLISHED.
+    #
+    # This script reads MARK5_CACHE (see the header) and silently falls back to
+    # the small working cache when it is unset. Run without it, the universe
+    # drops 1337 -> 456 names and the headline "improves" from 21.83% to 25.2%
+    # CAGR, Sharpe 1.13 -> 1.35 — because a third of the names is a survivorship
+    # -filtered sample, not because anything got better. It prints nothing to say
+    # so, and the result is a strictly more flattering number that would have gone
+    # straight to the public page.
+    #
+    # That is Mandate §0's failure mode exactly: every defect in this repo's
+    # history was a measurement error that made results look better. A guard is
+    # cheap; noticing this by eye is luck. Shrinkage is refused rather than
+    # warned, because a warning in a long log is a warning nobody reads.
+    prev_n = 0
+    if os.path.exists(OUT):
+        try:
+            prev_n = json.load(open(OUT))["research"]["universe"]["symbols"]
+        except (ValueError, KeyError, OSError):
+            prev_n = 0
+    new_n = doc["research"]["universe"]["symbols"]
+    if (prev_n and new_n < prev_n * 0.9
+            and os.environ.get("ALLOW_UNIVERSE_SHRINK") != "1"):
+        sys.exit(
+            f"REFUSING TO WRITE: universe collapsed {prev_n} -> {new_n} names "
+            f"({new_n / prev_n:.0%} of what is already published).\n"
+            f"  A smaller universe is survivorship-filtered and reads BETTER, so "
+            f"this would publish a flattered number.\n"
+            f"  MARK5_CACHE is currently {os.environ.get('MARK5_CACHE') or '<unset>'} — "
+            f"re-run as:  MARK5_CACHE=data/pit_cache python3 scripts/export_dashboard.py\n"
+            f"  If the shrinkage is real and intended, say so explicitly with "
+            f"ALLOW_UNIVERSE_SHRINK=1.")
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     json.dump(doc, open(OUT, "w"), indent=1, default=float)
     kb = os.path.getsize(OUT) / 1024
