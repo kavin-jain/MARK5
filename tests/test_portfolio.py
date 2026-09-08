@@ -1978,6 +1978,119 @@ class TestPublishedFeedTellsTheTruth:
         assert "delisted" in clean[0]["price_absent_reason"]
 
 
+class TestTheRecordWasRepairedHonestly:
+    """The NAV log was rewritten, which Mandate §6 forbids by default.
+
+    Four defects, one cause: 2026-08-28 and 2026-09-08 traded but were never
+    marked (the mark only ever wrote the CURRENT session), and 2026-08-27 and
+    2026-09-07 were marked with a close from the FOLLOWING session, which made
+    both read higher than the truth. These pin the properties that make the
+    rewrite defensible rather than merely done.
+    """
+
+    @staticmethod
+    def _rows():
+        import csv as _csv
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with open(os.path.join(root, "data", "paper", "paper_nav.csv")) as f:
+            return list(_csv.DictReader(f))
+
+    @staticmethod
+    def _report():
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        p = os.path.join(root, "reports", "nav_repair.json")
+        if not os.path.exists(p):
+            pytest.skip("no repair report")
+        import json as _json
+        return _json.load(open(p))
+
+    def test_the_corrections_are_recorded_not_just_applied(self):
+        """A silent edit to an append-only record is the same species of failure
+        as the bug it fixes. The old values must survive the correction."""
+        ch = self._report()["changes"]
+        assert ch, "the record was rewritten with no record of the rewrite"
+        for c in ch:
+            assert c["kind"] in ("inserted", "corrected")
+            if c["kind"] == "corrected":
+                assert c["was"] is not None and c["delta"] is not None, \
+                    f"{c['date']} was corrected without preserving its old value"
+
+    def test_both_corrections_moved_the_record_DOWN(self):
+        """The lookahead reached forward into a rising market, so every affected
+        row was inflated. A correction that raised the headline would mean the
+        diagnosis was wrong — this is the check that would catch that."""
+        for c in self._report()["changes"]:
+            if c["kind"] == "corrected":
+                assert c["delta"] < 0, \
+                    f"{c['date']} was corrected UPWARD ({c['delta']:+.2f}) — the " \
+                    f"lookahead story does not explain that"
+
+    def test_the_repaired_rows_are_identifiable_as_one_batch(self):
+        """Auditability without adding a column: the log already stamps WHEN each
+        row was written, so the repaired rows carry the repair run's timestamp
+        and can be told apart from rows the cadence produced. (Not "a later
+        date" — a session repaired the same evening is legitimately same-day,
+        which is exactly what the daily job does too.)"""
+        import pandas as _pd
+        rep = self._report()
+        repaired = {c["date"] for c in rep["changes"]}
+        run = _pd.Timestamp(rep["generated"]).tz_localize(None)
+        stamps = set()
+        for r in self._rows():
+            if r["date"] in repaired:
+                ts = _pd.Timestamp(r["timestamp"]).tz_localize(None)
+                assert ts >= _pd.Timestamp(r["date"]), \
+                    f"{r['date']} claims to have been written before its own session"
+                assert abs((ts - run).total_seconds()) < 300, \
+                    f"{r['date']} does not carry the repair run's timestamp"
+                stamps.add(ts)
+        # Each row is stamped as it is built, so they differ by the seconds the
+        # price fetches take — one batch, not one instant.
+        assert stamps and (max(stamps) - min(stamps)).total_seconds() < 300, \
+            "the repaired rows did not come from a single repair run"
+
+    def test_the_repaired_log_still_has_one_row_per_session(self):
+        d = [r["date"] for r in self._rows()]
+        assert d == sorted(d), "the repair broke date ordering"
+        assert len(d) == len(set(d)), "the repair introduced a duplicate session"
+
+    def test_day_numbers_survived_the_repair(self):
+        import pandas as _pd
+        rows = self._rows()
+        start = _pd.Timestamp(rows[0]["date"])
+        for r in rows:
+            assert int(r["day"]) == (_pd.Timestamp(r["date"]) - start).days, \
+                f"{r['date']} carries day {r['day']}, which is not its distance from inception"
+
+    def test_the_repair_refuses_to_reach_past_a_position_change(self):
+        """Before the last ledger event the current book does not describe what
+        was held, so repricing there would be confidently wrong."""
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        src = open(os.path.join(root, "scripts", "repair_nav_log.py")).read()
+        assert "floor = max(r[\"date\"] for r in led)" in src
+        assert "if d <= floor" in src, "the repair can reach past a position change"
+
+    def test_the_repair_self_checks_before_rewriting(self):
+        """A method that cannot reproduce the GOOD rows has no business
+        rewriting the bad ones."""
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        src = open(os.path.join(root, "scripts", "repair_nav_log.py")).read()
+        assert "ABORT" in src and "self-check" in src
+        rep = self._report()["self_check"]
+        assert rep["reproduced"] >= rep["checked"] - len(
+            [c for c in self._report()["changes"] if c["kind"] == "corrected"]), \
+            "more rows failed the self-check than were corrected"
+
+    def test_the_published_feed_carries_the_corrections(self):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        p = os.path.join(root, "data", "paper", "paper_export.json")
+        if not os.path.exists(p):
+            pytest.skip("no export")
+        import json as _json
+        assert _json.load(open(p)).get("corrections"), \
+            "the record was corrected but the published feed does not disclose it"
+
+
 class TestPublishingCannotShrinkTheUniverse:
     """A smaller universe reads BETTER, so shrinkage must never publish silently.
 

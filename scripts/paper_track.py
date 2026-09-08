@@ -631,6 +631,24 @@ def confirm_final(pending, session, prices, recorded) -> dict:
     return {"flush": flush, "action": "defer"}
 
 
+def nav_corrections() -> list:
+    """Every row this record has had inserted or corrected after the fact.
+
+    Published alongside the numbers rather than left in a commit message. Two
+    rows carried a price from the following session and read HIGHER than the
+    truth; two sessions were never marked at all. Correcting them silently would
+    be the same species of failure as the bug — a track record whose value is
+    that nothing is quietly edited out cannot quietly edit itself back in.
+    """
+    p = os.path.join(_ROOT, "reports", "nav_repair.json")
+    if not os.path.exists(p):
+        return []
+    try:
+        return json.load(open(p)).get("changes", [])
+    except (ValueError, OSError):
+        return []
+
+
 def last_recorded_session():
     """Newest session actually IN the record, or None. What publishing pins to."""
     if not os.path.exists(NAV_LOG):
@@ -1031,6 +1049,10 @@ def cmd_export():
            # the same failure it claims to defend against, so the events ship
            # with the data and the page can render them on the NAV chart.
            "rebalance_events": rebalance_events(book),
+           # Rows inserted or corrected after the fact, with their old values.
+           # An append-only record that gets edited must say so where the numbers
+           # are read, not only where the code is reviewed.
+           "corrections": nav_corrections(),
            # the blended headline hides that half the book is passive ETFs
            "sleeves": sleeve_attribution(book, detail, nav),
            "holdings": detail, "nav_history": hist}
