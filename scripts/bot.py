@@ -1476,11 +1476,25 @@ def register():
 
     Done on every run rather than as a one-off setup step: the menu is then
     derived from COMMANDS and cannot drift from what the code actually answers.
+
+    WHICH RUN, THOUGH. This used to be reached only from `--serve`, and bot.yml
+    dropped its schedule when GitHub throttled it to 5 of 144 requested runs a
+    day — the webhook answers commands now, and `--serve` survives as a manual
+    fallback. So the menu silently stopped being republished, and the paragraph
+    above quietly became false: /cashout answered correctly but never appeared in
+    the "/" list, which for the owner is the same as not existing. It is now
+    published by the daily refresh, in the same step that re-renders the answers,
+    so what the bot can say and what it offers to say are updated together.
     """
+    if not os.getenv("TELEGRAM_BOT_TOKEN"):
+        print("  no TELEGRAM_BOT_TOKEN — command menu not published")
+        return
     try:
         _api("setMyCommands",
              commands=json.dumps([{"command": n, "description": d}
                                   for n, d, _ in COMMANDS]))
+        print(f"  published {len(COMMANDS)} commands to Telegram: "
+              + " ".join("/" + n for n, _, _ in COMMANDS))
     except RuntimeError as e:
         print(f"  could not publish the command menu: {e}")
 
@@ -1554,8 +1568,12 @@ def main():
                     help="pre-render every answer to DIR for the webhook to serve")
     ap.add_argument("--say", metavar="CMD",
                     help="render one command locally, e.g. --say /holdings")
+    ap.add_argument("--register", action="store_true",
+                    help="publish the command menu to Telegram and exit")
     a = ap.parse_args()
 
+    if a.register:
+        return register()
     if a.render:
         return render_all(a.render)
     if a.say:

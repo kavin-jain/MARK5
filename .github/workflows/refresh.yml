@@ -167,6 +167,19 @@ jobs:
         continue-on-error: true
         run: python scripts/bot.py --render docs/data
 
+      - name: Publish the bot's command menu
+        # The "/" autocomplete list in Telegram. It was published only by
+        # `bot.py --serve`, and bot.yml dropped its schedule when GitHub throttled
+        # it to 5 of 144 requested runs a day, so the menu stopped being
+        # republished entirely: a new command answered correctly and never showed
+        # up in the list, which for the owner is the same as not existing.
+        # It belongs beside the render — one step updates what the bot can say,
+        # the next updates what it offers to say, and they cannot drift apart.
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python scripts/bot.py --register
+
       - name: Rebuild the standalone dashboard from the feed
         # docs/index.html EMBEDS mark6.json rather than fetching it, so updating the
         # feed alone leaves the standalone page frozen at whatever it was built with.

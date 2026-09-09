@@ -2316,6 +2316,53 @@ class TestCashoutIsTheHeadlineAfterTheExitIsPaidFor:
             "bot.py cannot import paper_track — its workflow has no scipy"
 
 
+class TestTheBotOffersWhatItCanAnswer:
+    """A command that answers but is not in the "/" list does not exist.
+
+    `register()` publishes the Telegram autocomplete menu and used to be reached
+    only from `bot.py --serve`. bot.yml then dropped its schedule (GitHub served
+    5 of 144 requested runs a day) and the webhook took over answering, so the
+    menu silently stopped being republished — /cashout replied correctly and
+    never appeared in the list.
+    """
+
+    @staticmethod
+    def _read(*parts):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return open(os.path.join(root, *parts)).read()
+
+    def test_the_daily_job_publishes_the_menu(self):
+        wf = self._read(".github", "workflows", "refresh.yml")
+        assert "bot.py --register" in wf, \
+            "nothing republishes the command menu — a new command stays invisible"
+        assert wf.index("bot.py --render") < wf.index("bot.py --register"), \
+            "the menu must be published after the answers it advertises exist"
+
+    def test_the_menu_step_has_the_token(self):
+        wf = self._read(".github", "workflows", "refresh.yml")
+        step = wf[wf.index("Publish the bot's command menu"):]
+        step = step[:step.index("- name:", 1)]
+        assert "TELEGRAM_BOT_TOKEN" in step, "the step cannot authenticate"
+
+    def test_register_is_derived_from_commands(self):
+        """Never a hand-maintained second list."""
+        src = self._read("scripts", "bot.py")
+        fn = src[src.index("def register("):]
+        fn = fn[:fn.index("\ndef ", 1)]
+        assert "for n, d, _ in COMMANDS" in fn
+        assert "setMyCommands" in fn
+
+    def test_cashout_is_in_the_published_list(self):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        p = os.path.join(root, "docs", "data", "bot_answers.json")
+        if not os.path.exists(p):
+            pytest.skip("no rendered answers")
+        d = json.load(open(p))
+        names = [c["name"] for c in d.get("commands", [])]
+        assert "cashout" in names, "cashout is answerable but not advertised"
+        assert "cashout" in (d.get("text") or {}), "advertised with no answer"
+
+
 class TestNoProvisionalMarks:
     """A NAV row may only be written from closes that have stopped moving.
 
