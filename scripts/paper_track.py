@@ -48,6 +48,17 @@ LEDGER = os.path.join(PAPER_DIR, "paper_ledger.csv")
 # it — the workflow commits data/paper/, so it survives between runs, which is
 # the whole mechanism (see confirm_final).
 PENDING = os.path.join(PAPER_DIR, ".pending_mark.json")
+# The exact mark that produced the newest recorded NAV row, kept so that
+# PUBLISHING CAN READ THE RECORD INSTEAD OF RE-DERIVING IT. Yahoo does not serve
+# a past session identically twice: on 2026-09-08 all 22 names printed a 09-08
+# bar and the row was written at Rs 5,46,414.88; the next morning only 20 of 22
+# still had one, so re-pricing the SAME session returned Rs 5,42,993.94, and the
+# scheduled run before that had none of them and returned Rs 5,32,474.25 — the
+# 09-07 mark under a 09-08 label. That last one reached the page: the headline
+# box read Rs 5,32,474 beside a chart whose final point was Rs 5,46,415.
+# Pinning the export to the record fixed the DATE; the VALUE was still being
+# recomputed from a live fetch, and a recomputation can only ever disagree.
+MARK_SNAPSHOT = os.path.join(PAPER_DIR, "last_mark.json")
 # Four equal sleeves. Equity is the remainder, so this dict alone sets the
 # allocation: 1 - 0.75 = 25% equity.
 #
@@ -674,8 +685,38 @@ def _save_pending(obs):
         json.dump(obs, fh, indent=1, sort_keys=True)
 
 
-def _append_nav_row(stamp, days, nav, ret, bench, capital):
-    """The one place a NAV row is written. Append-only, header on first write."""
+def recorded_row(sess):
+    """The recorded NAV row for a session, or None. The record's own answer."""
+    if sess is None or not os.path.exists(NAV_LOG):
+        return None
+    want = str(pd.Timestamp(sess).date())
+    for r in csv.DictReader(open(NAV_LOG)):
+        if r.get("date") == want:
+            return r
+    return None
+
+
+def _load_snapshot():
+    try:
+        with open(MARK_SNAPSHOT) as fh:
+            return json.load(fh)
+    except (OSError, ValueError):
+        return None
+
+
+def _save_snapshot(session, days, nav, ret, bench, detail):
+    json.dump({"session": session, "days": days, "nav": nav, "return": ret,
+               "bench": bench, "detail": detail, "written": now_iso()},
+              open(MARK_SNAPSHOT, "w"), indent=1, default=float, allow_nan=False)
+
+
+def _append_nav_row(stamp, days, nav, ret, bench, capital, detail=None):
+    """The one place a NAV row is written. Append-only, header on first write.
+
+    `detail` is the per-position mark behind the row. It is saved beside the row
+    so the dashboard can publish the mark that was RECORDED rather than a fresh
+    re-price of the same date, which is not reproducible (see MARK_SNAPSHOT).
+    """
     new = not os.path.exists(NAV_LOG)
     with open(NAV_LOG, "a", newline="") as f:
         w = csv.writer(f)
@@ -686,6 +727,8 @@ def _append_nav_row(stamp, days, nav, ret, bench, capital):
         w.writerow([stamp, days, f"{nav:.2f}", f"{ret*100:.4f}",
                     f"{bench:.2f}" if bench else "",
                     f"{br:.4f}" if br is not None else "", now_iso()])
+    if detail is not None:
+        _save_snapshot(stamp, days, nav, ret, bench, detail)
 
 
 def _mark(book, asof=None):
@@ -748,8 +791,31 @@ def cmd_status(quiet=False, record=True, pin_to_record=False):
     # point and the sleeve table arithmetically incapable of disagreeing.
     sess = ((last_recorded_session() if pin_to_record else None)
             or last_session_date(held))
-    nav, detail = _mark(book, asof=sess)
-    bench = benchmark_value(book["capital"], book["start_date"], asof=sess)
+    # PUBLISHING READS THE RECORD. It does not re-derive it.
+    #
+    # Pinning the export to the newest RECORDED session fixed the date but left
+    # the value being recomputed from a live fetch, and Yahoo does not serve a
+    # past session identically twice — a name that printed a bar last night can
+    # be missing this morning, at which point live_prices falls back to the
+    # session before and the whole panel silently shifts a day. The published
+    # headline then sits BELOW its own chart's last point (Rs 5,32,474 against
+    # Rs 5,46,415 on 2026-09-09), which is the same class of contradiction the
+    # pin was added to remove, only mirrored. A recorded row is evidence; it is
+    # not a quantity to be re-estimated every time the page is rebuilt.
+    snap = _load_snapshot() if pin_to_record else None
+    if snap and sess is not None and snap.get("session") == str(sess.date()):
+        nav, detail, bench = snap["nav"], snap["detail"], snap.get("bench")
+    else:
+        nav, detail = _mark(book, asof=sess)
+        bench = benchmark_value(book["capital"], book["start_date"], asof=sess)
+        # No snapshot for this session (it predates them, or was written by the
+        # repair script). The holdings table is then a fresh re-price and may be
+        # a bar or two behind, but the headline still comes from the record, so
+        # the number the page leads with can never contradict the chart under it.
+        rec = recorded_row(sess) if pin_to_record else None
+        if rec:
+            nav = float(rec["nav_inr"])
+            bench = float(rec["bench_inr"]) if rec.get("bench_inr") else None
     ret = nav / book["capital"] - 1
     days = (pd.Timestamp.today().normalize()
             - pd.Timestamp(book["start_date"]).normalize()).days
@@ -809,16 +875,16 @@ def cmd_status(quiet=False, record=True, pin_to_record=False):
         # re-price it from today's data rather than trusting the last provisional
         # look, which is the entire thing being defended against.
         fs = pd.Timestamp(verdict["flush"])
-        fnav, _ = _mark(book, asof=fs)
+        fnav, fdetail = _mark(book, asof=fs)
         fbench = benchmark_value(book["capital"], book["start_date"], asof=fs)
         fdays = (fs.normalize() - pd.Timestamp(book["start_date"]).normalize()).days
         _append_nav_row(verdict["flush"], fdays, fnav, fnav / book["capital"] - 1,
-                        fbench, book["capital"])
+                        fbench, book["capital"], fdetail)
         seen.add(verdict["flush"])
         print(f"  MARKED {verdict['flush']} (deferred session, settled)")
 
     if verdict["action"] == "confirm":
-        _append_nav_row(stamp, days, nav, ret, bench, book["capital"])
+        _append_nav_row(stamp, days, nav, ret, bench, book["capital"], detail)
         _save_pending(None)
         print(f"  MARKED {stamp}")
     elif verdict["action"] == "already":
@@ -1031,7 +1097,12 @@ def cmd_export():
                   "sleeves_pending_next_rebalance":
                       sorted(k for k in SLEEVES if k not in _held),
                   "sizing": "inverse volatility within the equity sleeve"}
-    out = {"generated": now_iso(), "mode": book["mode"], "config": out_config,
+    # The session every number below is marked at, said out loud. The page's
+    # chart is `nav_history`, so publishing the date the headline belongs to is
+    # what makes "headline == last plotted point" checkable rather than assumed.
+    as_of = hist[-1]["date"] if hist else None
+    out = {"generated": now_iso(), "as_of": as_of,
+           "mode": book["mode"], "config": out_config,
            "start_date": book["start_date"], "days_live": days,
            "capital": book["capital"], "nav": nav, "return_pct": ret * 100,
            "cash": book.get("cash", 0), "integrity": book.get("integrity"),

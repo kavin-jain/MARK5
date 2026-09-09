@@ -11,7 +11,9 @@ Covers the invariants that make the backtest trustworthy:
 
 Run: pytest tests/test_portfolio.py -v
 """
+import json
 import os
+import re
 import sys
 
 import numpy as np
@@ -2161,6 +2163,80 @@ class TestPublishedPayloadHasOneAsOfDate:
         lp = lp[:lp.index("\ndef ", 1)]
         assert "s = s.loc[s.index <= asof]" in lp, \
             "the fallback can still reach forward past the as-of date"
+
+
+class TestTheHeadlineIsTheRecordNotAReEstimate:
+    """The published headline must BE the last row of the published chart.
+
+    Pinning the export to the newest recorded session fixed the DATE and left
+    the VALUE recomputed from a live fetch. Yahoo does not serve a past session
+    identically twice, so the same session returned three different numbers in
+    fifteen hours: Rs 5,46,414.88 written into the record when all 22 names had
+    a 2026-09-08 bar, Rs 5,32,474.25 published by the scheduled run whose fetch
+    had none of them (the 09-07 mark under a 09-08 label), and Rs 5,42,993.94 on
+    re-pricing the next morning with 20 of 22. The middle one reached the page:
+    the headline box read Rs 5,32,474 beside a chart ending at Rs 5,46,415.
+    """
+
+    @staticmethod
+    def _src():
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        return open(os.path.join(root, "scripts", "paper_track.py")).read()
+
+    @staticmethod
+    def _status():
+        src = TestTheHeadlineIsTheRecordNotAReEstimate._src()
+        s = src[src.index("def cmd_status("):]
+        return s[:s.index("\ndef ", 1)]
+
+    def test_a_recorded_session_is_read_not_recomputed(self):
+        st = self._status()
+        assert "rec = recorded_row(sess) if pin_to_record else None" in st, \
+            "publishing still re-derives a session the record already answers"
+        assert 'nav = float(rec["nav_inr"])' in st
+
+    def test_the_mark_behind_a_row_is_saved_with_it(self):
+        """So the next publish is a read, not a re-estimate."""
+        src = self._src()
+        ap = src[src.index("def _append_nav_row("):]
+        ap = ap[:ap.index("\ndef ", 1)]
+        assert "_save_snapshot(stamp, days, nav, ret, bench, detail)" in ap, \
+            "a row can be written without the mark that produced it"
+        calls = list(re.finditer(r"(?<!def )_append_nav_row\(", src))
+        assert calls, "no call sites found — the test is looking at the wrong name"
+        for m in calls:
+            i, depth = m.end(), 1
+            while depth:                       # slice to this call's closing paren
+                depth += {"(": 1, ")": -1}.get(src[i], 0)
+                i += 1
+            args = src[m.end():i - 1].rstrip()
+            assert args.endswith("detail"), \
+                f"_append_nav_row called without its detail: {args[-60:]!r}"
+
+    def test_the_snapshot_is_only_trusted_for_its_own_session(self):
+        st = self._status()
+        assert 'snap.get("session") == str(sess.date())' in st, \
+            "a stale snapshot could be published under a newer session's date"
+
+    def test_published_headline_equals_the_last_charted_point(self):
+        """The end-to-end invariant, checked on the real published feed."""
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        p = os.path.join(root, "data", "paper", "paper_export.json")
+        if not os.path.exists(p):
+            pytest.skip("no export to check")
+        d = json.load(open(p))
+        hist = d.get("nav_history") or []
+        if not hist:
+            pytest.skip("no history")
+        last = hist[-1]
+        assert abs(d["nav"] - float(last["nav_inr"])) < 0.01, (
+            f"headline Rs {d['nav']:,.2f} is not the chart's last point "
+            f"Rs {float(last['nav_inr']):,.2f} ({last['date']})")
+        assert d.get("as_of") == last["date"], \
+            f"payload dated {d.get('as_of')}, chart ends {last['date']}"
+        if d.get("benchmark_nav") and last.get("bench_inr"):
+            assert abs(d["benchmark_nav"] - float(last["bench_inr"])) < 0.01, \
+                "the benchmark leg is from a different session than the NAV"
 
 
 class TestNoProvisionalMarks:
