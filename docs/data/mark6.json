@@ -1,8 +1,8 @@
 {
- "generated": "2026-09-09T15:45:31+05:30",
+ "generated": "2026-09-09T16:47:08+05:30",
  "disclaimer": "PAPER MODE. The live panel is a real-price paper book with no money at risk. The research panel is a historical simulation: real prices, simulated trades. Neither is investment advice.",
  "live": {
-  "generated": "2026-09-09T15:45:30+05:30",
+  "generated": "2026-09-09T16:47:07+05:30",
   "as_of": "2026-09-08",
   "mode": "PAPER \u2014 no real money; all prices, quantities and costs are real",
   "config": {
@@ -137,6 +137,59 @@
    "total_pnl_inr": 46414.92013244638,
    "total_impact_pp": 9.282984026489276,
    "method": "NAV impact is cash-on-cash and sums exactly to the headline. Return % is time-weighted and chain-linked across rebalances, so cash swept in at a rebalance is never counted as profit."
+  },
+  "cashout": {
+   "gross": 546402.3701324463,
+   "sell_costs": 566.1963423928643,
+   "tax": 9169.737544943271,
+   "cash": 12.513934662822408,
+   "in_hand": 536678.950179773,
+   "capital": 500000.0,
+   "profit": 36678.95017977303,
+   "profit_pct": 7.335790035954615,
+   "paper_profit": 46414.88406710909,
+   "paper_profit_pct": 9.282976813421817,
+   "gap": 9735.933887336054,
+   "long_term_holdings": 0,
+   "holdings": 22,
+   "sleeves": [
+    {
+     "sleeve": "Equity",
+     "gross": 284318.46937561035,
+     "sell_costs": 294.6181902472112,
+     "gain": 33284.46440595226,
+     "names": 20,
+     "tax": 6414.452557708653,
+     "in_hand": 277609.3986276545,
+     "committed": 252510.42999999993,
+     "profit": 25098.96862765454,
+     "profit_pct": 9.939775013513131
+    },
+    {
+     "sleeve": "Gold ETF",
+     "gross": 132131.99615478516,
+     "sell_costs": 136.9186098474884,
+     "gain": 6566.10165687468,
+     "names": 1,
+     "tax": 1265.3935798222687,
+     "in_hand": 130729.6839651154,
+     "committed": 125430.63999999998,
+     "profit": 5299.043965115416,
+     "profit_pct": 4.2246806403247295
+    },
+    {
+     "sleeve": "US Nasdaq-100",
+     "gross": 129951.90460205078,
+     "sell_costs": 134.65954229816467,
+     "gain": 7731.0163373419555,
+     "names": 1,
+     "tax": 1489.8914074123502,
+     "in_hand": 128327.35365234027,
+     "committed": 122046.37999999999,
+     "profit": 6280.973652340283,
+     "profit_pct": 5.146382590241738
+    }
+   ]
   },
   "holdings": [
    {

@@ -907,6 +907,105 @@ def cmd_status(quiet=False, record=True, pin_to_record=False):
 PASSIVE = {"GOLDBEES": "Gold ETF", "MON100": "US Nasdaq-100"}
 
 
+def cashout(book, detail):
+    """What the owner would actually receive if the whole book were sold today.
+
+    The headline is a paper number. It is the market value of holdings nobody has
+    sold, and between it and money in a bank account sit two deductions that only
+    appear at the moment of exit: the cost of selling, and capital gains tax on
+    everything that has gone up. On this book that gap is about a fifth of the
+    stated profit, and nothing else in the system quantifies it — /costs reports
+    what has ALREADY been paid, /tax reports what is owed on gains ALREADY
+    realised. Neither answers "what do I walk away with".
+
+    The tax is not per-trade. Indian law nets the fiscal year's gains and losses
+    into one pool (Sec 70/74), so selling a loser genuinely reduces the bill on a
+    winner, and the only correct way to compute this is to add every unrealised
+    gain to the year's existing bucket and tax the total — which is exactly what
+    `net_fy_tax` already does. It is called here rather than reimplemented, so
+    the live book, the backtest and this answer can never drift onto three
+    different readings of the same law.
+
+    Per-sleeve tax is attributed PRO-RATA to each sleeve's share of the taxable
+    gain. A pooled liability has no exact per-sleeve split; pro-rata is the
+    standard attribution and it makes the three sleeves sum to the total, which a
+    "sold in isolation" figure would not.
+    """
+    if not detail:
+        return None
+    pos = book.get("positions", {})
+    today = pd.Timestamp.today().normalize()
+    st = lt = lt_112a = 0.0
+    long_term = 0
+    rows = {}
+    for d in detail:
+        t = d["ticker"]
+        p = pos.get(t)
+        if not p:
+            continue
+        gross = d["qty"] * d["price"]
+        cost = gross * SELL_COST_RATE
+        gain = gross - cost - p["entry_value"] - p["entry_cost"]
+        held = (today - pd.Timestamp(p.get("entry_date") or book["start_date"])).days
+        if held > 365:
+            lt += gain
+            long_term += 1
+            if t not in SLEEVES:
+                lt_112a += gain
+        else:
+            st += gain
+        k = PASSIVE.get(t, "Equity")
+        r = rows.setdefault(k, {"sleeve": k, "gross": 0.0, "sell_costs": 0.0,
+                                "gain": 0.0, "names": 0})
+        r["gross"] += gross
+        r["sell_costs"] += cost
+        r["gain"] += gain
+        r["names"] += 1
+
+    before = net_fy_tax(book)
+    after = dict(book)
+    after["fy_stcg"] = book.get("fy_stcg", 0.0) + st
+    after["fy_ltcg"] = book.get("fy_ltcg", 0.0) + lt
+    after["fy_ltcg_112a"] = book.get("fy_ltcg_112a", 0.0) + lt_112a
+    tax = net_fy_tax(after) - before
+
+    # net rupees committed per sleeve — the same rule sleeve_attribution uses, so
+    # "what I put in" means one thing across the whole system
+    invested = {}
+    for r in (list(csv.DictReader(open(LEDGER))) if os.path.exists(LEDGER) else []):
+        if r["action"] not in ("BUY", "SELL"):
+            continue
+        k = PASSIVE.get(r["ticker"], "Equity")
+        sgn = 1 if r["action"] == "BUY" else -1
+        invested[k] = invested.get(k, 0.0) + sgn * float(r["value_inr"]) + float(r["cost_inr"])
+
+    taxable = sum(max(0.0, v["gain"]) for v in rows.values())
+    out_rows = []
+    for k, r in rows.items():
+        share = (max(0.0, r["gain"]) / taxable) if taxable else 0.0
+        r_tax = tax * share
+        in_hand = r["gross"] - r["sell_costs"] - r_tax
+        put_in = invested.get(k, 0.0)
+        out_rows.append({**r, "tax": r_tax, "in_hand": in_hand, "committed": put_in,
+                         "profit": in_hand - put_in,
+                         "profit_pct": ((in_hand / put_in - 1) * 100) if put_in else None})
+    out_rows.sort(key=lambda r: -r["gross"])
+
+    gross = sum(r["gross"] for r in rows.values())
+    costs = sum(r["sell_costs"] for r in rows.values())
+    cash = book.get("cash", 0.0)
+    in_hand = gross - costs - tax + cash
+    cap = book["capital"]
+    paper = gross + cash - net_fy_tax(book) - cap      # the headline, same basis as _mark
+    return {"gross": gross, "sell_costs": costs, "tax": tax, "cash": cash,
+            "in_hand": in_hand, "capital": cap,
+            "profit": in_hand - cap, "profit_pct": (in_hand / cap - 1) * 100,
+            "paper_profit": paper, "paper_profit_pct": paper / cap * 100,
+            "gap": paper - (in_hand - cap),
+            "long_term_holdings": long_term, "holdings": len(detail),
+            "sleeves": out_rows}
+
+
 def sleeve_attribution(book, detail, nav_now):
     """Split the headline into its three sleeves. Real money, two honest measures.
 
@@ -1126,6 +1225,10 @@ def cmd_export():
            "corrections": nav_corrections(),
            # the blended headline hides that half the book is passive ETFs
            "sleeves": sleeve_attribution(book, detail, nav),
+           # What the headline becomes after selling costs and capital gains tax.
+           # Published rather than computed by the reader, so the bot and the page
+           # cannot arrive at two different answers to "what do I walk away with".
+           "cashout": cashout(book, detail),
            "holdings": detail, "nav_history": hist}
     path = os.path.join(PAPER_DIR, "paper_export.json")
     json.dump(out, open(path, "w"), indent=1, default=float, allow_nan=False)

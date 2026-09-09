@@ -2239,6 +2239,83 @@ class TestTheHeadlineIsTheRecordNotAReEstimate:
                 "the benchmark leg is from a different session than the NAV"
 
 
+class TestCashoutIsTheHeadlineAfterTheExitIsPaidFor:
+    """`/cashout` must reconcile, and must never flatter the headline.
+
+    The page's profit is a paper number: holdings nobody has sold. Selling costs
+    and capital gains tax sit between it and money in a bank account, and on this
+    book they are about a fifth of it. The risk in publishing a second profit
+    figure is that it quietly disagrees with the first, so these check that it is
+    the SAME money with deductions applied, not a separate calculation.
+    """
+
+    @staticmethod
+    def _c():
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        p = os.path.join(root, "data", "paper", "paper_export.json")
+        if not os.path.exists(p):
+            pytest.skip("no export")
+        d = json.load(open(p))
+        if not d.get("cashout"):
+            pytest.skip("no cashout block")
+        return d, d["cashout"]
+
+    def test_it_never_exceeds_the_paper_profit(self):
+        """Costs and tax only ever subtract. A cash-out above the headline would
+        mean the deductions had the wrong sign."""
+        _, c = self._c()
+        assert c["profit"] <= c["paper_profit"] + 0.01, (
+            f"selling today nets {c['profit']:,.2f}, more than the paper "
+            f"{c['paper_profit']:,.2f} — the deductions are inverted")
+        assert c["tax"] >= -0.01 and c["sell_costs"] >= -0.01
+
+    def test_the_arithmetic_closes(self):
+        _, c = self._c()
+        built = c["gross"] - c["sell_costs"] - c["tax"] + c["cash"]
+        assert abs(built - c["in_hand"]) < 0.01
+        assert abs((c["in_hand"] - c["capital"]) - c["profit"]) < 0.01
+        assert abs(c["gap"] - (c["paper_profit"] - c["profit"])) < 0.01
+
+    def test_the_sleeves_sum_to_the_whole(self):
+        """Pro-rata tax attribution is only defensible if it adds up."""
+        _, c = self._c()
+        s = c.get("sleeves") or []
+        if not s:
+            pytest.skip("no sleeves")
+        for f in ("gross", "sell_costs", "tax"):
+            assert abs(sum(r[f] for r in s) - c[f]) < 0.01, f"{f} does not sum"
+        assert abs(sum(r["in_hand"] for r in s) + c["cash"] - c["in_hand"]) < 0.01
+
+    def test_its_paper_profit_is_the_published_headline(self):
+        """The whole point is that it deducts from the SAME number the page
+        leads with, not from a second estimate of it."""
+        d, c = self._c()
+        assert abs(c["paper_profit"] - (d["nav"] - d["capital"])) < 0.01
+        assert abs(c["capital"] - d["capital"]) < 0.01
+
+    def test_the_tax_law_is_not_reimplemented(self):
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        src = open(os.path.join(root, "scripts", "paper_track.py")).read()
+        fn = src[src.index("def cashout("):]
+        fn = fn[:fn.index("\ndef ", 1)]
+        assert "net_fy_tax(" in fn, "cashout must call the one tax function"
+        assert "* STCG" not in fn and "* LTCG" not in fn, \
+            "cashout is applying a rate itself instead of netting the FY pool"
+
+    def test_the_bot_formats_it_and_does_not_compute_it(self):
+        """bot.py runs in a workflow without scipy, so it cannot import
+        paper_track; it must read the published block."""
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        src = open(os.path.join(root, "scripts", "bot.py")).read()
+        fn = src[src.index("def h_cashout("):]
+        fn = fn[:fn.index("\ndef ", 1)]
+        assert 'L.get("cashout")' in fn
+        assert "net_fy_tax(" not in fn and "SELL_COST_RATE" not in fn, \
+            "the bot is recomputing what the feed already publishes"
+        assert "import paper_track" not in src, \
+            "bot.py cannot import paper_track — its workflow has no scipy"
+
+
 class TestNoProvisionalMarks:
     """A NAV row may only be written from closes that have stopped moving.
 

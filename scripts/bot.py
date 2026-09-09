@@ -1088,6 +1088,69 @@ def h_costs(arg=""):
     return "\n".join(out)
 
 
+def h_cashout(arg=""):
+    """What the owner actually walks away with, as opposed to what the page says.
+
+    Every other number in this bot is a paper number: the market value of things
+    nobody has sold. Between it and money in a bank account sit two deductions
+    that exist only at the moment of exit — the cost of selling and capital gains
+    tax on everything that has risen. On this book that is roughly a fifth of the
+    stated profit, and no other command shows it: /costs reports what has ALREADY
+    been paid, /tax what is owed on gains ALREADY realised.
+
+    The arithmetic is NOT done here. It is published in the feed by
+    paper_track.cashout, which calls the same net_fy_tax the live book and the
+    backtest use, so this cannot become a fourth reading of Indian tax law.
+    """
+    L = _export()
+    c = L.get("cashout")
+    if not c:
+        return "No cash-out figures in the feed yet."
+    out = ["IF YOU SOLD EVERYTHING TODAY",
+           f"  at the {_asof(L)} closes", "─" * W,
+           _kv("gross proceeds", _amt(c["gross"])),
+           _kv("selling costs", _amt(-c["sell_costs"], True)),
+           _kv("capital gains tax", _amt(-c["tax"], True)),
+           _kv("idle cash", _amt(c["cash"])),
+           "─" * W,
+           _kv("IN YOUR HAND", _amt(c["in_hand"])),
+           _kv("you put in", _amt(c["capital"])),
+           _kv("PROFIT", f"{_amt(c['profit'], True)}  {c['profit_pct']:+.2f}%"),
+           "",
+           _kv("the page says", f"{_amt(c['paper_profit'], True)}  "
+                                f"{c['paper_profit_pct']:+.2f}%"),
+           _kv("never reaches you", _amt(-c["gap"], True)),
+           ""]
+    if c.get("sleeves"):
+        out += ["BY SLEEVE", "  put in / in hand / profit", "─" * W]
+        for r in c["sleeves"]:
+            pc = f"{r['profit_pct']:+.2f}%" if r["profit_pct"] is not None else "—"
+            out += [f"  {r['sleeve'][:22]}",
+                    f"    {_amt(r['committed']):>11} -> {_amt(r['in_hand']):>11}  {pc:>8}"]
+        out += ["",
+                "  Tax is one pooled bill for the fiscal year,",
+                "  so the per-sleeve split is its share of the",
+                "  taxable gain, not a separate assessment.",
+                ""]
+    lt, n = c.get("long_term_holdings", 0), c.get("holdings", 0)
+    if lt < n:
+        out += [f"  {n - lt} of {n} holdings are under a year old,",
+                "  so their gain is taxed at 20% short-term.",
+                "  Past 365 days that falls to 12.5% and the",
+                "  first Rs 1,25,000 each year is exempt.",
+                ""]
+    out += ["  The gold and US ETFs are not listed Indian",
+            "  equity: short-term gains on them are taxed at",
+            "  your slab rate, not 20%. This uses 20% for",
+            "  the whole book, so a 30% slab makes the true",
+            "  figure lower than the one above.",
+            "",
+            "  Nothing here sells anything. It is what the",
+            "  headline is worth after the exit is paid for.",
+            "", PAGE]
+    return "\n".join(out)
+
+
 def h_tax(arg=""):
     """What is owed, and which holdings are close to costing less.
 
@@ -1161,6 +1224,7 @@ COMMANDS = [
     ("sector",   "Chart: which industries hold my money", h_sector),
     ("compare",  "This vs the index vs a fixed deposit",  h_compare),
     ("costs",    "What fees and tax have actually taken",  h_costs),
+    ("cashout",  "If you sold today: what you'd keep",     h_cashout),
     ("tax",      "What is owed, and the 365-day line",     h_tax),
     ("clear",    "Delete recent messages: /clear 100",   h_clear),
     ("next",     "When it next re-picks the stocks",     h_next),
@@ -1170,7 +1234,9 @@ COMMANDS = [
 HANDLERS = {n: f for n, _, f in COMMANDS}
 ALIASES = {"status": "update", "pnl": "update", "money": "update",
            "start": "help", "positions": "holdings", "stocks": "holdings", "graph": "chart",
-           "rebalance": "next", "explain": "why", "top": "ranking", "scores": "ranking", "sectors": "sector", "division": "sector", "industry": "sector", "allocation": "sector", "clean": "clear", "fees": "costs", "vs": "compare"}
+           "rebalance": "next", "explain": "why", "top": "ranking", "scores": "ranking", "sectors": "sector", "division": "sector", "industry": "sector", "allocation": "sector", "clean": "clear", "fees": "costs", "vs": "compare",
+           "sell": "cashout", "exit": "cashout", "inhand": "cashout",
+           "liquidate": "cashout", "withdraw": "cashout", "real": "cashout"}
 
 
 # ── dispatch ─────────────────────────────────────────────────────────────
