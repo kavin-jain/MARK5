@@ -93,6 +93,17 @@ data/temp/
 *.parquet
 *.feather
 *.hdf5
+# Price/flow caches. data/bhavcopy, data/cache and data/pit_cache were listed by
+# name and the ones added later never were, so 1.2 GB of cache sat untracked but
+# NOT ignored — one `git add -A` from being committed, which Mandate §7 forbids.
+# Ignore the caches by name here rather than relying on the extension rules
+# above, which cover the file types but not the JSON and directory scaffolding.
+data/fno/
+data/cache_yf/
+data/pit_cache_2007/
+data/fii_dii/
+data/delivery/
+!data/delivery/_nontrading.json
 
 # Databases
 *.db
