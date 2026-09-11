@@ -1,8 +1,8 @@
 {
- "generated": "2026-09-11T17:03:52+00:00",
+ "generated": "2026-09-11T18:31:20+00:00",
  "disclaimer": "PAPER MODE. The live panel is a real-price paper book with no money at risk. The research panel is a historical simulation: real prices, simulated trades. Neither is investment advice.",
  "live": {
-  "generated": "2026-09-11T17:03:51+00:00",
+  "generated": "2026-09-11T18:31:20+00:00",
   "as_of": "2026-09-11",
   "mode": "PAPER \u2014 no real money; all prices, quantities and costs are real",
   "config": {
@@ -104,7 +104,7 @@
      "weight_pct": 52.58729973230124,
      "pnl_inr": 32389.16121704108,
      "nav_impact_pp": 6.477832243408216,
-     "return_pct": 12.800595784671366
+     "return_pct": 11.370895018705474
     },
     {
      "key": "Gold ETF",
@@ -117,7 +117,7 @@
      "weight_pct": 24.249628480599476,
      "pnl_inr": 5945.362883911148,
      "nav_impact_pp": 1.1890725767822297,
-     "return_pct": 5.0193078626565635
+     "return_pct": 5.5732746547465295
     },
     {
      "key": "US Nasdaq-100",
@@ -130,7 +130,7 @@
      "weight_pct": 23.160761941619583,
      "pnl_inr": 3430.5249377441505,
      "nav_impact_pp": 0.6861049875488301,
-     "return_pct": 2.9031610375900962
+     "return_pct": 5.296192416989531
     }
    ],
    "cash_inr": 12.513934662822408,
