@@ -1,5 +1,5 @@
 {
- "generated": "2026-09-29T21:31:57+00:00",
+ "generated": "2026-09-30T17:00:51+00:00",
  "as_of": "2026-09-28",
  "mode": "PAPER \u2014 no real money; all prices, quantities and costs are real",
  "config": {
@@ -101,7 +101,7 @@
     "weight_pct": 52.37243435464596,
     "pnl_inr": 25533.43045837409,
     "nav_impact_pp": 5.106686091674818,
-    "return_pct": 10.086200196637375
+    "return_pct": 11.478789779550237
    },
    {
     "key": "Gold ETF",
@@ -114,7 +114,7 @@
     "weight_pct": 24.609560206032175,
     "pnl_inr": 5220.860320434585,
     "nav_impact_pp": 1.044172064086917,
-    "return_pct": 4.440155231347909
+    "return_pct": 1.703876774967683
    },
    {
     "key": "US Nasdaq-100",
@@ -127,7 +127,7 @@
     "weight_pct": 23.01564831041219,
     "pnl_inr": 143.0844775390724,
     "nav_impact_pp": 0.028616895507814478,
-    "return_pct": 0.20714287196976766
+    "return_pct": 0.12984878400510436
    }
   ],
   "cash_inr": 12.513934662822408,
