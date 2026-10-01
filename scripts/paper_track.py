@@ -668,6 +668,34 @@ def last_recorded_session():
     return pd.Timestamp(max(dates)) if dates else None
 
 
+def read_nav_log() -> list[dict]:
+    """Every recorded NAV row, oldest session first. The one place to read the
+    log AS A TIME SERIES.
+
+    confirm_final() can legitimately settle an older session's mark (a flush)
+    after a newer session already recorded — the price-settling defer exists
+    precisely so a provisional close never gets frozen into the record (see
+    its docstring). That makes the FILE order a mark-CONFIRMATION order, not a
+    session-date order: on 2026-09-30 the 2026-09-29 row was appended AFTER
+    the 2026-09-30 row already in the file. A caller that reads the log with
+    plain csv.DictReader() and assumes row order == date order walks a
+    scrambled series. Confirmed live, not hypothetical: the 2026-09-30T21:32
+    export's own `as_of` field (cmd_export: `hist[-1]["date"]`) published
+    "2026-09-29" alongside a `nav`/`days_live` that were correctly pinned to
+    2026-09-30, and notify.py's "as of" headline picked the same wrong last
+    ROW while its "SINCE" label picked the second-last, publishing a
+    day-over-day change that ran backwards. The max-drawdown walk and the
+    per-sleeve time-weighted-return chain-link have the same ordering
+    assumption and would misstate the headline risk numbers the same way on a
+    future gap, even though this particular gap doesn't happen to land on
+    values that expose it. Sort once, here, so every consumer gets a true
+    time series for free.
+    """
+    if not os.path.exists(NAV_LOG):
+        return []
+    return sorted(csv.DictReader(open(NAV_LOG)), key=lambda r: r["date"])
+
+
 def _load_pending():
     try:
         with open(PENDING) as fh:
@@ -1079,7 +1107,7 @@ def _sleeve_twr(book, led):
     import yfinance as yf
     if not os.path.exists(NAV_LOG):
         return {}
-    hist = [r for r in csv.DictReader(open(NAV_LOG)) if r.get("nav_inr")]
+    hist = [r for r in read_nav_log() if r.get("nav_inr")]
     if len(hist) < 2:
         return {}
     dates = [pd.Timestamp(r["date"]) for r in hist]
@@ -1167,9 +1195,7 @@ def cmd_export():
     # read-only: publishing must never write to the append-only record
     book, nav, ret, days, detail, bench = cmd_status(quiet=True, record=False,
                                                      pin_to_record=True)
-    hist = []
-    if os.path.exists(NAV_LOG):
-        hist = list(csv.DictReader(open(NAV_LOG)))
+    hist = read_nav_log()
     navs = [float(r["nav_inr"]) for r in hist if r.get("nav_inr")]
     peak, mdd = 0.0, 0.0
     for v in navs:
