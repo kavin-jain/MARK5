@@ -1,8 +1,8 @@
 {
- "generated": "2026-10-05T19:55:19+00:00",
+ "generated": "2026-10-05T21:14:55+00:00",
  "disclaimer": "PAPER MODE. The live panel is a real-price paper book with no money at risk. The research panel is a historical simulation: real prices, simulated trades. Neither is investment advice.",
  "live": {
-  "generated": "2026-10-05T19:55:18+00:00",
+  "generated": "2026-10-05T21:14:54+00:00",
   "as_of": "2026-10-01",
   "mode": "PAPER \u2014 no real money; all prices, quantities and costs are real",
   "config": {
