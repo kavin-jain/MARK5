@@ -47,6 +47,11 @@ Everything below is reported with those two facts in force.
 
 **Deployed configuration · survivorship-free universe · 2016-01-01 → 2026-07-21 (10.6 years) · net of Indian tax and costs.**
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/equity-curve-dark.svg">
+  <img src="docs/img/equity-curve-light.svg" width="880" alt="Growth of 1 rupee, weekly, log scale, 2016 to 2026: MARK6 simulated reaches 9.16 rupees and Nifty 50 TRI reaches 3.28 rupees, before the one-off exit tax. The two track closely until 2020, after which MARK6 pulls ahead.">
+</picture>
+
 | Metric | MARK6 (deployed) | Nifty 50 **TRI** B&H |
 |---|---:|---:|
 | Net CAGR | **+21.83%** | +10.95% |
