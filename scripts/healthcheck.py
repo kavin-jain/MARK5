@@ -100,7 +100,21 @@ def main():
         # allow a long weekend: Fri evening -> Mon evening is ~72h
         check("feed refreshed recently", age_h < 96,
               f"{age_h:.0f}h old (generated {feed.get('generated','?')[:16]})", warn=age_h < 120)
+
+        # Read nav_history from the LOCAL feed, not the served one, for the same
+        # reason section 4b compares the standalone page to the local feed: this
+        # script runs right after the commit+push, and the served copy lags by
+        # however long GitHub Pages takes to rebuild (minutes, not always done
+        # by the time this line runs). A session that was just backfilled —
+        # recorded late because its prices were still provisional on the prior
+        # run — is in the committed record this instant but not yet in the
+        # deployed one, which made this exact check FAIL on 2026-10-14/15 for a
+        # session (2026-10-13) that was, in fact, already recorded. The record
+        # on disk is the evidence; the public mirror is just a cache of it.
+        local_feed_path = os.path.join(_ROOT, "docs", "data", "mark6.json")
         nh = feed.get("live", {}).get("nav_history", [])
+        if os.path.exists(local_feed_path):
+            nh = json.load(open(local_feed_path)).get("live", {}).get("nav_history", nh)
         check("nav history is accumulating", len(nh) >= 1, f"{len(nh)} daily marks")
         dates = [r.get("date") for r in nh]
         check("no duplicate days in nav history", len(dates) == len(set(dates)),
